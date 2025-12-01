@@ -1873,6 +1873,32 @@ input[type="number"] {
   }
 }
 
+.guaranteed-label{
+  font-size: 10px;
+  color:var(--secondary-text);
+  border:1px solid var(--success-green);
+  border-radius:8px;
+  padding:1px 6px;
+  width: 80%;
+  margin: auto;
+  margin-bottom: 4px;
+  display:flex;
+  align-items: center;
+  justify-items: center;
+}
+.remaining-stock-label{
+ font-size: 10px;
+  color:var(--secondary-text);
+  border:1px solid var(--warm-beige);
+  border-radius:8px;
+  padding:1px 6px;
+  width: 60%;
+  margin: auto;
+  margin-bottom: 4px;
+  display:flex;
+  align-items: center;
+  justify-items: center;
+}
 /* .sticky-menu-header {
   position: sticky;
   top: 80px; 

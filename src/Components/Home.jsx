@@ -35,8 +35,8 @@ import DateSessionSelector from "./DateSessionSelector";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const navigate = useNavigate();
-  const location = useLocation(); 
-  
+  const location = useLocation();
+
   const { wallet, transactions, loading, walletSeting, getorderByCustomerId } =
     useContext(WalletContext);
 
@@ -72,28 +72,28 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
     );
   };
- const [address, setAddress] = useState(() => {
+  const [address, setAddress] = useState(() => {
     // Priority 1: Address passed from "Add More"
     if (location.state?.overrideAddress) {
-        return location.state.overrideAddress;
+      return location.state.overrideAddress;
     }
     // Priority 2: localStorage
     return JSON.parse(
-      localStorage.getItem("primaryAddress")??
-      localStorage.getItem("currentLocation") 
+      localStorage.getItem("primaryAddress") ??
+        localStorage.getItem("currentLocation")
     );
-});
+  });
 
-// Also update your selectedDate/Session initialization (you might have done this already)
-const [selectedDate, setSelectedDate] = useState(() => {
+  // Also update your selectedDate/Session initialization (you might have done this already)
+  const [selectedDate, setSelectedDate] = useState(() => {
     if (location.state?.targetDate) return new Date(location.state.targetDate);
     return getNormalizedToday();
-});
+  });
 
-const [selectedSession, setSelectedSession] = useState(() => {
+  const [selectedSession, setSelectedSession] = useState(() => {
     if (location.state?.targetSession) return location.state.targetSession;
     return "Lunch";
-});
+  });
   const [allHubMenuData, setAllHubMenuData] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   // const [isMultiCartOpen, setIsMultiCartOpen] = useState(false);
@@ -118,7 +118,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
       setloader(true);
       try {
         const res = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
+          "http://localhost:7013/api/user/get-hub-menu",
           {
             params: {
               hubId: address.hubId, // Only need hubId
@@ -218,7 +218,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
 
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItemsUnBlocks"
+        "http://localhost:7013/api/admin/getFoodItemsUnBlocks"
       );
       if (res.status === 200) {
         setfooditemdata(res.data.data);
@@ -356,7 +356,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
 
     const addonedCarts = async () => {
       try {
-        let res = await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
+        let res = await axios.post("http://localhost:7013/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
           lastUpdated: Date.now,
@@ -896,7 +896,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
         addressDetails: addressDetails,
       });
       const res = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/add-to-plan",
+        "http://localhost:7013/api/user/plan/add-to-plan",
         {
           userId: user._id,
           mobile: user.Mobile,
@@ -974,7 +974,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
 
       if (user?._id && location) {
         const response = await axios.put(
-          "https://dd-merge-backend-2.onrender.com/api/admin/getuseroffer",
+          "http://localhost:7013/api/admin/getuseroffer",
           {
             id: user._id,
             location,
@@ -1127,7 +1127,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -1221,7 +1221,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1679,34 +1679,21 @@ const [selectedSession, setSelectedSession] = useState(() => {
                           </div>
 
                           {address && (
-                            <div className="parentdivqty">
-                              <div className="h-100 d-flex justify-content-center align-items-center">
-                                <span
-                                  style={{
-                                    background:
-                                      matchedLocation?.Remainingstock &&
-                                      "rgba(255, 179, 0, 0.25)",
-                                  }}
-                                >
-                                  {isPreOrder && (
-                                    <div
-                                      className="guaranteed-label"
-                                      style={{
-                                        fontSize: 11,
-                                        color: "#6B8E23",
-                                        fontWeight: 600,
-                                      }}
-                                    >
-                                      {" "}
-                                      Guaranteed Availability{" "}
-                                    </div>
-                                  )}
-                                  {checkOf && <BiSolidOffer color="green" />}
-                                  {!isPreOrder &&
-                                    `${matchedLocation?.Remainingstock || 0}
-                                  servings Left`}
-                                </span>
-                              </div>
+                            <div>
+                              {isPreOrder && (
+                                <div className="guaranteed-label">
+                                  Guaranteed Availability{" "}
+                                </div>
+                              )}
+                              {checkOf && <BiSolidOffer color="green" />}
+                              {!isPreOrder && (
+                                <div className="remaining-stock-label">
+ {`${
+                                    matchedLocation?.Remainingstock || 0
+                                  } servings Left`}
+                                </div>
+                              )}
+                              {/* </div> */}
                             </div>
                           )}
 
@@ -1747,12 +1734,13 @@ const [selectedSession, setSelectedSession] = useState(() => {
                                   {isPreOrder ? (
                                     <span className="add-to-cart-btn-text">
                                       Pick
-                                      <br /> {`for ${
-    new Date(item.deliveryDate).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'short'
-    })
-  }`}
+                                      <br />{" "}
+                                      {`for ${new Date(
+                                        item.deliveryDate
+                                      ).toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                      })}`}
                                     </span>
                                   ) : (
                                     <span className="add-to-cart-btn-text">
@@ -2111,10 +2099,8 @@ const [selectedSession, setSelectedSession] = useState(() => {
                                   style={{ marginRight: "5px" }}
                                 />
                               )}{" "}
-                                  {!isPreOrderDrawer &&
-                                  `${stockCount} servings left!`
-                                  }
-                              
+                              {!isPreOrderDrawer &&
+                                `${stockCount} servings left!`}
                             </>
                           ) : (
                             "Sold Out"
