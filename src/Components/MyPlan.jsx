@@ -15,7 +15,7 @@ import myplanseparator from "./../assets/myplanseparator.png";
 import myplanskip from "./../assets/myplanskip.png";
 import myplancancel2 from "./../assets/myplancancelicon.png";
 // import myplanblackedit from "./../assets/myplanblackedit.png";
-
+import BottomNav from "./BottomNav";
 import "../Styles/MyPlan.css";
 
 const formatDate = (isoString) => {
@@ -1278,6 +1278,7 @@ const MyPlan = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <BottomNav />
     </div>
   );
 };
