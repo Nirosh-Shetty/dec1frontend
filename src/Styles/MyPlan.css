@@ -855,4 +855,8 @@ padding: 0 10px;
   /* margin: 0 auto; */
   width: 33vw;
 }
+.plan-modal-overlay{
+  width: 33vw;
+  margin: 0 auto;
+}
 }
