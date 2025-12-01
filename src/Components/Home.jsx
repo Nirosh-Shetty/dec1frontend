@@ -1620,14 +1620,14 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           {item?.foodTags && (
                             <div className="food-tag-container">
                               {item.foodTags.map((tag) => (
-                                <div
+                                <span
                                   className="food-tag-pill"
                                   style={{
                                     backgroundColor: tag.tagColor,
                                   }}
                                 >
                                   {tag.tagName}
-                                </div>
+                                </span>
                               ))}
                             </div>
                           )}
@@ -1732,9 +1732,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                   }}
                                 >
                                   {isPreOrder ? (
-                                    <span className="add-to-cart-btn-text">
-                                      Pick
-                                      <br />{" "}
+                                    <div className="pick-btn-text">
+                                    <span className="pick-btn-text1">
+                                      PICK
+                                    </span>
+                                    <span className="pick-btn-text2">
                                       {`for ${new Date(
                                         item.deliveryDate
                                       ).toLocaleDateString("en-GB", {
@@ -1742,6 +1744,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                         month: "short",
                                       })}`}
                                     </span>
+                                    </div>
                                   ) : (
                                     <span className="add-to-cart-btn-text">
                                       Add
