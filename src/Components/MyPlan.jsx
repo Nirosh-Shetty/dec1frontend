@@ -1008,8 +1008,8 @@ const MyPlan = () => {
                             Cancel
                           </button>
                         )}
-                        {/* {isPaidLocked && ( */}
-                        {true && (
+                        {isPaidLocked && (
+                        // {true && (
                           <button
                             className="track-order-btn"
                             onClick={() => handleTrackOrder(plan)}
