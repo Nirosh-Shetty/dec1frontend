@@ -117,7 +117,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
       setloader(true);
       try {
         const res = await axios.get(
-          "http://localhost:7013/api/user/get-hub-menu",
+          "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
           {
             params: {
               hubId: address.hubId, // Only need hubId
@@ -217,7 +217,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
 
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getFoodItemsUnBlocks"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItemsUnBlocks"
       );
       if (res.status === 200) {
         setfooditemdata(res.data.data);
@@ -355,7 +355,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
 
     const addonedCarts = async () => {
       try {
-        let res = await axios.post("http://localhost:7013/api/cart/addCart", {
+        let res = await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
           lastUpdated: Date.now,
@@ -895,7 +895,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
         addressDetails: addressDetails,
       });
       const res = await axios.post(
-        "http://localhost:7013/api/user/plan/add-to-plan",
+        "https://dd-merge-backend-2.onrender.com/api/user/plan/add-to-plan",
         {
           userId: user._id,
           mobile: user.Mobile,
@@ -973,7 +973,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
 
       if (user?._id && location) {
         const response = await axios.put(
-          "http://localhost:7013/api/admin/getuseroffer",
+          "https://dd-merge-backend-2.onrender.com/api/admin/getuseroffer",
           {
             id: user._id,
             location,
@@ -1126,7 +1126,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -1220,7 +1220,7 @@ const [selectedSession, setSelectedSession] = useState(() => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,

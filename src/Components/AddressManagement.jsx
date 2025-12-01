@@ -70,7 +70,7 @@
 //       }
 
 //       const response = await fetch(
-//         `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: getAuthHeaders(),
@@ -132,7 +132,7 @@
 //       }
 
 //       const response = await fetch(
-//         `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressId}`,
 //         {
 //           method: "DELETE",
 //           headers: getAuthHeaders(),
@@ -176,7 +176,7 @@
 //       }
 
 //       const response = await fetch(
-//         `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressId}/primary`,
 //         {
 //           method: "PATCH",
 //           headers: getAuthHeaders(),
@@ -214,7 +214,7 @@
 //       }
 
 //       const response = await fetch(
-//         `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
 //         {
 //           method: "PATCH",
 //           headers: getAuthHeaders(),
@@ -705,7 +705,7 @@ const AddressManagement = () => {
   const fetchAddressesInBackground = useCallback(async (customerId) => {
     try {
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -774,7 +774,7 @@ const AddressManagement = () => {
       fetchAbortControllerRef.current = new AbortController();
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -858,7 +858,7 @@ const AddressManagement = () => {
       }
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressId}`,
         {
           method: "DELETE",
           headers: getAuthHeaders(),
@@ -948,7 +948,7 @@ const AddressManagement = () => {
 
       // API call in background
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: getAuthHeaders(),
@@ -1008,7 +1008,7 @@ const AddressManagement = () => {
 
       // API call in background
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: getAuthHeaders(),

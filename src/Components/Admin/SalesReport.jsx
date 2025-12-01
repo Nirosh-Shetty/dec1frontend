@@ -68,7 +68,7 @@ const SalesReport = () => {
   //   setLoading(true);
   //   try {
   //     const res = await axios.get(
-  //       "http://localhost:7013/api/admin/getFoodItems"
+  //       "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems"
   //     );
   //     if (res.status === 200) {
   //       setProducts(res.data.data);
@@ -110,7 +110,7 @@ const SalesReport = () => {
       params.append("sortOrder", sortOrder);
 
       const res = await axios.get(
-        `http://localhost:7013/api/admin/getSalesReport?${params.toString()}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/getSalesReport?${params.toString()}`
       );
       if (res.status === 200) {
         setFilteredData(res.data.data);
@@ -125,7 +125,7 @@ const SalesReport = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
+      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${"token"}` },
       });
       setHubs(res.data);

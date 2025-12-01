@@ -162,7 +162,7 @@ const LocationModal = ({ show, onClose,onAddressSelected  }) => {
   const fetchAddressesInBackground = async (customerId) => {
     try {
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         { method: "GET", headers: { "Content-Type": "application/json" } }
       );
 
@@ -223,7 +223,7 @@ const LocationModal = ({ show, onClose,onAddressSelected  }) => {
       fetchAbortControllerRef.current = new AbortController();
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -427,7 +427,7 @@ navigate("/location", { state: { editingAddress: address } });
       }
 
       fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -495,7 +495,7 @@ navigate("/location", { state: { editingAddress: address } });
         onClose();
 
         const response = await fetch(
-          `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -683,7 +683,7 @@ navigate("/location", { state: { editingAddress: address } });
 
       console.log("Final address data being sent:", addressData);
 
-      const response = await fetch("http://localhost:7013/api/User/addresses", {
+      const response = await fetch("https://dd-merge-backend-2.onrender.com/api/User/addresses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -704,7 +704,7 @@ navigate("/location", { state: { editingAddress: address } });
       // Set as primary address in backend
       try {
         const primaryResponse = await fetch(
-          `http://localhost:7013/api/User/customers/${customerId}/addresses/${newAddress._id}/primary`,
+          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${newAddress._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

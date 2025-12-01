@@ -91,7 +91,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/registercustomer",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -144,7 +144,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -169,7 +169,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -479,7 +479,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
                       <>
                         {user?.profileImage ? (
                           <img
-                            src={`http://localhost:7013/Customer/${user?.profileImage}`}
+                            src={`https://dd-merge-backend-2.onrender.com/Customer/${user?.profileImage}`}
                             alt=""
                             style={{ width: "50px", borderRadius: "50%" }}
                           />

@@ -21,7 +21,7 @@
 // import moment from "moment";
 // import { BsSearch } from "react-icons/bs";
 
-// const socket = io("http://localhost:7013/", {
+// const socket = io("https://dd-merge-backend-2.onrender.com/", {
 //   reconnection: true, // Enable reconnection
 //   reconnectionAttempts: 5, // Retry up to 5 times
 //   reconnectionDelay: 1000, // Start with 1-second delay
@@ -75,7 +75,7 @@
 //     setLoading(true);
 //     try {
 //       const orderResponse = await axios.get(
-//         "http://localhost:7013/api/admin/getPackerOrders",
+//         "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -185,7 +185,7 @@
 //         }
 //       }
 //       const orderResponse = await axios.get(
-//         "http://localhost:7013/api/admin/getPackerOrders",
+//         "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -219,7 +219,7 @@
 
 //       // Fetch drivers
 //       setLocations([...new Set(allorder.map((ele) => ele?.delivarylocation))]);
-//       // const driverResponse = await axios.get('http://localhost:7013/api/admin/getDrivers');
+//       // const driverResponse = await axios.get('https://dd-merge-backend-2.onrender.com/api/admin/getDrivers');
 //       // setDrivers(driverResponse.data);
 //       setLoading(false);
 //     } catch (error) {
@@ -243,7 +243,7 @@
 
 //   const getBegs = async () => {
 //     try {
-//       let res = await axios.get("http://localhost:7013/api/admin/getbags");
+//       let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
 //       if (res.status == 200) {
 //         setAllBags(res.data.bags);
 //       }
@@ -255,7 +255,7 @@
 //   const getAllReason = async () => {
 //     try {
 //       let res = await axios.get(
-//         "http://localhost:7013/api/admin/getdelayreasons"
+//         "https://dd-merge-backend-2.onrender.com/api/admin/getdelayreasons"
 //       );
 //       if (res.status == 200) {
 //         setAllReason(
@@ -699,7 +699,7 @@
 //     setLoading(true);
 //     try {
 //       const response = await axios.put(
-//         `http://localhost:7013/api/admin/updatePackerOrder`,
+//         `https://dd-merge-backend-2.onrender.com/api/admin/updatePackerOrder`,
 //         updatedData,
 //         {
 //           headers: {
@@ -2223,7 +2223,7 @@ import io from "socket.io-client";
 import moment from "moment";
 import { BsSearch } from "react-icons/bs";
 
-const socket = io("http://localhost:7013/", {
+const socket = io("https://dd-merge-backend-2.onrender.com/", {
   reconnection: true, // Enable reconnection
   reconnectionAttempts: 5, // Retry up to 5 times
   reconnectionDelay: 1000, // Start with 1-second delay
@@ -2330,7 +2330,7 @@ const DashboardPage = () => {
     setLoading(true);
     try {
       const orderResponse = await axios.get(
-        "http://localhost:7013/api/admin/getPackerOrders",
+        "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -2432,7 +2432,7 @@ const DashboardPage = () => {
         }
       }
       const orderResponse = await axios.get(
-        "http://localhost:7013/api/admin/getPackerOrders",
+        "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -2486,7 +2486,7 @@ const DashboardPage = () => {
 
   const getBegs = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getbags");
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
       if (res.status == 200) {
         setAllBags(res.data.bags);
       }
@@ -2498,7 +2498,7 @@ const DashboardPage = () => {
   const getAllReason = async () => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getdelayreasons"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getdelayreasons"
       );
       if (res.status == 200) {
         setAllReason(
@@ -2578,7 +2578,7 @@ const DashboardPage = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:7013/api/packer/packing")
+    fetch("https://dd-merge-backend-2.onrender.com/api/packer/packing")
       .then((res) => res.json())
       .then((data) => setPackingStats(data.data));
 
@@ -2941,7 +2941,7 @@ const DashboardPage = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://localhost:7013/api/admin/updatePackerOrder`,
+        `https://dd-merge-backend-2.onrender.com/api/admin/updatePackerOrder`,
         updatedData,
         {
           headers: {

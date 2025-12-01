@@ -160,7 +160,7 @@ const CorporateList = () => {
       const config = {
         url: "/admin/addcorporate",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -206,7 +206,7 @@ const CorporateList = () => {
   const getAddCorporate = async () => {
     try {
       setLoading(true);
-      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcorporate");
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
         setNoChangeData(res.data.corporatedata);
@@ -225,7 +225,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/deletecorporate/" + Data,
         method: "delete",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -306,7 +306,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/updatecorporatelist",
         method: "put",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         headers: {
           "Content-Type": "multipart/form-data",
         },

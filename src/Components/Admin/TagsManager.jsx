@@ -13,7 +13,7 @@ const TagsManager = () => {
 
     const load = async () => {
         try {
-            const res = await axios.get('http://localhost:7013/api/admin/food-tags');
+            const res = await axios.get('https://dd-merge-backend-2.onrender.com/api/admin/food-tags');
             setTags(res.data.data || []);
         } catch (e) { console.error(e); }
     };
@@ -23,7 +23,7 @@ const TagsManager = () => {
     const createTag = async () => {
         try {
             if (!name) return alert('Tag name required');
-            await axios.post('http://localhost:7013/api/admin/food-tags', { tagName: name, description: desc, tagColor: color });
+            await axios.post('https://dd-merge-backend-2.onrender.com/api/admin/food-tags', { tagName: name, description: desc, tagColor: color });
             setName(''); setDesc(''); setColor(''); setShow(false); load();
         } catch (e) { alert(e.response?.data?.error || 'Error'); }
     };
@@ -34,14 +34,14 @@ const TagsManager = () => {
 
     const saveEdit = async () => {
         try {
-            await axios.put(`http://localhost:7013/api/admin/food-tags/${editing._id}`, { tagName: name, description: desc, tagColor: color });
+            await axios.put(`https://dd-merge-backend-2.onrender.com/api/admin/food-tags/${editing._id}`, { tagName: name, description: desc, tagColor: color });
             setEditShow(false); setEditing(null); setName(''); setDesc(''); setColor(''); load();
         } catch (e) { alert(e.response?.data?.error || 'Error'); }
     };
 
     const deleteTag = async (id) => {
         // if (!confirm('Delete this tag?')) return;
-        try { await axios.delete(`http://localhost:7013/api/admin/food-tags/${id}`); load(); } catch (e) { alert('Error deleting'); }
+        try { await axios.delete(`https://dd-merge-backend-2.onrender.com/api/admin/food-tags/${id}`); load(); } catch (e) { alert('Error deleting'); }
     };
 
     return (

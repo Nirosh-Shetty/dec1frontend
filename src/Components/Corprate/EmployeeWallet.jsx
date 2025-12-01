@@ -29,7 +29,7 @@ const CorparateWallet = () => {
   const getCorporateWallet = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:7013/api/wallet/getAllWalletCompsny/${corparate._id}`
+        `https://dd-merge-backend-2.onrender.com/api/wallet/getAllWalletCompsny/${corparate._id}`
       );
       setAllWallet(response.data);
     } catch (error) {
@@ -119,8 +119,8 @@ const CorparateWallet = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "http://localhost:7013/api/wallet/add-free-cash"
-          : "http://localhost:7013/api/wallet/deduct-cash",
+          ? "https://dd-merge-backend-2.onrender.com/api/wallet/add-free-cash"
+          : "https://dd-merge-backend-2.onrender.com/api/wallet/deduct-cash",
         {
           userId: selectedWallet?.userId?._id,
           amount: amount,

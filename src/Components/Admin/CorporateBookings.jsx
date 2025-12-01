@@ -102,7 +102,7 @@ const CorporateBookings = () => {
       };
 
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getallordersfilter",
+        "https://dd-merge-backend-2.onrender.com/api/admin/getallordersfilter",
         { params }
       );
 
@@ -128,7 +128,7 @@ const CorporateBookings = () => {
   // Fetch Hubs (from original)
   const getHubs = async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
       setHubs(res.data);
     } catch (error) {
       console.error("Failed to fetch hubs:", error);
@@ -175,7 +175,7 @@ const CorporateBookings = () => {
     try {
       setLoading(true);
       let res = await axios.delete(
-        `http://localhost:7013/api/admin/deletefoodorder/${data}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/deletefoodorder/${data}`
       );
       if (res) {
         Swal.fire("Success", "Booking deleted", "success");
@@ -196,7 +196,7 @@ const CorporateBookings = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { newStatus: statusdata },
       };
@@ -233,7 +233,7 @@ const CorporateBookings = () => {
       const config = {
         url: "/admin/updateMultipleOrderStatus",
         method: "put",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: {
           status: filters.status,
@@ -260,7 +260,7 @@ const CorporateBookings = () => {
       };
 
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getallordersfilter",
+        "https://dd-merge-backend-2.onrender.com/api/admin/getallordersfilter",
         { params }
       );
 

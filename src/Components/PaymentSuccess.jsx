@@ -24,7 +24,7 @@ const PaymentSuccess = () => {
   const checkPaymentStatus = async () => {
     try {
       // Construct API endpoint
-      const url = `http://localhost:7013/api/User/checkPayment/${transactionId}/${userId}`;
+      const url = `https://dd-merge-backend-2.onrender.com/api/User/checkPayment/${transactionId}/${userId}`;
 
       // Make the GET request
       const response = await axios.get(url);

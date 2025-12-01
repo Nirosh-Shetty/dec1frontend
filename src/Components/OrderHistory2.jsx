@@ -61,7 +61,7 @@ const OrderHistory = () => {
   const getorders = async (id) => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getallordersbyUserId/" +
+        "https://dd-merge-backend-2.onrender.com/api/admin/getallordersbyUserId/" +
           id
       );
       if (res.status === 200) {
@@ -100,8 +100,8 @@ const OrderHistory = () => {
       const config = {
         url: "/admin/addfoodorder",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           customerId: user?._id,

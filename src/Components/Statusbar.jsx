@@ -17,7 +17,7 @@ const Statusbar = () => {
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("http://localhost:7013/api/admin/getstories");
+        let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getstories");
         if (res.status === 200) {
           const stories = res.data.getbanner.reverse(); // Adjust order if needed
           setAddWebstory(stories);

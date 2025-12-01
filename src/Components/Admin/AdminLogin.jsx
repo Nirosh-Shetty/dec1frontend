@@ -25,7 +25,7 @@ function AdminLogin() {
       const config = {
         url: "/admin/adminLogin",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: { REmail: REmail, RPassword: RPassword },
       };

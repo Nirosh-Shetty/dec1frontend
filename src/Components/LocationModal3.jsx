@@ -102,7 +102,7 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: {
@@ -215,7 +215,7 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
         {
           method: "PATCH",
           headers: {

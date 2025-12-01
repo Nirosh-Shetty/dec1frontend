@@ -69,7 +69,7 @@ const HubList = () => {
   const getCorporateLocations = useCallback(async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getcorporate",
+        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -87,7 +87,7 @@ const HubList = () => {
   const getApartmentLocations = useCallback(async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getapartment",
+        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -129,7 +129,7 @@ const HubList = () => {
   const getHubs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
+      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setHubs(res.data);
@@ -161,7 +161,7 @@ const HubList = () => {
     setAddHubLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:7013/api/Hub/hubs",
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs",
         {
           hubName: newHub.hubName.trim(),
           locations: newHub.locations,
@@ -205,7 +205,7 @@ const HubList = () => {
         payload.geometry = editHub.geometry;
       }
       const res = await axios.put(
-        `http://localhost:7013/api/Hub/hubs/${editHub.hubId}`,
+        `https://dd-merge-backend-2.onrender.com/api/Hub/hubs/${editHub.hubId}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -229,7 +229,7 @@ const HubList = () => {
     setDeleteHubLoading(true);
     try {
       const res = await axios.delete(
-        `http://localhost:7013/api/Hub/hubs/${selectedHub.hubId}`,
+        `https://dd-merge-backend-2.onrender.com/api/Hub/hubs/${selectedHub.hubId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

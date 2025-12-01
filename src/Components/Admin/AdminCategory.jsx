@@ -18,7 +18,7 @@ const AdminCategory = () => {
   const fetchMenuCategories = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/menuCategory/getmenucategory"
+        "https://dd-merge-backend-2.onrender.com/api/admin/menuCategory/getmenucategory"
       );
       setMenuCategories(res.data.categories);
       console.log(res, "categoriessssssssssssssssssssssssssssssss");
@@ -31,7 +31,7 @@ const AdminCategory = () => {
   const fetchPackersCategories = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getcategory"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getcategory"
       );
       setPackersCategories(res.data.categories);
     } catch (error) {
@@ -50,7 +50,7 @@ const AdminCategory = () => {
     try {
       if (menuEditId) {
         await axios.put(
-          `http://localhost:7013/api/admin/menuCategory/updatemenucategory/${menuEditId}`,
+          `https://dd-merge-backend-2.onrender.com/api/admin/menuCategory/updatemenucategory/${menuEditId}`,
           {
             menuCategory: menuCategoryName,
           }
@@ -58,7 +58,7 @@ const AdminCategory = () => {
         setMenuEditId(null);
       } else {
         await axios.post(
-          "http://localhost:7013/api/admin/menuCategory/addmenucategory",
+          "https://dd-merge-backend-2.onrender.com/api/admin/menuCategory/addmenucategory",
           {
             menuCategory: menuCategoryName,
           }
@@ -75,7 +75,7 @@ const AdminCategory = () => {
   const handleMenuDelete = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:7013/api/admin/menuCategory/deletemenucategory/${id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/menuCategory/deletemenucategory/${id}`
       );
       fetchMenuCategories();
     } catch (error) {
@@ -95,14 +95,14 @@ const AdminCategory = () => {
     try {
       if (packersEditId) {
         await axios.put(
-          `http://localhost:7013/api/admin/updatecategory/${packersEditId}`,
+          `https://dd-merge-backend-2.onrender.com/api/admin/updatecategory/${packersEditId}`,
           {
             CategoryName: packersCategoryName,
           }
         );
         setPackersEditId(null);
       } else {
-        await axios.post("http://localhost:7013/api/admin/addcategory", {
+        await axios.post("https://dd-merge-backend-2.onrender.com/api/admin/addcategory", {
           CategoryName: packersCategoryName,
         });
       }
@@ -117,7 +117,7 @@ const AdminCategory = () => {
   const handlePackersDelete = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:7013/api/admin/deletecategory/${id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/deletecategory/${id}`
       );
       fetchPackersCategories();
     } catch (error) {

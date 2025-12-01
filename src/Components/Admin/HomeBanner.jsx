@@ -43,7 +43,7 @@ const HomeBanner = () => {
       const config = {
         url: "/admin/banner",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -62,7 +62,7 @@ const HomeBanner = () => {
   const [AddBanner, setAddBanner] = useState([]);
   const getAddBanner = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getbanner");
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbanner");
       if (res.status === 200) {
         setAddBanner(res.data.getbanner);
       }
@@ -78,7 +78,7 @@ const HomeBanner = () => {
       const config = {
         url: "admin/Deletebanner/" + Data,
         method: "delete",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -117,7 +117,7 @@ const HomeBanner = () => {
       const config = {
         url: "admin/editbanner",
         method: "put",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };

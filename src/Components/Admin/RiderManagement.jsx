@@ -53,7 +53,7 @@ const RiderManagement = () => {
   const fetchHubOptions = async () => {
     try {
       setHubLoading(true);
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
       if (res.status === 200) {
         setHubOptions(res.data || []);
       }
@@ -76,7 +76,7 @@ const RiderManagement = () => {
     try {
       if (opts.showLoader) setLoading(true);
       const res = await axios.get(
-        "http://localhost:7013/api/admin/riders",
+        "https://dd-merge-backend-2.onrender.com/api/admin/riders",
         {
           params: {
             status: statusFilter,
@@ -164,7 +164,7 @@ const RiderManagement = () => {
       delete payload.licenseNumber;
 
       const baseConfig = {
-        baseURL: "http://localhost:7013/api/admin",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/admin",
         headers: { "Content-Type": "application/json" },
       };
 
@@ -212,7 +212,7 @@ const RiderManagement = () => {
     if (!selectedRider?._id) return;
     try {
       const res = await axios.delete(
-        `http://localhost:7013/api/admin/riders/${selectedRider._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/riders/${selectedRider._id}`
       );
       if (res.status === 200) {
         alert("Rider removed successfully");

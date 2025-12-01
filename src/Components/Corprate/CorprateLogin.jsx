@@ -20,7 +20,7 @@ function CorporateLogin() {
       const config = {
         url: "/admin/Loginwithotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: { mobile: mobileNumber },
       };
@@ -52,7 +52,7 @@ function CorporateLogin() {
       const config = {
         url: "/admin/verifyOtpCorprate",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: { mobile: mobileNumber, otp: otp },
       };

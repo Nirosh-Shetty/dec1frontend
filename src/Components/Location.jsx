@@ -327,7 +327,7 @@ const LocationConfirmation = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "http://localhost:7013/api/Hub/validate-location",
+        "https://dd-merge-backend-2.onrender.com/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -1148,7 +1148,7 @@ const LocationConfirmation = () => {
       console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
-        "http://localhost:7013/api/service-requests",
+        "https://dd-merge-backend-2.onrender.com/api/service-requests",
         requestData,
         {
           headers: {
@@ -1336,8 +1336,8 @@ const LocationConfirmation = () => {
       }
 
       const endpoint = location.state?.editingAddress?._id
-        ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-        : "http://localhost:7013/api/User/addresses";
+        ? `https://dd-merge-backend-2.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+        : "https://dd-merge-backend-2.onrender.com/api/User/addresses";
       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
       const response = await fetch(endpoint, {

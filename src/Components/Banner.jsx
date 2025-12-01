@@ -103,7 +103,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -191,7 +191,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getapartmentd = async () => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getapartment"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment"
       );
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
@@ -209,7 +209,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getcorporate = async () => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getcorporate"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate"
       );
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
@@ -229,7 +229,7 @@ const Banner = ({ Carts, getAllOffer }) => {
     const getAddWebstory = async () => {
       try {
         let res = await axios.get(
-          "http://localhost:7013/api/admin/getstories"
+          "https://dd-merge-backend-2.onrender.com/api/admin/getstories"
         );
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
@@ -327,7 +327,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       const config = {
         url: "User/EnquiryEnquiry",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           Name: Name,
@@ -370,7 +370,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -418,7 +418,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getSelectedAddress = async () => {
     try {
       let res = await axios.get(
-        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
+        `https://dd-merge-backend-2.onrender.com/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
       );
       if (res.status === 200) {
         setSelectedAddress(res.data.getdata);
@@ -458,7 +458,7 @@ const Banner = ({ Carts, getAllOffer }) => {
     try {
       if (!user) return;
       let res = await axios.post(
-        `http://localhost:7013/api/user/addressadd`,
+        `https://dd-merge-backend-2.onrender.com/api/user/addressadd`,
         {
           Name: user?.Fname,
           Number: user?.Mobile,
@@ -514,7 +514,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       }
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
