@@ -1053,7 +1053,7 @@ const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                           alt=""
                           style={{ width: 16, height: 16 }}
                         />
-                        <div className="location-text">
+                        <div className="plan-location-text">
                           <h1 className="addressLine1">
                             {plan?.addressType === "Home"
                               ? plan?.homeName || "Home"
