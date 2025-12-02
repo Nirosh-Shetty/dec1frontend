@@ -467,7 +467,7 @@ const ViewPlanModal = ({
                 </div>
 
                 {/* Change Button */}
-                <div className="change-button">
+                {/* <div className="change-button">
                   <div className="change-icon">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -495,7 +495,7 @@ const ViewPlanModal = ({
                       </span>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <img className="separator-line" src={myplanseparator} alt="" />
@@ -953,7 +953,7 @@ const MyPlan = () => {
                               ? plan?.apartmentName || "PG"
                               : plan?.addressType === "School"
                               ? plan?.schoolName || "School"
-                              : plan?.addressType === "Company"
+                              : plan?.addressType === "Work"
                               ? plan?.companyName || "Company"
                               : "Unknown"}
                           </h1>
