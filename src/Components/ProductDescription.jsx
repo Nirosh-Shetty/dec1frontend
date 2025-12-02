@@ -61,7 +61,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
   const getAddproducts = async () => {
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/admin/product"
+        "https://dailydish-backend.onrender.com/api/admin/admin/product"
       );
       if (res.status === 200) {
         setAddproducts(res.data.products);
@@ -109,7 +109,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
         const config = {
           url: "/addcart/Addtocart",
           method: "post",
-          baseURL: "https://dd-merge-backend-2.onrender.com/api",
+          baseURL: "https://dailydish-backend.onrender.com/api",
           data: {
             productId: item._id,
             customerId: user._id,
@@ -146,7 +146,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
       const config = {
         url: "/addcart/deletecart",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: {
           productId: item?.productId?._id, // Update this to match the actual productId
@@ -170,7 +170,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
       const config = {
         url: "/priceIncAnddec",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/addcart",
+        baseURL: "https://dailydish-backend.onrender.com/api/addcart",
         headers: { "conten-type": "application/json" },
         data: {
           cartId: items?._id,
@@ -194,7 +194,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
         const config = {
           url: "/priceIncAnddec",
           method: "put",
-          baseURL: "https://dd-merge-backend-2.onrender.com/api/addcart",
+          baseURL: "https://dailydish-backend.onrender.com/api/addcart",
           headers: { "conten-type": "application/json" },
           data: {
             cartId: items?._id,
@@ -218,7 +218,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
 
   const getCatrDeatils = () => {
     axios
-      .get("https://dd-merge-backend-2.onrender.com/api/addcart/getcart/" + user?._id)
+      .get("https://dailydish-backend.onrender.com/api/addcart/getcart/" + user?._id)
       .then(function (response) {
         setCarts(response.data.success);
         setCartstatus(response.data.success);

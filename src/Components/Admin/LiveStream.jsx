@@ -49,7 +49,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/Livestream",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -73,7 +73,7 @@ const Livestreams = () => {
   const getAddLivestream = async () => {
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getLivestream"
+        "https://dailydish-backend.onrender.com/api/admin/getLivestream"
       );
       if (res.status === 200) {
         // Sort by date (updatedAt or other date field) or ObjectId (_id)
@@ -94,7 +94,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/DeleteLivestream/" + Datav,
         method: "delete",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -130,7 +130,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/editLivestream",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };

@@ -51,7 +51,7 @@ function Bag() {
       const config = {
         url: "admin/addbag",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { bagNo },
       };
@@ -76,7 +76,7 @@ function Bag() {
       const config = {
         url: `admin/updatebag/${editData._id}`,
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { bagNo },
       };
@@ -94,7 +94,7 @@ function Bag() {
 
   const getBags = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
+      let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getbags");
       if (res.status === 200) {
         setBagList(res.data.bags.reverse());
         setNoChangeData(res.data.bags.reverse());
@@ -107,7 +107,7 @@ function Bag() {
   const deleteBag = async () => {
     try {
       let res = await axios.delete(
-        `https://dd-merge-backend-2.onrender.com/api/admin/deletebag/${delData._id}`
+        `https://dailydish-backend.onrender.com/api/admin/deletebag/${delData._id}`
       );
       if (res.status === 200) {
         alert("Bag Deleted Successfully");

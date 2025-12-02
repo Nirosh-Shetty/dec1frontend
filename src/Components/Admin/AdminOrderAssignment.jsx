@@ -116,7 +116,7 @@ const AdminOrderAssignment = () => {
   const fetchRiders = useCallback(async () => {
     try {
       setIsRidersLoading(true);
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/riders");
+      const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/riders");
       if (Array.isArray(res.data?.riders)) {
         setAvailableRiders(res.data.riders);
       } else {
@@ -137,7 +137,7 @@ const AdminOrderAssignment = () => {
   // POLYGON FUNCTIONS - NEW
   const loadZones = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getZones");
+      const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getZones");
       if (Array.isArray(res.data)) {
         // Map backend zones to frontend format (ensure id field exists)
         const formattedZones = res.data.map((zone) => ({
@@ -169,7 +169,7 @@ const AdminOrderAssignment = () => {
 
   const saveZoneToStorage = async (newZone) => {
     try {
-      const res = await axios.post("https://dd-merge-backend-2.onrender.com/api/admin/saveZone", newZone);
+      const res = await axios.post("https://dailydish-backend.onrender.com/api/admin/saveZone", newZone);
       console.log("Zone saved to backend", res.data);
       // Reload zones from backend to get the saved zone with proper ID
       await loadZones();
@@ -253,7 +253,7 @@ const AdminOrderAssignment = () => {
   const updateZone = async (zoneId, zoneData) => {
     try {
       const res = await axios.put(
-        `https://dd-merge-backend-2.onrender.com/api/admin/updateZone/${zoneId}`,
+        `https://dailydish-backend.onrender.com/api/admin/updateZone/${zoneId}`,
         zoneData
       );
       console.log("Zone updated in backend", res.data);
@@ -269,7 +269,7 @@ const AdminOrderAssignment = () => {
     try {
       // Fetch full zone details with populated riders
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getZone/${zone.id || zone._id}`
+        `https://dailydish-backend.onrender.com/api/admin/getZone/${zone.id || zone._id}`
       );
       const fullZone = res.data;
       
@@ -304,7 +304,7 @@ const AdminOrderAssignment = () => {
   const handleViewZoneDetails = async (zone) => {
     try {
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getZone/${zone.id || zone._id}`
+        `https://dailydish-backend.onrender.com/api/admin/getZone/${zone.id || zone._id}`
       );
       setZoneDetails(res.data);
       setShowZoneDetails(true);
@@ -339,7 +339,7 @@ const AdminOrderAssignment = () => {
     }
 
     try {
-      await axios.delete(`https://dd-merge-backend-2.onrender.com/api/admin/deleteZone/${zoneId}`);
+      await axios.delete(`https://dailydish-backend.onrender.com/api/admin/deleteZone/${zoneId}`);
       // Reload zones from backend after deletion
       await loadZones();
       if (selectedZone?.id === zoneId || selectedZone?._id === zoneId) {
@@ -572,7 +572,7 @@ const AdminOrderAssignment = () => {
   const fetchTodaysOrders = async () => {
     try {
       const res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders"
+        "https://dailydish-backend.onrender.com/api/admin/getPackerOrders"
       );
       
       if (!Array.isArray(res.data)) {

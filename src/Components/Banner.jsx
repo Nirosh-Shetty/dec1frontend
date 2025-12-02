@@ -103,7 +103,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -191,7 +191,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getapartmentd = async () => {
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment"
+        "https://dailydish-backend.onrender.com/api/admin/getapartment"
       );
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
@@ -209,7 +209,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getcorporate = async () => {
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate"
+        "https://dailydish-backend.onrender.com/api/admin/getcorporate"
       );
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
@@ -229,7 +229,7 @@ const Banner = ({ Carts, getAllOffer }) => {
     const getAddWebstory = async () => {
       try {
         let res = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/admin/getstories"
+          "https://dailydish-backend.onrender.com/api/admin/getstories"
         );
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
@@ -327,7 +327,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       const config = {
         url: "User/EnquiryEnquiry",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           Name: Name,
@@ -370,7 +370,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -418,7 +418,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getSelectedAddress = async () => {
     try {
       let res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
+        `https://dailydish-backend.onrender.com/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
       );
       if (res.status === 200) {
         setSelectedAddress(res.data.getdata);
@@ -458,7 +458,7 @@ const Banner = ({ Carts, getAllOffer }) => {
     try {
       if (!user) return;
       let res = await axios.post(
-        `https://dd-merge-backend-2.onrender.com/api/user/addressadd`,
+        `https://dailydish-backend.onrender.com/api/user/addressadd`,
         {
           Name: user?.Fname,
           Number: user?.Mobile,
@@ -514,7 +514,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       }
 
       const response = await fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),

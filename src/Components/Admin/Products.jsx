@@ -173,7 +173,7 @@
 //       const config = {
 //         url: "admin/admin/addproduct",
 //         method: "post",
-//         baseURL: "https://dd-merge-backend-2.onrender.com/api",
+//         baseURL: "https://dailydish-backend.onrender.com/api",
 //         headers: { "Content-Type": "multipart/form-data" },
 //         data: {
 //           productcategory: productcategory,
@@ -242,7 +242,7 @@
 //   const getAddproducts = async () => {
 //     try {
 //       let res = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/admin/product"
+//         "https://dailydish-backend.onrender.com/api/admin/admin/product"
 //       );
 //       if (res.status === 200) {
 //         setAddproducts(res.data.products);
@@ -258,7 +258,7 @@
 //   let deleteProduct = async () => {
 //     try {
 //       let res = await axios.delete(
-//         `https://dd-merge-backend-2.onrender.com/api/admin/admin/deleteproduct/${delData._id}`
+//         `https://dailydish-backend.onrender.com/api/admin/admin/deleteproduct/${delData._id}`
 //       );
 //       if (res) {
 //         alert(`Products Details Deleted Successfully`);
@@ -309,7 +309,7 @@
 //       const config = {
 //         url: `admin/admin/editProduct`,
 //         method: "put",
-//         baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+//         baseURL: "https://dailydish-backend.onrender.com/api/",
 //         headers: { "Content-Type": "multipart/form-data" },
 //         data: {
 //           productcategory: productcategory,
@@ -404,7 +404,7 @@
 //   const [AddCategory, setAddCategory] = useState([]);
 //   const getAddCategory = async () => {
 //     try {
-//       let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcategory");
+//       let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getcategory");
 //       if (res.status === 200) {
 //         setAddCategory(res.data.getcategory);
 //         setNoChangeData(res.data.getcategory);
@@ -436,7 +436,7 @@
 
 //     try {
 //       const response = await axios.put(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/admin/updateGalleryImages",
+//         "https://dailydish-backend.onrender.com/api/admin/admin/updateGalleryImages",
 //         formData,
 //         {
 //           headers: { "Content-Type": "multipart/form-data" },
@@ -459,9 +459,9 @@
 //   const deleteImage = async () => {
 //     try {
 //       const config = {
-//         url: `https://dd-merge-backend-2.onrender.com/api/admin/admin/DeleteGalleryimage/${Data?._id}`,
+//         url: `https://dailydish-backend.onrender.com/api/admin/admin/DeleteGalleryimage/${Data?._id}`,
 //         method: "delete",
-//         baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+//         baseURL: "https://dailydish-backend.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: { productId: View?._id },
 //       };
@@ -488,7 +488,7 @@
 //     const config = {
 //       url: "/admin/admin/addgallery",
 //       method: "put",
-//       baseURL: "https://dd-merge-backend-2.onrender.com/api",
+//       baseURL: "https://dailydish-backend.onrender.com/api",
 //       headers: { "Content-Type": "multipart/form-data" },
 //       data: formdata1,
 //     };
@@ -511,7 +511,7 @@
 //       const config = {
 //         url: `/admin/admin/Acceptorrejectproduct/${items?._id}`,
 //         method: "put",
-//         baseURL: "https://dd-merge-backend-2.onrender.com/api",
+//         baseURL: "https://dailydish-backend.onrender.com/api",
 //         headers: { "Content-Type": "application/json" },
 //       };
 

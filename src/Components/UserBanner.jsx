@@ -13,7 +13,7 @@ const UserBanner = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/banners");
+        const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/banners");
         console.log(res.getbanner, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
         if (res.status === 200) {
           const bannerData = res.data.getbanner || res.data.getbanner || [];

@@ -146,7 +146,7 @@ const LocationModal2 = ({ show, onClose }) => {
       fetchAbortControllerRef.current = new AbortController();
 
       const response = await fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -187,7 +187,7 @@ const LocationModal2 = ({ show, onClose }) => {
   const fetchAddressesInBackground = async (customerId) => {
     try {
       const response = await fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -341,7 +341,7 @@ const LocationModal2 = ({ show, onClose }) => {
 
       // Background API call
       fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
+        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -416,7 +416,7 @@ const LocationModal2 = ({ show, onClose }) => {
 
         // API call in background
         const response = await fetch(
-          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+          `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

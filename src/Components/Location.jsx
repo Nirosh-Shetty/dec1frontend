@@ -327,7 +327,7 @@ const LocationConfirmation = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "https://dd-merge-backend-2.onrender.com/api/Hub/validate-location",
+        "https://dailydish-backend.onrender.com/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -1148,7 +1148,7 @@ const LocationConfirmation = () => {
       console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/service-requests",
+        "https://dailydish-backend.onrender.com/api/service-requests",
         requestData,
         {
           headers: {
@@ -1336,8 +1336,8 @@ const LocationConfirmation = () => {
       }
 
       const endpoint = location.state?.editingAddress?._id
-        ? `https://dd-merge-backend-2.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-        : "https://dd-merge-backend-2.onrender.com/api/User/addresses";
+        ? `https://dailydish-backend.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+        : "https://dailydish-backend.onrender.com/api/User/addresses";
       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
       const response = await fetch(endpoint, {

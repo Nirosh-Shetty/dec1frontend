@@ -40,7 +40,7 @@ const WebStory = () => {
   const getAddWebstory = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getstories");
+      let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getstories");
       if (res.status === 200) {
         setAddWebstory(res.data.getbanner.reverse());
       }
@@ -82,7 +82,7 @@ const WebStory = () => {
       const config = {
         url: "/admin/Addstories",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -109,7 +109,7 @@ const WebStory = () => {
       const config = {
         url: "admin/Deletestories/" + Data,
         method: "delete",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         headers: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -140,7 +140,7 @@ const WebStory = () => {
       const config = {
         url: "admin/editstories",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };

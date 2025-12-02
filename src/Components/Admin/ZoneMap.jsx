@@ -34,7 +34,7 @@ const ZoneMap = () => {
 
   const axiosCfg = useMemo(
     () => ({
-      baseURL: "https://dd-merge-backend-2.onrender.com/api",
+      baseURL: "https://dailydish-backend.onrender.com/api",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }),
     [token]

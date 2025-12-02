@@ -68,7 +68,7 @@ const ViewPlanModal = ({
 
     try {
       const res = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/update-product",
+        "https://dailydish-backend.onrender.com/api/user/plan/update-product",
         {
           planId: localPlan._id,
           foodItemId:
@@ -109,7 +109,7 @@ const ViewPlanModal = ({
         throw new Error("Customer ID not found. Please login again.");
       }
       const response = await axios.patch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${addressId}/primary`
+        `https://dailydish-backend.onrender.com/api/User/customers/${userId}/addresses/${addressId}/primary`
       );
       alert("Setting primary address...");
 
@@ -192,7 +192,7 @@ const ViewPlanModal = ({
   const handleSkipOrCancel = async () => {
     try {
       setLoading(true);
-      await axios.post("https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel", {
+      await axios.post("https://dailydish-backend.onrender.com/api/user/plan/skip-cancel", {
         planId: plan._id,
         userId,
       });
@@ -660,7 +660,7 @@ const MyPlan = () => {
     if (!userId) return;
     try {
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/user/plan/get-plan/${userId}`
+        `https://dailydish-backend.onrender.com/api/user/plan/get-plan/${userId}`
       );
       if (res.data.success) setPlans(res.data.data || []);
     } catch (err) {
@@ -770,7 +770,7 @@ const getTimeRemaining = (plan) => {
     if (!plan.orderId) return;
     try {
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getOrderByOrderId/${plan.orderId}`
+        `https://dailydish-backend.onrender.com/api/admin/getOrderByOrderId/${plan.orderId}`
       );
       if (res.data.success) {
         const order = res.data.data;
@@ -852,7 +852,7 @@ const getTimeRemaining = (plan) => {
 
       const configObj = {
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         url: "/user/plan/create-from-plan",
         headers: { "content-type": "application/json" },
         data: {
@@ -879,7 +879,7 @@ const getTimeRemaining = (plan) => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://dailydish-backend.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId,
@@ -1104,7 +1104,7 @@ const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                             className="btn-base btn-primary"
                             onClick={async () => {
                               await axios.post(
-                                "https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel",
+                                "https://dailydish-backend.onrender.com/api/user/plan/skip-cancel",
                                 {
                                   planId: plan._id,
                                   userId,

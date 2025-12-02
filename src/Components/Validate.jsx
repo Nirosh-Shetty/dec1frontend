@@ -45,7 +45,7 @@ export default function Validate() {
         const config = {
           url: "/User/mobileotpverification",
           method: "post",
-          baseURL: "https://dd-merge-backend-2.onrender.com/api",
+          baseURL: "https://dailydish-backend.onrender.com/api",
           headers: { "content-type": "application/json" },
           data: payload,
         };
@@ -530,7 +530,7 @@ export default function Validate() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
 
         headers: { "content-type": "application/json" },
         data: {

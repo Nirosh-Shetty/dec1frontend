@@ -127,7 +127,7 @@ export default function LeafWithLogo() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://dailydish-backend.onrender.com/api",
 
         headers: { "content-type": "application/json" },
         data: {
