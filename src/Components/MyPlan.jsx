@@ -68,7 +68,7 @@ const ViewPlanModal = ({
 
     try {
       const res = await axios.post(
-        "http://localhost:7013/api/user/plan/update-product",
+        "https://dd-merge-backend-2.onrender.com/api/user/plan/update-product",
         {
           planId: localPlan._id,
           foodItemId:
@@ -149,7 +149,7 @@ const ViewPlanModal = ({
   const handleSkipOrCancel = async () => {
     try {
       setLoading(true);
-      await axios.post("http://localhost:7013/api/user/plan/skip-cancel", {
+      await axios.post("https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel", {
         planId: plan._id,
         userId,
       });
@@ -617,7 +617,7 @@ const MyPlan = () => {
     if (!userId) return;
     try {
       const res = await axios.get(
-        `http://localhost:7013/api/user/plan/get-plan/${userId}`
+        `https://dd-merge-backend-2.onrender.com/api/user/plan/get-plan/${userId}`
       );
       if (res.data.success) setPlans(res.data.data || []);
     } catch (err) {
@@ -684,7 +684,7 @@ const MyPlan = () => {
     if (!plan.orderId) return;
     try {
       const res = await axios.get(
-        `http://localhost:7013/api/admin/getOrderByOrderId/${plan.orderId}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/getOrderByOrderId/${plan.orderId}`
       );
       if (res.data.success) {
         const order = res.data.data;
@@ -766,7 +766,7 @@ const MyPlan = () => {
 
       const configObj = {
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         url: "/user/plan/create-from-plan",
         headers: { "content-type": "application/json" },
         data: {
@@ -793,7 +793,7 @@ const MyPlan = () => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId,
@@ -996,7 +996,7 @@ const MyPlan = () => {
                             className="btn-base btn-primary"
                             onClick={async () => {
                               await axios.post(
-                                "http://localhost:7013/api/user/plan/skip-cancel",
+                                "https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel",
                                 {
                                   planId: plan._id,
                                   userId,
