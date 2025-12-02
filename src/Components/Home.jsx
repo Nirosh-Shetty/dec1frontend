@@ -876,7 +876,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     try {
       const addressDetails = {
         addressline: `${address.fullAddress}`,
-        addressType: addresstype,
+        addressType: address.addressType || "",
         coordinates: address.location?.coordinates || [0, 0],
         hubId: address.hubId || "",
         // Student info (if available)
