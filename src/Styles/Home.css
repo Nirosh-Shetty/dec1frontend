@@ -19,6 +19,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  padding-bottom: 100px; /* Space for fixed bottom navbar and cart button */
 }
 .copyright-text {
   color: #6b6b6b;
@@ -813,7 +814,7 @@ input[type="number"] {
   text-align: center;
   padding: 16px;
   font-size: 18px;
-  z-index: 100;
+  z-index: 10000; /* Higher than nav (9999) to appear above it */
   width: calc(100% - 40px); /* Full width with 20px margin on each side */
   max-width: 400px; /* Maximum width for larger screens */
   border-radius: 24px;
@@ -824,6 +825,16 @@ input[type="number"] {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* When nav is visible, push cart button up above the navbar */
+body.nav-visible .cartbtn {
+  bottom: 90px; /* 70px navbar height + 20px spacing */
+}
+
+/* When nav is hidden, cart button stays at normal position */
+body.nav-hidden .cartbtn {
+  bottom: 20px;
 }
 
 .cartbtn.multi-cart{

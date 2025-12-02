@@ -214,6 +214,10 @@
   line-height: 12px;
 }
 
+.subtext.active{
+  color:var(--Primary-Text);
+}
+
 /* small visual hint when both sessions missing */
 .date-card.disabled .day,
 .date-card.disabled .date,

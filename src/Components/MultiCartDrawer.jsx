@@ -67,8 +67,8 @@ const MultiCartDrawer = ({
 
                 <div className="cartbutton">
                     <div className={`cartbtn ${groupedCarts.length>1?'multi-cart':"" }`}>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div className="d-flex gap-1 align-items-center">
+                        <div className="d-flex justify-content-between align-items-center flex-row">
+                            <div className="d-flex gap-1 align-items-center flex-row">
                                 {/* <p className="cart-slot-type">{SloteType}</p> */}
                                 <div className="cart-items-price">
                                     {overallTotalItems} items | ₹{overallSubtotal.toFixed(0)}
@@ -170,7 +170,7 @@ const MultiCartDrawer = ({
                     <div className="multi-cart-header">
                         {/* <h3>Your Meals</h3> */}
                         <div className="checkout-top" onClick={proceedToPlan}>
-                            Checkout All <img src="/Assets/checkoutback.svg" style={{ transform: "rotate(0deg)" }}  />
+                            Add to Myplan <img src="/Assets/checkoutback.svg" style={{ transform: "rotate(0deg)" }}  />
                         </div>
                     </div>
 

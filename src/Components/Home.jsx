@@ -31,7 +31,7 @@ import IsVeg from "../assets/isVeg=yes.svg";
 import IsNonVeg from "../assets/isVeg=no.svg";
 import MultiCartDrawer from "./MultiCartDrawer";
 import DateSessionSelector from "./DateSessionSelector";
-// import BottomNav from "./BottomNav";
+import BottomNav from "./BottomNav";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const navigate = useNavigate();
@@ -72,17 +72,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
     );
   };
-  const [address, setAddress] = useState(() => {
-    // Priority 1: Address passed from "Add More"
-    if (location.state?.overrideAddress) {
-      return location.state.overrideAddress;
-    }
-    // Priority 2: localStorage
-    return JSON.parse(
-      localStorage.getItem("primaryAddress") ??
-        localStorage.getItem("currentLocation")
-    );
-  });
+  const address = JSON.parse(
+    localStorage.getItem("primaryAddress") ??
+      localStorage.getItem("currentLocation")
+  );
 
   // Also update your selectedDate/Session initialization (you might have done this already)
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -875,6 +868,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setloader(true);
     try {
       const addressDetails = {
+        addressId: address._id || "",
         addressline: `${address.fullAddress}`,
         addressType: address.addressType || "",
         coordinates: address.location?.coordinates || [0, 0],
@@ -1688,7 +1682,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                               {checkOf && <BiSolidOffer color="green" />}
                               {!isPreOrder && (
                                 <div className="remaining-stock-label">
- {`${
+                                  {`${
                                     matchedLocation?.Remainingstock || 0
                                   } servings Left`}
                                 </div>
@@ -1733,17 +1727,17 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 >
                                   {isPreOrder ? (
                                     <div className="pick-btn-text">
-                                    <span className="pick-btn-text1">
-                                      PICK
-                                    </span>
-                                    <span className="pick-btn-text2">
-                                      {`for ${new Date(
-                                        item.deliveryDate
-                                      ).toLocaleDateString("en-GB", {
-                                        day: "2-digit",
-                                        month: "short",
-                                      })}`}
-                                    </span>
+                                      <span className="pick-btn-text1">
+                                        PICK
+                                      </span>
+                                      <span className="pick-btn-text2">
+                                        {`for ${new Date(
+                                          item.deliveryDate
+                                        ).toLocaleDateString("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                        })}`}
+                                      </span>
                                     </div>
                                   ) : (
                                     <span className="add-to-cart-btn-text">

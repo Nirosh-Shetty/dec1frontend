@@ -6,21 +6,21 @@ import { FaUser, FaEye, FaEyeSlash, FaWallet } from "react-icons/fa";
 
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import ApartmentIcon from "@mui/icons-material/Apartment"; // Icon to represent apartments
-import { ToastContainer, toast } from "react-toastify";
+// import TextField from "@mui/material/TextField";
+// import Autocomplete from "@mui/material/Autocomplete";
+// import ApartmentIcon from "@mui/icons-material/Apartment"; // Icon to represent apartments
+import {  toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Nav from "react-bootstrap/Nav";
-import { MdAccountCircle } from "react-icons/md";
-import { MdOutlineLogout } from "react-icons/md";
+// import Nav from "react-bootstrap/Nav";
+// import { MdAccountCircle } from "react-icons/md";
+// import { MdOutlineLogout } from "react-icons/md";
 import { FaLock } from "react-icons/fa";
-import { BiMessageDetail } from "react-icons/bi";
-import { IoLogoYoutube, IoSearchCircleOutline } from "react-icons/io5";
-import { ImSpoonKnife } from "react-icons/im";
-import Offcanvas from "react-bootstrap/Offcanvas";
-import { IoMdHeart } from "react-icons/io";
-import { GrDocumentUser } from "react-icons/gr";
+// import { BiMessageDetail } from "react-icons/bi";
+// import { IoLogoYoutube, IoSearchCircleOutline } from "react-icons/io5";
+// import { ImSpoonKnife } from "react-icons/im";
+// import Offcanvas from "react-bootstrap/Offcanvas";
+// import { IoMdHeart } from "react-icons/io";
+// import { GrDocumentUser } from "react-icons/gr";
 import Swal2 from "sweetalert2";
 import swal from "sweetalert";
 
@@ -30,11 +30,11 @@ import { WalletContext } from "../WalletContext";
 import Selectlocation from "../assets/selectlocation.svg";
 import UserIcons from "../assets/userp.svg";
 
-import SearchIcon from "../assets/search.svg";
-import Logo from "../assets/logo-container.svg";
+// import SearchIcon from "../assets/search.svg";
+// import Logo from "../assets/logo-container.svg";
 import UserBanner from "./UserBanner";
 import ProfileOffcanvas from "./Navbar2";
-import LocationModal from "./LocationModal";
+// import LocationModal from "./LocationModal";
 import LocationModal2 from "./LocationModal2";
 
 // const Banner = ({ Carts, getAllOffer, hubName, setHubName }) => {

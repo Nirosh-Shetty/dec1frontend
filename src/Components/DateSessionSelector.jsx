@@ -223,7 +223,7 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
             disabled={currentDate && !sessionsForDate(currentDate).has("Lunch")}
           >
             <div className="title">Lunch</div>
-            <div className="subtext">Order before 12:00 PM</div>
+            <div className={`subtext ${currentSession === "Lunch" ? "active" : ""}`}>Order before 12:00 PM</div>
           </button>
         </div>
 
@@ -234,7 +234,7 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
             disabled={currentDate && !sessionsForDate(currentDate).has("Dinner")}
           >
             <div className="title">Dinner</div>
-            <div className="subtext">Order before 07:00 PM</div>
+            <div className={`subtext ${currentSession === "Dinner" ? "active" : ""}`}>Order before 07:00 PM</div>
           </button>
         </div>
       </div>

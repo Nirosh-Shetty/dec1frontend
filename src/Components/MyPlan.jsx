@@ -91,34 +91,77 @@ const ViewPlanModal = ({
       alert(e.response?.data?.error || "Failed to update quantity");
     }
   }
+  // console.log(localPlan);
   // Find this function in MyPlan.jsx
-  const handleAddMore = () => {
-    // We need to find the plan to get its address details
-    // Since this function is called inside the modal (ViewPlanModal), 'localPlan' or 'plan' is available
-
-    // If this is inside ViewPlanModal component:
-    const targetAddress = {
-      // We reconstruct the address object structure your Home/LocationModal expects
-      addressType: localPlan.addressType,
-      fullAddress: localPlan.delivarylocation,
-      hubId: localPlan.hubId,
-      location: { coordinates: localPlan.coordinates?.coordinates },
-      // Add any other fields your Home.jsx needs to "setAddress" correctly
-      studentInformation: {
-        studentName: localPlan.studentName,
-        studentClass: localPlan.studentClass,
-        studentSection: localPlan.studentSection,
-      },
-    };
-
+  const handleAddMore = async () => {
+    await handleSetPrimary(localPlan.addressId);
     navigate("/home", {
       state: {
         targetDate: localPlan.deliveryDate,
         targetSession: localPlan.session,
-        overrideAddress: targetAddress, // <--- PASSING THE ADDRESS
       },
     });
   };
+
+  const handleSetPrimary = async (addressId) => {
+    try {
+      if (!userId) {
+        throw new Error("Customer ID not found. Please login again.");
+      }
+      const response = await axios.patch(
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${addressId}/primary`
+      );
+      alert("Setting primary address...");
+
+      // Optimistic cache update: update local cached addresses so UI reflects change immediately
+      try {
+        const cacheKey = `addresses_${userId}`;
+        const cacheTsKey = `addresses_timestamp_${userId}`;
+
+        const cachedStr = localStorage.getItem(cacheKey);
+        if (cachedStr) {
+          const cached = JSON.parse(cachedStr);
+          // update primary id
+          cached.primaryAddress = addressId;
+
+          // If we have the addresses array, try to locate the full address object
+          const fullAddr = Array.isArray(cached.addresses)
+            ? cached.addresses.find((a) => a._id === addressId) || null
+            : null;
+
+          // persist updated cache
+          localStorage.setItem(cacheKey, JSON.stringify(cached));
+          localStorage.setItem(cacheTsKey, Date.now().toString());
+
+          // store a convenient `primaryAddress` entry (other parts of app use this)
+          if (fullAddr) {
+            localStorage.setItem("primaryAddress", JSON.stringify(fullAddr));
+          } else if (response.data?.primaryAddress) {
+            localStorage.setItem("primaryAddress", JSON.stringify(response.data.primaryAddress));
+          } else {
+            // fallback: store id only
+            localStorage.setItem("primaryAddress", JSON.stringify(addressId));
+          }
+        } else {
+          // no cache present — still set timestamp and primaryAddress from response if available
+          localStorage.setItem(`addresses_timestamp_${userId}`, Date.now().toString());
+          if (response.data?.primaryAddress) {
+            localStorage.setItem("primaryAddress", JSON.stringify(response.data.primaryAddress));
+          } else {
+            localStorage.setItem("primaryAddress", JSON.stringify(addressId));
+          }
+        }
+      } catch (cacheErr) {
+        console.warn("Failed to update address cache:", cacheErr);
+      }
+
+      console.log("Primary address set successfully!", "success");
+    } catch (error) {
+      console.error("Error setting primary address:", error);
+      console.log(error.message || "Failed to set primary address", "danger");
+    }
+  };
+
   const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -209,7 +252,7 @@ const ViewPlanModal = ({
               <h3 className="session-title">{localPlan.session}</h3>
               <div className="delivery-time-text">
                 {/* static for now; optionally store slot time in DB later */}
-                Arrives fresh between 12:00 to 01:00PM
+                Arrives fresh between {localPlan.session==="Lunch" ? "12:00 to 01:00PM" : "07:00 to 08:00PM"}
               </div>
             </div>
             {localPlan.status === "Confirmed" && (
@@ -666,15 +709,58 @@ const MyPlan = () => {
     }
   };
 
-  const getTimeRemaining = (deadlineStr) => {
-    const deadline = new Date(deadlineStr);
-    const now = new Date();
-    const diff = deadline - now;
-    if (diff <= 0) return { days: 0, hours: 0 };
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    return { days, hours };
+// NO moment version
+const getTimeRemaining = (plan) => {
+  const now = new Date();
+
+  // Assume plan.deliveryDate is an ISO string or Date
+  const deliveryDate = new Date(plan.deliveryDate);
+
+  // Normalize to start of the day in local time
+  deliveryDate.setHours(0, 0, 0, 0);
+
+  // Base target time on that date
+  const targetTime = new Date(deliveryDate.getTime());
+
+  if (plan.orderType === "Reserved") {
+    if (plan.session === "Lunch") {
+      // 6:00 AM
+      targetTime.setHours(6, 0, 0, 0);
+    } else {
+      // 3:00 PM
+      targetTime.setHours(15, 0, 0, 0);
+    }
+  } else {
+    // Instant / after cutoff → use payment deadline visual
+    if (plan.session === "Lunch") {
+      // 12:00 PM
+      targetTime.setHours(12, 0, 0, 0);
+    } else {
+      // 7:00 PM
+      targetTime.setHours(19, 0, 0, 0);
+    }
+  }
+
+  const diffMs = targetTime.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return { days: 0, hours: 0, mins: 0, isExpired: true };
+  }
+
+  // Work purely in minutes to avoid float mess
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const mins = totalMinutes % 60;
+
+  return {
+    days,
+    hours,
+    mins,
+    isExpired: false,
   };
+};
+
 
   const handleViewPlan = (plan) => {
     setSelectedPlan(plan);
@@ -844,7 +930,26 @@ const MyPlan = () => {
               </svg>
             </div>
             <h3 className="checkout-title">My Plans</h3>
-            <div style={{ width: 36 }}></div>
+            {/* <div style={{ width: 36 }}></div> */}
+<div 
+              onClick={() => navigate("/orders")} 
+              style={{ 
+                  cursor: "pointer", 
+                  background: "rgba(255,255,255,0.15)", 
+                  padding: "10px 8px 10px 12px", 
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  filter: "invert(100%)"
+              }}
+            >
+               <img
+                        src="/Assets/lists.svg"
+                        alt="My Orders"
+                        className="icon-img-l"
+                      />
+            </div>
           </div>
         </div>
 
@@ -881,7 +986,7 @@ const MyPlan = () => {
               <div className="no-plans-text">No plans for this day yet</div>
             ) : (
               currentTabOrders.map((plan) => {
-                const { days, hours } = getTimeRemaining(plan.paymentDeadline);
+const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                 const now = new Date();
                 const deadline = new Date(plan.paymentDeadline);
                 const isBeforeDeadline = now < deadline;
@@ -900,11 +1005,14 @@ const MyPlan = () => {
 
                 return (
                   <>
-                    {isUnpaidEditable && (
-                      <div className="reminder-banner">
-                        Confirm plan within {days} days, {hours} hours
-                      </div>
-                    )}
+                   {isUnpaidEditable && !isExpired && (
+                  <div className="reminder-banner">
+                    {plan.orderType === "Reserved" 
+                      ? `Reserve Price valid for: ${days > 0 ? `${days}d` : ''} ${hours}h ${mins}m`
+                      : `Confirm plan within: ${days > 0 ? `${days}d` : ''} ${hours}h ${mins}m`
+                    }
+                  </div>
+                )}
                     <div
                       key={plan._id}
                       className="plan-card"
@@ -923,7 +1031,7 @@ const MyPlan = () => {
                           <h3 className="session-title">{plan.session}</h3>
                           <div className="delivery-time-text">
                             {/* static for now; optionally store slot time in DB later */}
-                            Arrives fresh between 12:00 to 01:00PM
+                            Arrives fresh between {plan.session === "Lunch" ? "12:00 to 01:00PM" : "07:00 to 08:00PM"}
                           </div>
                         </div>
                         {plan.status === "Confirmed" && (
@@ -1009,7 +1117,7 @@ const MyPlan = () => {
                           </button>
                         )}
                         {isPaidLocked && (
-                        // {true && (
+                          // {true && (
                           <button
                             className="track-order-btn"
                             onClick={() => handleTrackOrder(plan)}
@@ -1092,11 +1200,11 @@ const MyPlan = () => {
                 currentStatusIndex >= stepIndex ? "#FFFFFF" : "#2C2C2C";
               const getConnectorFill = (stepIndex) =>
                 currentStatusIndex >= stepIndex ? "#6B8E23" : "#C0C0C0";
-    const phoneNumber = "7204188504";
-  const message = "Hello! I need assistance.";
-  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
-  )}`;
+              const phoneNumber = "7204188504";
+              const message = "Hello! I need assistance.";
+              const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+                message
+              )}`;
               return (
                 <>
                   <div className="track-order-header">

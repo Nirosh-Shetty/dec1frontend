@@ -148,7 +148,7 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                     >
                       <img
                         src="/Assets/lists.svg"
-                        alt="WhatsApp"
+                        alt="My Orders"
                         className="icon-img-l"
                       />
                       <span>My Orders</span>
