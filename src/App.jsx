@@ -85,6 +85,7 @@ import LocationRequest from "./Components/Admin/LocationRequest";
 import LocationConfirmationSimple from "./Components/CurrentLocation";
 import AdminOrderAssignment from "./Components/Admin/AdminOrderAssignment";
 import MyPlan from "./Components/MyPlan";
+import AdminPlanDashboard from "./Components/Admin/AdminPlanDashboard";
 
 
 
@@ -347,6 +348,10 @@ function App() {
           <Route
             path="admin/referral-dashboard"
             element={<Main children={<AdminReferralDashboard />} />}
+          />
+          <Route
+            path="admin/myplan-dashboard"
+            element={<Main children={<AdminPlanDashboard />} />}
           />
             <Route
             path="admin/menu-upload"

@@ -1,104 +1,18 @@
-import React, { useState } from "react";
+import { useState,useEffect } from "react";
 import { Card, Table, Button, Form, Row, Col, Badge } from "react-bootstrap";
 import { FaSearch, FaFilter, FaDownload, FaUser, FaUtensils, FaCheckCircle, FaClock, FaTimesCircle, FaListAlt, FaCommentDots } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Admin.css"; 
-
+import axios from "axios";
+import moment from "moment";
 const AdminPlanDashboard = () => {
   const [activeView, setActiveView] = useState("sales"); // 'sales' or 'orders'
   const [startDate, setStartDate] = useState(new Date());
   const [selectedSession, setSelectedSession] = useState("Lunch");
   const [selectedHub, setSelectedHub] = useState("All Hubs");
 
-  // --- DUMMY DATA: SALES TRACKER ---
-  const dummySalesData = [
-    {
-      id: 1,
-      foodName: "Chicken Ghee Roast",
-      hub: "Manyata Tech Park",
-      totalReserved: 50,
-      confirmed: 30,
-      pending: 15,
-      skipped: 5,
-      basePrice: 120,
-      hubPrice: 100, 
-      preOrderPrice: 90, 
-    },
-    {
-      id: 2,
-      foodName: "Chapati",
-      hub: "Manyata Tech Park",
-      totalReserved: 100,
-      confirmed: 80,
-      pending: 10,
-      skipped: 10,
-      basePrice: 20,
-      hubPrice: 15,
-      preOrderPrice: 12,
-    },
-    {
-      id: 3,
-      foodName: "Dal Fry",
-      hub: "Hebbal",
-      totalReserved: 60,
-      confirmed: 20,
-      pending: 35,
-      skipped: 5,
-      basePrice: 80,
-      hubPrice: 70,
-      preOrderPrice: 60,
-    },
-  ];
-
-  // --- DUMMY DATA: ORDERS TRACKER ---
-  const dummyOrdersData = [
-    {
-      id: 101,
-      customerName: "Rahul Kumar",
-      contact: "9876543210",
-      items: "Chicken Ghee Roast x2, Chapati x4",
-      value: 228,
-      status: "Confirmed",
-      session: "Lunch",
-      hub: "Manyata Tech Park",
-      date: "2024-11-12",
-    },
-    {
-      id: 102,
-      customerName: "Sneha Reddy",
-      contact: "9123456789",
-      items: "Dal Fry x1, Chapati x3",
-      value: 96,
-      status: "Pending Payment",
-      session: "Lunch",
-      hub: "Hebbal",
-      date: "2024-11-12",
-    },
-    {
-      id: 103,
-      customerName: "Amit Shah",
-      contact: "8888888888",
-      items: "Chicken Ghee Roast x1",
-      value: 90,
-      status: "Skipped",
-      session: "Dinner",
-      hub: "Manyata Tech Park",
-      date: "2024-11-12",
-    },
-     {
-      id: 104,
-      customerName: "John Doe",
-      contact: "7777777777",
-      items: "Chapati x10",
-      value: 120,
-      status: "Cancelled",
-      session: "Lunch",
-      hub: "Hebbal",
-      date: "2024-11-12",
-    },
-  ];
-
+  
   const getStatusBadge = (status) => {
     switch (status) {
       case "Confirmed": return "success";
@@ -109,17 +23,61 @@ const AdminPlanDashboard = () => {
     }
   };
 
-  const totalOrders = dummyOrdersData.length;
-  const confirmedOrders = dummyOrdersData.filter(o => o.status === "Confirmed").length;
-  const pendingOrders = dummyOrdersData.filter(o => o.status === "Pending Payment").length;
-  const cancelledOrders = dummyOrdersData.filter(o => o.status === "Skipped" || o.status === "Cancelled").length;
+  
+  const [salesData, setSalesData] = useState([]); 
+  const [ordersData, setOrdersData] = useState([]);
+  const [loading, setLoading] = useState(false);
+const fetchDashboardData = async () => {
+      if (!startDate || !selectedSession) return; // Don't fetch if filters incomplete
+      
+      setLoading(true);
+      try {
+          // Format date for API (YYYY-MM-DD)
+          // Using local date string to avoid timezone shifts
+          const dateStr = moment(startDate).format("YYYY-MM-DD");
+          
+          const params = {
+              date: dateStr,
+              session: selectedSession,
+              hubId: selectedHub
+          };
 
-  const handleSendReminders = () => {
-      if(window.confirm(`Send WhatsApp reminder to ${pendingOrders} pending customers?`)) {
-          alert("Reminders sent successfully!");
+          if (activeView === 'sales') {
+              const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/plan/sales-tracker", { params });
+              if(res.data.success) setSalesData(res.data.data);
+          } else {
+              const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/plan/orders-tracker", { params });
+              if(res.data.success) setOrdersData(res.data.data);
+          }
+      } catch (error) {
+          console.error("Fetch error", error);
+      } finally {
+          setLoading(false);
       }
   };
 
+  // --- 2. TRIGGER FETCH ON FILTER CHANGE OR TAB SWITCH ---
+  useEffect(() => {
+      fetchDashboardData();
+  }, [activeView, startDate, selectedSession, selectedHub]);
+  const totalOrders = ordersData.length;
+  const confirmedOrders = ordersData.filter(o => o.status === "Confirmed").length;
+  const pendingOrders = ordersData.filter(o => o.status === "Pending Payment").length;
+  const cancelledOrders = ordersData.filter(o => o.status === "Skipped" || o.status === "Cancelled").length;
+
+  // --- 2. EFFECT HOOK ---
+
+  // --- 3. REMINDER HANDLER ---
+  const handleSendReminders = async () => {
+      if(!window.confirm(`Send WhatsApp reminder to pending customers?`)) return;
+      try {
+          const dateStr = startDate.toISOString().split('T')[0];
+          const res = await axios.post("https://dailydish-backend.onrender.com/api/admin/plan/send-reminders", {
+               date: dateStr, session: selectedSession, hubId: selectedHub
+          });
+          if(res.data.success) alert(res.data.message);
+      } catch(e) { alert("Failed to send"); }
+  };
   return (
     <div className="container-fluid p-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
       
@@ -208,7 +166,7 @@ const AdminPlanDashboard = () => {
                             <th className="text-center">Total Rsrvd</th>
                             <th className="text-center">Confirmed</th>
                             <th className="text-center">Pending</th>
-                            <th className="text-center">Skipped</th>
+                            <th className="text-center">Skipped/Cancelled</th>
                             {/* Price Columns */}
                             <th className="text-center bg-light border-start">Base ₹</th>
                             <th className="text-center bg-light">Hub ₹</th>
@@ -219,14 +177,12 @@ const AdminPlanDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {dummySalesData.map((item) => {
-                            const salesValue = item.preOrderPrice * item.totalReserved;
-                            const achievedSales = item.preOrderPrice * item.confirmed;
-                            
+                        {salesData.map((item) => {
+                          
                             return (
                                 <tr key={item.id}>
                                     <td className="ps-4 fw-bold text-dark">{item.foodName}</td>
-                                    <td className="text-muted small">{item.hub}</td>
+                                    <td className="text-muted small">{item.hub?.hubName}</td>
                                     <td className="text-center fw-bold bg-light">{item.totalReserved}</td>
                                     <td className="text-center text-success fw-bold">{item.confirmed}</td>
                                     <td className="text-center text-warning fw-bold">{item.pending}</td>
@@ -236,8 +192,8 @@ const AdminPlanDashboard = () => {
                                     <td className="text-center text-muted">{item.hubPrice}</td>
                                     <td className="text-center fw-bold bg-warning bg-opacity-10">{item.preOrderPrice}</td>
                                     
-                                    <td className="text-end border-start text-muted">₹{salesValue.toLocaleString()}</td>
-                                    <td className="text-end pe-4 fw-bolder text-success">₹{achievedSales.toLocaleString()}</td>
+                                    <td className="text-end border-start text-muted">₹{item?.estSalesValue}</td>
+                                    <td className="text-end pe-4 fw-bolder text-success">₹{item?.achievedSales}</td>
                                 </tr>
                             )
                         })}
@@ -348,7 +304,7 @@ const AdminPlanDashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {dummyOrdersData.map((order) => (
+                            {ordersData.map((order) => (
                                 <tr key={order.id}>
                                     <td className="ps-4 fw-bold text-dark">{order.customerName}</td>
                                     <td>{order.contact}</td>
@@ -364,7 +320,7 @@ const AdminPlanDashboard = () => {
                                         </Badge>
                                     </td>
                                     <td>{order.session}</td>
-                                    <td>{order.hub}</td>
+                                    <td>{order.hub?.hubName}</td>
                                     <td className="text-end pe-4 text-muted">{order.date}</td>
                                 </tr>
                             ))}

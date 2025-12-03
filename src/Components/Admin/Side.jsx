@@ -342,6 +342,14 @@ const Side = () => {
                   <span className="ms-2">Referral Dashboard</span>
                 </li>
               </Link>
+              <Link to="/admin/myplan-dashboard" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <FaGift style={{ fontSize: "20px" }} />
+                  </span>
+                  <span className="ms-2">My Plan Dashboard</span>
+                </li>
+              </Link>
               <Link to="/apartment-booking-list" onClick={handleNavCollapse}>
                 <li className="a-ele ">
                   <span>
