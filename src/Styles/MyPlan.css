@@ -184,7 +184,8 @@
   gap: 4px;
 }
 .status-badge-skipped {
-  background: var(--success-green);
+    background: var(--turmeric-golden);
+
   color: white;
   font-size: 8px;
   font-weight: 600;
@@ -195,7 +196,7 @@
   gap: 4px;
 }
 .status-badge-canceled {
-  background: var(--success-green);
+   background: var(--turmeric-golden);
   color: white;
    font-size: 8px;
   font-weight: 600;
@@ -276,18 +277,25 @@
 }
 .reminder-banner {
   color:var(--app-foreground);
-  background-color: var(--neu-STB);
+    background: var(--turmeric-golden);
   font-size: 10px;
   font-weight: 600;
   /* position: relative; */
   /* top: 10px; */
-  z-index: 100;
+  /* z-index: 100; */
   /* width: 100%; */
-  align-self: self-end;
+  /* align-self: self-end; */
   padding: 2px 4px;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
+  /* border-top-left-radius: 6px; */
+  border-radius: 6px;
   /* left: ; */
+}
+
+.make-payment-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
 }
 
 
@@ -344,23 +352,35 @@
   background-color:var(--success-green);
   border: 1px solid var(--app-foreground);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  width: 50%;
+  /* width: 90%; */
   padding: 10px 44px;
-  border-radius:12px;
+  border-radius:10px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap:8px;
-  color:var(--app-foreground)
+  color:var(--app-foreground);
+  height: 43px;
+  width: auto;
 }
 
 .price-pill {
-  background: var(--warm-beige);
+  background: var(--app-foreground);
   color: var(--primary-text);
   font-weight: 700;
   border-radius: 8px;
   padding: 4px 10px;
   font-size: 14px;
+}
+
+.actuall-amount{
+  text-decoration: line-through;
+  color: var(--secondary-text);
+}
+
+.pre-order-amount{
+  border-radius: 4px;
+  background-color: var(--turmeric-golden);
 }
 
 /* --- Modal Styles --- */
@@ -404,7 +424,7 @@
   max-height: 85vh;
   overflow-y: auto;
   position: relative;
-  border-top-left-radius: 0;
+  /* border-top-left-radius: 0; */
   display: flex;
   flex-direction: column;
   /* align-items: center; */
@@ -541,6 +561,17 @@
   gap: 2px;
   justify-content: center;
 }
+.plan-actual-price{
+  font-weight: bold;
+  line-height: 9px;
+  /* color: #212121; */
+  color: var(--secondary-text);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: center;
+  text-decoration: line-through;
+}
 .plan-current-amount{
   font-size: 10px;
 }
@@ -656,7 +687,8 @@
 }
 .plan-cart-footer{
 display: flex;
-justify-content: space-between;
+/* justify-content: space-between; */
+justify-content: flex-end;
 align-items: center;
 /* padding: 8px 16px; */
 width: 100%;
@@ -676,6 +708,7 @@ padding: 0 10px;
 }
 .plan-total-container{
   border-radius: 10px;
+  /* align-self: flex-end; */
   padding: 3px;
   border: var(--warm-beige) 1px solid;
 }
