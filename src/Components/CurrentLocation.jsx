@@ -37,8 +37,7 @@ const LocationConfirmationSimple = () => {
   const placesServiceRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
-  console.log('dfgdfg',API_KEY);
+  const API_KEY = process.env.REACT_APP_MAP_KEY;
 
   // Initialize services
   const initializeServices = useCallback(() => {

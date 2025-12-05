@@ -572,10 +572,7 @@ const HubWiseProductManagement = () => {
                       >
                         Mark All Filtered as Sold Out
                       </Button>
-                      <Link
-                        to="/admin/menu-upload"
-                        className="ms-2"
-                      >
+                      <Link to="/admin/menu-upload" className="ms-2">
                         <Button variant="success">
                           <FaExternalLinkAlt
                             style={{

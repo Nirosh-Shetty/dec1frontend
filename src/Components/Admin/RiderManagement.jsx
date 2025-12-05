@@ -68,22 +68,18 @@ const RiderManagement = () => {
     fetchHubOptions();
   }, []);
 
-
   const perPage = 8;
   const pagesVisited = pageNumber * perPage;
 
   const fetchRiders = async (opts = { showLoader: true }) => {
     try {
       if (opts.showLoader) setLoading(true);
-      const res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/admin/riders",
-        {
-          params: {
-            status: statusFilter,
-            search: search.trim() || undefined,
-          },
-        }
-      );
+      const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/riders", {
+        params: {
+          status: statusFilter,
+          search: search.trim() || undefined,
+        },
+      });
       if (res.status === 200) {
         setRiders(res.data?.riders || []);
         setPageNumber(0);
@@ -187,7 +183,9 @@ const RiderManagement = () => {
 
       if (response.status === 200 || response.status === 201) {
         alert(
-          selectedRider ? "Rider updated successfully" : "Rider created successfully"
+          selectedRider
+            ? "Rider updated successfully"
+            : "Rider created successfully"
         );
         closeFormModal();
         fetchRiders({ showLoader: false });
@@ -369,8 +367,9 @@ const RiderManagement = () => {
                     </td>
                     <td>{renderStatusBadge(rider.status)}</td>
                     <td>
-                      {new Date(rider.updatedAt || rider.createdAt || Date.now())
-                        .toLocaleDateString()}
+                      {new Date(
+                        rider.updatedAt || rider.createdAt || Date.now()
+                      ).toLocaleDateString()}
                     </td>
                     <td>
                       <div className="d-flex gap-3 fs-5">
@@ -407,7 +406,12 @@ const RiderManagement = () => {
         </div>
       )}
 
-      <Modal show={showFormModal} onHide={closeFormModal} size="lg" style={{ zIndex: 99999 }}> 
+      <Modal
+        show={showFormModal}
+        onHide={closeFormModal}
+        size="lg"
+        style={{ zIndex: 99999 }}
+      >
         <Modal.Header closeButton>
           <Modal.Title>
             {selectedRider ? "Update Rider" : "Add New Rider"}
@@ -561,7 +565,11 @@ const RiderManagement = () => {
           <Button variant="outline-secondary" onClick={closeFormModal}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={submitting}>
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
             {submitting
               ? "Saving..."
               : selectedRider
@@ -582,8 +590,8 @@ const RiderManagement = () => {
           <Modal.Title>Remove Rider</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to remove{" "}
-          <strong>{selectedRider?.name}</strong>? This action cannot be undone.
+          Are you sure you want to remove <strong>{selectedRider?.name}</strong>
+          ? This action cannot be undone.
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -605,4 +613,3 @@ const RiderManagement = () => {
 };
 
 export default RiderManagement;
-

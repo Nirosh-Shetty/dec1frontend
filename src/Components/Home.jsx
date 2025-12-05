@@ -32,6 +32,7 @@ import IsNonVeg from "../assets/isVeg=no.svg";
 import MultiCartDrawer from "./MultiCartDrawer";
 import DateSessionSelector from "./DateSessionSelector";
 import BottomNav from "./BottomNav";
+import chef from "./../assets/chef_3.png";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const navigate = useNavigate();
@@ -114,8 +115,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       item?.basePrice ||
       0;
     const preOrderPrice =
-      (matchedLocation && (matchedLocation.preOrderPrice || matchedLocation.preorderPrice)) ||
-      item?.preOrderPrice || item?.preorderPrice || 0;
+      (matchedLocation &&
+        (matchedLocation.preOrderPrice || matchedLocation.preorderPrice)) ||
+      item?.preOrderPrice ||
+      item?.preorderPrice ||
+      0;
     const isPre = isPreOrderFor(
       item?.deliveryDate || item?.deliveryDateISO,
       session
@@ -890,7 +894,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // };
 
   // Inside Home.jsx
-console.log(address,'dddddddddddddd')
+  console.log(address, "dddddddddddddd");
 
   const proceedToPlan = async () => {
     if (!user) {
@@ -939,7 +943,7 @@ console.log(address,'dddddddddddddd')
         coordinates: address.location?.coordinates || [0, 0],
         hubId: address.hubId || "",
         // Student info (if available)
-        studentInformation:address.studentInformation,
+        studentInformation: address.studentInformation,
         schoolName: address.schoolName || "",
         houseName: address.houseName || "",
         apartmentName: address.apartmentName || "",
@@ -1693,6 +1697,15 @@ console.log(address,'dddddddddddddd')
                                     backgroundColor: tag.tagColor,
                                   }}
                                 >
+                                  <img
+                                    src={chef}
+                                    alt=""
+                                    style={{
+                                      width: "10px",
+                                      height: "10px",
+                                      marginRight: "2px",
+                                    }}
+                                  />
                                   {tag.tagName}
                                 </span>
                               ))}
@@ -1707,7 +1720,8 @@ console.log(address,'dddddddddddddd')
                           <div className="d-flex gap-2">
                             {/* Show base price only if it's different from foodprice */}
                             {matchedLocation?.basePrice !==
-                              (matchedLocation?.basePrice !== matchedLocation?.hubPrice) && (
+                              (matchedLocation?.basePrice !==
+                                matchedLocation?.hubPrice) && (
                               <div
                                 style={{
                                   textDecoration: "line-through",
@@ -2115,7 +2129,8 @@ console.log(address,'dddddddddddddd')
                       ? foodData.locationPrice[0]
                       : {
                           Remainingstock: 0,
-                          hubPrice: foodData.hubPrice || foodData.basePrice || 0,
+                          hubPrice:
+                            foodData.hubPrice || foodData.basePrice || 0,
                           preOrderPrice: foodData.preOrderPrice || 0,
                           basePrice: foodData.basePrice || 0,
                         };

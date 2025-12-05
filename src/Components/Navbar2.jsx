@@ -85,27 +85,30 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                   />
                 </button>
                 {/* <div className="avatar"> */}
-                <Link to="/profile"  style={{
-                  display:"flex",
-                  alignItems:"center",
-                  justifyContent:"space-evenly"
-                }}>
-                <img
+                <Link
+                  to="/profile"
                   style={{
-                    paddingRight: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
                   }}
-                  src="/Assets/profile.svg"
-                  alt="profile"
-                  // className="icon-img-l"
-                />
-                {/* </div> */}
-                <div className="user-details">
-                  <h4>{`${user.Fname} ${user.Lname || ""}`}</h4>
-                  <p>
-                    {/* {user.Mobile} | {user.Email} */}
-                    {user.Mobile}
-                  </p>
-                </div>
+                >
+                  <img
+                    style={{
+                      paddingRight: "10px",
+                    }}
+                    src="/Assets/profile.svg"
+                    alt="profile"
+                    // className="icon-img-l"
+                  />
+                  {/* </div> */}
+                  <div className="user-details">
+                    <h4>{`${user.Fname} ${user.Lname || ""}`}</h4>
+                    <p>
+                      {/* {user.Mobile} | {user.Email} */}
+                      {user.Mobile}
+                    </p>
+                  </div>
                 </Link>
               </div>
             ) : (
@@ -172,11 +175,11 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                   </div>
                 </div>
                 <div className="nav-list">
-                  {/* <NavItem
+                  <NavItem
                     icon={<User size={20} />}
-                    text='My Profile'
-                    onClick={() => handleLinkClick('/profile')}
-                  /> */}
+                    text="My Profile"
+                    onClick={() => handleLinkClick("/profile")}
+                  />
                   <NavItem
                     icon={
                       <img
@@ -188,17 +191,17 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                     text="My Addresses"
                     onClick={() => handleLinkClick("/addresses")}
                   />
-                   <NavItem
-                icon={
-                  <img
-                    src="/Assets/gifticon.svg"
-                    alt="Refer & Earn"
-                    className="icon-img-l"
+                  <NavItem
+                    icon={
+                      <img
+                        src="/Assets/gifticon.svg"
+                        alt="Refer & Earn"
+                        className="icon-img-l"
+                      />
+                    }
+                    text="Refer & Earn"
+                    onClick={() => handleLinkClick("/refer")}
                   />
-                }
-                text="Refer & Earn"
-                onClick={() => handleLinkClick('/refer')}
-              />
                   <NavItemExternal
                     icon={
                       <img

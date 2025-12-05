@@ -16,6 +16,7 @@ import secure from "./../assets/secure.png";
 import warning from "./../assets/warning.png";
 import axios from "axios";
 import { MdMyLocation } from "react-icons/md";
+import "./../Styles/Location.css";
 
 const LocationConfirmation = () => {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ const LocationConfirmation = () => {
   const fixedPinRef = useRef(null);
   const fixedMessageRef = useRef(null);
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
+  const API_KEY = process.env.REACT_APP_MAP_KEY;
 
   // Track if we're editing an address
   const [isEditing, setIsEditing] = useState(false);
@@ -148,9 +149,27 @@ const LocationConfirmation = () => {
   };
 
   // Handle retry location
+
   const handleRetryLocation = () => {
-    setLocationDenied(false);
-    setShowLocationPermission(true);
+    setShowLocationPermission(false);
+
+    // First, ensure the script is loaded
+    if (!scriptLoaded) {
+      setIsLoading(true);
+      // Wait a moment for script to potentially load
+      setTimeout(() => {
+        if (window.google && window.google.maps) {
+          setScriptLoaded(true);
+          initializeServices();
+          getCurrentLocation();
+        } else {
+          setError("Google Maps failed to load. Please refresh the page.");
+          setIsLoading(false);
+        }
+      }, 500);
+    } else {
+      getCurrentLocation();
+    }
   };
 
   // Check if coming from modal with selected place OR editing existing address
@@ -1262,6 +1281,122 @@ const LocationConfirmation = () => {
   };
 
   // Handle save address
+  // const handleSaveAddress = async (e) => {
+  //   e.preventDefault();
+  //   if (!isFormValid()) {
+  //     setError("Please fill all required fields");
+  //     return;
+  //   }
+
+  //   const addressData = {
+  //     location: selectedLocation,
+  //     address: address,
+  //     houseName: houseName,
+  //     addressType: addressType,
+  //     homeName: homeName,
+  //     apartmentName: apartmentName,
+  //     schoolName: schoolName,
+  //     companyName: companyName,
+  //     hubName: hub[0]?.hubName || "",
+  //     hubId: hub[0]?.hub || "",
+  //     ...(addressType === "Home" && { landmark, floor }),
+  //     ...(addressType === "PG" && { towerBlock, flat, floor }),
+  //     ...(addressType === "School" && {
+  //       studentName,
+  //       studentClass,
+  //       studentSection,
+  //     }),
+  //     ...(addressType === "Work" && { floorNo }),
+  //     fullAddress: generateFullAddress(),
+  //   };
+
+  //   console.log("Saving address:", addressData);
+
+  //   try {
+  //     setIsLoading(true);
+
+  //     const user = JSON.parse(localStorage.getItem("user"));
+  //     const customerId = user._id;
+
+  //     if (!customerId) {
+  //       setError("Customer ID not found. Please login again.");
+  //       return;
+  //     }
+
+  //     const requestPayload = {
+  //       customerId: customerId,
+  //       addressType: addressData.addressType,
+  //       houseName: addressData.houseName,
+  //       fullAddress: addressData.fullAddress,
+  //       location: {
+  //         lat: addressData.location.lat,
+  //         lng: addressData.location.lng,
+  //       },
+  //       landmark: addressData.landmark || "",
+  //       floor: addressData.floor || "",
+  //       towerBlock: addressData.towerBlock || "",
+  //       flat: addressData.flat || "",
+  //       studentName: addressData.studentName || "",
+  //       studentClass: addressData.studentClass || "",
+  //       studentSection: addressData.studentSection || "",
+  //       floorNo: addressData.floorNo || "",
+  //       homeName: addressData.homeName || "",
+  //       apartmentName: addressData.apartmentName || "",
+  //       schoolName: addressData.schoolName || "",
+  //       companyName: addressData.companyName || "",
+  //       isDefault: true,
+  //       hubName: addressData.hubName || "",
+  //       hubId: addressData.hubId || "",
+  //     };
+
+  //     // If editing existing address, include addressId for update
+  //     if (location.state?.editingAddress?._id) {
+  //       requestPayload.addressId = location.state.editingAddress._id;
+  //     }
+
+  //     const endpoint = location.state?.editingAddress?._id
+  //       ? `https://dailydish-backend.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+  //       : "https://dailydish-backend.onrender.com/api/User/addresses";
+  //     const method = location.state?.editingAddress?._id ? "PUT" : "POST";
+
+  //     const response = await fetch(endpoint, {
+  //       method: method,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(requestPayload),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || "Failed to save address");
+  //     }
+
+  //     const result = await response.json();
+
+  //     if (result.success) {
+  //       setShowAddressForm(false);
+  //       resetForm();
+
+  //       navigate("/home", {
+  //         state: {
+  //           userLocation: selectedLocation,
+  //           userAddress: address,
+  //           addressData: addressData,
+  //         },
+  //       });
+  //     } else {
+  //       throw new Error(result.message || "Failed to save address");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error saving address:", error);
+  //     setError(error.message || "Failed to save address. Please try again.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // Handle save address - UPDATED to set as primary
   const handleSaveAddress = async (e) => {
     e.preventDefault();
     if (!isFormValid()) {
@@ -1289,9 +1424,10 @@ const LocationConfirmation = () => {
       }),
       ...(addressType === "Work" && { floorNo }),
       fullAddress: generateFullAddress(),
+      isDefault: true, // NEW: Mark as primary by default
     };
 
-    console.log("Saving address:", addressData);
+    console.log("Saving address as primary:", addressData);
 
     try {
       setIsLoading(true);
@@ -1325,7 +1461,7 @@ const LocationConfirmation = () => {
         apartmentName: addressData.apartmentName || "",
         schoolName: addressData.schoolName || "",
         companyName: addressData.companyName || "",
-        isDefault: true,
+        isDefault: true, // NEW: Ensure it's set as default
         hubName: addressData.hubName || "",
         hubId: addressData.hubId || "",
       };
@@ -1333,6 +1469,10 @@ const LocationConfirmation = () => {
       // If editing existing address, include addressId for update
       if (location.state?.editingAddress?._id) {
         requestPayload.addressId = location.state.editingAddress._id;
+        // For editing, we don't automatically set as primary unless it already was
+        if (!location.state.editingAddress.isDefault) {
+          requestPayload.isDefault = false;
+        }
       }
 
       const endpoint = location.state?.editingAddress?._id
@@ -1356,14 +1496,32 @@ const LocationConfirmation = () => {
       const result = await response.json();
 
       if (result.success) {
+        // NEW: If this is a new address (not editing), set it as primary
+        if (!location.state?.editingAddress?._id) {
+          // Get the saved address ID from response
+          const savedAddressId = result.address?._id || result.addressId;
+
+          if (savedAddressId) {
+            // Make this address primary
+            await setAddressAsPrimary(customerId, savedAddressId);
+          }
+        }
+
         setShowAddressForm(false);
         resetForm();
+
+        // Dispatch event to notify LocationModal2
+        window.dispatchEvent(new Event("addressAdded"));
+
+        // Update localStorage with the new primary address
+        localStorage.setItem("primaryAddress", JSON.stringify(addressData));
 
         navigate("/home", {
           state: {
             userLocation: selectedLocation,
             userAddress: address,
             addressData: addressData,
+            isPrimary: true, // NEW: Indicate this is primary
           },
         });
       } else {
@@ -1374,6 +1532,40 @@ const LocationConfirmation = () => {
       setError(error.message || "Failed to save address. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // NEW: Helper function to set address as primary
+  const setAddressAsPrimary = async (customerId, addressId) => {
+    try {
+      const response = await fetch(
+        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.ok) {
+        console.log(`Address ${addressId} set as primary successfully`);
+
+        // Update local storage cache
+        const cachedAddresses = localStorage.getItem(`addresses_${customerId}`);
+        if (cachedAddresses) {
+          const cached = JSON.parse(cachedAddresses);
+          cached.primaryAddress = addressId;
+          localStorage.setItem(
+            `addresses_${customerId}`,
+            JSON.stringify(cached)
+          );
+        }
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error setting address as primary:", error);
+      return false;
     }
   };
 
@@ -1756,7 +1948,7 @@ const LocationConfirmation = () => {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
         backgroundColor: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",
@@ -1794,6 +1986,7 @@ const LocationConfirmation = () => {
               style={{
                 fontSize: "48px",
                 marginBottom: "16px",
+                color: "#ff6b6b",
               }}
             >
               📍
@@ -1806,7 +1999,7 @@ const LocationConfirmation = () => {
                 fontWeight: "600",
               }}
             >
-              Allow Location Access
+              Location is Disabled
             </h3>
             <p
               style={{
@@ -1816,18 +2009,19 @@ const LocationConfirmation = () => {
                 lineHeight: "1.5",
               }}
             >
-              We need your location to show nearby restaurants and deliver your
-              orders accurately.
+              Please enable location access in your browser settings to use this
+              feature.
             </p>
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
                 gap: "12px",
+                marginTop: "12px",
               }}
             >
               <button
-                onClick={handleAllowLocation}
+                onClick={handleRetryLocation}
                 style={{
                   backgroundColor: "#6B8E23",
                   color: "white",
@@ -1846,29 +2040,7 @@ const LocationConfirmation = () => {
                   e.target.style.backgroundColor = "#6B8E23";
                 }}
               >
-                Allow Location Access
-              </button>
-              <button
-                onClick={handleDenyLocation}
-                style={{
-                  backgroundColor: "transparent",
-                  color: "#666",
-                  border: "1px solid #ddd",
-                  borderRadius: "12px",
-                  padding: "14px",
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f5f5f5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-              >
-                Not Now
+                Try Again
               </button>
             </div>
           </div>
@@ -1910,7 +2082,7 @@ const LocationConfirmation = () => {
                 color: "#ff6b6b",
               }}
             >
-              ❌
+              📍
             </div>
             <h3
               style={{
@@ -1920,7 +2092,7 @@ const LocationConfirmation = () => {
                 fontWeight: "600",
               }}
             >
-              Location Access Denied
+              Location is Disabled
             </h3>
             <p
               style={{
@@ -1930,14 +2102,15 @@ const LocationConfirmation = () => {
                 lineHeight: "1.5",
               }}
             >
-              To get accurate delivery locations and nearby restaurants, please
-              enable location access in your browser settings.
+              Please enable location access in your browser settings to use this
+              feature.
             </p>
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
                 gap: "12px",
+                marginTop: "12px",
               }}
             >
               <button
@@ -1961,28 +2134,6 @@ const LocationConfirmation = () => {
                 }}
               >
                 Try Again
-              </button>
-              <button
-                onClick={() => setLocationDenied(false)}
-                style={{
-                  backgroundColor: "transparent",
-                  color: "#666",
-                  border: "1px solid #ddd",
-                  borderRadius: "12px",
-                  padding: "14px",
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f5f5f5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-              >
-                Continue Anyway
               </button>
             </div>
           </div>
@@ -2183,17 +2334,17 @@ const LocationConfirmation = () => {
         {/* Top Panel - Map */}
         <div
           style={{
-            flex: "1",
+            flex: window.innerWidth <= 480 ? "1" : "1", // Let it take available space
             position: "relative",
             backgroundColor: "#e9ecef",
-            minHeight: "50vh",
+            overflow: "hidden",
           }}
         >
           <div
             ref={mapRef}
             style={{
               width: "100%",
-              height: "100%",
+              height: "100%", // Full height of parent
               backgroundColor: "#e9ecef",
             }}
           />
@@ -2358,40 +2509,47 @@ const LocationConfirmation = () => {
           {/* Address Form Modal */}
           {showAddressForm && (
             <div
-              className="modal show fade d-block"
-              tabIndex="-1"
-              role="dialog"
               style={{
-                position: "absolute",
+                position: "fixed",
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
                 backgroundColor: "rgba(0,0,0,0.5)",
-                boxShadow: "1px 0px 4px 0px #00000040",
                 zIndex: 2000,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                padding: window.innerWidth <= 768 ? "0" : "16px", // No padding on mobile
               }}
             >
               <div
-                className="modal-dialog"
-                role="document"
                 style={{
-                  maxWidth: window.innerWidth > 768 ? "605px" : "402px",
-                  height: "auto",
+                  width: "100%",
+                  maxWidth: window.innerWidth > 768 ? "605px" : "100%", // Full width on mobile
                   margin: "auto",
-                  width: "90%",
+                  animation: "fadeIn 0.3s ease-out",
+                  height: window.innerWidth <= 768 ? "100%" : "auto", // Full height on mobile
                 }}
               >
                 <div
-                  className="modal-content"
                   style={{
                     backgroundColor: "#F8F6F0",
-                    borderRadius: "16px",
-                    padding: window.innerWidth > 768 ? "30px 40px" : "20px",
+                    borderRadius: window.innerWidth <= 768 ? "0" : "16px", // No border radius on mobile
+                    padding:
+                      window.innerWidth > 768
+                        ? "30px 40px"
+                        : window.innerWidth <= 360
+                        ? "16px"
+                        : "20px",
                     position: "relative",
+                    maxHeight: window.innerWidth <= 768 ? "100vh" : "90vh", // Full height on mobile
+                    height: window.innerWidth <= 768 ? "100%" : "auto", // Full height on mobile
+                    overflowY: "auto",
+                    boxShadow:
+                      window.innerWidth <= 768
+                        ? "none"
+                        : "0 4px 20px rgba(0, 0, 0, 0.15)",
                   }}
                 >
                   {/* Close Button */}
@@ -2400,20 +2558,46 @@ const LocationConfirmation = () => {
                     onClick={handleCancel}
                     style={{
                       position: "absolute",
-                      top: "16px",
-                      right: "16px",
+                      top:
+                        window.innerWidth <= 360
+                          ? "12px"
+                          : window.innerWidth <= 768
+                          ? "16px"
+                          : "24px",
+                      right:
+                        window.innerWidth <= 360
+                          ? "12px"
+                          : window.innerWidth <= 768
+                          ? "16px"
+                          : "24px",
                       background: "none",
                       border: "none",
-                      fontSize: "24px",
+                      fontSize:
+                        window.innerWidth <= 360
+                          ? "20px"
+                          : window.innerWidth <= 768
+                          ? "24px"
+                          : "28px",
                       color: "#666",
                       cursor: "pointer",
-                      width: "32px",
-                      height: "32px",
+                      width:
+                        window.innerWidth <= 360
+                          ? "28px"
+                          : window.innerWidth <= 768
+                          ? "32px"
+                          : "36px",
+                      height:
+                        window.innerWidth <= 360
+                          ? "28px"
+                          : window.innerWidth <= 768
+                          ? "32px"
+                          : "36px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: "50%",
                       transition: "background-color 0.2s",
+                      zIndex: 10,
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.backgroundColor = "rgba(0,0,0,0.1)";
@@ -2425,32 +2609,130 @@ const LocationConfirmation = () => {
                     ×
                   </button>
 
+                  {/* Modal Header */}
+                  <div
+                    style={{
+                      marginBottom: "20px",
+                      paddingRight:
+                        window.innerWidth <= 360
+                          ? "30px"
+                          : window.innerWidth <= 768
+                          ? "40px"
+                          : "50px",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        fontSize:
+                          window.innerWidth <= 360
+                            ? "16px"
+                            : window.innerWidth <= 768
+                            ? "18px"
+                            : "20px",
+                        fontWeight: "600",
+                        color: "#2c2c2c",
+                        margin: 0,
+                        fontFamily: "Inter",
+                      }}
+                    >
+                      {location.state?.editingAddress
+                        ? "Edit Address"
+                        : "Add New Address"}
+                    </h3>
+                  </div>
+
                   <form onSubmit={handleSaveAddress}>
                     {/* Address Details Section */}
                     <div style={{ marginBottom: "20px" }}>
                       {addressType ? (
                         <div
                           style={{
-                            fontSize: "12px",
+                            fontSize:
+                              window.innerWidth <= 360
+                                ? "11px"
+                                : window.innerWidth <= 768
+                                ? "12px"
+                                : "14px",
                             color: "#2c2c2c",
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "8px",
                           }}
                         >
-                          <img src={locationpng} alt="" />
-                          {address}
+                          <img
+                            src={locationpng}
+                            alt="Location"
+                            style={{
+                              width:
+                                window.innerWidth <= 360
+                                  ? "14px"
+                                  : window.innerWidth <= 768
+                                  ? "16px"
+                                  : "18px",
+                              height:
+                                window.innerWidth <= 360
+                                  ? "14px"
+                                  : window.innerWidth <= 768
+                                  ? "16px"
+                                  : "18px",
+                              marginTop: "2px",
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span
+                            style={{
+                              wordBreak: "break-word",
+                              lineHeight: "1.4",
+                            }}
+                          >
+                            {address}
+                          </span>
                         </div>
                       ) : (
                         <div
                           style={{
-                            fontSize: "12px",
+                            fontSize:
+                              window.innerWidth <= 360
+                                ? "11px"
+                                : window.innerWidth <= 768
+                                ? "12px"
+                                : "14px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
                           }}
                         >
-                          <img src={locationpng} alt="" />
+                          <img
+                            src={locationpng}
+                            alt="Location"
+                            style={{
+                              width:
+                                window.innerWidth <= 360
+                                  ? "14px"
+                                  : window.innerWidth <= 768
+                                  ? "16px"
+                                  : "18px",
+                              height:
+                                window.innerWidth <= 360
+                                  ? "14px"
+                                  : window.innerWidth <= 768
+                                  ? "16px"
+                                  : "18px",
+                              flexShrink: 0,
+                            }}
+                          />
                           <span
                             style={{
                               fontFamily: "Inter",
-                              fontSize: "14px",
+                              fontSize:
+                                window.innerWidth <= 360
+                                  ? "12px"
+                                  : window.innerWidth <= 768
+                                  ? "14px"
+                                  : "16px",
                               fontWeight: "500",
                               color: "#2c2c2c",
+                              lineHeight: "1.3",
                             }}
                           >
                             Select Delivery Address Type
@@ -2459,13 +2741,22 @@ const LocationConfirmation = () => {
                       )}
                     </div>
 
-                    {/* Address Type Selection */}
+                    {/* Address Type Selection - Takes full width */}
                     <div style={{ marginBottom: "20px" }}>
                       <div
                         style={{
                           display: "grid",
-                          gridTemplateColumns: "repeat(4, 1fr)",
-                          gap: "8px",
+                          gridTemplateColumns:
+                            window.innerWidth <= 360
+                              ? "repeat(2, 1fr)"
+                              : "repeat(4, 1fr)",
+                          gap:
+                            window.innerWidth <= 360
+                              ? "8px"
+                              : window.innerWidth <= 768
+                              ? "6px"
+                              : "8px",
+                          width: "100%",
                         }}
                       >
                         {addressTypes.map((type) => (
@@ -2474,10 +2765,25 @@ const LocationConfirmation = () => {
                             type="button"
                             onClick={() => setAddressType(type.key)}
                             style={{
-                              width: isLargeScreen ? "auto" : "75px",
-                              height: isLargeScreen ? "55px" : "43px",
-                              padding: "8px",
-                              borderRadius: "12px",
+                              width: "100%",
+                              minHeight:
+                                window.innerWidth <= 360
+                                  ? "38px"
+                                  : window.innerWidth <= 768
+                                  ? "43px"
+                                  : "65px",
+                              padding:
+                                window.innerWidth <= 360
+                                  ? "6px 4px"
+                                  : window.innerWidth <= 768
+                                  ? "8px"
+                                  : "12px",
+                              borderRadius:
+                                window.innerWidth <= 360
+                                  ? "8px"
+                                  : window.innerWidth <= 768
+                                  ? "12px"
+                                  : "14px",
                               border:
                                 addressType === type.key
                                   ? "1.2px solid #F5DEB3"
@@ -2492,8 +2798,25 @@ const LocationConfirmation = () => {
                               flexDirection: "row",
                               alignItems: "center",
                               justifyContent: "center",
-                              gap: "4px",
-                              opacity: 1,
+                              gap:
+                                window.innerWidth <= 360
+                                  ? "4px"
+                                  : window.innerWidth <= 768
+                                  ? "4px"
+                                  : "8px",
+                              overflow: "hidden",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (addressType !== type.key) {
+                                e.currentTarget.style.backgroundColor =
+                                  "#F8F4E8";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (addressType !== type.key) {
+                                e.currentTarget.style.backgroundColor =
+                                  "#FFF8DC";
+                              }
                             }}
                           >
                             <img
@@ -2504,18 +2827,41 @@ const LocationConfirmation = () => {
                               }
                               alt={type.label}
                               style={{
-                                width: isLargeScreen ? "24px" : "16px",
-                                height: isLargeScreen ? "24px" : "16px",
+                                width:
+                                  window.innerWidth <= 360
+                                    ? "14px"
+                                    : window.innerWidth <= 768
+                                    ? "16px"
+                                    : "24px",
+                                height:
+                                  window.innerWidth <= 360
+                                    ? "14px"
+                                    : window.innerWidth <= 768
+                                    ? "16px"
+                                    : "24px",
                                 objectFit: "contain",
+                                flexShrink: 0,
                               }}
                             />
                             <span
                               style={{
-                                fontSize: "12px",
+                                fontSize:
+                                  window.innerWidth <= 360
+                                    ? "8px"
+                                    : window.innerWidth <= 768
+                                    ? "10px"
+                                    : "14px",
                                 fontWeight: "500",
                                 fontFamily: "Inter",
                                 color:
                                   addressType === type.key ? "#fff" : "#000",
+                                textAlign: "center",
+                                lineHeight: "1.2",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "normal",
+                                width: "100%",
+                                padding: "0 2px",
                               }}
                             >
                               {type.label}
@@ -2525,70 +2871,154 @@ const LocationConfirmation = () => {
                       </div>
                     </div>
 
-                    {/* Type Specific Fields */}
-                    {renderTypeSpecificFields()}
+                    {/* Type Specific Fields - Takes full width */}
+                    <div style={{ width: "100%" }}>
+                      {renderTypeSpecificFields()}
+                    </div>
 
-                    {/* Footer Buttons */}
+                    {/* Footer Buttons - Takes full width */}
                     {addressType && (
                       <div
-                        className="d-flex flex-wrap justify-content-center align-items-center mt-4 gap-3"
                         style={{
+                          display: "flex",
+                          justifyContent: "space-between", // Changed to space-between for full width
+                          alignItems: "center",
+                          marginTop: "24px",
+                          gap:
+                            window.innerWidth <= 360
+                              ? "8px"
+                              : window.innerWidth <= 768
+                              ? "12px"
+                              : "16px",
+                          paddingTop: "20px",
+                          borderTop: "1px solid rgba(0,0,0,0.1)",
                           width: "100%",
-                          margin: "0 auto",
                         }}
                       >
-                        {/* Cancel Button */}
+                        {/* Cancel Button - Takes available space */}
                         <button
                           type="button"
-                          className="btn"
                           onClick={handleCancel}
                           style={{
                             backgroundColor: "transparent",
                             border: "1px solid #d5c5b0",
-                            borderRadius: "12px",
-                            width: window.innerWidth > 768 ? "160px" : "120px", // smaller on mobile
-                            height: "45px",
+                            borderRadius:
+                              window.innerWidth <= 360
+                                ? "8px"
+                                : window.innerWidth <= 768
+                                ? "12px"
+                                : "14px",
+                            width: window.innerWidth <= 360 ? "48%" : "48%", // Percentage width
+                            height:
+                              window.innerWidth <= 360
+                                ? "40px"
+                                : window.innerWidth <= 768
+                                ? "45px"
+                                : "50px",
                             fontWeight: "600",
                             textAlign: "center",
-                            fontSize: window.innerWidth > 768 ? "16px" : "14px",
+                            fontSize:
+                              window.innerWidth <= 360
+                                ? "13px"
+                                : window.innerWidth <= 768
+                                ? "14px"
+                                : "16px",
                             padding: "0 10px",
                             display: "flex",
+                            flexDirection: "row",
                             justifyContent: "center",
                             alignItems: "center",
                             gap: "6px",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            flex: 1, // Takes available space
+                            marginRight:
+                              window.innerWidth <= 360 ? "4px" : "8px",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#f9f9f9";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
                           }}
                         >
                           Cancel
                           <img
                             src={cross}
                             alt=""
-                            style={{ width: "14px", height: "14px" }}
+                            style={{
+                              width:
+                                window.innerWidth <= 360
+                                  ? "12px"
+                                  : window.innerWidth <= 768
+                                  ? "14px"
+                                  : "16px",
+                              height:
+                                window.innerWidth <= 360
+                                  ? "12px"
+                                  : window.innerWidth <= 768
+                                  ? "14px"
+                                  : "16px",
+                            }}
                           />
                         </button>
 
-                        {/* Save Button */}
+                        {/* Save Button - Takes available space */}
                         <button
                           type="submit"
-                          className="btn d-flex justify-content-center align-items-center"
                           disabled={!isFormValid() || isLoading}
                           style={{
                             backgroundColor:
                               isFormValid() && !isLoading
                                 ? "#E6B800"
                                 : "#C0C0C0",
-                            borderRadius: "12px",
+                            borderRadius:
+                              window.innerWidth <= 360
+                                ? "8px"
+                                : window.innerWidth <= 768
+                                ? "12px"
+                                : "14px",
                             border: "1px solid #c0c0c0",
-                            width: window.innerWidth > 768 ? "200px" : "160px",
-                            height: "45px",
+                            width: window.innerWidth <= 360 ? "48%" : "48%", // Percentage width
+                            height:
+                              window.innerWidth <= 360
+                                ? "40px"
+                                : window.innerWidth <= 768
+                                ? "45px"
+                                : "50px",
                             fontWeight: "600",
                             color: "black",
                             cursor:
                               isFormValid() && !isLoading
                                 ? "pointer"
                                 : "not-allowed",
-                            fontSize: window.innerWidth > 768 ? "16px" : "14px",
+                            fontSize:
+                              window.innerWidth <= 360
+                                ? "13px"
+                                : window.innerWidth <= 768
+                                ? "14px"
+                                : "16px",
                             padding: "0 12px",
                             gap: "6px",
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            transition: "all 0.2s ease",
+                            flex: 1, // Takes available space
+                            marginLeft:
+                              window.innerWidth <= 360 ? "4px" : "8px",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (isFormValid() && !isLoading) {
+                              e.currentTarget.style.backgroundColor = "#FFD700";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (isFormValid() && !isLoading) {
+                              e.currentTarget.style.backgroundColor = "#E6B800";
+                            }
                           }}
                         >
                           {isLoading
@@ -2599,8 +3029,18 @@ const LocationConfirmation = () => {
                           {!isLoading && (
                             <CircleCheck
                               style={{
-                                width: "16px",
-                                height: "16px",
+                                width:
+                                  window.innerWidth <= 360
+                                    ? "14px"
+                                    : window.innerWidth <= 768
+                                    ? "16px"
+                                    : "18px",
+                                height:
+                                  window.innerWidth <= 360
+                                    ? "14px"
+                                    : window.innerWidth <= 768
+                                    ? "16px"
+                                    : "18px",
                                 marginTop: "1px",
                               }}
                             />
@@ -2611,6 +3051,101 @@ const LocationConfirmation = () => {
                   </form>
                 </div>
               </div>
+
+              <style>
+                {`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        /* Custom scrollbar */
+        div[style*="maxHeight:"]::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        div[style*="maxHeight:"]::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        
+        div[style*="maxHeight:"]::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 10px;
+        }
+        
+        div[style*="maxHeight:"]::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+          div[style*="position: fixed"] {
+            padding: 0 !important;
+          }
+          
+          div[style*="borderRadius: '0'"] {
+            border-radius: 0 !important;
+          }
+          
+          div[style*="boxShadow: 'none'"] {
+            box-shadow: none !important;
+          }
+          
+          /* Full width grid */
+          div[style*="gridTemplateColumns"] {
+            width: 100% !important;
+          }
+          
+          /* Full width address type buttons */
+          button[style*="width: '100%'"] {
+            width: 100% !important;
+          }
+          
+          /* Make address type buttons 2 columns on very small screens */
+          @media (max-width: 360px) {
+            div[style*="gridTemplateColumns"] {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+          }
+          
+          /* 4 columns on tablets (between 361px and 768px) */
+          @media (min-width: 361px) and (max-width: 768px) {
+            div[style*="gridTemplateColumns"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+        }
+        
+        /* Desktop styles */
+        @media (min-width: 769px) {
+          div[style*="maxWidth:"] {
+            max-width: 605px !important;
+          }
+          
+          /* Full width grid on desktop */
+          div[style*="gridTemplateColumns"] {
+            width: 100% !important;
+          }
+        }
+        
+        /* Prevent body scrolling when modal is open */
+        body.modal-open {
+          overflow: hidden;
+        }
+        
+        /* Ensure all elements take full width */
+        form {
+          width: 100%;
+        }
+      `}
+              </style>
             </div>
           )}
 
@@ -2649,7 +3184,7 @@ const LocationConfirmation = () => {
                   fontWeight: "500",
                 }}
               >
-                {isLoading ? "Saving address..." : "Loading map..."}
+                {isLoading ? "" : "Loading map..."}
               </div>
             </div>
           )}
@@ -2826,247 +3361,178 @@ const LocationConfirmation = () => {
         {!showAddressForm && (
           <div
             style={{
-              display: "flex",
-              justifyContent: "center",
-              padding:
-                window.innerWidth <= 480
-                  ? "2px"
-                  : window.innerWidth <= 768
-                  ? "4px"
-                  : "8px",
-              backgroundColor: "transparent",
               position: "relative",
               zIndex: 1000,
+              width: "100%",
+              backgroundColor: "white",
+              borderTop: "1px solid #e0e0e0",
+              boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
+              // Removed fixed height constraints
             }}
           >
             <div
               style={{
-                backgroundColor: "white",
-                borderRadius: window.innerWidth <= 480 ? "10px" : "12px",
-                boxShadow: "0 -2px 12px rgba(0,0,0,0.1)",
-                width: "100%",
-                maxWidth:
+                padding:
                   window.innerWidth <= 480
-                    ? "96%"
+                    ? "12px 16px"
                     : window.innerWidth <= 768
-                    ? "98%"
-                    : "500px",
-                maxHeight:
-                  window.innerWidth <= 480
-                    ? "35vh"
-                    : window.innerWidth <= 768
-                    ? "40vh"
-                    : "55vh",
-                overflowY: "auto",
-                border: "1px solid #e0e0e0",
+                    ? "16px 20px"
+                    : "20px 24px",
+                maxWidth: "500px",
                 margin: "0 auto",
-                transition: "all 0.3s ease",
               }}
             >
-              <div
-                style={{
-                  padding:
-                    window.innerWidth <= 480
-                      ? "6px 10px"
-                      : window.innerWidth <= 768
-                      ? "8px 12px"
-                      : "12px 16px",
-                }}
-              >
-                {/* Serviceability Status */}
-                {selectedLocation && isServiceable === false && (
-                  <div
-                    style={{
-                      backgroundColor: "#fff3e0",
-                      border: "1px solid #ffcc80",
-                      borderRadius: window.innerWidth <= 480 ? "5px" : "6px",
-                      padding:
-                        window.innerWidth <= 480 ? "6px 10px" : "8px 12px",
-                      marginBottom: window.innerWidth <= 480 ? "8px" : "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: window.innerWidth <= 480 ? "4px" : "6px",
-                        fontSize: window.innerWidth <= 480 ? "12px" : "13px",
-                        fontWeight: "500",
-                        color: "#b22222",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: window.innerWidth <= 480 ? "14px" : "16px",
-                        }}
-                      >
-                        ⚠️
-                      </span>
-                      <span>Service not available</span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: window.innerWidth <= 480 ? "10px" : "11px",
-                        color: "#666",
-                        marginTop: window.innerWidth <= 480 ? "1px" : "2px",
-                        lineHeight: "1.3",
-                      }}
-                    >
-                      Confirm to request service for this location
-                    </div>
-                  </div>
-                )}
-
-                {/* Current Location Display */}
+              {/* Serviceability Status */}
+              {selectedLocation && isServiceable === false && (
                 <div
                   style={{
-                    padding:
-                      window.innerWidth <= 480
-                        ? "6px"
-                        : window.innerWidth <= 768
-                        ? "8px"
-                        : "10px",
-                    borderRadius: window.innerWidth <= 480 ? "6px" : "8px",
-                    marginBottom:
-                      window.innerWidth <= 480
-                        ? "8px"
-                        : window.innerWidth <= 768
-                        ? "10px"
-                        : "12px",
-                    backgroundColor: "#f8f9fa",
+                    backgroundColor: "#fff3e0",
+                    border: "1px solid #ffcc80",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    marginBottom: "16px",
+                    fontSize: window.innerWidth <= 480 ? "13px" : "14px",
                   }}
                 >
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "flex-start",
-                      gap:
-                        window.innerWidth <= 480
-                          ? "4px"
-                          : window.innerWidth <= 768
-                          ? "6px"
-                          : "8px",
+                      alignItems: "center",
+                      gap: "8px",
+                      fontWeight: "500",
+                      color: "#b22222",
+                      marginBottom: "4px",
                     }}
                   >
+                    <span>⚠️</span>
+                    <span>Service not available</span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: window.innerWidth <= 480 ? "11px" : "12px",
+                      color: "#666",
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    Confirm to request service for this location
+                  </div>
+                </div>
+              )}
+
+              {/* Address Display */}
+              <div
+                style={{
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "8px",
+                  padding: "16px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "20px",
+                      color: "#4caf50",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
+                  >
+                    📍
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        fontSize:
-                          window.innerWidth <= 480
-                            ? "14px"
-                            : window.innerWidth <= 768
-                            ? "16px"
-                            : "18px",
-                        color: "#4caf50",
-                        marginTop: window.innerWidth <= 480 ? "1px" : "2px",
-                        flexShrink: 0,
+                        fontSize: window.innerWidth <= 480 ? "14px" : "16px",
+                        fontWeight: "600",
+                        color: "#2e7d32",
+                        marginBottom: "4px",
                       }}
                     >
-                      📍
+                      {isConfirmed
+                        ? "Confirmed Location"
+                        : location.state?.editingAddress
+                        ? "Editing Address"
+                        : "Your Location"}
                     </div>
-                    <div style={{ flex: "1", minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize:
-                            window.innerWidth <= 480
-                              ? "12px"
-                              : window.innerWidth <= 768
-                              ? "13px"
-                              : "14px",
-                          fontWeight: "600",
-                          color: "#2e7d32",
-                          marginBottom:
-                            window.innerWidth <= 480 ? "1px" : "2px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {isConfirmed
-                          ? "Confirmed Location"
-                          : location.state?.editingAddress
-                          ? "Editing Address"
-                          : "Your Location"}
-                      </div>
-                      <div
-                        style={{
-                          fontSize:
-                            window.innerWidth <= 480
-                              ? "10px"
-                              : window.innerWidth <= 768
-                              ? "11px"
-                              : "12px",
-                          color: "#666",
-                          lineHeight: window.innerWidth <= 480 ? "1.2" : "1.3",
-                          wordBreak: "break-word",
-                          display: "-webkit-box",
-                          WebkitLineClamp: window.innerWidth <= 480 ? 2 : 3,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {address || "Detecting address..."}
-                      </div>
+                    <div
+                      style={{
+                        fontSize: window.innerWidth <= 480 ? "12px" : "14px",
+                        color: "#666",
+                        lineHeight: "1.4",
+                        wordBreak: "break-word",
+                        maxHeight: window.innerWidth <= 480 ? "36px" : "42px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {address || "Detecting address..."}
                     </div>
                   </div>
                 </div>
-
-                {/* Confirm Button */}
-                <div>
-                  <button
-                    onClick={handleConfirmLocation}
-                    disabled={isValidatingServiceability || !selectedLocation}
-                    style={{
-                      width: "100%",
-                      padding:
-                        window.innerWidth <= 480
-                          ? "8px"
-                          : window.innerWidth <= 768
-                          ? "10px"
-                          : "12px",
-                      ...getConfirmButtonStyle(),
-                      color: "white",
-                      border: "none",
-                      borderRadius: window.innerWidth <= 480 ? "6px" : "8px",
-                      fontSize:
-                        window.innerWidth <= 480
-                          ? "12px"
-                          : window.innerWidth <= 768
-                          ? "13px"
-                          : "14px",
-                      fontWeight: "600",
-                      cursor:
-                        isValidatingServiceability || !selectedLocation
-                          ? "default"
-                          : "pointer",
-                      transition: "all 0.2s ease",
-                      opacity:
-                        isValidatingServiceability || !selectedLocation
-                          ? 0.6
-                          : 1,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isValidatingServiceability && selectedLocation) {
-                        e.target.style.transform = "translateY(-1px)";
-                        e.target.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isValidatingServiceability && selectedLocation) {
-                        e.target.style.transform = "translateY(0)";
-                        e.target.style.boxShadow = "none";
-                      }
-                    }}
-                  >
-                    {getConfirmButtonText()}
-                  </button>
-                </div>
               </div>
+
+              {/* Confirm Button */}
+              <button
+                onClick={handleConfirmLocation}
+                disabled={isValidatingServiceability || !selectedLocation}
+                style={{
+                  width: "100%",
+                  padding: window.innerWidth <= 480 ? "14px" : "16px",
+                  backgroundColor:
+                    isValidatingServiceability || !selectedLocation
+                      ? "#ccc"
+                      : isServiceable === false
+                      ? "#b22222"
+                      : isConfirmed
+                      ? "#4caf50"
+                      : "#6B8E23",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: window.innerWidth <= 480 ? "14px" : "16px",
+                  fontWeight: "600",
+                  cursor:
+                    isValidatingServiceability || !selectedLocation
+                      ? "default"
+                      : "pointer",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isValidatingServiceability && selectedLocation) {
+                    e.target.style.opacity = "0.9";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isValidatingServiceability && selectedLocation) {
+                    e.target.style.opacity = "1";
+                  }
+                }}
+              >
+                {isValidatingServiceability
+                  ? "Checking serviceability..."
+                  : isConfirmed
+                  ? "✅ Location Confirmed"
+                  : location.state?.editingAddress
+                  ? "Confirm Location to Edit"
+                  : isServiceable === false
+                  ? "Request Service for This Area"
+                  : "Confirm Location"}
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {error && (
+      {/* {error && (
         <div
           style={{
             position: "fixed",
@@ -3117,7 +3583,7 @@ const LocationConfirmation = () => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
 
       <style>
         {`

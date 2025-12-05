@@ -1,4 +1,4 @@
-/* Reset default margins and ensure mobile-friendly scaling */
+Reset default margins and ensure mobile-friendly scaling
 
 
 html, body {
@@ -6,9 +6,16 @@ html, body {
   overflow-x: hidden;
 }
 
+#root, .App, .login-page-wrapper {
+  height: 100%;
+  overflow: hidden;
+}
+
+
 .login-container {
   display: flex;
   flex-direction: column;
+  height: 100vh;
   min-height: 100vh;
   background-color: #F8F6F0; /* Colors.warmmarble */
   justify-content: space-between;
@@ -17,6 +24,7 @@ html, body {
   margin: 0 auto;
   font-family: "InterVariable", sans-serif;
   position: relative;
+  overflow: hidden;
 }
 
 .header-wrapper {
@@ -30,11 +38,12 @@ html, body {
   padding: 16px;
   width: 100%;
   display: flex;
+  height: 202px;
   justify-content: center;
   align-items: center;
-  background-color: #E6B800; /* Colors.turmericGolden */
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
+  background-color: #6B8E23; /* Colors.turmericGolden */
+  /* border-bottom-left-radius: 16px; */
+  /* border-bottom-right-radius: 16px; */
   box-shadow: 0 4px 6px rgba(107, 107, 107, 0.3); /* Colors.secondaryText */
   max-height: 280px; /* Limit header height */
   overflow: hidden;
@@ -116,9 +125,9 @@ html, body {
   padding: 10px 0 10px 12px;
   justify-content: flex-start;
   align-items: center;
-  flex: 0.72;
+  /* flex: 0.48; */
   border-radius: 18px;
-  border: 0.4px solid var(--success-green, #6B8E23);
+  border: 1px solid var(--success-green, #6B8E23);
   background: var(--app-foreground, #FAFAFA);
   font-size: 16px;
   font-weight: 400;
@@ -126,7 +135,7 @@ html, body {
   letter-spacing: -0.8px;
   color: #2C2C2C;
   outline: none;
-  /* width: 70%; */
+  width: 66%;
 }
 
 .customer-name-input::placeholder {
@@ -144,11 +153,12 @@ html, body {
 .input-group-phone {
   display: flex;
   padding: 8px;
+  width: 217px;
   align-items: center;
   gap: 8px;
   flex: 1;
   border-radius: 18px;
-  border: 0.4px solid var(--success-green, #6B8E23);
+  border: 1px solid var(--success-green, #6B8E23);
   background: var(--app-foreground, #FAFAFA);
 }
 
@@ -245,7 +255,7 @@ html, body {
 }
 
 .footer {
-  padding: 16px;
+  /* padding: 16px; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -299,6 +309,7 @@ html, body {
 .login-container {
   max-width: 400px; /* Keep consistent mobile width */
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Add subtle shadow for desktop */
+  overflow: hidden !important;
 }
 }
 
@@ -307,7 +318,9 @@ html, body {
   .login-container {
     margin: 0 !important;
     max-width: 100vw !important;
+    height: 98vh !important;
     padding: 0;
+    overflow: hidden !important;
   }
   
   .header-wrapper {
@@ -339,6 +352,7 @@ html, body {
 @media (max-width: 320px) {
   .login-container {
     max-width: 100%;
+    overflow: hidden !important;
   }
   
   .phone-row {

@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Button, Modal, Table, Image, Form, Spinner } from "react-bootstrap";
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import { AiFillDelete } from "react-icons/ai";
 import { BiSolidEdit } from "react-icons/bi";
 import { BsSearch } from "react-icons/bs";
 import axios from "axios";
 import moment from "moment";
 import ImportExcel from "./ImportExcel";
-import TagsManager from './TagsManager';
+import TagsManager from "./TagsManager";
 import * as XLSX from "xlsx";
 import DownloadIcon from "@mui/icons-material/Download";
 import ReactPaginate from "react-paginate";
@@ -182,7 +182,7 @@ const Add_Products = () => {
       const res = await axios.get("https://dailydish-backend.onrender.com/api/admin/food-tags");
       if (res.status === 200) setTagsList(res.data.data || []);
     } catch (error) {
-      console.error('Error fetching tags', error);
+      console.error("Error fetching tags", error);
     }
   };
 
@@ -226,7 +226,7 @@ const Add_Products = () => {
       formdata.append("quantity", Quantity);
       formdata.append("fooddescription", ProductDesc);
       if (selectedTags && selectedTags.length > 0) {
-        formdata.append('foodTags', JSON.stringify(selectedTags));
+        formdata.append("foodTags", JSON.stringify(selectedTags));
       }
       formdata.append("aggregatedPrice", aggregatedPrice);
 
@@ -328,7 +328,7 @@ const Add_Products = () => {
       formdata.append("aggregatedPrice", aggregatedPrice);
       formdata.append("userid", id);
       if (selectedTags && selectedTags.length > 0) {
-        formdata.append('foodTags', JSON.stringify(selectedTags));
+        formdata.append("foodTags", JSON.stringify(selectedTags));
       }
 
       setIsLoading(true);
@@ -430,7 +430,9 @@ const Add_Products = () => {
   // when opening edit modal, if Data1 has foodTags, preselect them as id strings
   useEffect(() => {
     if (Data1 && Data1.foodTags) {
-      const arr = Data1.foodTags.map((ft) => (typeof ft === 'object' ? String(ft._id) : String(ft)));
+      const arr = Data1.foodTags.map((ft) =>
+        typeof ft === "object" ? String(ft._id) : String(ft)
+      );
       setSelectedTags(arr);
     }
   }, [Data1]);
@@ -438,7 +440,7 @@ const Add_Products = () => {
   useEffect(() => {
     setTotalAmount(
       Number(ProductPrice) +
-      (Number(GST?.TotalGst || 0) / 100) * Number(ProductPrice)
+        (Number(GST?.TotalGst || 0) / 100) * Number(ProductPrice)
     );
   }, [ProductPrice, GST]);
 
@@ -564,7 +566,12 @@ const Add_Products = () => {
           <Button variant="success" onClick={handleShow3}>
             + ADD
           </Button>
-          <Button variant="outline-secondary" onClick={() => setShowTagsManager(true)}>Manage Tags</Button>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setShowTagsManager(true)}
+          >
+            Manage Tags
+          </Button>
         </div>
 
         <div className="mb-3">
@@ -633,10 +640,27 @@ const Add_Products = () => {
                         {items.foodcategory}
                       </td>
                       <td style={{ paddingTop: "20px" }}>{items?.foodname}</td>
-                      <td style={{ paddingTop: "20px", fontSize:"0.7rem", lineHeight:"0.9rem"  }}>
+                      <td
+                        style={{
+                          paddingTop: "20px",
+                          fontSize: "0.7rem",
+                          lineHeight: "0.9rem",
+                        }}
+                      >
                         {items?.foodTags && items.foodTags.length > 0 ? (
                           items.foodTags.map((t, idx) => (
-                            <span key={idx} style={{ display: 'inline-block', marginRight: 6, padding: '2px 6px', background: t.tagColor || '#eee', borderRadius: 6 }}>{t.tagName || t}</span>
+                            <span
+                              key={idx}
+                              style={{
+                                display: "inline-block",
+                                marginRight: 6,
+                                padding: "2px 6px",
+                                background: t.tagColor || "#eee",
+                                borderRadius: 6,
+                              }}
+                            >
+                              {t.tagName || t}
+                            </span>
                           ))
                         ) : (
                           <span>—</span>
@@ -797,7 +821,9 @@ const Add_Products = () => {
                   className="form-select"
                   value={selectedTags}
                   onChange={(e) => {
-                    const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
+                    const vals = Array.from(e.target.selectedOptions).map(
+                      (o) => o.value
+                    );
                     setSelectedTags(vals);
                   }}
                   style={{ minHeight: 120 }}
@@ -956,7 +982,11 @@ const Add_Products = () => {
           </Modal.Footer>
         </Modal>
 
-        <Modal show={showTagsManager} onHide={() => setShowTagsManager(false)} size="lg">
+        <Modal
+          show={showTagsManager}
+          onHide={() => setShowTagsManager(false)}
+          size="lg"
+        >
           <Modal.Header closeButton>
             <Modal.Title>Manage Food Tags</Modal.Title>
           </Modal.Header>
@@ -1138,7 +1168,9 @@ const Add_Products = () => {
                   className="form-select"
                   value={selectedTags}
                   onChange={(e) => {
-                    const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
+                    const vals = Array.from(e.target.selectedOptions).map(
+                      (o) => o.value
+                    );
                     setSelectedTags(vals);
                   }}
                   style={{ minHeight: 120 }}

@@ -158,8 +158,8 @@ const PackerList = () => {
     if (
       !newPacker.username ||
       !newPacker.mobileNumber ||
-      !newPacker.hubs.length ||
-      !newPacker.locations.length
+      !newPacker.hubs.length
+      // !newPacker.locations.length
     ) {
       showToast("All fields are required.", "error");
       return;
@@ -205,8 +205,8 @@ const PackerList = () => {
     if (
       !editPacker.username ||
       !editPacker.mobileNumber ||
-      !editPacker.hubs.length ||
-      !editPacker.locations.length
+      !editPacker.hubs.length
+      // !editPacker.locations.length
     ) {
       showToast("All fields are required.", "error");
       return;
@@ -689,7 +689,7 @@ const PackerList = () => {
                 disabled={addPackerLoading}
               >
                 {hubs.map((hub) => (
-                  <option key={hub.hubId} value={hub.hubId}>
+                  <option key={hub.hubId} value={hub.hubName}>
                     {hub.hubName}
                   </option>
                 ))}
@@ -831,7 +831,7 @@ const PackerList = () => {
                 disabled={editPackerLoading}
               >
                 {hubs.map((hub) => (
-                  <option key={hub.hubId} value={hub.hubId}>
+                  <option key={hub.hubId} value={hub.hubName}>
                     {hub.hubName}
                   </option>
                 ))}

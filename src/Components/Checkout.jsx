@@ -2108,7 +2108,7 @@ const Checkout = () => {
                       onClick={() => setShowLocationModal(true)}
                       style={{ cursor: "pointer" }}
                     >
-                      Change
+                      {defaultAddress ? "Change" : "Add address"}
                     </span>
                   </div>
                 </div>

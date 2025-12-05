@@ -22,16 +22,18 @@
 }
 
 .nav-item {
+  height: 56px;
+  background-color: #FAFAFA !important;
+  border-radius: 15px;
+  padding: 15px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
   cursor: pointer;
-  width: 100%;
-  height: 100%;
-  padding-bottom: 5px; /* Adjust for iPhone home indicator area if needed */
+  transition: background-color 0.2s;
 }
 
 .nav-label {
@@ -53,4 +55,11 @@
 
 .nav-item.active .nav-icon-svg {
   transform: scale(1.1);
+}
+
+@media screen and (min-width: 799px) {
+  .bottom-nav-container{
+    width: 33%;
+    margin: 0 auto;
+  }
 }

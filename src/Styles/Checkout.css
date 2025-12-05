@@ -933,6 +933,54 @@ justify-content: space-between; */
     height: auto !important;
   }
 
+  .billdetail {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.label-column,
+.value-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.label-column {
+  flex: 1;
+  text-align: left;
+  align-items: flex-start;
+}
+
+.value-column {
+  flex: 1;
+  text-align: right;
+  align-items: flex-end;
+}
+
+/* --- FIX FOR SMALL SCREENS --- */
+@media (max-width: 600px) {
+  .billdetail {
+    flex-direction: row;             /* keep in a row */
+    justify-content: space-between;  /* space between */
+    gap: 20px;                       /* reduce gap if needed */
+  }
+
+  .label-column,
+  .value-column {
+    flex: 1;
+    flex-direction: column; /* keep labels/values vertical inside */
+    align-items: flex-start; /* optional: this aligns better on mobile */
+    text-align: left;        /* optional: improves readability */
+  }
+
+  .value-column {
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+
   .addressCard {
     width: 100%;
     height: auto;

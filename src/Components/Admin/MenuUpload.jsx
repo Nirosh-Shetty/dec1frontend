@@ -148,7 +148,9 @@ const MenuUpload = () => {
     const productToDelete = addedProducts[currentProductIndex];
     if (!productToDelete) return;
     // Remove from addedProducts
-    const newAdded = addedProducts.filter((p, idx) => idx !== currentProductIndex);
+    const newAdded = addedProducts.filter(
+      (p, idx) => idx !== currentProductIndex
+    );
     setAddedProducts(newAdded);
     // Remove assignments for that product
     setAssignments((prev) => {
@@ -177,24 +179,26 @@ const MenuUpload = () => {
       return;
     }
 
-    const items = addedProducts.map((product) => {
-      const hubObj = assignments[product._id] || {};
-      const hubData = Object.values(hubObj).map((h) => ({
-        hubId: h.hubId,
-        hubPrice: Number(h.hubPrice || product.foodprice || 0),
-        preOrderPrice: Number(h.preOrderPrice || product.foodprice || 0),
-        totalQuantity: Number(h.totalQuantity || 0),
-        hubPriority: Number(h.hubPriority || 0),
-        isActive: h.isActive !== undefined ? Boolean(h.isActive) : true,
-      }));
-      return {
-        productId: product._id,
-        menuDate,
-        session,
-        basePrice: Number(product.foodprice || 0),
-        hubData,
-      };
-    }).filter(it => Array.isArray(it.hubData) && it.hubData.length > 0);
+    const items = addedProducts
+      .map((product) => {
+        const hubObj = assignments[product._id] || {};
+        const hubData = Object.values(hubObj).map((h) => ({
+          hubId: h.hubId,
+          hubPrice: Number(h.hubPrice || product.foodprice || 0),
+          preOrderPrice: Number(h.preOrderPrice || product.foodprice || 0),
+          totalQuantity: Number(h.totalQuantity || 0),
+          hubPriority: Number(h.hubPriority || 0),
+          isActive: h.isActive !== undefined ? Boolean(h.isActive) : true,
+        }));
+        return {
+          productId: product._id,
+          menuDate,
+          session,
+          basePrice: Number(product.foodprice || 0),
+          hubData,
+        };
+      })
+      .filter((it) => Array.isArray(it.hubData) && it.hubData.length > 0);
 
     if (items.length === 0) {
       toast.warn("No hub assignments found to save.");
@@ -405,7 +409,8 @@ const MenuUpload = () => {
                             )
                           }
                         />
-                      </td>  <td>
+                      </td>{" "}
+                      <td>
                         <input
                           type="number"
                           className="form-control"

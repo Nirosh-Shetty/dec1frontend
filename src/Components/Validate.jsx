@@ -63,6 +63,51 @@ export default function Validate() {
             console.log("Referral code used and cleared.");
           }
 
+          // ✅ Fix: Properly handle fetch response
+          if (userData?.primaryAddress) {
+            try {
+              const response = await fetch(
+                `https://dailydish-backend.onrender.com/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
+                {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                }
+              );
+
+              if (response.ok) {
+                const addressData = await response.json();
+                console.log(
+                  "Primary address set:",
+                  addressData?.primaryAddress
+                );
+                localStorage.setItem(
+                  "primaryAddress",
+                  JSON.stringify(addressData?.primaryAddress)
+                );
+              } else {
+                console.warn("Failed to set primary address:", response.status);
+                // Don't crash if this fails - just use user data as fallback
+                localStorage.setItem(
+                  "primaryAddress",
+                  JSON.stringify(userData?.primaryAddress)
+                );
+              }
+            } catch (fetchError) {
+              console.error("Error setting primary address:", fetchError);
+              // Fallback to user data
+              localStorage.setItem(
+                "primaryAddress",
+                JSON.stringify(userData?.primaryAddress)
+              );
+            }
+          } else {
+            // If no primaryAddress in userData, use userData as fallback
+            localStorage.setItem(
+              "primaryAddress",
+              JSON.stringify(userData?.primaryAddress)
+            );
+          }
+
           // ✅ Redirect logic based on address availability
           const hasAddresses =
             Array.isArray(userData.addresses) && userData.addresses.length > 0;
@@ -71,7 +116,7 @@ export default function Validate() {
             if (hasAddresses) {
               window.location.replace("/home");
             } else {
-              window.location.replace("/current-location");
+              window.location.replace("/location");
             }
           }, 100);
           Swal2.fire({

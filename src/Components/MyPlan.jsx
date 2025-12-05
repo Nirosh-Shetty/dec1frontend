@@ -14,11 +14,19 @@ import myplancancelicon from "./../assets/myplancancelicon.png";
 // import myplandrop from "./../assets/myplandrop.png";
 import myplanseparator from "./../assets/myplanseparator.png";
 import myplanskip from "./../assets/myplanskip.png";
-import myplancancel2 from "./../assets/myplancancelicon.png";
+// import myplancancel2 from "./../assets/myplancancelicon.png";
+import myplancancel2 from "./../assets/mycancel.png";
 // import myplanblackedit from "./../assets/myplanblackedit.png";
 import BottomNav from "./BottomNav";
 import "../Styles/MyPlan.css";
+// import "../Styles/Checkout.css"
 import { toast } from "react-toastify";
+import pending from "./../assets/pending.png";
+import success from "./../assets/success-green.png";
+import discount from "./../assets/discount.png";
+import myplancancel from "./../assets/myplancancel.png";
+import './../Styles/Normal.css';
+
 
 const formatDate = (isoString) => {
   const d = new Date(isoString);
@@ -281,7 +289,7 @@ const ViewPlanModal = ({
     <div className="plan-modal-overlay" onClick={onClose}>
       <div className="close-button-container">
         <button onClick={onClose} className="close-modal-btn">
-          <img src={myplancancel2} alt="" style={{ width: 24 }} />
+          <img src={myplancancel2} alt="" style={{ width: 39, height: 39 }} />
         </button>
       </div>
 
@@ -324,7 +332,7 @@ const ViewPlanModal = ({
                   : "07:00 to 08:00PM"}
               </div>
             </div>
-            {localPlan.status === "Confirmed" && (
+            {/* {localPlan.status === "Confirmed" && (
               <div className="status-badge-confirmed">✓ Confirmed</div>
             )}
             {localPlan.status === "Skipped" && (
@@ -335,7 +343,22 @@ const ViewPlanModal = ({
             )}
             {localPlan.status === "Pending Payment" && (
               <div className="status-badge-pending">Pending</div>
-            )}
+            )} */}
+
+            <div className="upcoming-date-badge2">
+              <div className="date-column2">
+                <div className="date-day2">
+                  {new Date(plan.deliveryDate).toLocaleDateString("en-US", {
+                    day: "numeric",
+                  })}
+                </div>
+                <div className="date-month2">
+                  {new Date(plan.deliveryDate).toLocaleDateString("en-US", {
+                    month: "short",
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -489,6 +512,18 @@ const ViewPlanModal = ({
 
             {/* Delivery Details */}
 
+            <div
+              style={{
+                fontWeight: 500,
+                color: "#212121",
+                paddingBottom: 8,
+                paddingLeft: 8,
+                fontSize: 20,
+              }}
+            >
+              Delivery Details
+            </div>
+
             <div className="plan-delivery-details-container">
               {/* --- Address Row --- */}
               <div className="plan-delivery-details-row">
@@ -635,8 +670,9 @@ const ViewPlanModal = ({
             </div>
           </div>
         </div>
-        <div className="plan-total-container">
-          {/* <div className="plan-total-section">
+
+        {/* <div className="plan-total-container">
+          <div className="plan-total-section">
                       <div className="total-label-container">
                         <div className="total-label">Wallet</div>
                       </div>
@@ -644,8 +680,24 @@ const ViewPlanModal = ({
                         <input type="checkbox" checked={useWallet} onChange={e => setUseWallet(e.target.checked)} disabled={walletBalance <= 0} />
                         <span className="wallet-amount">₹{walletDeduction.toFixed(0)} / ₹{walletBalance.toFixed(0)}</span>
                       </div>
-                    </div> */}
-        </div>
+                    </div>
+
+
+        </div> */}
+
+        
+                      <div
+              style={{
+                fontWeight: 500,
+                color: "#212121",
+                paddingBottom: 8,
+                paddingLeft: 8,
+                fontSize: 20,
+              }}
+            >
+              Apply & Save
+            </div>
+
         {localPlan.status === "Pending Payment" && (
           <div className="promo-wallet-container">
             <div className="wallet-section">
@@ -697,7 +749,17 @@ const ViewPlanModal = ({
         )}
 
         <div className="billing-details-container">
-          <h1>Billing Details</h1>
+          <span
+            style={{
+              fontWeight: 500,
+              color: "#212121",
+              paddingBottom: 8,
+              paddingLeft: 8,
+              fontSize: 20,
+            }}
+          >
+            Billing Details
+          </span>
           <div className="billing-details-list">
             <div className="billing-details-row">
               <span>Total Order value</span>
@@ -1188,34 +1250,69 @@ const MyPlan = () => {
                           <h3 className="session-title">{plan.session}</h3>
                           <div className="delivery-time-text">
                             {/* static for now; optionally store slot time in DB later */}
-                            Arrives fresh between{" "}
-                            {plan.session === "Lunch"
-                              ? "12:00 to 01:00PM"
-                              : "07:00 to 08:00PM"}
+                            <span className=" fw-semibold">Delivery : </span>
+
+                            <span className=" fw-medium">
+                              {plan.session === "Lunch"
+                                ? "12:00 to 01:00PM"
+                                : "07:00 to 08:00PM"}
+                            </span>
                           </div>
                         </div>
                         {plan.status === "Confirmed" && (
                           <div className="status-badge-confirmed">
-                            ✓ Confirmed
+                            <img
+                              src={success}
+                              alt=""
+                              style={{ width: "16px", height: "16px" }}
+                            />{" "}
+                            Confirmed
                           </div>
                         )}
                         {plan.status === "Skipped" && (
                           <div className="status-badge-skipped">Skipped</div>
                         )}
                         {plan.status === "Cancelled" && (
-                          <div className="status-badge-canceled">Cancelled</div>
+                          <div className="status-badge-cancele">
+                            {" "}
+                            <img
+                              src={myplancancel}
+                              alt=""
+                              style={{ width: "14px", height: "14px" }}
+                            />{" "}
+                            Cancelled
+                          </div>
                         )}
                         {plan.status === "Pending Payment" && (
                           <div className="status-badge-pending">
+                            <img
+                              src={pending}
+                              alt=""
+                              style={{ width: "15px", height: "15px" }}
+                            />{" "}
                             Payment Pending
                           </div>
                         )}
                         {selectedTab === "upcoming" && (
                           <div className="upcoming-date-badge">
-                            {new Date(plan.deliveryDate).toLocaleDateString(
-                              "en-US",
-                              { day: "numeric", month: "short" }
-                            )}
+                            <div className="date-column">
+                              <div className="date-day">
+                                {new Date(plan.deliveryDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    day: "numeric",
+                                  }
+                                )}
+                              </div>
+                              <div className="date-month">
+                                {new Date(plan.deliveryDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                  }
+                                )}
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1224,7 +1321,7 @@ const MyPlan = () => {
                         <img
                           src={myplanlocation}
                           alt=""
-                          style={{ width: 16, height: 16 }}
+                          style={{ width: 24, height: 24, marginBottom: "3px" }}
                         />
                         <div className="plan-location-text">
                           <h1 className="addressLine1">
@@ -1274,12 +1371,20 @@ const MyPlan = () => {
                           {isUnpaidEditable &&
                             !isExpired &&
                             plan.orderType === "PreOrder" && (
-                              <div className="reminder-banner">
-                                {`Before ${
-                                  plan.session === "Lunch" ? "6AM" : "3PM"
-                                }, pay ₹ ${(
-                                  plan.slotHubTotalAmount - plan.slotTotalAmount
-                                ).toFixed(0)} less`}
+                              <div className="d-flex gap-1">
+                                <img
+                                  src={discount}
+                                  alt=""
+                                  style={{ width: "15px", height: "15px" }}
+                                />
+                                <div className="reminder-banner">
+                                  {`Before ${
+                                    plan.session === "Lunch" ? "6AM" : "3PM"
+                                  }, pay ₹ ${(
+                                    plan.slotHubTotalAmount -
+                                    plan.slotTotalAmount
+                                  ).toFixed(0)} less`}
+                                </div>
                               </div>
                             )}
                           {isUnpaidEditable && (
@@ -1288,7 +1393,7 @@ const MyPlan = () => {
                               onClick={() => handlePayPlan(plan, "")}
                             >
                               Pay
-                              {plan.orderType === "PreOrder" ? (
+                              {/* {plan.orderType === "PreOrder" ? (
                                 <div className="price-pill">
                                   ₹{plan.slotTotalAmount?.toFixed(0)}
                                 </div>
@@ -1300,6 +1405,47 @@ const MyPlan = () => {
                                   <span className="pre-order-amount">
                                     ₹{plan.slotTotalAmount?.toFixed(0)}
                                   </span>
+                                </div>
+                              )} */}
+                              {plan.orderType === "PreOrder" ? (
+                                <div className="price-pill">
+                                  {plan.slotHubTotalAmount ===
+                                  plan.slotTotalAmount ? (
+                                    // Show only one price without strikethrough when amounts are equal
+                                    <span>
+                                      ₹{plan.slotTotalAmount?.toFixed(0)}
+                                    </span>
+                                  ) : (
+                                    // Show both prices with strikethrough for the higher one
+                                    <div className="d-flex gap-2">
+                                      <span className="actuall-amount">
+                                        ₹{plan.slotHubTotalAmount?.toFixed(0)}
+                                      </span>
+                                      <span className="pre-order-amount">
+                                        ₹{plan.slotTotalAmount?.toFixed(0)}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="price-pill">
+                                  {plan.slotHubTotalAmount ===
+                                  plan.slotTotalAmount ? (
+                                    // Show only one price without strikethrough when amounts are equal
+                                    <span>
+                                      ₹{plan.slotTotalAmount?.toFixed(0)}
+                                    </span>
+                                  ) : (
+                                    // Show both prices with strikethrough for the higher one
+                                    <div className="d-flex gap-2">
+                                      <span className="actuall-amount">
+                                        ₹{plan.slotHubTotalAmount?.toFixed(0)}
+                                      </span>
+                                      <span className="pre-order-amount">
+                                        ₹{plan.slotTotalAmount?.toFixed(0)}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </button>

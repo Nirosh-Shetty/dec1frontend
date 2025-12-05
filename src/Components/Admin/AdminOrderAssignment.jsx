@@ -8,7 +8,7 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import '../../Styles/AdminOrderAssignment.css';
+import "../../Styles/AdminOrderAssignment.css";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
 // Define libraries outside component to prevent re-renders
@@ -169,7 +169,10 @@ const AdminOrderAssignment = () => {
 
   const saveZoneToStorage = async (newZone) => {
     try {
-      const res = await axios.post("https://dailydish-backend.onrender.com/api/admin/saveZone", newZone);
+      const res = await axios.post(
+        "https://dailydish-backend.onrender.com/api/admin/saveZone",
+        newZone
+      );
       console.log("Zone saved to backend", res.data);
       // Reload zones from backend to get the saved zone with proper ID
       await loadZones();
@@ -183,26 +186,34 @@ const AdminOrderAssignment = () => {
     }
   };
 
-  const handlePolygonComplete = useCallback((polygon) => {
-    const coordinates = polygon.getPath().getArray().map((latLng) => ({
-      lat: latLng.lat(),
-      lng: latLng.lng(),
-    }));
+  const handlePolygonComplete = useCallback(
+    (polygon) => {
+      const coordinates = polygon
+        .getPath()
+        .getArray()
+        .map((latLng) => ({
+          lat: latLng.lat(),
+          lng: latLng.lng(),
+        }));
 
-    console.log('Polygon drawn with coordinates:', coordinates);
-    setTempPolygonCoords(coordinates);
-    polygon.setMap(null);
-    setIsDrawingMode(false);
-    setShowZoneForm(true);
-    // Only set default name if not editing
-    if (!editingZone) {
-      setZoneName((prev) => prev || generateNextZoneName());
-      setSelectedRiders([]);
-    }
-  }, [generateNextZoneName, editingZone]);
+      console.log("Polygon drawn with coordinates:", coordinates);
+      setTempPolygonCoords(coordinates);
+      polygon.setMap(null);
+      setIsDrawingMode(false);
+      setShowZoneForm(true);
+      // Only set default name if not editing
+      if (!editingZone) {
+        setZoneName((prev) => prev || generateNextZoneName());
+        setSelectedRiders([]);
+      }
+    },
+    [generateNextZoneName, editingZone]
+  );
 
   const handleRiderSelection = useCallback((event) => {
-    const values = Array.from(event.target.selectedOptions).map((option) => option.value);
+    const values = Array.from(event.target.selectedOptions).map(
+      (option) => option.value
+    );
     setSelectedRiders(values);
   }, []);
 
@@ -237,7 +248,7 @@ const AdminOrderAssignment = () => {
         await saveZoneToStorage(zoneData);
         alert(`Zone "${zoneName}" saved successfully!`);
       }
-      
+
       setZoneName("");
       setZoneColor("#FF0000");
       setTempPolygonCoords(null);
@@ -272,21 +283,21 @@ const AdminOrderAssignment = () => {
         `https://dailydish-backend.onrender.com/api/admin/getZone/${zone.id || zone._id}`
       );
       const fullZone = res.data;
-      
+
       setEditingZone(fullZone);
       setZoneName(fullZone.name);
       setZoneColor(fullZone.fillColor || "#FF0000");
       setTempPolygonCoords(fullZone.paths);
       setSelectedRiders(
         fullZone.assignedRiders
-          ? fullZone.assignedRiders.map((rider) => 
-              typeof rider === 'object' ? rider._id : rider
+          ? fullZone.assignedRiders.map((rider) =>
+              typeof rider === "object" ? rider._id : rider
             )
           : []
       );
       setShowZoneForm(true);
       setShowZoneDetails(false);
-      
+
       // Center map on zone
       if (fullZone.paths && fullZone.paths.length > 0) {
         setMapCenter({
@@ -309,7 +320,7 @@ const AdminOrderAssignment = () => {
       setZoneDetails(res.data);
       setShowZoneDetails(true);
       setSelectedZone(zone);
-      
+
       // Center map on zone
       if (res.data.paths && res.data.paths.length > 0) {
         setMapCenter({
@@ -339,7 +350,9 @@ const AdminOrderAssignment = () => {
     }
 
     try {
-      await axios.delete(`https://dailydish-backend.onrender.com/api/admin/deleteZone/${zoneId}`);
+      await axios.delete(
+        `https://dailydish-backend.onrender.com/api/admin/deleteZone/${zoneId}`
+      );
       // Reload zones from backend after deletion
       await loadZones();
       if (selectedZone?.id === zoneId || selectedZone?._id === zoneId) {
@@ -348,7 +361,9 @@ const AdminOrderAssignment = () => {
     } catch (error) {
       console.error("Error deleting zone:", error);
       console.log("Backend not available, deleting from localStorage");
-      const updatedZones = zones.filter(z => z.id !== zoneId && z._id !== zoneId);
+      const updatedZones = zones.filter(
+        (z) => z.id !== zoneId && z._id !== zoneId
+      );
       setZones(updatedZones);
       localStorage.setItem("deliveryZones", JSON.stringify(updatedZones));
       if (selectedZone?.id === zoneId || selectedZone?._id === zoneId) {
@@ -358,7 +373,7 @@ const AdminOrderAssignment = () => {
   };
 
   const handleZoneClick = useCallback((zone, event) => {
-    console.log('Clicked zone:', zone.name);
+    console.log("Clicked zone:", zone.name);
     setSelectedZone(zone);
   }, []);
 
@@ -574,7 +589,7 @@ const AdminOrderAssignment = () => {
       const res = await axios.get(
         "https://dailydish-backend.onrender.com/api/admin/getPackerOrders"
       );
-      
+
       if (!Array.isArray(res.data)) {
         console.error("Orders API returned non-array data");
         setOrders([]);
@@ -778,9 +793,7 @@ const AdminOrderAssignment = () => {
 
   if (!isLoaded) {
     return (
-      <div style={{ padding: "20px", fontSize: "18px" }}>
-        Loading Maps...
-      </div>
+      <div style={{ padding: "20px", fontSize: "18px" }}>Loading Maps...</div>
     );
   }
 
@@ -792,7 +805,8 @@ const AdminOrderAssignment = () => {
             <p className="eyebrow-text">Live delivery overview</p>
             <h2>Orders Map & Zone Management</h2>
             <p className="subtext">
-              Track active orders, inspect hub distribution, and draw delivery zones without losing the interactive map.
+              Track active orders, inspect hub distribution, and draw delivery
+              zones without losing the interactive map.
             </p>
           </div>
           <div className="header-actions">
@@ -809,16 +823,28 @@ const AdminOrderAssignment = () => {
         <div className="header-metrics surface">
           <div className="snapshot-row header-snapshot-row">
             <div className="snapshot-card snapshot-card--primary">
-              <span>{selectedHub === "all" ? "Total orders" : `Orders in ${selectedHub}`}</span>
+              <span>
+                {selectedHub === "all"
+                  ? "Total orders"
+                  : `Orders in ${selectedHub}`}
+              </span>
               <strong>{filteredOrders.length}</strong>
             </div>
             <div className="snapshot-card">
               <span>Mapped orders</span>
-              <strong>{filteredOrders.filter((order) => order.coordinates).length}</strong>
+              <strong>
+                {filteredOrders.filter((order) => order.coordinates).length}
+              </strong>
             </div>
-            <div className={`snapshot-card${hasGroupedMarkers ? " snapshot-card--warning" : ""}`}>
+            <div
+              className={`snapshot-card${
+                hasGroupedMarkers ? " snapshot-card--warning" : ""
+              }`}
+            >
               <span>Grouped locations</span>
-              <strong>{hasGroupedMarkers ? Object.keys(locationGroups).length : 0}</strong>
+              <strong>
+                {hasGroupedMarkers ? Object.keys(locationGroups).length : 0}
+              </strong>
             </div>
             <div className="snapshot-card">
               <span>Last updated</span>
@@ -835,8 +861,6 @@ const AdminOrderAssignment = () => {
 
         <div className="assignment-layout">
           <div className="control-panel">
-          
-
             <section className="surface hub-filter-card">
               <div className="section-title-row">
                 <div>
@@ -867,7 +891,6 @@ const AdminOrderAssignment = () => {
                   ))}
               </select>
             </section>
-          
 
             {/* <div className="info-banner info">
               💡 Each order renders as a colored pin with its sequence number.{" "}
@@ -878,7 +901,9 @@ const AdminOrderAssignment = () => {
             <section className="surface actions-card">
               <div className="actions-bar">
                 <button
-                  className={`btn ${isDrawingMode ? "btn-danger" : "btn-success"}`}
+                  className={`btn ${
+                    isDrawingMode ? "btn-danger" : "btn-success"
+                  }`}
                   onClick={() => {
                     setIsDrawingMode(!isDrawingMode);
                     setShowZoneForm(false);
@@ -897,22 +922,32 @@ const AdminOrderAssignment = () => {
 
               {isDrawingMode && (
                 <div className="instructions-banner">
-                  📍 Drawing mode is active. Click on the map to drop points and double-click to finish the polygon.
+                  📍 Drawing mode is active. Click on the map to drop points and
+                  double-click to finish the polygon.
                 </div>
               )}
 
-{hasGroupedMarkers && (
-              <div className="info-banner warning">
-                ⚠️ <strong>{Object.keys(locationGroups).length}</strong> location(s) host multiple orders. Markers with
-                a red badge show the total stacked at that stop.
-              </div>
-            )}
+              {hasGroupedMarkers && (
+                <div className="info-banner warning">
+                  ⚠️ <strong>{Object.keys(locationGroups).length}</strong>{" "}
+                  location(s) host multiple orders. Markers with a red badge
+                  show the total stacked at that stop.
+                </div>
+              )}
               {showZoneForm && (
                 <div className="zone-form">
-                  <h3>{editingZone ? "Edit delivery zone" : "Create delivery zone"}</h3>
+                  <h3>
+                    {editingZone
+                      ? "Edit delivery zone"
+                      : "Create delivery zone"}
+                  </h3>
                   {editingZone && tempPolygonCoords && (
-                    <div className="info-banner info" style={{ marginBottom: "16px" }}>
-                      ℹ️ Current polygon has {tempPolygonCoords.length} points. Click "Redraw Polygon" to change it.
+                    <div
+                      className="info-banner info"
+                      style={{ marginBottom: "16px" }}
+                    >
+                      ℹ️ Current polygon has {tempPolygonCoords.length} points.
+                      Click "Redraw Polygon" to change it.
                     </div>
                   )}
                   <div className="form-grid">
@@ -945,7 +980,9 @@ const AdminOrderAssignment = () => {
                         multiple
                         value={selectedRiders}
                         onChange={handleRiderSelection}
-                        disabled={isRidersLoading || availableRiders.length === 0}
+                        disabled={
+                          isRidersLoading || availableRiders.length === 0
+                        }
                       >
                         {isRidersLoading && (
                           <option value="" disabled>
@@ -981,16 +1018,29 @@ const AdminOrderAssignment = () => {
                         >
                           Redraw Polygon
                         </button>
-                        <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginTop: "4px" }}>
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#64748b",
+                            display: "block",
+                            marginTop: "4px",
+                          }}
+                        >
                           Click to redraw the zone polygon on the map
                         </span>
                       </div>
                     )}
                     <div className="form-actions">
-                      <button className="btn btn-success" onClick={handleSaveZone}>
+                      <button
+                        className="btn btn-success"
+                        onClick={handleSaveZone}
+                      >
                         {editingZone ? "Update zone" : "Save zone"}
                       </button>
-                      <button className="btn btn-ghost" onClick={handleCancelZone}>
+                      <button
+                        className="btn btn-ghost"
+                        onClick={handleCancelZone}
+                      >
                         Cancel
                       </button>
                     </div>
@@ -1000,7 +1050,10 @@ const AdminOrderAssignment = () => {
             </section>
 
             {showZoneDetails && zoneDetails && (
-              <section className="surface zone-details-card" style={{ marginBottom: "20px" }}>
+              <section
+                className="surface zone-details-card"
+                style={{ marginBottom: "20px" }}
+              >
                 <div className="section-title-row">
                   <div>
                     <p className="eyebrow-text">Zone Details</p>
@@ -1016,10 +1069,24 @@ const AdminOrderAssignment = () => {
                     ✕ Close
                   </button>
                 </div>
-                <div style={{ padding: "16px 0", maxHeight: "600px", overflowY: "auto" }}>
+                <div
+                  style={{
+                    padding: "16px 0",
+                    maxHeight: "600px",
+                    overflowY: "auto",
+                  }}
+                >
                   <div style={{ marginBottom: "20px" }}>
-                    <p style={{ fontWeight: "bold", marginBottom: "8px" }}>Zone Color:</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <p style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                      Zone Color:
+                    </p>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
                       <div
                         style={{
                           width: "30px",
@@ -1041,10 +1108,21 @@ const AdminOrderAssignment = () => {
 
                   <div style={{ marginBottom: "20px" }}>
                     <p style={{ fontWeight: "bold", marginBottom: "12px" }}>
-                      Assigned Riders ({zoneDetails.assignedRiders?.length || 0}):
+                      Assigned Riders ({zoneDetails.assignedRiders?.length || 0}
+                      ):
                     </p>
-                    {zoneDetails.assignedRiders && zoneDetails.assignedRiders.length > 0 ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "400px", overflowY: "auto", paddingRight: "4px" }}>
+                    {zoneDetails.assignedRiders &&
+                    zoneDetails.assignedRiders.length > 0 ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          maxHeight: "400px",
+                          overflowY: "auto",
+                          paddingRight: "4px",
+                        }}
+                      >
                         {zoneDetails.assignedRiders.map((rider, index) => (
                           <div
                             key={rider._id || rider.id || index}
@@ -1056,21 +1134,49 @@ const AdminOrderAssignment = () => {
                               marginBottom: "4px",
                             }}
                           >
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                gap: "12px",
+                                flexWrap: "wrap",
+                              }}
+                            >
                               <div style={{ flex: "1", minWidth: "150px" }}>
                                 <p style={{ fontWeight: "bold", margin: 0 }}>
                                   {rider.name || "Unnamed Rider"}
                                 </p>
-                                <p style={{ margin: "4px 0 0 0", fontSize: "0.875rem", color: "#64748b" }}>
+                                <p
+                                  style={{
+                                    margin: "4px 0 0 0",
+                                    fontSize: "0.875rem",
+                                    color: "#64748b",
+                                  }}
+                                >
                                   📞 {rider.phone || "No phone"}
                                 </p>
                                 {rider.email && (
-                                  <p style={{ margin: "4px 0 0 0", fontSize: "0.875rem", color: "#64748b" }}>
+                                  <p
+                                    style={{
+                                      margin: "4px 0 0 0",
+                                      fontSize: "0.875rem",
+                                      color: "#64748b",
+                                    }}
+                                  >
                                     ✉️ {rider.email}
                                   </p>
                                 )}
                               </div>
-                              <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
+                              <div
+                                style={{
+                                  textAlign: "right",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "flex-end",
+                                  gap: "4px",
+                                }}
+                              >
                                 {rider.hub && (
                                   <span
                                     style={{
@@ -1086,9 +1192,15 @@ const AdminOrderAssignment = () => {
                                   </span>
                                 )}
                                 {rider.vehicleType && (
-                                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                                  <span
+                                    style={{
+                                      fontSize: "0.75rem",
+                                      color: "#64748b",
+                                    }}
+                                  >
                                     🚗 {rider.vehicleType}
-                                    {rider.vehicleNumber && ` (${rider.vehicleNumber})`}
+                                    {rider.vehicleNumber &&
+                                      ` (${rider.vehicleNumber})`}
                                   </span>
                                 )}
                                 <span
@@ -1126,18 +1238,40 @@ const AdminOrderAssignment = () => {
                     )}
                   </div>
 
-                  <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid #e9ecef" }}>
-                    <p style={{ fontSize: "0.875rem", color: "#64748b", margin: 0 }}>
-                      Created: {new Date(zoneDetails.createdAt).toLocaleString()}
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      paddingTop: "20px",
+                      borderTop: "1px solid #e9ecef",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "#64748b",
+                        margin: 0,
+                      }}
+                    >
+                      Created:{" "}
+                      {new Date(zoneDetails.createdAt).toLocaleString()}
                     </p>
                     {zoneDetails.updatedAt && (
-                      <p style={{ fontSize: "0.875rem", color: "#64748b", margin: "4px 0 0 0" }}>
-                        Last updated: {new Date(zoneDetails.updatedAt).toLocaleString()}
+                      <p
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#64748b",
+                          margin: "4px 0 0 0",
+                        }}
+                      >
+                        Last updated:{" "}
+                        {new Date(zoneDetails.updatedAt).toLocaleString()}
                       </p>
                     )}
                   </div>
 
-                  <div style={{ marginTop: "20px", display: "flex", gap: "8px" }}>
+                  <div
+                    style={{ marginTop: "20px", display: "flex", gap: "8px" }}
+                  >
                     <button
                       className="btn btn-success"
                       onClick={() => {
@@ -1198,26 +1332,34 @@ const AdminOrderAssignment = () => {
                       }}
                     >
                       <div className="d-flex gap-2">
-
                         <span
                           className="zone-color-chip"
                           style={{
-                            backgroundColor: zone.fillColor || zone.strokeColor || "#FF0000",
-                            borderColor: zone.strokeColor || zone.fillColor || "#FF0000",
+                            backgroundColor:
+                              zone.fillColor || zone.strokeColor || "#FF0000",
+                            borderColor:
+                              zone.strokeColor || zone.fillColor || "#FF0000",
                             display: "block",
                             visibility: "visible",
                           }}
                         />
                         <div className="zone-text-content">
-                          <p className="zone-name" title={zone.name || "Unnamed Zone"}>
+                          <p
+                            className="zone-name"
+                            title={zone.name || "Unnamed Zone"}
+                          >
                             {zone.name ? String(zone.name) : "Unnamed Zone"}
                           </p>
                           {zone.createdAt && (
                             <p className="zone-meta">
-                              Created {new Date(zone.createdAt).toLocaleDateString(undefined, {
-                                month: "short",
-                                day: "numeric",
-                              })}
+                              Created{" "}
+                              {new Date(zone.createdAt).toLocaleDateString(
+                                undefined,
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                }
+                              )}
                             </p>
                           )}
                         </div>
@@ -1251,14 +1393,13 @@ const AdminOrderAssignment = () => {
                           <FaTrash />
                         </button>
                       </div>
-
                     </div>
                   ))}
                 </div>
               </section>
             )}
 
-             <section className="surface stats-card">
+            <section className="surface stats-card">
               {selectedHub === "all" && hubs.length > 0 && (
                 <div className="stat-subcard">
                   <p className="stat-subcard-title">Hub distribution</p>
@@ -1269,25 +1410,31 @@ const AdminOrderAssignment = () => {
                     </div>
                   ))}
                   {hubs.length > 4 && (
-                    <p className="stat-subcard-foot">+{hubs.length - 4} more hubs tracked</p>
+                    <p className="stat-subcard-foot">
+                      +{hubs.length - 4} more hubs tracked
+                    </p>
                   )}
                 </div>
               )}
 
               {hasGroupedMarkers && (
                 <div className="stat-subcard">
-                  <p className="stat-subcard-title">Orders sharing an address</p>
+                  <p className="stat-subcard-title">
+                    Orders sharing an address
+                  </p>
                   <div className="grouped-list">
-                    {Object.entries(locationGroups).map(([groupKey, groupOrders], idx) => (
-                      <div className="grouped-row" key={groupKey}>
-                        <span>Location {idx + 1}</span>
-                        <span>{groupOrders.length} orders</span>
-                      </div>
-                    ))}
+                    {Object.entries(locationGroups).map(
+                      ([groupKey, groupOrders], idx) => (
+                        <div className="grouped-row" key={groupKey}>
+                          <span>Location {idx + 1}</span>
+                          <span>{groupOrders.length} orders</span>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               )}
-            </section> 
+            </section>
           </div>
 
           <div className="map-panel">
@@ -1307,323 +1454,363 @@ const AdminOrderAssignment = () => {
                   maxZoom: 20,
                 }}
               >
-        {/* DRAWING MANAGER - NEW */}
-        {isDrawingMode && (
-          <DrawingManager
-            onPolygonComplete={handlePolygonComplete}
-            options={{
-              drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
-              drawingControl: false,
-              polygonOptions: {
-                fillColor: zoneColor,
-                fillOpacity: 0.35,
-                strokeWeight: 2,
-                strokeColor: zoneColor,
-                strokeOpacity: 0.8,
-                clickable: false,
-                editable: true,
-                draggable: false,
-                zIndex: 1,
-              },
-            }}
-          />
-        )}
-
-        {/* RENDER ZONES - NEW */}
-        {Array.isArray(zones) && zones.map((zone) => (
-          <Polygon
-            key={zone.id || zone._id}
-            paths={zone.paths}
-            options={{
-              fillColor: zone.fillColor,
-              fillOpacity: zone.fillOpacity,
-              strokeColor: zone.strokeColor,
-              strokeOpacity: zone.strokeOpacity,
-              strokeWeight: (selectedZone?.id === zone.id || selectedZone?._id === zone._id) ? 4 : 2,
-              clickable: true,
-              draggable: false,
-              editable: false,
-              geodesic: false,
-              zIndex: (selectedZone?.id === zone.id || selectedZone?._id === zone._id) ? 10 : 1,
-            }}
-            onClick={(e) => handleZoneClick(zone, e)}
-          />
-        ))}
-
-        {/* Individual markers are now handled by the clusterer */}
-        {/* Only render InfoWindow for selected order */}
-        {selectedOrder && (
-          <InfoWindow
-            position={{
-              lat: selectedOrder.displayLat,
-              lng: selectedOrder.displayLng,
-            }}
-            onCloseClick={() => setSelectedOrder(null)}
-          >
-            <div
-              style={{
-                padding: "0",
-                maxWidth: "320px",
-                fontFamily: "Arial, sans-serif",
-                borderRadius: "10px",
-                overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              }}
-            >
-              {/* Header */}
-              <div
-                style={{
-                  padding: "16px",
-                  backgroundColor:
-                    addressTypeConfig[selectedOrder.addressType]?.color ||
-                    "#007bff",
-                  color: "white",
-                }}
-              >
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
-                >
-                  <div
-                    style={{
-                      width: "45px",
-                      height: "45px",
-                      backgroundColor: "white",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color:
-                        addressTypeConfig[selectedOrder.addressType]?.color ||
-                        "#007bff",
-                      fontWeight: "bold",
-                      fontSize: "18px",
-                      border: "3px solid rgba(255,255,255,0.3)",
+                {/* DRAWING MANAGER - NEW */}
+                {isDrawingMode && (
+                  <DrawingManager
+                    onPolygonComplete={handlePolygonComplete}
+                    options={{
+                      drawingMode:
+                        window.google.maps.drawing.OverlayType.POLYGON,
+                      drawingControl: false,
+                      polygonOptions: {
+                        fillColor: zoneColor,
+                        fillOpacity: 0.35,
+                        strokeWeight: 2,
+                        strokeColor: zoneColor,
+                        strokeOpacity: 0.8,
+                        clickable: false,
+                        editable: true,
+                        draggable: false,
+                        zIndex: 1,
+                      },
                     }}
+                  />
+                )}
+
+                {/* RENDER ZONES - NEW */}
+                {Array.isArray(zones) &&
+                  zones.map((zone) => (
+                    <Polygon
+                      key={zone.id || zone._id}
+                      paths={zone.paths}
+                      options={{
+                        fillColor: zone.fillColor,
+                        fillOpacity: zone.fillOpacity,
+                        strokeColor: zone.strokeColor,
+                        strokeOpacity: zone.strokeOpacity,
+                        strokeWeight:
+                          selectedZone?.id === zone.id ||
+                          selectedZone?._id === zone._id
+                            ? 4
+                            : 2,
+                        clickable: true,
+                        draggable: false,
+                        editable: false,
+                        geodesic: false,
+                        zIndex:
+                          selectedZone?.id === zone.id ||
+                          selectedZone?._id === zone._id
+                            ? 10
+                            : 1,
+                      }}
+                      onClick={(e) => handleZoneClick(zone, e)}
+                    />
+                  ))}
+
+                {/* Individual markers are now handled by the clusterer */}
+                {/* Only render InfoWindow for selected order */}
+                {selectedOrder && (
+                  <InfoWindow
+                    position={{
+                      lat: selectedOrder.displayLat,
+                      lng: selectedOrder.displayLng,
+                    }}
+                    onCloseClick={() => setSelectedOrder(null)}
                   >
-                    {selectedOrder.orderNumber}
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: "18px" }}>
-                      Order #{selectedOrder.orderNumber}
-                    </h3>
-                    <p
+                    <div
                       style={{
-                        margin: "4px 0 0 0",
-                        fontSize: "13px",
-                        opacity: 0.9,
+                        padding: "0",
+                        maxWidth: "320px",
+                        fontFamily: "Arial, sans-serif",
+                        borderRadius: "10px",
+                        overflow: "hidden",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                       }}
                     >
-                      {addressTypeConfig[selectedOrder.addressType]?.icon}{" "}
-                      {selectedOrder.addressType}
-                      {selectedOrder.isGrouped && (
-                        <span
+                      {/* Header */}
+                      <div
+                        style={{
+                          padding: "16px",
+                          backgroundColor:
+                            addressTypeConfig[selectedOrder.addressType]
+                              ?.color || "#007bff",
+                          color: "white",
+                        }}
+                      >
+                        <div
                           style={{
-                            marginLeft: "8px",
-                            backgroundColor: "rgba(255,0,0,0.8)",
-                            padding: "2px 6px",
-                            borderRadius: "10px",
-                            fontSize: "11px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
                           }}
                         >
-                          {selectedOrder.groupCount} at location
-                        </span>
-                      )}
-                    </p>
-                    {selectedOrder.hubName && (
-                      <p
-                        style={{
-                          margin: "4px 0 0 0",
-                          fontSize: "12px",
-                          opacity: 0.9,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                        }}
-                      >
-                        🏢 Hub: {selectedOrder.hubName}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+                          <div
+                            style={{
+                              width: "45px",
+                              height: "45px",
+                              backgroundColor: "white",
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color:
+                                addressTypeConfig[selectedOrder.addressType]
+                                  ?.color || "#007bff",
+                              fontWeight: "bold",
+                              fontSize: "18px",
+                              border: "3px solid rgba(255,255,255,0.3)",
+                            }}
+                          >
+                            {selectedOrder.orderNumber}
+                          </div>
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: "18px" }}>
+                              Order #{selectedOrder.orderNumber}
+                            </h3>
+                            <p
+                              style={{
+                                margin: "4px 0 0 0",
+                                fontSize: "13px",
+                                opacity: 0.9,
+                              }}
+                            >
+                              {
+                                addressTypeConfig[selectedOrder.addressType]
+                                  ?.icon
+                              }{" "}
+                              {selectedOrder.addressType}
+                              {selectedOrder.isGrouped && (
+                                <span
+                                  style={{
+                                    marginLeft: "8px",
+                                    backgroundColor: "rgba(255,0,0,0.8)",
+                                    padding: "2px 6px",
+                                    borderRadius: "10px",
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  {selectedOrder.groupCount} at location
+                                </span>
+                              )}
+                            </p>
+                            {selectedOrder.hubName && (
+                              <p
+                                style={{
+                                  margin: "4px 0 0 0",
+                                  fontSize: "12px",
+                                  opacity: 0.9,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "4px",
+                                }}
+                              >
+                                🏢 Hub: {selectedOrder.hubName}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
 
-              {/* Content */}
-              <div style={{ padding: "16px" }}>
-                <div
-                  style={{ display: "grid", gap: "10px", marginBottom: "16px" }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
-                    <span style={{ fontSize: "18px" }}>👤</span>
-                    <div>
-                      <div style={{ fontWeight: "bold", fontSize: "15px" }}>
-                        {selectedOrder.username}
-                      </div>
-                      <div style={{ fontSize: "13px", color: "#666" }}>
-                        📞 {selectedOrder.Mobilenumber}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                      {/* Content */}
+                      <div style={{ padding: "16px" }}>
+                        <div
+                          style={{
+                            display: "grid",
+                            gap: "10px",
+                            marginBottom: "16px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <span style={{ fontSize: "18px" }}>👤</span>
+                            <div>
+                              <div
+                                style={{ fontWeight: "bold", fontSize: "15px" }}
+                              >
+                                {selectedOrder.username}
+                              </div>
+                              <div style={{ fontSize: "13px", color: "#666" }}>
+                                📞 {selectedOrder.Mobilenumber}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-                {/* Order Details Card */}
-                <div
-                  style={{
-                    backgroundColor: "#f8f9fa",
-                    padding: "14px",
-                    borderRadius: "8px",
-                    marginBottom: "16px",
-                    border: "1px solid #e9ecef",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "10px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <div>
-                      <strong>Status:</strong>
-                      <div
-                        style={{
-                          color:
-                            selectedOrder.status === "Delivered"
-                              ? "#28a745"
-                              : selectedOrder.status === "Cooking"
-                              ? "#ffc107"
-                              : "#007bff",
-                          fontWeight: "bold",
-                          fontSize: "13px",
-                        }}
-                      >
-                        {selectedOrder.status}
-                      </div>
-                    </div>
-                    <div>
-                      <strong>Time Slot:</strong>
-                      <div style={{ fontSize: "13px" }}>
-                        {selectedOrder.slot}
-                      </div>
-                    </div>
-                    <div>
-                      <strong>Total Amount:</strong>
-                      <div
-                        style={{
-                          fontWeight: "bold",
-                          color: "#28a745",
-                          fontSize: "13px",
-                        }}
-                      >
-                        ₹{selectedOrder.allTotal}
-                      </div>
-                    </div>
-                    <div>
-                      <strong>Items Count:</strong>
-                      <div style={{ fontSize: "13px" }}>
-                        {selectedOrder.allProduct.length}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                        {/* Order Details Card */}
+                        <div
+                          style={{
+                            backgroundColor: "#f8f9fa",
+                            padding: "14px",
+                            borderRadius: "8px",
+                            marginBottom: "16px",
+                            border: "1px solid #e9ecef",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns: "1fr 1fr",
+                              gap: "10px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            <div>
+                              <strong>Status:</strong>
+                              <div
+                                style={{
+                                  color:
+                                    selectedOrder.status === "Delivered"
+                                      ? "#28a745"
+                                      : selectedOrder.status === "Cooking"
+                                      ? "#ffc107"
+                                      : "#007bff",
+                                  fontWeight: "bold",
+                                  fontSize: "13px",
+                                }}
+                              >
+                                {selectedOrder.status}
+                              </div>
+                            </div>
+                            <div>
+                              <strong>Time Slot:</strong>
+                              <div style={{ fontSize: "13px" }}>
+                                {selectedOrder.slot}
+                              </div>
+                            </div>
+                            <div>
+                              <strong>Total Amount:</strong>
+                              <div
+                                style={{
+                                  fontWeight: "bold",
+                                  color: "#28a745",
+                                  fontSize: "13px",
+                                }}
+                              >
+                                ₹{selectedOrder.allTotal}
+                              </div>
+                            </div>
+                            <div>
+                              <strong>Items Count:</strong>
+                              <div style={{ fontSize: "13px" }}>
+                                {selectedOrder.allProduct.length}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-                {/* Items List */}
-                <div style={{ fontSize: "13px", marginBottom: "12px" }}>
-                  <strong style={{ display: "block", marginBottom: "6px" }}>
-                    📦 Order Items:
-                  </strong>
-                  <div style={{ maxHeight: "120px", overflowY: "auto" }}>
-                    {selectedOrder.allProduct.map((product, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          marginTop: "4px",
-                          padding: "6px 0",
-                          borderBottom:
-                            idx < selectedOrder.allProduct.length - 1
-                              ? "1px solid #f0f0f0"
-                              : "none",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
+                        {/* Items List */}
+                        <div style={{ fontSize: "13px", marginBottom: "12px" }}>
+                          <strong
+                            style={{ display: "block", marginBottom: "6px" }}
+                          >
+                            📦 Order Items:
+                          </strong>
+                          <div
+                            style={{ maxHeight: "120px", overflowY: "auto" }}
+                          >
+                            {selectedOrder.allProduct.map((product, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  marginTop: "4px",
+                                  padding: "6px 0",
+                                  borderBottom:
+                                    idx < selectedOrder.allProduct.length - 1
+                                      ? "1px solid #f0f0f0"
+                                      : "none",
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <span>
+                                  •{" "}
+                                  {product.foodItemId?.foodname ||
+                                    "Unknown Item"}
+                                </span>
+                                <span
+                                  style={{
+                                    color: "#666",
+                                    backgroundColor: "#f0f0f0",
+                                    padding: "2px 6px",
+                                    borderRadius: "4px",
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  Qty: {product.quantity}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Address */}
+                        <div
+                          style={{
+                            padding: "12px",
+                            backgroundColor: "#e9ecef",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                            color: "#495057",
+                            lineHeight: "1.4",
+                            border: "1px solid #dee2e6",
+                          }}
+                        >
+                          <strong>📍 Delivery Address:</strong>
+                          <br />
+                          {selectedOrder.delivarylocation}
+                        </div>
+                      </div>
+                    </div>
+                  </InfoWindow>
+                )}
+              </GoogleMap>
+              <section className="surface legend-card legend-card--inline">
+                <div className="legend-inline-scroll">
+                  {Object.entries(addressTypeConfig).map(([type, config]) => {
+                    const markerIcon = createPinShapedMarker(
+                      "1",
+                      type,
+                      false,
+                      1
+                    );
+                    const typeCount = filteredOrders.filter(
+                      (order) => order.addressType === type
+                    ).length;
+                    return (
+                      <div className="legend-chip" key={type}>
+                        <div className="legend-marker-count">
+                          <img src={markerIcon.url} alt={`${type} marker`} />
+                          <span className="legend-marker-badge">
+                            {typeCount}
+                          </span>
+                        </div>
                         <span>
-                          • {product.foodItemId?.foodname || "Unknown Item"}
-                        </span>
-                        <span
-                          style={{
-                            color: "#666",
-                            backgroundColor: "#f0f0f0",
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                            fontSize: "11px",
-                          }}
-                        >
-                          Qty: {product.quantity}
+                          {config.icon} {config.label}
                         </span>
                       </div>
-                    ))}
+                    );
+                  })}
+                  <div className="legend-chip legend-chip--highlight">
+                    <img
+                      src={createPinShapedMarker("1", "PG", true, 3).url}
+                      alt="Grouped marker example"
+                    />
+                    <span>Grouped 🔴</span>
+                  </div>
+                  <div className="legend-chip legend-chip--accent">
+                    <div className="cluster-pill">5</div>
+                    <span>Cluster 🔵</span>
                   </div>
                 </div>
-
-                {/* Address */}
-                <div
-                  style={{
-                    padding: "12px",
-                    backgroundColor: "#e9ecef",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    color: "#495057",
-                    lineHeight: "1.4",
-                    border: "1px solid #dee2e6",
-                  }}
-                >
-                  <strong>📍 Delivery Address:</strong>
-                  <br />
-                  {selectedOrder.delivarylocation}
-                </div>
-              </div>
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
-      <section className="surface legend-card legend-card--inline">
-        <div className="legend-inline-scroll">
-          {Object.entries(addressTypeConfig).map(([type, config]) => {
-            const markerIcon = createPinShapedMarker("1", type, false, 1);
-            const typeCount = filteredOrders.filter((order) => order.addressType === type).length;
-            return (
-              <div className="legend-chip" key={type}>
-                <div className="legend-marker-count">
-                  <img src={markerIcon.url} alt={`${type} marker`} />
-                  <span className="legend-marker-badge">{typeCount}</span>
-                </div>
-                <span>
-                  {config.icon} {config.label}
-                </span>
-              </div>
-            );
-          })}
-          <div className="legend-chip legend-chip--highlight">
-            <img src={createPinShapedMarker("1", "PG", true, 3).url} alt="Grouped marker example" />
-            <span>Grouped 🔴</span>
-          </div>
-          <div className="legend-chip legend-chip--accent">
-            <div className="cluster-pill">5</div>
-            <span>Cluster 🔵</span>
-          </div>
-        </div>
-      </section>
+              </section>
             </div>
           </div>
-   
         </div>
       </div>
     </div>

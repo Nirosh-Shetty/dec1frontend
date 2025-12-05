@@ -1,0 +1,19 @@
+/* Add to your existing <style> tag */
+@media (max-width: 480px) {
+  /* Ensure bottom panel stays within viewport */
+  .bottom-panel {
+    max-height: 45vh !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Improve address text display */
+  .address-text {
+    -webkit-line-clamp: 2 !important;
+    line-clamp: 2 !important;
+  }
+}
+
+/* Prevent body scrolling when needed */
+.no-scroll {
+  overflow: hidden !important;
+}

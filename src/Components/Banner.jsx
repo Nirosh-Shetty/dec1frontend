@@ -9,7 +9,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 // import TextField from "@mui/material/TextField";
 // import Autocomplete from "@mui/material/Autocomplete";
 // import ApartmentIcon from "@mui/icons-material/Apartment"; // Icon to represent apartments
-import {  toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // import Nav from "react-bootstrap/Nav";
 // import { MdAccountCircle } from "react-icons/md";
@@ -34,7 +34,7 @@ import UserIcons from "../assets/userp.svg";
 // import Logo from "../assets/logo-container.svg";
 import UserBanner from "./UserBanner";
 import ProfileOffcanvas from "./Navbar2";
-// import LocationModal from "./LocationModal";
+import LocationModal from "./LocationModal";
 import LocationModal2 from "./LocationModal2";
 
 // const Banner = ({ Carts, getAllOffer, hubName, setHubName }) => {
@@ -190,9 +190,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/admin/getapartment"
-      );
+      let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -208,9 +206,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/admin/getcorporate"
-      );
+      let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -228,9 +224,7 @@ const Banner = ({ Carts, getAllOffer }) => {
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get(
-          "https://dailydish-backend.onrender.com/api/admin/getstories"
-        );
+        let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getstories");
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -457,17 +451,14 @@ const Banner = ({ Carts, getAllOffer }) => {
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(
-        `https://dailydish-backend.onrender.com/api/user/addressadd`,
-        {
-          Name: user?.Fname,
-          Number: user?.Mobile,
-          userId: user?._id,
-          ApartmentName: data?.Apartmentname,
-          addresstype: addresstype,
-          addressid: data?._id,
-        }
-      );
+      let res = await axios.post(`https://dailydish-backend.onrender.com/api/user/addressadd`, {
+        Name: user?.Fname,
+        Number: user?.Mobile,
+        userId: user?._id,
+        ApartmentName: data?.Apartmentname,
+        addresstype: addresstype,
+        addressid: data?._id,
+      });
     } catch (error) {
       // console.log(error);
     }
@@ -540,7 +531,7 @@ const Banner = ({ Carts, getAllOffer }) => {
         //         localStorage.setItem("primaryAddress", JSON.stringify(primaryAddr));
         //     }
         //      else {
-        //         localStorage.removeItem("primaryAddress"); // Clean up if no primary exists
+        //         localStorage.removeItem("currentLocation"); // Clean up if no primary exists
         //     }
 
         if (addresses && addresses.length > 0) {
@@ -630,17 +621,19 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getDisplayName = (address) => {
     if (!address) return "";
 
+    console.log(address);
+
     switch (address.addressType) {
       case "Home":
-        return address.homeName || address.houseName || "";
+        return address.fullAddress || address.houseName || "";
       case "PG":
-        return address.apartmentName || address.houseName || "";
+        return address.fullAddress || address.houseName || "";
       case "School":
-        return address.schoolName || address.houseName || "";
+        return address.fullAddress || address.houseName || "";
       case "Work":
-        return address.companyName || address.houseName || "";
+        return address.fullAddress || address.houseName || "";
       default:
-        return address.houseName || "";
+        return address.fullAddress || "";
     }
   };
 
@@ -933,7 +926,7 @@ const Banner = ({ Carts, getAllOffer }) => {
       </div>
       <div className="ban-container">
         <div className="mobile-banner" style={{ position: "relative" }}>
-          {user && !address && (
+          {/* {user && !address && (
             <div
               style={{
                 position: "absolute",
@@ -947,7 +940,7 @@ const Banner = ({ Carts, getAllOffer }) => {
                 opacity: 0.8,
               }}
             ></div>
-          )}
+          )} */}
           <UserBanner />
         </div>
       </div>
