@@ -72,6 +72,58 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
     );
   };
+
+  // Helper: determine if an item is preorder according to session cutoff rules
+  const isPreOrderFor = (deliveryDate, session) => {
+    if (!deliveryDate) return false;
+    const now = new Date();
+    const delivery = new Date(deliveryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const delDay = new Date(delivery);
+    delDay.setHours(0, 0, 0, 0);
+
+    if (delDay.getTime() > today.getTime()) return true; // future date => preorder
+    if (delDay.getTime() < today.getTime()) return false; // past
+
+    // same day -> check cutoff by session
+    const s = (session || "").toLowerCase();
+    if (s === "lunch") {
+      // Preorder allowed until 6:00 AM
+      return now.getHours() < 6;
+    }
+    if (s === "dinner") {
+      // Preorder allowed until 3:00 PM
+      return now.getHours() < 15;
+    }
+    return false;
+  };
+
+  // Helper: get effective hub/preorder price for display or calculations
+  const getEffectivePrice = (
+    item,
+    matchedLocation,
+    session,
+    usePreorderIfAvailable = true
+  ) => {
+    // Always use explicit hubPrice and preOrderPrice fields
+    const hubPrice =
+      (matchedLocation &&
+        (matchedLocation.hubPrice || matchedLocation.basePrice)) ||
+      item?.hubPrice ||
+      item?.basePrice ||
+      0;
+    const preOrderPrice =
+      (matchedLocation && (matchedLocation.preOrderPrice || matchedLocation.preorderPrice)) ||
+      item?.preOrderPrice || item?.preorderPrice || 0;
+    const isPre = isPreOrderFor(
+      item?.deliveryDate || item?.deliveryDateISO,
+      session
+    );
+    if (usePreorderIfAvailable && isPre && preOrderPrice > 0)
+      return { price: preOrderPrice, isPre };
+    return { price: hubPrice, isPre };
+  };
   const address = JSON.parse(
     localStorage.getItem("primaryAddress") ??
       localStorage.getItem("currentLocation")
@@ -285,12 +337,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       return;
     }
 
+    // determine applied price: offers (checkOf) take precedence, else preorder vs hub price
+    const eff = getEffectivePrice(item, matchedLocation, selectedSession, true);
+    const appliedPrice = checkOf ? checkOf?.price : eff.price;
+
     const newCartItem = {
       deliveryDate: new Date(selectedDate).toISOString(),
       session: selectedSession,
       foodItemId: item?._id,
-      price: checkOf ? checkOf?.price : matchedLocation?.foodprice,
-      totalPrice: checkOf ? checkOf?.price : matchedLocation?.foodprice,
+      price: appliedPrice,
+      totalPrice: appliedPrice,
       image: item?.Foodgallery[0]?.image2,
       unit: item?.unit,
       foodname: item?.foodname,
@@ -302,10 +358,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       remainingstock: matchedLocation?.Remainingstock,
       offerProduct: !!checkOf,
       minCart: checkOf?.minCart || 0,
-      actualPrice: matchedLocation?.foodprice,
+      actualPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
       offerQ: 1,
+      basePrice: matchedLocation?.basePrice || item?.basePrice || 0,
+      hubPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
+      preOrderPrice: matchedLocation?.preOrderPrice || item?.preOrderPrice || 0,
     };
-
+    console.log(matchedLocation);
     const cart = JSON.parse(localStorage.getItem("cart"));
     const cartArray = Array.isArray(cart) ? cart : [];
 
@@ -501,14 +560,20 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
           updateCartData(updatedCart);
         } else {
+          const effNew = getEffectivePrice(
+            item,
+            matchedLocation,
+            selectedSession,
+            true
+          );
           updateCartData([
             ...Carts,
             {
               deliveryDate: selectedDate.toISOString(),
               session: selectedSession,
               foodItemId: item?._id,
-              price: matchedLocation?.foodprice,
-              totalPrice: matchedLocation?.foodprice,
+              price: effNew.price,
+              totalPrice: effNew.price,
               image: item?.Foodgallery[0]?.image2,
               unit: item?.unit,
               foodname: item?.foodname,
@@ -520,7 +585,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
               remainingstock: maxStock,
               offerProduct: false,
               minCart: 0,
-              actualPrice: matchedLocation?.foodprice,
+              actualPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
               offerQ: 0,
               extra: true,
             },
@@ -825,6 +890,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // };
 
   // Inside Home.jsx
+console.log(address,'dddddddddddddd')
 
   const proceedToPlan = async () => {
     if (!user) {
@@ -864,7 +930,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       });
       return;
     }
-
     setloader(true);
     try {
       const addressDetails = {
@@ -874,9 +939,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         coordinates: address.location?.coordinates || [0, 0],
         hubId: address.hubId || "",
         // Student info (if available)
-        studentName: address.studentName || "",
-        studentClass: address.studentClass || "",
-        studentSection: address.studentSection || "",
+        studentInformation:address.studentInformation,
         schoolName: address.schoolName || "",
         houseName: address.houseName || "",
         apartmentName: address.apartmentName || "",
@@ -1567,7 +1630,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                 {/* We change 'fooditemdata' to 'menuItems' */}
                 {/* We also remove the .filter() and .sort() because our dummy data is already prepared */}
                 {menuItems?.map((item, i) => {
-                  const isPreOrder = isFutureDate(item.deliveryDate);
+                  const isPreOrder = isPreOrderFor(
+                    item?.deliveryDate || item?.deliveryDateISO,
+                    item?.session
+                  );
                   let matchedLocation = item.locationPrice?.[0];
                   const checkOf = AllOffer?.find(
                     (ele) => ele?.foodItemId == item?._id?.toString()
@@ -1575,10 +1641,17 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                   if (!matchedLocation) {
                     matchedLocation = {
                       Remainingstock: 0,
-                      foodprice: item.foodprice,
-                      basePrice: item.basePrice,
+                      hubPrice: item.hubPrice || item.basePrice || 0,
+                      preOrderPrice: item.preOrderPrice || 0,
+                      basePrice: item.basePrice || 0,
                     };
                   }
+                  const { price: effectivePrice } = getEffectivePrice(
+                    item,
+                    matchedLocation,
+                    item?.session,
+                    true
+                  );
                   return (
                     <div
                       key={item._id?.toString() || i}
@@ -1634,8 +1707,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           <div className="d-flex gap-2">
                             {/* Show base price only if it's different from foodprice */}
                             {matchedLocation?.basePrice !==
-                              (matchedLocation?.foodprice ||
-                                item?.foodprice) && (
+                              (matchedLocation?.basePrice !== matchedLocation?.hubPrice) && (
                               <div
                                 style={{
                                   textDecoration: "line-through",
@@ -1657,16 +1729,15 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 <p className="d-flex gap-1">
                                   <span className="offer-price">
                                     <b>₹</b>
-                                    {matchedLocation?.foodprice}
+                                    {effectivePrice}
                                   </span>
                                   <span>₹</span>
-                                  {checkOf?.price}{" "}
+                                  {checkOf?.price}
                                 </p>
                               ) : (
                                 <p className="d-flex gap-1">
                                   <b>₹</b>
-                                  {matchedLocation?.foodprice ||
-                                    item?.foodprice}
+                                  {effectivePrice}
                                 </p>
                               )}
                             </div>
@@ -2044,8 +2115,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                       ? foodData.locationPrice[0]
                       : {
                           Remainingstock: 0,
-                          foodprice: foodData.foodprice,
-                          basePrice: foodData.basePrice,
+                          hubPrice: foodData.hubPrice || foodData.basePrice || 0,
+                          preOrderPrice: foodData.preOrderPrice || 0,
+                          basePrice: foodData.basePrice || 0,
                         };
 
                   const checkOffer = AllOffer?.find(
@@ -2056,19 +2128,26 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                         .includes(foodData?._id)
                   );
 
-                  // Get the correct price to display
+                  // Get the correct price to display using preorder rules
+                  const eff = getEffectivePrice(
+                    foodData,
+                    matchedLocation,
+                    foodData?.session,
+                    true
+                  );
                   const currentPrice = checkOffer
-                    ? checkOffer.price // Use offer price
-                    : matchedLocation?.foodprice || foodData?.foodprice; // Use location price or default
-
-                  // Get the correct original price (usually the matched location price when there is an offer)
-                  const originalPrice = matchedLocation?.foodprice;
+                    ? checkOffer.price
+                    : eff.price;
+                  const originalPrice = eff.price;
 
                   // Get the stock count to display
                   const stockCount = matchedLocation?.Remainingstock || 0;
 
-                  // Calculate isPreOrder based on foodData delivery date
-                  const isPreOrderDrawer = isFutureDate(foodData.deliveryDate);
+                  // Calculate isPreOrder based on foodData delivery date and session cutoff
+                  const isPreOrderDrawer = isPreOrderFor(
+                    foodData?.deliveryDate || foodData?.deliveryDateISO,
+                    foodData?.session
+                  );
 
                   return (
                     <>

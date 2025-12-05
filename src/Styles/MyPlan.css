@@ -923,7 +923,22 @@ padding: 0 10px;
     bottom: 0; /* Default position */
 }
 
-/* MAGIC: When Nav is visible, push this bar UP */
+.billing-details-list{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:6px
+}
+
+.billing-details-row{
+  width:100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
 body.nav-visible .bottom-fixed-actions,
 body.nav-visible .fixed-bottom-bar {
     bottom: 70px; /* Height of the BottomNav */

@@ -183,7 +183,7 @@ const fetchDashboardData = async () => {
                                 <tr key={item.id}>
                                     <td className="ps-4 fw-bold text-dark">{item.foodName}</td>
                                     <td className="text-muted small">{item.hub?.hubName}</td>
-                                    <td className="text-center fw-bold bg-light">{item.totalReserved}</td>
+                                    <td className="text-center fw-bold bg-light">{item.totalPreOrder}</td>
                                     <td className="text-center text-success fw-bold">{item.confirmed}</td>
                                     <td className="text-center text-warning fw-bold">{item.pending}</td>
                                     <td className="text-center text-danger">{item.skipped}</td>

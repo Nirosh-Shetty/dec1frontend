@@ -1,6 +1,7 @@
 // front/src/Pages/MyPlan.jsx (or wherever this file is)
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useContext } from "react";
+import { WalletContext } from "../WalletContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button, Modal } from "react-bootstrap";
@@ -17,6 +18,7 @@ import myplancancel2 from "./../assets/myplancancelicon.png";
 // import myplanblackedit from "./../assets/myplanblackedit.png";
 import BottomNav from "./BottomNav";
 import "../Styles/MyPlan.css";
+import { toast } from "react-toastify";
 
 const formatDate = (isoString) => {
   const d = new Date(isoString);
@@ -41,9 +43,10 @@ const ViewPlanModal = ({
   handlePayPlan,
   handleTrackOrder,
 }) => {
+  const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
   const [localPlan, setLocalPlan] = useState(plan);
-  console.log("Viewing plan:", plan);
+  // console.log("Viewing plan:", plan);
 
   const [deliveryNotes, setDeliveryNotes] = useState(plan.deliveryNotes || "");
   useEffect(() => {
@@ -54,6 +57,10 @@ const ViewPlanModal = ({
   const isEditable =
     localPlan.status === "Pending Payment" &&
     new Date() < new Date(localPlan.paymentDeadline);
+  // compute stored preorderCutoff if available for UI hints
+  const localPreorderCutoff = localPlan.preorderCutoff
+    ? new Date(localPlan.preorderCutoff)
+    : null;
 
   async function changeQuantity(foodItemId, delta) {
     if (!isEditable) return;
@@ -137,16 +144,25 @@ const ViewPlanModal = ({
           if (fullAddr) {
             localStorage.setItem("primaryAddress", JSON.stringify(fullAddr));
           } else if (response.data?.primaryAddress) {
-            localStorage.setItem("primaryAddress", JSON.stringify(response.data.primaryAddress));
+            localStorage.setItem(
+              "primaryAddress",
+              JSON.stringify(response.data.primaryAddress)
+            );
           } else {
             // fallback: store id only
             localStorage.setItem("primaryAddress", JSON.stringify(addressId));
           }
         } else {
           // no cache present — still set timestamp and primaryAddress from response if available
-          localStorage.setItem(`addresses_timestamp_${userId}`, Date.now().toString());
+          localStorage.setItem(
+            `addresses_timestamp_${userId}`,
+            Date.now().toString()
+          );
           if (response.data?.primaryAddress) {
-            localStorage.setItem("primaryAddress", JSON.stringify(response.data.primaryAddress));
+            localStorage.setItem(
+              "primaryAddress",
+              JSON.stringify(response.data.primaryAddress)
+            );
           } else {
             localStorage.setItem("primaryAddress", JSON.stringify(addressId));
           }
@@ -164,21 +180,47 @@ const ViewPlanModal = ({
 
   const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Wallet selection state (use WalletContext for live data)
+  const { wallet, walletSeting } = useContext(WalletContext);
+  const walletBalance = wallet?.balance || 0;
+  const [useWallet, setUseWallet] = useState(false);
+  // Compute max wallet deduction (same as Checkout)
+  const maxWalletDeduction = Math.max(
+    0,
+    Math.min(walletBalance, localPlan.slotTotalAmount || 0)
+  );
+  const [walletDeduction, setWalletDeduction] = useState(0);
+  // Update wallet deduction when useWallet toggles or wallet/plan changes
+  useEffect(() => {
+    if (useWallet) {
+      setWalletDeduction(maxWalletDeduction);
+    } else {
+      setWalletDeduction(0);
+    }
+  }, [useWallet, walletBalance, localPlan.slotTotalAmount]);
+  // Payable amount after wallet deduction
+  const payableAmount = Math.max(
+    0,
+    (localPlan.slotTotalAmount || 0) - walletDeduction
+  );
 
   if (!isOpen || !localPlan) return null;
 
   const toggleBillingDetails = () => setIsBillingOpen((p) => !p);
 
   const now = new Date();
-  const deadline = new Date(localPlan.paymentDeadline);
+  const deadline = localPlan.paymentDeadline
+    ? new Date(localPlan.paymentDeadline)
+    : null;
 
-  const isBeforeDeadline = now < deadline;
+  const isBeforeDeadline = deadline ? now < deadline : true;
   const isUnpaidEditable =
     localPlan.status === "Pending Payment" && isBeforeDeadline;
   const isPaidEditable = localPlan.status === "Confirmed" && isBeforeDeadline;
   const isPaidLocked = localPlan.status === "Confirmed" && !isBeforeDeadline;
 
   const getTimeRemainingToDeadline = () => {
+    if (!deadline) return { days: 0, hours: 0 };
     const diff = deadline - now;
     if (diff <= 0) return { days: 0, hours: 0 };
 
@@ -205,10 +247,34 @@ const ViewPlanModal = ({
     }
   };
 
-  const handlePay = () => {
-    // You can replace with your actual checkout navigation
-    // For example: navigate("/checkout", { state: { selectedPlanIds: [plan._id] } })
-    onPlanUpdated && onPlanUpdated("pay", plan);
+  // Payment handler: if payableAmount is 0, skip gateway and call /create-from-plan
+  const handlePay = async () => {
+    if (payableAmount === 0) {
+      // Directly create order from plan (like Checkout)
+      try {
+        setLoading(true);
+        const res = await axios.post("/api/user/myplan/create-from-plan", {
+          userId,
+          planId: localPlan._id,
+          discountWallet: walletDeduction,
+        });
+        setLoading(false);
+        if (res.data.success) {
+          toast.success("Order placed successfully!");
+          onPlanUpdated && onPlanUpdated();
+          onClose();
+        } else {
+          toast.error(res.data.message || "Order failed");
+        }
+      } catch (err) {
+        setLoading(false);
+        toast.error("Order failed");
+      }
+    } else {
+      // Proceed to payment gateway as usual
+      onPlanUpdated &&
+        onPlanUpdated("pay", { ...plan, discountWallet: walletDeduction });
+    }
   };
 
   return (
@@ -219,7 +285,7 @@ const ViewPlanModal = ({
         </button>
       </div>
 
-      <div className="view-plan-top">
+      {/* <div className="view-plan-top">
         <div className="view-plan-time">
           {formatDate(localPlan.deliveryDate)}{" "}
           {formatDay(localPlan.deliveryDate)}
@@ -231,19 +297,19 @@ const ViewPlanModal = ({
             </>
           )}
         </div>
-      </div>
+      </div> */}
       <div
         className="plan-modal-content"
         onClick={(e) => {
           e.stopPropagation();
         }}
-        style={
-          localPlan.status === "Pending Payment" && isBeforeDeadline
-            ? {
-                borderTopRightRadius: 0,
-              }
-            : {}
-        }
+        // style={
+        //   localPlan.status === "Pending Payment" && isBeforeDeadline
+        //     ? {
+        //         borderTopRightRadius: 0,
+        //       }
+        //     : {}
+        // }
       >
         {/* Header */}
         <div className="modal-header-section">
@@ -252,7 +318,10 @@ const ViewPlanModal = ({
               <h3 className="session-title">{localPlan.session}</h3>
               <div className="delivery-time-text">
                 {/* static for now; optionally store slot time in DB later */}
-                Arrives fresh between {localPlan.session==="Lunch" ? "12:00 to 01:00PM" : "07:00 to 08:00PM"}
+                Arrives fresh between{" "}
+                {localPlan.session === "Lunch"
+                  ? "12:00 to 01:00PM"
+                  : "07:00 to 08:00PM"}
               </div>
             </div>
             {localPlan.status === "Confirmed" && (
@@ -372,13 +441,25 @@ const ViewPlanModal = ({
                         </div>
                       </div>
                       <div className="price-container vertical">
+                        {localPlan.orderType === "PreOrder" && (
+                          <div className="plan-actual-price">
+                            <div className="plan-current-currency">
+                              <div className="current-currency-text">₹</div>
+                            </div>
+                            <div className="plan-hub-amount">
+                              <div className="hub-amount-text">
+                                {product.hubTotalPrice?.toFixed(0)}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <div className="plan-current-price">
                           <div className="plan-current-currency">
-                            <div className="current-currency-text">₹</div>
+                            <div className="current-currency-text"></div>
                           </div>
                           <div className="plan-current-amount">
                             <div className="current-amount-text">
-                              {product.totalPrice?.toFixed(0)}
+                              ₹{product.totalPrice?.toFixed(0)}
                             </div>
                           </div>
                         </div>
@@ -390,35 +471,18 @@ const ViewPlanModal = ({
 
                 {/* Total row */}
                 <div className="plan-cart-footer">
-                  <div className="add-more-section">
-                    <div className="plan-add-more-btn">
-                      {/* <div className="add-more-content"> */}
-                      {/* <div className="add-more-text-container"> */}
-                      {/* you can wire this to "add more items for this slot" */}
-                      <span className="add-more-label" onClick={handleAddMore}>
+                  {/* <div className="add-more-section"> */}
+                  {/* <div className="plan-add-more-btn"> */}
+                  {/* <div className="add-more-content"> */}
+                  {/* <div className="add-more-text-container"> */}
+                  {/* you can wire this to "add more items for this slot" */}
+                  {/* <span className="add-more-label" onClick={handleAddMore}>
                         Add More
-                      </span>
-                      {/* </div> */}
-                      {/* </div> */}
-                    </div>
-                  </div>
-                  <div className="plan-total-container">
-                    <div className="plan-total-section">
-                      <div className="total-label-container">
-                        <div className="total-label">Total</div>
-                      </div>
-                      <div className="total-price-section">
-                        <div className="current-currency">
-                          <div className="current-currency-text">₹</div>
-                        </div>
-                        <div className="current-amount">
-                          <div className="current-amount-text">
-                            {localPlan.slotTotalAmount?.toFixed(2)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      </span> */}
+                  {/* </div> */}
+                  {/* </div> */}
+                  {/* </div> */}
+                  {/* </div> */}
                 </div>
               </div>
             </div>
@@ -571,6 +635,106 @@ const ViewPlanModal = ({
             </div>
           </div>
         </div>
+        <div className="plan-total-container">
+          {/* <div className="plan-total-section">
+                      <div className="total-label-container">
+                        <div className="total-label">Wallet</div>
+                      </div>
+                      <div className="total-price-section">
+                        <input type="checkbox" checked={useWallet} onChange={e => setUseWallet(e.target.checked)} disabled={walletBalance <= 0} />
+                        <span className="wallet-amount">₹{walletDeduction.toFixed(0)} / ₹{walletBalance.toFixed(0)}</span>
+                      </div>
+                    </div> */}
+        </div>
+        {localPlan.status === "Pending Payment" && (
+          <div className="promo-wallet-container">
+            <div className="wallet-section">
+              <input
+                type="checkbox"
+                className="form-check-input wallet-checkbox"
+                // id="customCheckbox1"
+                name="Apply Wallet"
+                onChange={(e) => setUseWallet(e.target.checked)}
+                disabled={walletBalance <= 0}
+                // style={{
+                //   border: discountWallet
+                //     ? "1px solid #6B8E23 !important"
+                //     : "1px solid #6B6B6B !important",
+                //   backgroundColor: discountWallet ? "#6B8E23" : "white",
+                // }}
+              />
+              {/* Wallet Credit Text */}
+              <div className="wallet-text">
+                <div className="wallet-header">
+                  <span className="wallet-title">Apply Wallet Credit</span>
+                  <span className="wallet-amount">
+                    ₹{walletBalance.toFixed(0)}
+                    available
+                  </span>
+                </div>
+                {user.status === "Employee" ? (
+                  <p className="wallet-subtext">Now you can pay with wallet</p>
+                ) : (
+                  <p className="wallet-subtext">
+                    Add ₹
+                    {Math.max(
+                      0,
+                      Math.min(
+                        walletSeting?.minCartValueForWallet || 0,
+                        (walletSeting?.minCartValueForWallet || 0) -
+                          // Number(calculateTaxPrice) +
+                          (Number(localPlan.slotTotalAmount) ||
+                            // + Number(Cutlery)
+                            0)
+                      )
+                    )}{" "}
+                    more to use
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="billing-details-container">
+          <h1>Billing Details</h1>
+          <div className="billing-details-list">
+            <div className="billing-details-row">
+              <span>Total Order value</span>
+              <span> ₹{localPlan?.slotTotalAmount}</span>
+            </div>
+            {localPlan.orderType === "PreOrder" && (
+              <div className="billing-details-row">
+                <span>Pre-Order Savings</span>
+                <span>
+                  - ₹
+                  {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount}
+                </span>
+              </div>
+            )}
+            <div className="billing-details-row">
+              <span>Wallet</span>
+              <span>
+                {" "}
+                -₹
+                {localPlan.status === "Confirmed"
+                  ? localPlan.discountWallet
+                  : walletDeduction.toFixed(0)}
+              </span>
+            </div>
+            {localPlan.status === "Confirmed" ? (
+              <div className="billing-details-row">
+                <span>Amount Paid</span>
+                <span> ₹{localPlan?.payableAmount}</span>
+              </div>
+            ) : (
+              <div className="billing-details-row">
+                <span>Payable Amount</span>
+                <span> ₹{payableAmount}</span>
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="modal-footer-actions">
           {isUnpaidEditable && (
@@ -590,12 +754,15 @@ const ViewPlanModal = ({
               <button
                 className="confirm-pay-btn"
                 // className="pay-btn"
-                onClick={() => handlePayPlan(localPlan, deliveryNotes)}
+                onClick={() =>
+                  handlePayPlan(localPlan, deliveryNotes, walletDeduction)
+                }
                 disabled={loading}
               >
                 Confirm & Pay
                 <span className="pay-amount-badge">
-                  ₹{localPlan.slotTotalAmount?.toFixed(2)}
+                  {/* ₹{localPlan.slotTotalAmount?.toFixed(0)} */}
+                  {payableAmount}
                 </span>
               </button>
             </>
@@ -709,58 +876,56 @@ const MyPlan = () => {
     }
   };
 
-// NO moment version
-const getTimeRemaining = (plan) => {
-  const now = new Date();
+  // NO moment version
+  const getTimeRemaining = (plan) => {
+    const now = new Date();
 
-  // Assume plan.deliveryDate is an ISO string or Date
-  const deliveryDate = new Date(plan.deliveryDate);
+    // Assume plan.deliveryDate is an ISO string or Date
+    const deliveryDate = new Date(plan.deliveryDate);
 
-  // Normalize to start of the day in local time
-  deliveryDate.setHours(0, 0, 0, 0);
+    // Normalize to start of the day in local time
+    deliveryDate.setHours(0, 0, 0, 0);
 
-  // Base target time on that date
-  const targetTime = new Date(deliveryDate.getTime());
-
-  if (plan.orderType === "Reserved") {
-    if (plan.session === "Lunch") {
-      // 6:00 AM
-      targetTime.setHours(6, 0, 0, 0);
+    // Prefer stored cutoff/deadline if they exist on the plan document
+    let targetTime = null;
+    if (plan.orderType === "PreOrder") {
+      if (plan.preorderCutoff) {
+        targetTime = new Date(plan.preorderCutoff);
+      } else {
+        targetTime = new Date(deliveryDate.getTime());
+        if (plan.session === "Lunch") targetTime.setHours(6, 0, 0, 0);
+        else targetTime.setHours(15, 0, 0, 0);
+      }
     } else {
-      // 3:00 PM
-      targetTime.setHours(15, 0, 0, 0);
+      // Instant / after cutoff → prefer stored paymentDeadline for visual
+      if (plan.paymentDeadline) {
+        targetTime = new Date(plan.paymentDeadline);
+      } else {
+        targetTime = new Date(deliveryDate.getTime());
+        if (plan.session === "Lunch") targetTime.setHours(12, 0, 0, 0);
+        else targetTime.setHours(19, 0, 0, 0);
+      }
     }
-  } else {
-    // Instant / after cutoff → use payment deadline visual
-    if (plan.session === "Lunch") {
-      // 12:00 PM
-      targetTime.setHours(12, 0, 0, 0);
-    } else {
-      // 7:00 PM
-      targetTime.setHours(19, 0, 0, 0);
+
+    const diffMs = targetTime.getTime() - now.getTime();
+
+    if (diffMs <= 0) {
+      return { days: 0, hours: 0, mins: 0, isExpired: true };
     }
-  }
 
-  const diffMs = targetTime.getTime() - now.getTime();
+    // Work purely in minutes to avoid float mess
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const mins = totalMinutes % 60;
 
-  if (diffMs <= 0) {
-    return { days: 0, hours: 0, mins: 0, isExpired: true };
-  }
-
-  // Work purely in minutes to avoid float mess
-  const totalMinutes = Math.floor(diffMs / (1000 * 60));
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const mins = totalMinutes % 60;
-
-  return {
-    days,
-    hours,
-    mins,
-    isExpired: false,
+    return {
+      days,
+      hours,
+      mins,
+      isExpired: false,
+    };
   };
-};
-
 
   const handleViewPlan = (plan) => {
     setSelectedPlan(plan);
@@ -846,7 +1011,7 @@ const getTimeRemaining = (plan) => {
   const mobile = user?.Mobile;
   const username = user?.Fname;
 
-  async function handlePayPlan(plan, deliveryNotes = "") {
+  async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
       const amount = plan.slotTotalAmount; // single plan only
 
@@ -859,7 +1024,7 @@ const getTimeRemaining = (plan) => {
           userId,
           planId: plan._id,
           // optional discounts:
-          discountWallet: 0,
+          discountWallet,
           coupon: 0,
           // couponId: null,
           // companyId: null,
@@ -931,24 +1096,24 @@ const getTimeRemaining = (plan) => {
             </div>
             <h3 className="checkout-title">My Plans</h3>
             {/* <div style={{ width: 36 }}></div> */}
-<div 
-              onClick={() => navigate("/orders")} 
-              style={{ 
-                  cursor: "pointer", 
-                  background: "rgba(255,255,255,0.15)", 
-                  padding: "10px 8px 10px 12px", 
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  filter: "invert(100%)"
+            <div
+              onClick={() => navigate("/orders")}
+              style={{
+                cursor: "pointer",
+                background: "rgba(255,255,255,0.15)",
+                padding: "10px 8px 10px 12px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                filter: "invert(100%)",
               }}
             >
-               <img
-                        src="/Assets/lists.svg"
-                        alt="My Orders"
-                        className="icon-img-l"
-                      />
+              <img
+                src="/Assets/lists.svg"
+                alt="My Orders"
+                className="icon-img-l"
+              />
             </div>
           </div>
         </div>
@@ -986,7 +1151,7 @@ const getTimeRemaining = (plan) => {
               <div className="no-plans-text">No plans for this day yet</div>
             ) : (
               currentTabOrders.map((plan) => {
-const { days, hours, mins, isExpired } = getTimeRemaining(plan);
+                const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                 const now = new Date();
                 const deadline = new Date(plan.paymentDeadline);
                 const isBeforeDeadline = now < deadline;
@@ -1005,14 +1170,6 @@ const { days, hours, mins, isExpired } = getTimeRemaining(plan);
 
                 return (
                   <>
-                   {isUnpaidEditable && !isExpired && (
-                  <div className="reminder-banner">
-                    {plan.orderType === "Reserved" 
-                      ? `Reserve Price valid for: ${days > 0 ? `${days}d` : ''} ${hours}h ${mins}m`
-                      : `Confirm plan within: ${days > 0 ? `${days}d` : ''} ${hours}h ${mins}m`
-                    }
-                  </div>
-                )}
                     <div
                       key={plan._id}
                       className="plan-card"
@@ -1031,7 +1188,10 @@ const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                           <h3 className="session-title">{plan.session}</h3>
                           <div className="delivery-time-text">
                             {/* static for now; optionally store slot time in DB later */}
-                            Arrives fresh between {plan.session === "Lunch" ? "12:00 to 01:00PM" : "07:00 to 08:00PM"}
+                            Arrives fresh between{" "}
+                            {plan.session === "Lunch"
+                              ? "12:00 to 01:00PM"
+                              : "07:00 to 08:00PM"}
                           </div>
                         </div>
                         {plan.status === "Confirmed" && (
@@ -1044,6 +1204,19 @@ const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                         )}
                         {plan.status === "Cancelled" && (
                           <div className="status-badge-canceled">Cancelled</div>
+                        )}
+                        {plan.status === "Pending Payment" && (
+                          <div className="status-badge-pending">
+                            Payment Pending
+                          </div>
+                        )}
+                        {selectedTab === "upcoming" && (
+                          <div className="upcoming-date-badge">
+                            {new Date(plan.deliveryDate).toLocaleDateString(
+                              "en-US",
+                              { day: "numeric", month: "short" }
+                            )}
+                          </div>
                         )}
                       </div>
 
@@ -1086,18 +1259,52 @@ const { days, hours, mins, isExpired } = getTimeRemaining(plan);
                             />
                           </button>
                         </div>
-
-                        {isUnpaidEditable && (
-                          <button
-                            className="pay-btn"
-                            onClick={() => handlePayPlan(plan)}
-                          >
-                            Pay
-                            <span className="price-pill">
-                              ₹{plan.slotTotalAmount?.toFixed(2)}
-                            </span>
-                          </button>
-                        )}
+                        <div className="make-payment-container">
+                          {/* {isUnpaidEditable && !isExpired && (
+                            <div className="reminder-banner">
+                              {plan.orderType === "PreOrder"
+                                ? `Reserve Price valid for: ${
+                                    days > 0 ? `${days}d` : ""
+                                  } ${hours}h ${mins}m`
+                                : `Confirm plan within: ${
+                                    days > 0 ? `${days}d` : ""
+                                  } ${hours}h ${mins}m`}
+                            </div>
+                          )} */}
+                          {isUnpaidEditable &&
+                            !isExpired &&
+                            plan.orderType === "PreOrder" && (
+                              <div className="reminder-banner">
+                                {`Before ${
+                                  plan.session === "Lunch" ? "6AM" : "3PM"
+                                }, pay ₹ ${(
+                                  plan.slotHubTotalAmount - plan.slotTotalAmount
+                                ).toFixed(0)} less`}
+                              </div>
+                            )}
+                          {isUnpaidEditable && (
+                            <button
+                              className="pay-btn"
+                              onClick={() => handlePayPlan(plan, "")}
+                            >
+                              Pay
+                              {plan.orderType === "PreOrder" ? (
+                                <div className="price-pill">
+                                  ₹{plan.slotTotalAmount?.toFixed(0)}
+                                </div>
+                              ) : (
+                                <div className="price-pill">
+                                  <span className="actuall-amount">
+                                    ₹{plan.slotHubTotalAmount?.toFixed(0)}
+                                  </span>
+                                  <span className="pre-order-amount">
+                                    ₹{plan.slotTotalAmount?.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
+                            </button>
+                          )}
+                        </div>
 
                         {isPaidEditable && (
                           <button
