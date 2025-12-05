@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa"; // Icons for success and failure
-import "../Styles/payment.css"; // External CSS for better readability
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa"; 
+import "../Styles/payment.css"; 
 import axios from "axios";
-import swal from "sweetalert";
+import Swal2 from "sweetalert2"; // Using Swal2 for consistency with your MyPlan code
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -12,107 +12,123 @@ const PaymentSuccess = () => {
   // Extract query parameters
   const transactionId = searchParams.get("transactionId");
   const userId = searchParams.get("userID");
+  const code = searchParams.get("code"); // PhonePe sends this (e.g., PAYMENT_ERROR)
 
-  // State for payment status and details
-  const [paymentStatus, setPaymentStatus] = useState(null); // e.g., "CR" or "FAILED"
-  const [paymentDetails, setPaymentDetails] = useState(null); // Store the full payment data
+  // State for payment status
+  const [paymentStatus, setPaymentStatus] = useState("LOADING"); // LOADING, COMPLETED, FAILED
+  const [paymentDetails, setPaymentDetails] = useState(null); 
 
-  const handleHomeClick = () => {
-    navigate("/orders?userID=" + userId);
+  const handleSuccessRedirect = () => {
+    navigate("/orders"); // Changed to just /orders as per your request
+  };
+
+  const handleFailureRedirect = () => {
+    navigate("/my-plan"); // Go back to plan to retry
   };
 
   const checkPaymentStatus = async () => {
     try {
-      // Construct API endpoint
-      const url = `https://dailydish-backend.onrender.com/api/User/checkPayment/${transactionId}/${userId}`;
+      // 1. Check for immediate failure code from URL (User clicked Back/Cancel)
+      if (code === "PAYMENT_ERROR" || code === "PAYMENT_DECLINED") {
+        throw new Error("Payment was declined or cancelled by user.");
+      }
 
-      // Make the GET request
+      // 2. Verify with Backend
+      // Using your existing endpoint structure
+      const url = `https://dailydish-backend.onrender.com/api/User/checkPayment/${transactionId}/${userId}`;
+      
       const response = await axios.get(url);
 
-      if (response.status == 200) {
-        const paymentData = response.data.success;
+      if (response.status === 200) {
+        const paymentData = response.data.success || response.data.data; // Handle different response structures
         setPaymentDetails(paymentData);
-        if (paymentData.status === "COMPLETED") {
-          localStorage.removeItem("cart");
+
+        if (paymentData.status === "COMPLETED" || paymentData.state === "COMPLETED") {
           setPaymentStatus("COMPLETED");
-          setTimeout(() => {
-            navigate("/orders?userID=" + userId);
-          }, 1000);
+          
+          // Optional: Clear cart if this was a cart order. 
+          // For MyPlan, we don't strictly need to, but it's safe to leave if you use this page for Cart too.
+          localStorage.removeItem("cart");
+
+          Swal2.fire({
+            icon: 'success',
+            title: 'Payment Successful!',
+            text: 'Your order has been confirmed.',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+             navigate("/orders");
+          });
+
         } else {
-          setPaymentStatus("FAILED");
-          setTimeout(() => {
-            navigate("/checkout");
-          }, 1000);
+          throw new Error("Payment status is not COMPLETED");
         }
       } else {
-        // Handle unexpected response
-        swal({
-          title: "Payment Verification Failed",
-          text: "Unable to verify your payment status. Please contact support.",
-          icon: "error",
-          button: "OK",
-        });
+        throw new Error("Invalid response from server");
       }
     } catch (error) {
-      // Handle API errors
       console.error("Error checking payment status:", error);
-      swal({
-        title: "Error!",
-        text: "Unable to verify payment status. Please try again.",
-        icon: "error",
-        button: "OK",
-      });
+      setPaymentStatus("FAILED");
+      
+      // Allow user to see the error screen before auto-redirecting (optional)
+      // or simply stay on the failed screen
     }
   };
 
   useEffect(() => {
-    // Call payment status check when component mounts
-    if (transactionId && userId) {
+    alert('hi')
+    if (transactionId) {
       checkPaymentStatus();
+    } else if (code === "PAYMENT_ERROR") {
+        setPaymentStatus("FAILED");
     } else {
-      swal({
-        title: "Invalid Payment Details",
-        text: "Missing transaction ID or user ID.",
-        icon: "error",
-        button: "OK",
-      });
+      // No params? Probably manual navigation, go home
       navigate("/home");
     }
-  }, [transactionId, userId, navigate]);
+    // eslint-disable-next-line
+  }, [transactionId, userId, code]);
 
   return (
-    <div className="payment-success-container">
+    <div className="payment-success-container" style={{ textAlign: 'center', padding: '50px' }}>
       {paymentStatus === "COMPLETED" ? (
         <>
-          <FaCheckCircle className="payment-success-icon" />
+          <FaCheckCircle className="payment-success-icon" style={{ color: '#6b8e23', fontSize: '50px', marginBottom: '20px' }} />
           <h1 className="payment-success-title">Payment Successful!</h1>
           <p className="payment-success-message">
-            Thank you for your payment,{" "}
-            <strong>{paymentDetails?.username}</strong>.
+            Thank you for your payment{paymentDetails?.username ? `, ${paymentDetails.username}` : ""}.
           </p>
-          <p className="payment-success-message">
-            Amount: ₹{paymentDetails?.amount}
-          </p>
-          <button onClick={handleHomeClick} className="payment-success-button">
-            Go To My Order
+          {paymentDetails?.amount && (
+             <p className="payment-success-message">
+               Amount: <strong>₹{paymentDetails.amount}</strong>
+             </p>
+          )}
+          <button onClick={handleSuccessRedirect} className="payment-success-button" style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#6b8e23', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+            Go To My Orders
           </button>
         </>
       ) : paymentStatus === "FAILED" ? (
         <>
-          <FaTimesCircle className="payment-failed-icon" />
+          <FaTimesCircle className="payment-failed-icon" style={{ color: '#dc3545', fontSize: '50px', marginBottom: '20px' }} />
           <h1 className="payment-failed-title">Payment Failed</h1>
           <p className="payment-failed-message">
-            We could not process your payment. Please try again.
+            We could not process your payment or it was cancelled.
           </p>
           <button
-            onClick={() => navigate("/checkout")}
+            onClick={handleFailureRedirect}
             className="payment-success-button"
+            style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
           >
-            Retry Payment
+            Retry in My Plan
           </button>
         </>
       ) : (
-        <p>Loading payment status...</p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+             {/* You can use your Spinner here if you have one imported */}
+            <div className="spinner-border text-success" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+            <p>Verifying payment status...</p>
+        </div>
       )}
     </div>
   );

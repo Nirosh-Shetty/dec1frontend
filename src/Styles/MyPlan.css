@@ -971,6 +971,16 @@ body.nav-hidden .fixed-bottom-bar {
   padding: 0 10px;
 }
 
+.tab-btn.grayed-out .tab-label {
+  color: var(--steel-dark);
+  border-color: var(--steel-dark);
+  background-color: var(--steel-light);
+}
+
+.tab-btn.active {
+  opacity: 1 !important;
+}
+
 /* Mobile optimizations */
 @media screen and (max-width: 576px) {
   .plan-card {

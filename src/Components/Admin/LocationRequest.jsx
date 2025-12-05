@@ -762,7 +762,7 @@
 //   // Load Google Maps script
 //   useEffect(() => {
 //     if (showMapModal && !window.google) {
-//       const API_KEY = process.env.REACT_APP_MAP_KEY;
+//       const API_KEY = import.meta.env.VITE_MAP_KEY;
 
 //       if (document.querySelector(`script[src*="maps.googleapis.com"]`)) {
 //         return;
@@ -1743,7 +1743,7 @@ const LocationRequest = () => {
   // Load Google Maps script
   useEffect(() => {
     if ((showMapModal || showAllLocationsMap) && !window.google) {
-      const API_KEY = process.env.REACT_APP_MAP_KEY;
+      const API_KEY = import.meta.env.VITE_MAP_KEY;
 
       if (document.querySelector(`script[src*="maps.googleapis.com"]`)) {
         return;

@@ -1182,23 +1182,24 @@ const MyPlan = () => {
 
         {/* Tabs */}
         <div className="myplan-mid-section">
-          <div className="tabs-container">
+       <div className="tabs-container">
             {["today", "tomorrow", "upcoming"].map((tab) => {
               const isActive = selectedTab === tab;
-              const display = getTabDateDisplay(tab);
               const label = tab.charAt(0).toUpperCase() + tab.slice(1);
+              
+              // Check if plan exists for this specific tab
+              let hasPlan = false;
+              if (tab === 'today' && categorizedOrders.todayOrders.length > 0) hasPlan = true;
+              if (tab === 'tomorrow' && categorizedOrders.tomorrowOrders.length > 0) hasPlan = true;
+              if (tab === 'upcoming' && categorizedOrders.upcomingOrders.length > 0) hasPlan = true;
+
               return (
                 <div
                   key={tab}
                   onClick={() => setSelectedTab(tab)}
-                  className={`tab-btn ${isActive ? "active" : ""}`}
+                  // Add 'grayed-out' class if there is NO plan
+                  className={`tab-btn ${isActive ? "active" : ""} ${!hasPlan ? "grayed-out" : ""}`}
                 >
-                  {/* <div className="tab-btn-content">
-                  <span>{display.date}</span>
-                  <div className="tab-divider" />
-                  <span>{display.day}</span>
-                </div>
-                <div className="tab-line" /> */}
                   <h1 className={`tab-label ${isActive ? "active" : ""}`}>
                     {label}
                   </h1>
