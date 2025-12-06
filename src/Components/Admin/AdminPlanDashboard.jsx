@@ -58,13 +58,13 @@ const AdminPlanDashboard = () => {
 
       if (activeView === "sales") {
         const res = await axios.get(
-          "https://dailydish-backend.onrender.com/api/admin/plan/sales-tracker",
+          "https://dd-merge-backend-2.onrender.com/api/admin/plan/sales-tracker",
           { params }
         );
         if (res.data.success) setSalesData(res.data.data);
       } else {
         const res = await axios.get(
-          "https://dailydish-backend.onrender.com/api/admin/plan/orders-tracker",
+          "https://dd-merge-backend-2.onrender.com/api/admin/plan/orders-tracker",
           { params }
         );
         if (res.data.success) setOrdersData(res.data.data);
@@ -99,7 +99,7 @@ const AdminPlanDashboard = () => {
     try {
       const dateStr = startDate.toISOString().split("T")[0];
       const res = await axios.post(
-        "https://dailydish-backend.onrender.com/api/admin/plan/send-reminders",
+        "https://dd-merge-backend-2.onrender.com/api/admin/plan/send-reminders",
         {
           date: dateStr,
           session: selectedSession,

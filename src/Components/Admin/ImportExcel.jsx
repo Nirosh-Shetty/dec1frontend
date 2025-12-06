@@ -28,7 +28,7 @@ const ImportExcel = () => {
       const config = {
         url: `/admin/updatefoodstocks`,
         method: "put",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { data },
       };

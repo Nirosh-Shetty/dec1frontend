@@ -32,7 +32,7 @@ function OrderHistory() {
   const getorders = async (id) => {
     try {
       let res = await axios.get(
-        `https://dailydish-backend.onrender.com/api/admin/getallordersbyUserId/${id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/getallordersbyUserId/${id}`
       );
       if (res.status === 200 && res.data.order) {
         const formattedOrders = res.data.order
@@ -487,7 +487,7 @@ function OrderHistory() {
     const comment = isFoodRating ? foodReview : deliveryReview;
 
     try {
-      await axios.put(`https://dailydish-backend.onrender.com/api/admin/submitOrderRating`, {
+      await axios.put(`https://dd-merge-backend-2.onrender.com/api/admin/submitOrderRating`, {
         orderId: currentOrderId,
         ratingType,
         rating,

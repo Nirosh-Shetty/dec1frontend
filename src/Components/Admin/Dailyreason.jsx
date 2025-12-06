@@ -118,7 +118,7 @@ function ReasonManagement() {
       const config = {
         url: "admin/adddelayreason",
         method: "post",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: delayReason, reasonType: "delay" },
       };
@@ -143,7 +143,7 @@ function ReasonManagement() {
       const config = {
         url: `admin/updatedelayreason/${delayEditData._id}`,
         method: "put",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: delayReason, reasonType: "delay" },
       };
@@ -162,7 +162,7 @@ function ReasonManagement() {
   const getDelayReasons = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/admin/getdelayreasons"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getdelayreasons"
       );
       if (res.status === 200) {
         const Reasons = res.data.reasons || [];
@@ -191,7 +191,7 @@ function ReasonManagement() {
   const deleteDelayReason = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish-backend.onrender.com/api/admin/deletedelayreason/${delayDelData._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/deletedelayreason/${delayDelData._id}`
       );
       if (res.status === 200) {
         alert("Delay Reason Deleted Successfully");
@@ -213,7 +213,7 @@ function ReasonManagement() {
       const config = {
         url: "admin/adddelayreason",
         method: "post",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: rescheduleReason, reasonType: "reschedule" },
       };
@@ -238,7 +238,7 @@ function ReasonManagement() {
       const config = {
         url: `admin/updatedelayreason/${rescheduleEditData._id}`,
         method: "put",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: rescheduleReason, reasonType: "reschedule" },
       };
@@ -257,7 +257,7 @@ function ReasonManagement() {
   const deleteRescheduleReason = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish-backend.onrender.com/api/admin/deletedelayreason/${rescheduleDelData._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/deletedelayreason/${rescheduleDelData._id}`
       );
       if (res.status === 200) {
         alert("Reschedule Reason Deleted Successfully");
@@ -279,7 +279,7 @@ function ReasonManagement() {
       const config = {
         url: "admin/adddelayreason",
         method: "post",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: cancelReason, reasonType: "cancel" },
       };
@@ -304,7 +304,7 @@ function ReasonManagement() {
       const config = {
         url: `admin/updatedelayreason/${cancelEditData._id}`,
         method: "put",
-        baseURL: "https://dailydish-backend.onrender.com/api",
+        baseURL: "https://dd-merge-backend-2.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: cancelReason, reasonType: "cancel" },
       };
@@ -323,7 +323,7 @@ function ReasonManagement() {
   const deleteCancelReason = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish-backend.onrender.com/api/admin/deletedelayreason/${cancelDelData._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/deletedelayreason/${cancelDelData._id}`
       );
       if (res.status === 200) {
         alert("Cancel Reason Deleted Successfully");

@@ -146,7 +146,7 @@
 //       fetchAbortControllerRef.current = new AbortController();
 
 //       const response = await fetch(
-//         `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: { "Content-Type": "application/json" },
@@ -187,7 +187,7 @@
 //   const fetchAddressesInBackground = async (customerId) => {
 //     try {
 //       const response = await fetch(
-//         `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: { "Content-Type": "application/json" },
@@ -341,7 +341,7 @@
 
 //       // Background API call
 //       fetch(
-//         `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
+//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
 //         {
 //           method: "PATCH",
 //           headers: { "Content-Type": "application/json" },
@@ -416,7 +416,7 @@
 
 //         // API call in background
 //         const response = await fetch(
-//           `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+//           `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
 //           {
 //             method: "PATCH",
 //             headers: { "Content-Type": "application/json" },
@@ -1140,7 +1140,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
         fetchAbortControllerRef.current = new AbortController();
 
         const response = await fetch(
-          `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
+          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -1189,7 +1189,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
   const fetchAddressesInBackground = async (customerId) => {
     try {
       const response = await fetch(
-        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -1383,7 +1383,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
 
       // API call
       await fetch(
-        `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -1479,7 +1479,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
 
         // API call
         const response = await fetch(
-          `https://dailydish-backend.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

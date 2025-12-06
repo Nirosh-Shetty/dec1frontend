@@ -35,7 +35,7 @@ const PaymentSuccess = () => {
 
       // 2. Verify with Backend
       // Using your existing endpoint structure
-      const url = `https://dailydish-backend.onrender.com/api/User/checkPayment/${transactionId}/${userId}`;
+      const url = `https://dd-merge-backend-2.onrender.com/api/User/checkPayment/${transactionId}/${userId}`;
       
       const response = await axios.get(url);
 

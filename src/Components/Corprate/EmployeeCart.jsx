@@ -30,7 +30,7 @@ const EmployeeCart = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://dailydish-backend.onrender.com/api/cart/getCartBycompany/" + coprate._id
+        "https://dd-merge-backend-2.onrender.com/api/cart/getCartBycompany/" + coprate._id
       );
       setCarts(response.data.items || []);
     } catch (error) {

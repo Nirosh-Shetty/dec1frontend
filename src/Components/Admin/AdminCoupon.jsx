@@ -24,7 +24,7 @@ const AdminCoupon = () => {
   const getfooditems = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/admin/getFoodItemsUnBlocks"
+        "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItemsUnBlocks"
       );
       if (res.status === 200) {
         setfooditemdata(res.data.data);
@@ -43,7 +43,7 @@ const AdminCoupon = () => {
   const getCoupon = async () => {
     try {
       axios
-        .get("https://dailydish-backend.onrender.com/api/admin/coupons")
+        .get("https://dd-merge-backend-2.onrender.com/api/admin/coupons")
         .then((response) => {
           setCoupons(response.data);
         })

@@ -15,7 +15,7 @@ const Footer = () => {
   const [Addsocial, setAddsocial] = useState([]);
   const getAddsocial = async () => {
     try {
-      let res = await axios.get("https://dailydish-backend.onrender.com/api/admin/getsocial");
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getsocial");
       if (res.status === 200) {
         setAddsocial(res.data.getsocial);
       }
@@ -104,12 +104,12 @@ const Footer = () => {
                           <a href={items.CLink}>
                             <img
 <<<<<<< HEAD
-                              src={`https://dailydish-backend.onrender.com/Socialmedia/${items?.CIcon}`}
+                              src={`https://dd-merge-backend-2.onrender.com/Socialmedia/${items?.CIcon}`}
 =======
 <<<<<<< HEAD
-                              src={`https://dailydish-backend.onrender.com/Socialmedia/${items?.CIcon}`}
+                              src={`https://dd-merge-backend-2.onrender.com/Socialmedia/${items?.CIcon}`}
 =======
-                              src={https://dailydish-backend.onrender.com/Socialmedia/${items?.CIcon}`}
+                              src={https://dd-merge-backend-2.onrender.com/Socialmedia/${items?.CIcon}`}
 >>>>>>> fa6a4b781c4d232c73b640ae22091fa9def85f47
 >>>>>>> f38c3d35bd9284306dab024904fa816e65bee00d
                               alt="social-icon"

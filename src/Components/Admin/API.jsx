@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://dailydish-backend.onrender.com/api/admin"; // Replace with your backend URL
+const API_URL = "https://dd-merge-backend-2.onrender.com/api/admin"; // Replace with your backend URL
 
 // Admin API Calls
 export const createCoupon = (couponData, image) => {

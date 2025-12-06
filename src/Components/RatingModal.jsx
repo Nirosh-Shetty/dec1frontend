@@ -29,7 +29,7 @@ const RatingModal = () => {
       if (!userId) return;
 
       const res = await axios.get(
-        `https://dailydish-backend.onrender.com/api/admin/getorderNotRatedByUserID/${userId?._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/getorderNotRatedByUserID/${userId?._id}`
       );
 
       if (res.status === 200 && res.data.order) {
@@ -64,7 +64,7 @@ const RatingModal = () => {
       };
 
       const res = await axios.put(
-        "https://dailydish-backend.onrender.com/api/admin/submitOrderRating",
+        "https://dd-merge-backend-2.onrender.com/api/admin/submitOrderRating",
         payload
       );
 

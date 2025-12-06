@@ -64,7 +64,7 @@ const EmployeeList = () => {
 
   const getAllWallet = async () => {
     const result = await axios.get(
-      `https://dailydish-backend.onrender.com/api/wallet/getAllWalletCompsny/${corporate._id}`
+      `https://dd-merge-backend-2.onrender.com/api/wallet/getAllWalletCompsny/${corporate._id}`
     );
     setAllWallet(result.data.data);
   };
@@ -129,7 +129,7 @@ const EmployeeList = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/User/getUserByCompany/" + corporate._id
+        "https://dd-merge-backend-2.onrender.com/api/User/getUserByCompany/" + corporate._id
       );
       if (res.status === 200) {
         setEmployees(res.data.success);
@@ -152,7 +152,7 @@ const EmployeeList = () => {
     setAddEmployeeLoading(true);
     try {
       const res = await axios.post(
-        "https://dailydish-backend.onrender.com/api/User/registercustomer",
+        "https://dd-merge-backend-2.onrender.com/api/User/registercustomer",
         {
           Fname: newEmployee.Fname,
           Mobile: newEmployee.Mobile,
@@ -186,7 +186,7 @@ const EmployeeList = () => {
   const handleEditEmployee = async () => {
     setEditEmployeeLoading(true);
     try {
-      const res = await axios.put(`https://dailydish-backend.onrender.com/api/User/updateuser`, {
+      const res = await axios.put(`https://dd-merge-backend-2.onrender.com/api/User/updateuser`, {
         Fname: editEmployee.Fname,
         Mobile: editEmployee.Mobile,
         employeeId: editEmployee.employeeId,
@@ -212,7 +212,7 @@ const EmployeeList = () => {
     setDeleteEmployeeLoading(true);
     try {
       const res = await axios.delete(
-        `https://dailydish-backend.onrender.com/api/User/deleteUser/${selectedEmployee._id}`
+        `https://dd-merge-backend-2.onrender.com/api/User/deleteUser/${selectedEmployee._id}`
       );
       if (res.status === 200) {
         alert("Employee deleted successfully");
@@ -247,8 +247,8 @@ const EmployeeList = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://dailydish-backend.onrender.com/api/wallet/add-free-cash"
-          : "https://dailydish-backend.onrender.com/api/wallet/deduct-cash",
+          ? "https://dd-merge-backend-2.onrender.com/api/wallet/add-free-cash"
+          : "https://dd-merge-backend-2.onrender.com/api/wallet/deduct-cash",
         {
           userId: employeeW,
           amount: Number(amount),
