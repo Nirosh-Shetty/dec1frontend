@@ -352,7 +352,7 @@ function AdminInvoice() {
               marginTop: "30px",
               backgroundColor: "rgb(216 29 74)",
               color: "white",
-              border: "none",
+              // border: "none",
               padding: "15px",
               border: "1px solid white",
             }}
