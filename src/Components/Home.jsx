@@ -16,7 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 // import Autocomplete from "@mui/material/Autocomplete";
 // import TextField from "@mui/material/TextField";
 // import ApartmentIcon from "@mui/icons-material/Apartment";
-import swal from "sweetalert";
+// import swal from "sweetalert";
 import CoinBalance from "./CoinBalance";
 // import Lottie from "lottie-react";
 // import partybomb from "./../assets/Animation - 1741012219735.json";
@@ -26,12 +26,12 @@ import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
 // import ValidateCart from "./ValidateCart";
 import moment from "moment";
-import MyMeal from "../assets/mymeal.svg";
+// import MyMeal from "../assets/mymeal.svg";
 import IsVeg from "../assets/isVeg=yes.svg";
 import IsNonVeg from "../assets/isVeg=no.svg";
 import MultiCartDrawer from "./MultiCartDrawer";
 import DateSessionSelector from "./DateSessionSelector";
-import BottomNav from "./BottomNav";
+// import BottomNav from "./BottomNav";
 import chef from "./../assets/chef_3.png";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
@@ -43,7 +43,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   const [loader, setloader] = useState(false);
 
-  const addresstype = localStorage.getItem("addresstype");
+  // const addresstype = localStorage.getItem("addresstype");
 
   // const address = JSON.parse(
   //   localStorage.getItem(
@@ -54,7 +54,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   //   localStorage.getItem("currentLocation") ??
   //     localStorage.getItem("primaryAddress")
   // );
-  // console.log('dfgdgdfgdf',address)
   const isSameDay = (d1, d2) => {
     const a = new Date(d1);
     const b = new Date(d2);
@@ -239,16 +238,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [isMultiCartOpen, setIsMultiCartOpen] = useState(false);
   const [show4, setShow4] = useState(false);
 
-  const handleShow4 = () => setShow4(true);
+  // const handleShow4 = () => setShow4(true);
   const handleClose4 = () => setShow4(false);
 
   const [show3, setShow3] = useState(false);
 
   const handleClose3 = () => setShow3(false);
-  const handleShow3 = () => {
-    handleClose4();
-    setShow3(true);
-  };
+  // const handleShow3 = () => {
+  //   handleClose4();
+  //   setShow3(true);
+  // };
 
   // otp
   const [show2, setShow2] = useState(false);
@@ -257,33 +256,33 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   // This is your original fooditemdata, we leave it here
   // but we won't use it for the main list for now.
-  const [fooditemdata, setfooditemdata] = useState([]);
+  // const [fooditemdata, setfooditemdata] = useState([]);
 
   // Your original getfooditems function
-  const getfooditems = async () => {
-    if (fooditemdata.length < 0) {
-      setloader(true);
-    }
+  // const getfooditems = async () => {
+  //   if (fooditemdata.length < 0) {
+  //     setloader(true);
+  //   }
 
-    try {
-      let res = await axios.get(
-        "https://dailydish-backend.onrender.com/api/admin/getFoodItemsUnBlocks"
-      );
-      if (res.status === 200) {
-        setfooditemdata(res.data.data);
-        setloader(false);
-      }
-    } catch (error) {
-      setloader(false);
-      swal({
-        title: "Error",
-        text: "Check your internet connection!",
-        icon: "error",
-        buttons: "Try Again",
-      });
-      console.log(error);
-    }
-  };
+  //   try {
+  //     let res = await axios.get(
+  //       "https://dailydish-backend.onrender.com/api/admin/getFoodItemsUnBlocks"
+  //     );
+  //     if (res.status === 200) {
+  //       setfooditemdata(res.data.data);
+  //       setloader(false);
+  //     }
+  //   } catch (error) {
+  //     setloader(false);
+  //     swal({
+  //       title: "Error",
+  //       text: "Check your internet connection!",
+  //       icon: "error",
+  //       buttons: "Try Again",
+  //     });
+  //     console.log(error);
+  //   }
+  // };
 
   const user = JSON.parse(localStorage.getItem("user"));
   const addCart1 = async (item, checkOf, matchedLocation) => {

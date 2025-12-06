@@ -643,16 +643,35 @@ const CorporateBookings = () => {
                         {items?.coupon || "No"}
                       </td>
                       <td style={{ paddingTop: "20px" }}>₹{items?.allTotal}</td>
-                      <td style={{ paddingTop: "20px" }}>
-                        {items?.rate ? (
-                          <div>
-                            <div>{renderStars(items?.rate)}</div>
-                            <small>{items?.comement || "No comment"}</small>
-                          </div>
-                        ) : (
-                          "Not rated"
-                        )}
-                      </td>
+                     <td style={{ paddingTop: "20px", minWidth: "150px" }}>
+  {/* Food Rating */}
+  {items?.ratings?.order?.rating ? (
+    <div className="mb-2">
+      <strong>Food:</strong>
+      <div>{renderStars(items.ratings.order.rating)}</div>
+      <small className="text-muted">
+        "{items.ratings.order.comment || "No comment"}"
+      </small>
+    </div>
+  ) : null}
+
+  {/* Delivery Rating */}
+  {items?.ratings?.delivery?.rating ? (
+    <div>
+      <strong>Delivery:</strong>
+      <div>{renderStars(items.ratings.delivery.rating)}</div>
+      <small className="text-muted">
+        "{items.ratings.delivery.comment || "No comment"}"
+      </small>
+    </div>
+  ) : null}
+
+  {/* Fallback if neither exists */}
+  {!items?.ratings?.order?.rating &&
+    !items?.ratings?.delivery?.rating && (
+      <span className="text-muted">Not rated</span>
+    )}
+</td>
                       <td style={{ paddingTop: "5px" }}>
                         <Button onClick={() => handleShow(items)}>
                           <IoIosEye size={20} />
@@ -850,19 +869,61 @@ const CorporateBookings = () => {
                   </div>
                 </div>
 
-                <div className="row m-2 mt-3">
-                  <b>Customer Feedback</b>
-                  <div className="col-md-12">
-                    <div style={{ marginBottom: "10px" }}>
-                      <span>Rating: </span>
-                      {renderStars(data?.rate || 0)}
-                    </div>
-                    <div>
-                      <span>Comment: </span>
-                      {data?.comement || "No Comment"}
-                    </div>
-                  </div>
-                </div>
+              <div className="row m-2 mt-3">
+  <h5 className="mb-3">Customer Feedback</h5>
+  
+  {/* Food Rating Section */}
+  <div className="col-md-6 mb-3">
+    <div className="p-2 border rounded">
+      <h6>Food Rating</h6>
+      {data?.ratings?.order?.rating ? (
+        <>
+          <div className="mb-1">
+            {renderStars(data.ratings.order.rating)}
+            <span className="ms-2 badge bg-success">
+              {data.ratings.order.rating}/5
+            </span>
+          </div>
+          <p className="small text-muted mb-0">
+            {data.ratings.order.comment || "No comment provided."}
+          </p>
+        </>
+      ) : (
+        <small className="text-muted">
+          {data?.ratings?.order?.status === "skipped" 
+            ? "Skipped by user" 
+            : "Pending / Not Rated"}
+        </small>
+      )}
+    </div>
+  </div>
+
+  {/* Delivery Rating Section */}
+  <div className="col-md-6 mb-3">
+    <div className="p-2 border rounded">
+      <h6>Delivery Rating</h6>
+      {data?.ratings?.delivery?.rating ? (
+        <>
+          <div className="mb-1">
+            {renderStars(data.ratings.delivery.rating)}
+            <span className="ms-2 badge bg-primary">
+              {data.ratings.delivery.rating}/5
+            </span>
+          </div>
+          <p className="small text-muted mb-0">
+            {data.ratings.delivery.comment || "No comment provided."}
+          </p>
+        </>
+      ) : (
+        <small className="text-muted">
+          {data?.ratings?.delivery?.status === "skipped" 
+            ? "Skipped by user" 
+            : "Pending / Not Rated"}
+        </small>
+      )}
+    </div>
+  </div>
+</div>
               </div>
             )}
           </div>

@@ -50,8 +50,10 @@ const ViewPlanModal = ({
   onPlanUpdated,
   handlePayPlan,
   handleTrackOrder,
+  address
 }) => {
   const user = JSON.parse(localStorage.getItem("user"));
+  
   const navigate = useNavigate();
   const [localPlan, setLocalPlan] = useState(plan);
   // console.log("Viewing plan:", plan);
@@ -844,7 +846,7 @@ const ViewPlanModal = ({
               />
             </button>
           )}
-          {isPaidLocked && (
+          {isPaidEditable && (
             <button
               className="track-order-btn"
               onClick={() => handleTrackOrder(plan)}
@@ -868,7 +870,7 @@ const ViewPlanModal = ({
 
 const MyPlan = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState("today");
+  const [selectedTab, setSelectedTab] = useState(null);
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -882,6 +884,9 @@ const MyPlan = () => {
   } catch (e) {
     user = null;
   }
+   const [address, setAddress] = useState(
+      JSON.parse(localStorage.getItem("coporateaddress")) || {}
+    );
   const userId = user ? user._id : null;
   // console.log('UW3MR',JSON.stringify(userId))
 
@@ -924,7 +929,30 @@ const MyPlan = () => {
 
     return { todayOrders, tomorrowOrders, upcomingOrders };
   }, [plans]);
+useEffect(() => {
+    const { todayOrders, tomorrowOrders, upcomingOrders } = categorizedOrders;
 
+    const hasToday = todayOrders.length > 0;
+    const hasTomorrow = tomorrowOrders.length > 0;
+    const hasUpcoming = upcomingOrders.length > 0;
+
+    // 1. If we are currently on a valid tab that has data, don't change anything.
+    if (selectedTab === "today" && hasToday) return;
+    if (selectedTab === "tomorrow" && hasTomorrow) return;
+    if (selectedTab === "upcoming" && hasUpcoming) return;
+
+    // 2. Otherwise, find the closest available tab
+    if (hasToday) {
+      setSelectedTab("today");
+    } else if (hasTomorrow) {
+      setSelectedTab("tomorrow");
+    } else if (hasUpcoming) {
+      setSelectedTab("upcoming");
+    } else {
+      // If absolutely no plans exist anywhere, default to today
+      setSelectedTab("today");
+    }
+  }, [categorizedOrders, selectedTab]);
   const getCurrentTabOrders = () => {
     switch (selectedTab) {
       case "today":
@@ -1009,7 +1037,7 @@ const MyPlan = () => {
         }));
         const total = order.subTotal || 0;
         const rawStatus = order.status || order.orderstatus || "Cooking";
-        const orderId = order.orderid || order._id;
+        const orderid = order.orderid || order._id;
         const deliveryDate = new Date(order.deliveryDate);
         const session = order.session;
 
@@ -1022,7 +1050,7 @@ const MyPlan = () => {
             minute: "2-digit",
           }) + ` (${session})`;
 
-        setCurrentTrackedOrder({ items, total, rawStatus, orderId, eta });
+        setCurrentTrackedOrder({ items, total, rawStatus, orderid, eta });
         setTrackModalVisible(true);
       } else {
         alert(res.data.message || "Failed to fetch order details");
@@ -1076,7 +1104,11 @@ const MyPlan = () => {
   async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
       const amount = plan.slotTotalAmount; // single plan only
-
+        const generateUniqueId = () => {
+        const timestamp = Date.now().toString().slice(-4);
+        const randomNumber = Math.floor(1000 + Math.random() * 9000);
+        return `${address?.prefixcode}${timestamp}${randomNumber}`;
+      };
       const configObj = {
         method: "post",
         baseURL: "https://dailydish-backend.onrender.com/api/",
@@ -1101,6 +1133,7 @@ const MyPlan = () => {
           username: username,
           mobile: mobile,
           deliveryNotes: deliveryNotes,
+          orderid: generateUniqueId(),
         },
       };
       const config1 = {
@@ -1113,8 +1146,8 @@ const MyPlan = () => {
           username,
           Mobile: mobile,
           amount,
-          transactionid: null, // or generate
-          orderId: plan._id, // optional for reference
+          transactionid: null, 
+          orderid: generateUniqueId(),
           config: JSON.stringify(configObj),
           cartId: null,
           offerconfig: null,
@@ -1196,7 +1229,7 @@ const MyPlan = () => {
               return (
                 <div
                   key={tab}
-                  onClick={() => setSelectedTab(tab)}
+                  onClick={() =>hasPlan&& setSelectedTab(tab)}
                   // Add 'grayed-out' class if there is NO plan
                   className={`tab-btn ${isActive ? "active" : ""} ${!hasPlan ? "grayed-out" : ""}`}
                 >
@@ -1453,7 +1486,7 @@ const MyPlan = () => {
                           )}
                         </div>
 
-                        {isPaidEditable && (
+                        {/* {isPaidEditable && (
                           <button
                             className="btn-base btn-primary"
                             onClick={async () => {
@@ -1469,8 +1502,9 @@ const MyPlan = () => {
                           >
                             Cancel
                           </button>
-                        )}
-                        {isPaidLocked && (
+                        )} */}
+                        {/* {isPaidLocked && ( */}
+                        {isPaidEditable && (
                           // {true && (
                           <button
                             className="track-order-btn"
@@ -1506,6 +1540,7 @@ const MyPlan = () => {
           onPlanUpdated={onPlanUpdated}
           handlePayPlan={handlePayPlan}
           handleTrackOrder={handleTrackOrder}
+          address={address}
         />
       )}
 
@@ -1576,7 +1611,7 @@ const MyPlan = () => {
                   <div className="trackingTopRow1">
                     <div>
                       <div className="detailsorder" style={{ fontWeight: 700 }}>
-                        ORDER ID : <span>{currentTrackedOrder.orderId}</span>
+                        ORDER ID : <span>{currentTrackedOrder.orderid}</span>
                       </div>
                       <div className="detailsorder" style={{ color: "#888" }}>
                         Summary: {totalItems} items, ₹

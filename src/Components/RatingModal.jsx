@@ -2,13 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Modal, Form } from "react-bootstrap";
 import axios from "axios";
 import { FaStar } from "react-icons/fa";
-// import "../Styles/rating.css";
 
 const RatingModal = () => {
   const [rateorder, setRateOrder] = useState({});
   const [rateMode, setRateMode] = useState(false);
+  const [currentRatingType, setCurrentRatingType] = useState("food"); // 'food' or 'delivery'
+  
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+
+  // Determine which step to show based on order data
+  const determineRatingStep = (order) => {
+    if (order?.ratings?.order?.status === "pending") {
+      setCurrentRatingType("food");
+      return true;
+    } else if (order?.ratings?.delivery?.status === "pending") {
+      setCurrentRatingType("delivery");
+      return true;
+    }
+    return false; // Both rated or skipped
+  };
 
   const getOrderByCustomerId = async () => {
     try {
@@ -19,10 +32,13 @@ const RatingModal = () => {
         `https://dailydish-backend.onrender.com/api/admin/getorderNotRatedByUserID/${userId?._id}`
       );
 
-      if (res.status === 200) {
-        // console.log("Order to be rated:", res.data.order);
+      if (res.status === 200 && res.data.order) {
         setRateOrder(res.data.order);
-        setRateMode(true);
+        // Check which one needs rating
+        const needsRating = determineRatingStep(res.data.order);
+        if (needsRating) {
+          setRateMode(true);
+        }
       }
     } catch (error) {
       setRateMode(false);
@@ -30,26 +46,53 @@ const RatingModal = () => {
     }
   };
 
-  const makeRateOrder = async (id, rate, comment) => {
+  const submitRating = async (status = "rated") => {
     try {
-      if (rate === 0) return alert("Please select a rating");
-      if (rate <= 3 && !comment.trim()) return;
+      if (status === "rated" && rating === 0) {
+        return alert("Please select a rating or click Skip");
+      }
+      if (status === "rated" && rating <= 3 && !comment.trim()) {
+        return alert("Please provide a reason for the low rating");
+      }
+
+      const payload = {
+        orderId: rateorder._id,
+        ratingType: currentRatingType,
+        rating: status === "skipped" ? 0 : rating,
+        comment: status === "skipped" ? "" : comment,
+        status: status, // 'rated' or 'skipped'
+      };
 
       const res = await axios.put(
         "https://dailydish-backend.onrender.com/api/admin/submitOrderRating",
-        {
-          orderId: id,
-          ratingType: "food",
-          rating: rate,
-          comment,
-        }
+        payload
       );
 
       if (res.status === 200) {
-        setRateOrder({});
-        setRateMode(false);
+        // Clear form for next step
         setRating(0);
         setComment("");
+
+        // Logic for Sequential Flow
+        if (currentRatingType === "food") {
+          // We just finished Food. Check if Delivery is needed.
+          if (rateorder.ratings?.delivery?.status === "pending") {
+            setCurrentRatingType("delivery");
+            // Important: Update local state to reflect that food is done
+            setRateOrder((prev) => ({
+                ...prev,
+                ratings: {
+                    ...prev.ratings,
+                    order: { ...prev.ratings.order, status: status }
+                }
+            }));
+          } else {
+            handleClose();
+          }
+        } else {
+          // We just finished Delivery. We are done.
+          handleClose();
+        }
       }
     } catch (error) {
       if (error.response) alert(error.response.data.error);
@@ -62,6 +105,7 @@ const RatingModal = () => {
     setRateOrder({});
     setRating(0);
     setComment("");
+    setCurrentRatingType("food");
   };
 
   const formatDateTime = (isoString) => {
@@ -73,7 +117,6 @@ const RatingModal = () => {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      // second: "2-digit",
       hour12: true,
     };
     return date.toLocaleString("en-GB", options).replace(",", "");
@@ -85,15 +128,16 @@ const RatingModal = () => {
 
   const handleRating = (value) => setRating(value);
 
+  // Dynamic Texts based on Type
+  const titleText = currentRatingType === "food" ? "Rate your Meal" : "Rate the Delivery";
+  const subText = currentRatingType === "food" 
+    ? "How was the food taste and quality?" 
+    : "How was the delivery experience?";
+  const placeholderText = currentRatingType === "food" 
+    ? "Tell us about the taste, portion, etc." 
+    : "Was the delivery on time? Was the packing good?";
+
   return (
-    // <Modal
-    //   show={rateMode}
-    //   onHide={handleClose}
-    //   backdrop="static"
-    //   dialogClassName="bottom-modal" // 👈 custom class
-    //   contentClassName="border-0"
-    // >
-    //   <Modal.Body className="rating-body">
     <Modal
       show={rateMode}
       onHide={handleClose}
@@ -118,15 +162,12 @@ const RatingModal = () => {
           margin: "10px",
           left: 0,
           right: 0,
-          // maxWidth: "40%",
         }}
       >
         <button className="custom-close-btn" onClick={handleClose}>
           ×
         </button>
-        {rateorder &&
-        rateorder.allProduct &&
-        rateorder.allProduct.length > 0 ? (
+        {rateorder && (
           <>
             <h6
               style={{
@@ -137,10 +178,9 @@ const RatingModal = () => {
                 marginBottom: "1rem",
               }}
             >
-              Your Lunch/Dinner delivered on:{" "}
+              Order delivered on:{" "}
               <span style={{ fontWeight: 500 }}>
                 {formatDateTime(rateorder.updatedAt)}
-                {/* 10 Aug 2025, 12:12:00 */}
               </span>
             </h6>
 
@@ -149,12 +189,13 @@ const RatingModal = () => {
                 <Form.Label
                   style={{
                     display: "block",
-                    fontSize: "0.9rem",
+                    fontSize: "1.1rem",
+                    fontWeight: "600",
                     color: "#444",
                     marginBottom: "8px",
                   }}
                 >
-                  Your Food Rating
+                  {titleText}
                 </Form.Label>
                 <div className="d-flex justify-content-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -162,7 +203,7 @@ const RatingModal = () => {
                       key={star}
                       size={46}
                       color={star <= rating ? "#E6B800" : "#ccc"}
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: "pointer", transition: "color 0.2s" }}
                       onClick={() => handleRating(star)}
                     />
                   ))}
@@ -177,15 +218,14 @@ const RatingModal = () => {
                     color: "#333",
                   }}
                 >
-                  Tell us about your meal
+                  {subText}
                 </Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
-                  placeholder="Add a detailed review"
+                  placeholder={placeholderText}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  required={rating <= 3} // ✅ Required only if rating ≤ 3
                   style={{
                     fontSize: "0.9rem",
                     border: "1px solid #A9A9A9",
@@ -196,32 +236,49 @@ const RatingModal = () => {
                 />
               </Form.Group>
 
-              <div className="mt-3 d-flex justify-content-center">
+              <div className="mt-4 d-flex justify-content-between gap-3">
+                {/* Skip Button */}
                 <button
-                  className="btn w-100"
+                  className="btn w-50"
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    color: "#6c757d",
+                    fontWeight: 500,
+                    borderRadius: "10px",
+                    border: "1px solid #dee2e6",
+                    padding: "10px 0",
+                    fontSize: "1rem",
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    submitRating("skipped");
+                  }}
+                >
+                  Skip
+                </button>
+
+                {/* Submit Button */}
+                <button
+                  className="btn w-50"
                   style={{
                     backgroundColor: "#E6B800",
                     color: "black",
-                    fontWeight: 500,
+                    fontWeight: 600,
                     borderRadius: "10px",
                     border: "none",
                     padding: "10px 0",
                     fontSize: "1rem",
-                    // verticalAlign: "middle",
-                    paddingLeft: "40%",
-                    fontWeight: 600,
                   }}
-                  onClick={() => makeRateOrder(rateorder._id, rating, comment)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    submitRating("rated");
+                  }}
                 >
                   Submit
                 </button>
               </div>
             </Form>
           </>
-        ) : (
-          <p className="text-center mb-0" style={{ color: "#666" }}>
-            No product available to rate.
-          </p>
         )}
       </Modal.Body>
     </Modal>

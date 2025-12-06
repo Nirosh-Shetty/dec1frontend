@@ -975,6 +975,7 @@ body.nav-hidden .fixed-bottom-bar {
   color: var(--steel-dark);
   border-color: var(--steel-dark);
   background-color: var(--steel-light);
+  cursor: not-allowed;
 }
 
 .tab-btn.active {
