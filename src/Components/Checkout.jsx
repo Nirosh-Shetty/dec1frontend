@@ -822,7 +822,7 @@ const Checkout = () => {
           deliveryDate: group.date,
           session: group.session,
           orderid: generateUniqueId(),
-          hubId: group.items[0]?.locationInfo?.hubId || address?.hubId || null,
+          // hubId: group.items[0]?.locationInfo?.hubId || address?.hubId || null,
           customerId: user?._id,
           Placedon: new Date(),
           delivarylocation: defaultAddress?.fullAddress,
