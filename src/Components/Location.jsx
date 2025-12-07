@@ -82,7 +82,7 @@ const LocationConfirmation = () => {
   const fixedPinRef = useRef(null);
   const fixedMessageRef = useRef(null);
 
-  const API_KEY = import.meta.meta.VITE_MAP_KEY;
+  const API_KEY = import.meta.env.VITE_MAP_KEY;
 
   // Track if we're editing an address
   const [isEditing, setIsEditing] = useState(false);

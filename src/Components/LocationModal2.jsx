@@ -26,7 +26,7 @@
 //   const hasFetchedAddressesRef = useRef(false);
 //   const isModalMountedRef = useRef(false);
 
-//   const API_KEY = import.meta.meta.VITE_MAP_KEY;
+//   const API_KEY = import.meta.env.VITE_MAP_KEY;
 
 //   // Optimized Google Maps script loading with caching check
 //   useEffect(() => {
@@ -1019,7 +1019,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
   const hasFetchedAddressesRef = useRef(false);
   const isModalMountedRef = useRef(false);
 
-  const API_KEY = import.meta.meta.VITE_MAP_KEY;
+  const API_KEY = import.meta.env.VITE_MAP_KEY;
 
   // Optimized Google Maps script loading with caching check
   useEffect(() => {

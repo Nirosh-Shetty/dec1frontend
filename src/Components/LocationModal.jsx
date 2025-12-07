@@ -20,7 +20,7 @@
 //   const autocompleteServiceRef = useRef(null);
 //   const placesServiceRef = useRef(null);
 
-//   const API_KEY = import.meta.meta.VITE_MAP_KEY;
+//   const API_KEY = import.meta.env.VITE_MAP_KEY;
 
 //   // Load Google Maps script when modal opens
 //   useEffect(() => {
@@ -780,7 +780,7 @@
 //       const [companyName, setCompanyName] = useState("");
 //       const [floorNo, setFloorNo] = useState("");
 
-//   const API_KEY = import.meta.meta.VITE_MAP_KEY;
+//   const API_KEY = import.meta.env.VITE_MAP_KEY;
 
 //   // Optimized Google Maps script loading with caching check
 //   useEffect(() => {
@@ -2417,7 +2417,7 @@
 //   const isModalMountedRef = useRef(false);
 //   const dropdownRef = useRef(null);
 
-//   const API_KEY = import.meta.meta.VITE_MAP_KEY;
+//   const API_KEY = import.meta.env.VITE_MAP_KEY;
 //   const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress"));
 //   const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
 //   const isLargeScreen = window.innerWidth >= 768;
@@ -4259,7 +4259,7 @@ const LocationModal = ({ show, onClose }) => {
   const isModalMountedRef = useRef(false);
   const dropdownRef = useRef(null);
 
-  const API_KEY = import.meta.meta.VITE_MAP_KEY;
+  const API_KEY = import.meta.env.VITE_MAP_KEY;
   const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress"));
   const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   const isLargeScreen = window.innerWidth >= 768;
