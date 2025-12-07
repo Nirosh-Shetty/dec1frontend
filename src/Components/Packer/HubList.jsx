@@ -676,7 +676,7 @@ const HubList = () => {
               </Form.Label>
               <div className="border rounded overflow-hidden">
                 <AreaSelector
-                  apiKey={process.env.VITE_GOOGLE_MAPS_API_KEY || ""}
+                  apiKey={import.meta.meta.VITE_GOOGLE_MAPS_API_KEY || ""}
                   value={newHub.geometry}
                   onGeoJSONChange={(feature) =>
                     setNewHub({ ...newHub, geometry: feature })
@@ -768,7 +768,7 @@ const HubList = () => {
               </Form.Label>
               <div className="border rounded overflow-hidden">
                 <AreaSelector
-                  apiKey={process.env.VITE_GOOGLE_MAPS_API_KEY || ""}
+                  apiKey={import.meta.meta.VITE_GOOGLE_MAPS_API_KEY || ""}
                   value={editHub.geometry}
                   onGeoJSONChange={(feature) =>
                     setEditHub({ ...editHub, geometry: feature })
@@ -874,7 +874,7 @@ const HubList = () => {
         </Modal.Header>
         <Modal.Body style={{ height: "85vh", padding: 0 }}>
           <AreaSelector
-            apiKey={process.env.VITE_GOOGLE_MAPS_API_KEY || ""}
+            apiKey={import.meta.meta.VITE_GOOGLE_MAPS_API_KEY || ""}
             value={null}
             allPolygons={hubs
               .filter((hub) => hub.geometry)

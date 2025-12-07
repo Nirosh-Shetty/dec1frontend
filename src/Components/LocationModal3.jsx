@@ -20,7 +20,7 @@ const LocationModal3 = ({ show, onClose }) => {
   const autocompleteServiceRef = useRef(null);
   const placesServiceRef = useRef(null);
 
-  const API_KEY = process.env.VITE_MAP_KEY;
+  const API_KEY = import.meta.meta.VITE_MAP_KEY;
 
   // Load Google Maps script when modal opens
   useEffect(() => {
