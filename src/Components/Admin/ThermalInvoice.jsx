@@ -25,11 +25,11 @@ function ThermalInvoice() {
     document.body.innerHTML = originalContents;
 
     // Navigate back after printing
-    if (item.orderdelivarytype == "corporate") {
+    // if (item.orderdelivarytype == "corporate") {
       window.location.assign("/corporate-booking-list");
-    } else {
-      window.location.assign("/apartment-booking-list");
-    }
+    // } else {
+      // window.location.assign("/apartment-booking-list");
+    // }
 
     // navigate(-1)
   };
@@ -120,10 +120,10 @@ function ThermalInvoice() {
                   <td style={{ padding: "2px 0" }}>Order #:</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>{item?.orderid || "-"}</td>
                 </tr>
-                <tr>
+                {/* <tr>
                   <td style={{ padding: "2px 0" }}>Type:</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>{item?.orderdelivarytype || "-"}</td>
-                </tr>
+                </tr> */}
                 <tr>
                   <td style={{ padding: "2px 0" }}>Booking Date:</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>
@@ -153,8 +153,8 @@ function ThermalInvoice() {
                 <tr>
                   <td style={{ padding: "2px 0" }}>Address:</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>
-                    {item?.delivarylocation && item?.addressline
-                      ? `${item.delivarylocation}, ${item.addressline}`
+                    {item?.delivarylocation
+                      ? `${item.delivarylocation}`
                       : "-"}
                   </td>
                 </tr>
@@ -209,7 +209,7 @@ function ThermalInvoice() {
                 <tr>
                   <td style={{ textAlign: "left", padding: "2px 0" }}>Delivery:</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>
-                    {item?.delivarytype <= 0 ? "Free" : `₹ ${Number(item.delivarytype).toFixed(2)}`}
+                    {item?.deliveryCharge <= 0 ? "Free" : `₹ ${Number(item.deliveryCharge).toFixed(2)}`}
                   </td>
                 </tr>
                 <tr>

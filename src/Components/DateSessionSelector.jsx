@@ -216,6 +216,9 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
       </div>
 
       <div className="session-container">
+        <div>
+
+        </div>
         <div className={`session-btn-wrapper ${currentSession === "Lunch" ? "active" : ""} ${currentDate && !sessionsForDate(currentDate).has("Lunch") ? "disabled" : ""}`}>
           <button
             className={`session ${currentSession === "Lunch" ? "active" : ""} ${currentDate && !sessionsForDate(currentDate).has("Lunch") ? "disabled" : ""}`}

@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import AreaSelector from "../Map/AreaSelector";
 
-const GMAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+const GMAPS_KEY = process.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
 const ZoneMap = () => {
   const token = localStorage.getItem("authToken");

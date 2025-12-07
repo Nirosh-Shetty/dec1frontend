@@ -29,6 +29,8 @@ import { WalletContext } from "../WalletContext";
 
 import Selectlocation from "../assets/selectlocation.svg";
 import UserIcons from "../assets/userp.svg";
+import clockone from "./../assets/mynaui_clock-one.png";
+import switch2 from "./../assets/switch.png";
 
 // import SearchIcon from "../assets/search.svg";
 // import Logo from "../assets/logo-container.svg";
@@ -38,7 +40,7 @@ import LocationModal from "./LocationModal";
 import LocationModal2 from "./LocationModal2";
 
 // const Banner = ({ Carts, getAllOffer, hubName, setHubName }) => {
-const Banner = ({ Carts, getAllOffer }) => {
+const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
   const addresstype = localStorage.getItem("addresstype");
   const corporateaddress = JSON.parse(localStorage.getItem("coporateaddress"));
   const user = JSON.parse(localStorage.getItem("user"));
@@ -621,17 +623,17 @@ const Banner = ({ Carts, getAllOffer }) => {
   const getDisplayName = (address) => {
     if (!address) return "";
 
-    console.log(address);
+    console.log(address, ".................................");
 
     switch (address.addressType) {
       case "Home":
-        return address.fullAddress || address.houseName || "";
+        return address.homeName || address.houseName || "";
       case "PG":
-        return address.fullAddress || address.houseName || "";
+        return address.apartmentName || address.houseName || "";
       case "School":
-        return address.fullAddress || address.houseName || "";
+        return address.schoolName || address.houseName || "";
       case "Work":
-        return address.fullAddress || address.houseName || "";
+        return address.companyName || address.houseName || "";
       default:
         return address.fullAddress || "";
     }
@@ -662,8 +664,9 @@ const Banner = ({ Carts, getAllOffer }) => {
     <div>
       <div className="ban-container">
         <div className="mobile-banner-updated">
-          <div className="screen-2 mb-3">
-            <div className="w-100">
+          <div className="screen-3">
+            <div className="screen-2 mb-3">
+              {/* <div className="w-100"> */}
               <div className="d-flex flex-column align-items-start mt-2 gap-3">
                 <div
                   className="d-flex align-items-center gap-2 w-100"
@@ -680,7 +683,7 @@ const Banner = ({ Carts, getAllOffer }) => {
                   <div className="d-flex flex-column cursor-pointer flex-grow-1">
                     <p
                       className="select-location-text fw-semibold text-truncate mb-0"
-                      style={{ maxWidth: "220px" }}
+                      // style={{ maxWidth: "220px" }}
                       title={getDisplayAddress()}
                     >
                       {getDisplayAddress()}
@@ -700,29 +703,68 @@ const Banner = ({ Carts, getAllOffer }) => {
                   </div>
                 </div>
               </div>
+              {/* </div> */}
+              <div className="d-flex gap-1 justify-content-center align-items-center referbtn">
+                {user && ( // Only show if user is logged in
+                  <button
+                    className="refer-earn-btn"
+                    onClick={() => navigate("/refer")}
+                  >
+                    <img
+                      src="/Assets/gifticon.svg"
+                      alt="refer"
+                      className="refer-icon"
+                    />
+                    <span className="refer-earn-text">Refer & Earn</span>
+                  </button>
+                )}
+
+                <img
+                  src={UserIcons}
+                  alt="user-icon"
+                  onClick={handleShow8}
+                  className="p-2"
+                />
+              </div>
             </div>
 
-            <div className="d-flex gap-1 justify-content-between align-items-center">
-              {user && ( // Only show if user is logged in
-                <button
-                  className="refer-earn-btn"
-                  onClick={() => navigate("/refer")}
-                >
-                  <img
-                    src="/Assets/gifticon.svg"
-                    alt="refer"
-                    className="refer-icon"
-                  />
-                  <span className="refer-earn-text">Refer & Earn</span>
-                </button>
-              )}
+            <div
+              className="d-flex align-items-center m-0 order-row"
+              style={{ width: "100%" }}
+            >
+              {/* LEFT — text area */}
+              <div className="d-flex align-items-center flex-grow-1 min-w-0">
+                <img
+                  src={clockone}
+                  alt=""
+                  style={{ width: "24px", height: "24px" }}
+                />
+                <span className="clock-text mt-2">
+                  Order by 12 & Get Lunch by 1:00 PM
+                </span>
+              </div>
 
-              <img
-                src={UserIcons}
-                alt="user-icon"
-                onClick={handleShow8}
-                className="p-2"
-              />
+              {/* RIGHT — Veg Only */}
+              <div className="veg-btn d-flex flex-column align-items-center ms-2">
+                <h6 className="m-0 veg-title">Veg Only</h6>
+                <div
+                  className="veg-btn-toggle"
+                  onClick={() => setIsVegOnly(!isVegOnly)} // 1. Toggle state on click
+                  style={{ cursor: "pointer" }}
+                >
+                  <div
+                    className="veg-btn-switch"
+                    style={{
+                      // 2. Dynamic styling for animation and color
+                      transform: isVegOnly
+                        ? "translateX(18px)"
+                        : "translateX(0)",
+                      backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d", // Green when Active, Grey when inactive
+                      transition: "all 0.3s ease", // Smooth sliding effect
+                    }}
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -924,6 +966,7 @@ const Banner = ({ Carts, getAllOffer }) => {
           </Modal.Body>
         </Modal>
       </div>
+
       <div className="ban-container">
         <div className="mobile-banner" style={{ position: "relative" }}>
           {/* {user && !address && (

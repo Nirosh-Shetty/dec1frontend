@@ -7,7 +7,7 @@ const RatingModal = () => {
   const [rateorder, setRateOrder] = useState({});
   const [rateMode, setRateMode] = useState(false);
   const [currentRatingType, setCurrentRatingType] = useState("food"); // 'food' or 'delivery'
-  
+
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
@@ -80,11 +80,11 @@ const RatingModal = () => {
             setCurrentRatingType("delivery");
             // Important: Update local state to reflect that food is done
             setRateOrder((prev) => ({
-                ...prev,
-                ratings: {
-                    ...prev.ratings,
-                    order: { ...prev.ratings.order, status: status }
-                }
+              ...prev,
+              ratings: {
+                ...prev.ratings,
+                order: { ...prev.ratings.order, status: status },
+              },
             }));
           } else {
             handleClose();
@@ -129,13 +129,16 @@ const RatingModal = () => {
   const handleRating = (value) => setRating(value);
 
   // Dynamic Texts based on Type
-  const titleText = currentRatingType === "food" ? "Rate your Meal" : "Rate the Delivery";
-  const subText = currentRatingType === "food" 
-    ? "How was the food taste and quality?" 
-    : "How was the delivery experience?";
-  const placeholderText = currentRatingType === "food" 
-    ? "Tell us about the taste, portion, etc." 
-    : "Was the delivery on time? Was the packing good?";
+  const titleText =
+    currentRatingType === "food" ? "Rate your Meal" : "Rate the Delivery";
+  const subText =
+    currentRatingType === "food"
+      ? "How was the food taste and quality?"
+      : "How was the delivery experience?";
+  const placeholderText =
+    currentRatingType === "food"
+      ? "Tell us about the taste, portion, etc."
+      : "Was the delivery on time? Was the packing good?";
 
   return (
     <Modal

@@ -310,7 +310,7 @@ const UserList = () => {
       }
 
       const customHeaders = allUsers.map((item) => ({
-        "Registered Date": moment(item.updatedAt).format("MM/DD/YYYY, hh:mm A"),
+        "Registered Date": moment(item.createdAt).format("MM/DD/YYYY, hh:mm A"),
         "User ID": item._id,
         Name: item.Fname || "N/A",
         "Mobile Number": item.Mobile ? String(item.Mobile) : "N/A",
@@ -496,7 +496,7 @@ const UserList = () => {
                 <td>
                   {i + 1 + (pagination.currentPage - 1) * pagination.limit}
                 </td>
-                <td>{moment(item?.updatedAt).format("MM/DD/YYYY h:mm A")}</td>
+                <td>{moment(item?.createdAt).format("MM/DD/YYYY h:mm A")}</td>
                 <td>{item?._id}</td>
                 <td>
                   {item?.profileImage ? (

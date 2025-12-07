@@ -1,5 +1,4 @@
-// front/src/Pages/MyPlan.jsx (or wherever this file is)
-
+import Swal2 from "sweetalert2";
 import { useState, useMemo, useEffect, useContext } from "react";
 import { WalletContext } from "../WalletContext";
 import { useNavigate } from "react-router-dom";
@@ -25,8 +24,8 @@ import pending from "./../assets/pending.png";
 import success from "./../assets/success-green.png";
 import discount from "./../assets/discount.png";
 import myplancancel from "./../assets/myplancancel.png";
-import './../Styles/Normal.css';
-
+import "./../Styles/Normal.css";
+import orderhistoryicon from "./../assets/orderhistory.png";
 
 const formatDate = (isoString) => {
   const d = new Date(isoString);
@@ -50,10 +49,10 @@ const ViewPlanModal = ({
   onPlanUpdated,
   handlePayPlan,
   handleTrackOrder,
-  address
+  address,
 }) => {
   const user = JSON.parse(localStorage.getItem("user"));
-  
+
   const navigate = useNavigate();
   const [localPlan, setLocalPlan] = useState(plan);
   // console.log("Viewing plan:", plan);
@@ -334,18 +333,6 @@ const ViewPlanModal = ({
                   : "07:00 to 08:00PM"}
               </div>
             </div>
-            {/* {localPlan.status === "Confirmed" && (
-              <div className="status-badge-confirmed">✓ Confirmed</div>
-            )}
-            {localPlan.status === "Skipped" && (
-              <div className="status-badge-skipped">Skipped</div>
-            )}
-            {localPlan.status === "Cancelled" && (
-              <div className="status-badge-canceled">Cancelled</div>
-            )}
-            {localPlan.status === "Pending Payment" && (
-              <div className="status-badge-pending">Pending</div>
-            )} */}
 
             <div className="upcoming-date-badge2">
               <div className="date-column2">
@@ -687,18 +674,17 @@ const ViewPlanModal = ({
 
         </div> */}
 
-        
-                      <div
-              style={{
-                fontWeight: 500,
-                color: "#212121",
-                paddingBottom: 8,
-                paddingLeft: 8,
-                fontSize: 20,
-              }}
-            >
-              Apply & Save
-            </div>
+        <div
+          style={{
+            fontWeight: 500,
+            color: "#212121",
+            paddingBottom: 8,
+            paddingLeft: 8,
+            fontSize: 20,
+          }}
+        >
+          Apply & Save
+        </div>
 
         {localPlan.status === "Pending Payment" && (
           <div className="promo-wallet-container">
@@ -726,10 +712,10 @@ const ViewPlanModal = ({
                     available
                   </span>
                 </div>
-                {user.status === "Employee" ? (
+                {/* {user.status === "Employee" ? ( */}
                   <p className="wallet-subtext">Now you can pay with wallet</p>
-                ) : (
-                  <p className="wallet-subtext">
+                 {/* ) : ( */}
+                  {/* {/* <p className="wallet-subtext">
                     Add ₹
                     {Math.max(
                       0,
@@ -741,10 +727,10 @@ const ViewPlanModal = ({
                             // + Number(Cutlery)
                             0)
                       )
-                    )}{" "}
+                    )}
                     more to use
                   </p>
-                )}
+                )} */}
               </div>
             </div>
           </div>
@@ -817,17 +803,30 @@ const ViewPlanModal = ({
               </button>
               <button
                 className="confirm-pay-btn"
-                // className="pay-btn"
-                onClick={() =>
-                  handlePayPlan(localPlan, deliveryNotes, walletDeduction)
-                }
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    await handlePayPlan(
+                      localPlan,
+                      deliveryNotes,
+                      walletDeduction
+                    );
+                  } catch (e) {
+                    setLoading(false);
+                  }
+                }}
                 disabled={loading}
               >
-                Confirm & Pay
-                <span className="pay-amount-badge">
-                  {/* ₹{localPlan.slotTotalAmount?.toFixed(0)} */}
-                  {payableAmount}
-                </span>
+                {loading ? (
+                  <>
+                    <span className="button-loader"></span> Processing...
+                  </>
+                ) : (
+                  <>
+                    Confirm & Pay
+                    <span className="pay-amount-badge">{payableAmount}</span>
+                  </>
+                )}
               </button>
             </>
           )}
@@ -870,6 +869,7 @@ const ViewPlanModal = ({
 
 const MyPlan = () => {
   const navigate = useNavigate();
+  const [loadingTrackId, setLoadingTrackId] = useState(null);
   const [selectedTab, setSelectedTab] = useState(null);
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -884,9 +884,12 @@ const MyPlan = () => {
   } catch (e) {
     user = null;
   }
-   const [address, setAddress] = useState(
-      JSON.parse(localStorage.getItem("coporateaddress")) || {}
-    );
+ const address = JSON.parse(
+    localStorage.getItem("primaryAddress") ??
+      localStorage.getItem("currentLocation")
+  );
+
+  console.log(address);
   const userId = user ? user._id : null;
   // console.log('UW3MR',JSON.stringify(userId))
 
@@ -929,7 +932,7 @@ const MyPlan = () => {
 
     return { todayOrders, tomorrowOrders, upcomingOrders };
   }, [plans]);
-useEffect(() => {
+  useEffect(() => {
     const { todayOrders, tomorrowOrders, upcomingOrders } = categorizedOrders;
 
     const hasToday = todayOrders.length > 0;
@@ -1023,6 +1026,8 @@ useEffect(() => {
   };
   async function handleTrackOrder(plan) {
     if (!plan.orderId) return;
+    setLoadingTrackId(plan._id);
+
     try {
       const res = await axios.get(
         `https://dd-merge-backend-2.onrender.com/api/admin/getOrderByOrderId/${plan.orderId}`
@@ -1058,6 +1063,8 @@ useEffect(() => {
     } catch (err) {
       console.error("track order error", err);
       alert("Failed to fetch order details");
+    }finally {
+      setLoadingTrackId(null);
     }
   }
   const closeModal = () => {
@@ -1104,7 +1111,7 @@ useEffect(() => {
   async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
       const amount = plan.slotTotalAmount; // single plan only
-        const generateUniqueId = () => {
+      const generateUniqueId = () => {
         const timestamp = Date.now().toString().slice(-4);
         const randomNumber = Math.floor(1000 + Math.random() * 9000);
         return `${address?.prefixcode}${timestamp}${randomNumber}`;
@@ -1146,7 +1153,7 @@ useEffect(() => {
           username,
           Mobile: mobile,
           amount,
-          transactionid: null, 
+          transactionid: null,
           orderid: generateUniqueId(),
           config: JSON.stringify(configObj),
           cartId: null,
@@ -1163,10 +1170,27 @@ useEffect(() => {
         window.location.href = redirectInfo.redirectUrl;
       }
     } catch (err) {
+      // setLoading(false);
       console.error("pay plan error", err);
-      alert("Failed to start payment");
+      if (err.response?.data?.error === "OUT_OF_STOCK") {
+        Swal2.fire({
+          icon: "info",
+          title: "Item Unavailable",
+          text: err.response.data.message,
+          // text: 'Oops, That item just ran out. Please pick something else to continue.',
+          confirmButtonText: "See Other Options",
+          confirmButtonColor: "#d33",
+        }).then(() => {
+          if (isModalOpen) closeModal();
+          // fetchPlans();
+          navigate("/home");
+        });
+      } else {
+        toast.error(err.response?.data?.message || "Failed to start payment");
+      }
     }
   }
+
   return (
     <div className="my-plan-container mainbg">
       <div className="checkoutcontainer">
@@ -1190,48 +1214,76 @@ useEffect(() => {
               </svg>
             </div>
             <h3 className="checkout-title">My Plans</h3>
-            {/* <div style={{ width: 36 }}></div> */}
-            <div
-              onClick={() => navigate("/orders")}
-              style={{
-                cursor: "pointer",
-                background: "rgba(255,255,255,0.15)",
-                padding: "10px 8px 10px 12px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                filter: "invert(100%)",
-              }}
-            >
+            <div className="mb-3">
               <img
-                src="/Assets/lists.svg"
-                alt="My Orders"
-                className="icon-img-l"
+                src={pending}
+                alt=""
+                style={{ width: "20px", height: "20px" }}
               />
             </div>
+          </div>
+        </div>
+        <div className="d-flex justify-content-end">
+          <div
+            onClick={() => navigate("/orders")}
+            style={{
+              cursor: "pointer",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              gap: "2px",
+            }}
+          >
+            <img
+              src={orderhistoryicon}
+              alt="My Orders"
+              className="icon-img-l"
+            />
+            <h6
+              style={{
+                color: "#2c2c2c",
+                fontSize: "16px",
+                fontWeight: "400",
+                fontFamily: "Inter",
+                textDecoration: "underline",
+                margin: 0, // Remove default margin
+              }}
+            >
+              Order History
+            </h6>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="myplan-mid-section">
-       <div className="tabs-container">
+          <div className="tabs-container">
             {["today", "tomorrow", "upcoming"].map((tab) => {
               const isActive = selectedTab === tab;
               const label = tab.charAt(0).toUpperCase() + tab.slice(1);
-              
+
               // Check if plan exists for this specific tab
               let hasPlan = false;
-              if (tab === 'today' && categorizedOrders.todayOrders.length > 0) hasPlan = true;
-              if (tab === 'tomorrow' && categorizedOrders.tomorrowOrders.length > 0) hasPlan = true;
-              if (tab === 'upcoming' && categorizedOrders.upcomingOrders.length > 0) hasPlan = true;
+              if (tab === "today" && categorizedOrders.todayOrders.length > 0)
+                hasPlan = true;
+              if (
+                tab === "tomorrow" &&
+                categorizedOrders.tomorrowOrders.length > 0
+              )
+                hasPlan = true;
+              if (
+                tab === "upcoming" &&
+                categorizedOrders.upcomingOrders.length > 0
+              )
+                hasPlan = true;
 
               return (
                 <div
                   key={tab}
-                  onClick={() =>hasPlan&& setSelectedTab(tab)}
+                  onClick={() => hasPlan && setSelectedTab(tab)}
                   // Add 'grayed-out' class if there is NO plan
-                  className={`tab-btn ${isActive ? "active" : ""} ${!hasPlan ? "grayed-out" : ""}`}
+                  className={`tab-btn ${isActive ? "active" : ""} ${
+                    !hasPlan ? "grayed-out" : ""
+                  }`}
                 >
                   <h1 className={`tab-label ${isActive ? "active" : ""}`}>
                     {label}
@@ -1505,20 +1557,33 @@ useEffect(() => {
                         )} */}
                         {/* {isPaidLocked && ( */}
                         {isPaidEditable && (
-                          // {true && (
-                          <button
+                         // {true && (
+                           <button
                             className="track-order-btn"
+                            disabled={loadingTrackId === plan._id} 
                             onClick={() => handleTrackOrder(plan)}
                           >
-                            <span> Track Order</span>
-
-                            <img
-                              style={{
-                                scale: "0.8",
-                              }}
-                              src="/Assets/tracker.svg"
-                              alt=""
-                            />
+                            {loadingTrackId === plan._id ? (
+                              <span>
+                                <span
+                                  className="button-loader"
+                                  style={{
+                                    borderColor: "#212121",
+                                    borderBottomColor: "transparent",
+                                  }}
+                                ></span>
+                                Wait...
+                              </span>
+                            ) : (
+                              <>
+                                <span> Track Order</span>
+                                <img
+                                  style={{ scale: "0.8" }}
+                                  src="/Assets/tracker.svg"
+                                  alt=""
+                                />
+                              </>
+                            )}
                           </button>
                         )}
                       </div>

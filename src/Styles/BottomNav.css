@@ -3,62 +3,73 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 70px; /* Fixed height is important for calculations */
+  height: 70px;
   background-color: #ffffff;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
-  z-index: 9999; /* Very high z-index to stay on top */
+  z-index: 9999;
   transition: transform 0.3s ease-in-out;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   border-top: 1px solid #f0f0f0;
 }
 
-/* When hidden, push it down by its own height */
+/* Hide on scroll down */
 .bottom-nav-hidden {
   transform: translateY(100%);
 }
 
+/* Inner buttons: small, light, no big background */
 .nav-item {
-  height: 56px;
-  background-color: #FAFAFA !important;
-  border-radius: 15px;
-  padding: 15px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  text-decoration: none;
-  color: #333;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #ffffff;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #555555;
   cursor: pointer;
-  transition: background-color 0.2s;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Active tab: only top border in green */
+.nav-item.active {
+  border-color: transparent;        /* reset all sides */
+  border-top: 3px solid #6b8e23;    /* top border only */
+  border-radius: 0;                 /* flat like the screenshot */
+  padding-top: 9px;                 /* compensate for border height */
 }
 
 .nav-label {
   font-family: "Inter", sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: #c0c0c0;
-  margin-top: 4px;
-  transition: color 0.2s;
+  color: #777777;
 }
 
 .nav-item.active .nav-label {
   color: #6b8e23;
 }
 
+/* Icons follow the same color as text using currentColor */
 .nav-icon-svg {
-  transition: transform 0.2s;
+  color: inherit;
+  transition: transform 0.2s ease;
 }
 
 .nav-item.active .nav-icon-svg {
-  transform: scale(1.1);
+  color: #6b8e23;
+  transform: scale(1.05);
 }
 
+/* Centered narrow bar on larger screens (no red background anywhere) */
 @media screen and (min-width: 799px) {
-  .bottom-nav-container{
+  .bottom-nav-container {
     width: 33%;
     margin: 0 auto;
   }

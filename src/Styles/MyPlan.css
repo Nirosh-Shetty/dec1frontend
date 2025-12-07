@@ -7,7 +7,7 @@
 .checkout-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: start;
   margin-bottom: 0.5rem;
 }
 
@@ -228,8 +228,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* Add this for vertical centering */
   line-height: 1;
   background-color: var(--cuminBrown);
+  width: 100%; /* Make it fill the parent */
+  height: 100%; /* Make it fill the parent */
+  border-radius: 6px; /* Match parent border-radius */
+  padding: 8px 4px; /* Add padding here */
 }
 
 .date-day {
@@ -274,6 +279,31 @@
 .addressLine2 {
   font-size: 10px;
   margin-top: 8px;
+}
+
+/* Spinner Animation */
+.button-loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Optional: Dim button when loading */
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .view-plan-btn-container {
@@ -388,7 +418,7 @@
   gap: 8px;
   color: var(--app-foreground);
   height: 43px;
-  width: auto;
+  width: 174px;
 }
 
 .price-pill {
@@ -409,6 +439,31 @@
   border-radius: 4px;
   background-color: var(--turmeric-golden);
   padding: 2px;
+}
+
+@media (max-width: 480px) {
+  .pay-btn {
+    padding: 8px 20px;
+    width: 100%;         /* full width on mobile */
+    height: 45px;
+    font-size: 14px;
+    gap: 6px;
+  }
+
+  .price-pill {
+    padding: 3px 6px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .actuall-amount,
+  .pre-order-amount {
+    font-size: 12px;
+  }
+
+  .pre-order-amount {
+    padding: 2px 6px;
+  }
 }
 
 /* --- Modal Styles --- */

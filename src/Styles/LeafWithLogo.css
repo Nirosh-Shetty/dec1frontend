@@ -29,8 +29,8 @@ html, body {
 
 .header-wrapper {
   box-shadow: 0 4px 6px rgba(44, 44, 44, 0.15); /* Colors.primaryText */
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
   flex-shrink: 0; /* Prevent header from shrinking */
 }
 

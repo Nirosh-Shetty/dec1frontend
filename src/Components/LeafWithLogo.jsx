@@ -616,9 +616,9 @@ export default function LeafWithLogo() {
           // Reset animation state after the full animation duration
           setTimeout(() => {
             setIsAnimating(false);
-          }, 1600);
-        }, 150);
-      }, 4000); // Total cycle time: 4 seconds
+          }, 800);
+        }, 0);
+      }, 2000); // Total cycle time: 4 seconds
     };
 
     startAnimationCycle();
@@ -826,7 +826,7 @@ export default function LeafWithLogo() {
                     objectFit: "contain",
                   }}
                 />
-                <h3
+                {/* <h3
                   style={{
                     margin: 0,
                     textAlign: "center",
@@ -836,149 +836,88 @@ export default function LeafWithLogo() {
                   }}
                 >
                   Plan Food, Not Appetite
-                </h3>
+                </h3> */}
               </div>
 
               {/* First yellow container */}
-              <div
-                className="yellow-container"
-                style={{
-                  backgroundColor: "#FFD700",
-                  padding: "20px 0",
-                  margin: "20px 0",
-                  overflow: "hidden",
-                  position: "relative",
-                  height: "60px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentTextIndex}
-                    initial={{ x: "100vw", opacity: 0 }}
-                    animate={{
-                      x: "0%",
-                      opacity: 1,
-                      transition: {
-                        delay: 0.15, // 150ms delay
-                        x: {
-                          duration: 1.6, // 1600ms duration
-                          ease: customBezier,
-                        },
-                        opacity: {
-                          duration: 0.8,
-                          ease: customBezier,
-                        },
-                      },
-                    }}
-                    exit={{
-                      x: "-100vw",
-                      opacity: 0,
-                      transition: {
-                        duration: 1.6,
-                        ease: customBezier,
-                      },
-                    }}
-                    style={{
-                      position: "absolute",
-                      whiteSpace: "nowrap",
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: "18px",
-                      fontWeight: "600",
-                      color: "#333",
-                      textAlign: "center",
-                    }}
-                  >
-                    {textItems[currentTextIndex]}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
             </div>
           </div>
-        </motion.div>
 
-        {/* Main yellow container with animation */}
-        <div
-          className="yellow-container"
-          style={{
-            backgroundColor: "#FFD700",
-            borderBottomLeftRadius: "45px",
-            borderBottomRightRadius: "45px",
-            overflow: "hidden",
-            position: "relative",
-            height: "41px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentTextIndex}
-              initial={{ x: "100vw", opacity: 0 }}
-              animate={{
-                x: "0%",
-                opacity: 1,
-                transition: {
-                  delay: 0.15, // 150ms delay as per Figma
-                  x: {
-                    duration: 1.6, // 1600ms duration as per Figma
-                    ease: customBezier, // Custom bezier curve
-                  },
-                  opacity: {
-                    duration: 0.8,
-                    ease: customBezier,
-                  },
-                },
-              }}
-              exit={{
-                x: "-100vw",
-                opacity: 0,
-                transition: {
-                  duration: 1.6,
-                  ease: customBezier,
-                },
-              }}
-              style={{
-                position: "absolute",
-                whiteSpace: "nowrap",
-                fontFamily: "'Inter', sans-serif",
-                fontSize: "16px",
-                fontWeight: "500",
-                color: "#333",
-                textAlign: "center",
-              }}
-            >
-              {textItems[currentTextIndex]}{" "}
-              <motion.img
-                src={success}
-                alt=""
-                style={{ width: "20px", display: "inline-block" }}
-                initial={{ scale: 0, rotate: -180 }}
+          {/* Main yellow container with animation */}
+          <div
+            className="yellow-container"
+            style={{
+              height: "41px",
+              background: "#E6B800",
+              border: "2px solid #F5DEB3",
+              borderRadius: "0px 0px 32px 32px",
+              overflow: "hidden",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+          >
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={currentTextIndex}
+                initial={{ x: "120%" }}
                 animate={{
-                  scale: 1,
-                  rotate: 0,
+                  x: "0%",
                   transition: {
-                    delay: 0.15, // Same 150ms delay
-                    duration: 1.6,
-                    ease: customBezier,
+                    delay: 0, // 150ms delay as per Figma
+                    x: {
+                      duration: 0.7, // 1600ms duration as per Figma
+                      ease: customBezier, // Custom bezier curve
+                    },
                   },
                 }}
                 exit={{
-                  scale: 0,
-                  rotate: 180,
+                  x: "-180%",
                   transition: {
-                    duration: 1.6,
+                    duration: 0.7,
                     ease: customBezier,
                   },
                 }}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+                style={{
+                  position: "absolute",
+                  whiteSpace: "nowrap",
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: "16px",
+                  fontWeight: "500",
+                  color: "#333",
+                  textAlign: "center",
+                }}
+              >
+                {textItems[currentTextIndex]}{" "}
+                <motion.img
+                  src={success}
+                  alt=""
+                  style={{ width: "20px", display: "inline-block" }}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{
+                    scale: 1,
+                    rotate: 0,
+                    transition: {
+                      delay: 0.15, // Same 150ms delay
+                      duration: 0.9,
+                      ease: customBezier,
+                    },
+                  }}
+                  exit={{
+                    scale: 0,
+                    rotate: 180,
+                    transition: {
+                      duration: 0.9,
+                      ease: customBezier,
+                    },
+                  }}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
 
         <div className="main-content">
           <div className="divider-row">

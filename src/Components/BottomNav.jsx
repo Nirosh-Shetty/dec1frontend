@@ -8,14 +8,14 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
-  
+
   // Use Ref for scroll position to avoid re-binding event listeners constantly
   const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Threshold of 10px to prevent jitter
       if (Math.abs(currentScrollY - lastScrollY.current) < 10) return;
 
@@ -48,22 +48,28 @@ const BottomNav = () => {
   const activeTab = location.pathname.includes("my-plan") ? "plan" : "menu";
 
   return (
-    <div className={`bottom-nav-container ${isVisible ? "" : "bottom-nav-hidden"}`}>
-      <button 
-        className={`nav-item ${activeTab === "menu" ? "active" : ""}`}
-        onClick={() => navigate("/home")}
-      >
-        <BiFoodMenu size={24} className="nav-icon-svg" style={{ fill: activeTab === "menu" ? "#6b8e23" : "#c0c0c0" }} />
-        <span className="nav-label">Menu</span>
-      </button>
+    <div
+      className={`bottom-nav-container ${isVisible ? "" : "bottom-nav-hidden"}`}
+    >
+     <div>
+        <button
+          className={`nav-item ${activeTab === "menu" ? "active" : ""}`}
+          onClick={() => navigate("/home")}
+        >
+          <BiFoodMenu size={22} className="nav-icon-svg" />
+          <span className="nav-label">Menu</span>
+        </button>
+     </div>
 
-      <button 
-        className={`nav-item ${activeTab === "plan" ? "active" : ""}`}
-        onClick={() => navigate("/my-plan")}
-      >
-        <FaCalendarAlt size={22} className="nav-icon-svg" style={{ fill: activeTab === "plan" ? "#6b8e23" : "#c0c0c0" }} />
-        <span className="nav-label">My Plan</span>
-      </button>
+     <div>
+        <button
+          className={`nav-item ${activeTab === "plan" ? "active" : ""}`}
+          onClick={() => navigate("/my-plan")}
+        >
+          <FaCalendarAlt size={20} className="nav-icon-svg" />
+          <span className="nav-label">My Plans</span>
+        </button>
+     </div>
     </div>
   );
 };

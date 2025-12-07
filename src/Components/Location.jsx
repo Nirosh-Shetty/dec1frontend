@@ -10,7 +10,7 @@ import workimg2 from "./../assets/streamline-ultimate_work-from-home-user-sofa-w
 import schoolimg from "./../assets/streamline-ultimate-color_study-exam-math.png";
 import schoolimg2 from "./../assets/streamline-ultimate-color_study-exam-math-white.png";
 import cross from "./../assets/cross.png";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Search, MapPin } from "lucide-react";
 import spilt from "./../assets/spilt.png";
 import secure from "./../assets/secure.png";
 import warning from "./../assets/warning.png";
@@ -82,7 +82,7 @@ const LocationConfirmation = () => {
   const fixedPinRef = useRef(null);
   const fixedMessageRef = useRef(null);
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
+  const API_KEY = process.env.VITE_MAP_KEY;
 
   // Track if we're editing an address
   const [isEditing, setIsEditing] = useState(false);
@@ -1801,7 +1801,7 @@ const LocationConfirmation = () => {
             />
 
             <div
-              className="d-flex justify-content-between"
+              className="d-flex "
               style={{
                 width: "100%",
                 gap: "12px",
@@ -1948,7 +1948,8 @@ const LocationConfirmation = () => {
   return (
     <div
       style={{
-        height: "100vh",
+        // Use dynamic viewport height so content fits correctly when mobile browser UI (URL bar) shows/hides
+        height: "100dvh",
         backgroundColor: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",
@@ -2329,7 +2330,12 @@ const LocationConfirmation = () => {
 
       {/* Main Content - Vertical Layout */}
       <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          // Fill the parent container instead of forcing another fixed viewport height
+          height: "100%",
+        }}
       >
         {/* Top Panel - Map */}
         <div
@@ -2371,7 +2377,7 @@ const LocationConfirmation = () => {
                 gap: "8px",
               }}
             >
-              <span style={{ fontSize: "18px", color: "#666" }}>🔍</span>
+              <Search size={18} color="#666" style={{ flexShrink: 0 }} />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -2543,7 +2549,8 @@ const LocationConfirmation = () => {
                         ? "16px"
                         : "20px",
                     position: "relative",
-                    maxHeight: window.innerWidth <= 768 ? "100vh" : "90vh", // Full height on mobile
+                    // Use dynamic viewport height on mobile so the form fits within the visible screen
+                    maxHeight: window.innerWidth <= 768 ? "100dvh" : "90vh", // Full height on mobile
                     height: window.innerWidth <= 768 ? "100%" : "auto", // Full height on mobile
                     overflowY: "auto",
                     boxShadow:
@@ -2745,7 +2752,12 @@ const LocationConfirmation = () => {
                     <div style={{ marginBottom: "20px" }}>
                       <div
                         style={{
-                          display: "grid",
+                          display: window.innerWidth <= 768 ? "flex" : "grid",
+                          flexWrap:
+                            window.innerWidth <= 768 ? "wrap" : "nowrap",
+                          justifyContent:
+                            window.innerWidth <= 768 ? "flex-start" : "stretch",
+                          alignItems: "stretch",
                           gridTemplateColumns:
                             window.innerWidth <= 360
                               ? "repeat(2, 1fr)"
@@ -2765,7 +2777,7 @@ const LocationConfirmation = () => {
                             type="button"
                             onClick={() => setAddressType(type.key)}
                             style={{
-                              width: "100%",
+                              width: window.innerWidth <= 768 ? "auto" : "100%",
                               minHeight:
                                 window.innerWidth <= 360
                                   ? "38px"
@@ -2794,7 +2806,7 @@ const LocationConfirmation = () => {
                                   : "#FFF8DC",
                               cursor: "pointer",
                               transition: "all 0.2s ease",
-                              display: "flex",
+                              display: "inline-flex",
                               flexDirection: "row",
                               alignItems: "center",
                               justifyContent: "center",
@@ -2802,9 +2814,10 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "4px"
                                   : window.innerWidth <= 768
-                                  ? "4px"
+                                  ? "6px"
                                   : "8px",
                               overflow: "hidden",
+                              flexShrink: 0,
                             }}
                             onMouseEnter={(e) => {
                               if (addressType !== type.key) {
@@ -2847,21 +2860,25 @@ const LocationConfirmation = () => {
                               style={{
                                 fontSize:
                                   window.innerWidth <= 360
-                                    ? "8px"
-                                    : window.innerWidth <= 768
                                     ? "10px"
+                                    : window.innerWidth <= 768
+                                    ? "11px"
                                     : "14px",
                                 fontWeight: "500",
                                 fontFamily: "Inter",
                                 color:
                                   addressType === type.key ? "#fff" : "#000",
                                 textAlign: "center",
-                                lineHeight: "1.2",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "normal",
-                                width: "100%",
-                                padding: "0 2px",
+                                lineHeight: "1.3",
+                                whiteSpace:
+                                  window.innerWidth <= 768
+                                    ? "nowrap"
+                                    : "normal",
+                                wordBreak:
+                                  window.innerWidth <= 768
+                                    ? "normal"
+                                    : "break-word",
+                                // padding: "0 4px",
                               }}
                             >
                               {type.label}
@@ -3443,7 +3460,7 @@ const LocationConfirmation = () => {
                       marginTop: "2px",
                     }}
                   >
-                    📍
+                    <MapPin size={20} color="#4caf50" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div

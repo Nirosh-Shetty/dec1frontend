@@ -21,7 +21,7 @@ import * as XLSX from "xlsx";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import Swal from "sweetalert2";
 // import { debounce } from "lodash"; // Kept from original, but not used in new filter state
 
@@ -50,7 +50,7 @@ const CorporateBookings = () => {
   };
 
   // --- Data & Pagination States ---
-  const [ApartmentOrder, setApartmentOrder] = useState([]);
+  const [order, setOrder] = useState([]);
   const [hubs, setHubs] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -68,7 +68,28 @@ const CorporateBookings = () => {
     search: "",
     page: 1,
   });
+  const [sortConfig, setSortConfig] = useState({
+    key: "createdAt", // Default sort by Placed On
+    direction: "desc", // Default Newest First
+  });
 
+  // --- Sorting Handler ---
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // --- Helper to render Sort Icon ---
+  const renderSortIcon = (columnKey) => {
+    if (sortConfig.key !== columnKey)
+      return <FaSort className="text-muted ms-1" size={12} />;
+    if (sortConfig.direction === "asc")
+      return <FaSortUp className="text-primary ms-1" size={12} />;
+    return <FaSortDown className="text-primary ms-1" size={12} />;
+  };
   // --- States for Modal Actions ---
   const [delData, setdelData] = useState();
   const [markloder, setmarkloader] = useState(false);
@@ -99,6 +120,8 @@ const CorporateBookings = () => {
         hubId: filters.hubId,
         session: filters.session,
         status: filters.status,
+        sortBy: sortConfig.key,
+        sortOrder: sortConfig.direction,
       };
 
       const res = await axios.get(
@@ -107,14 +130,14 @@ const CorporateBookings = () => {
       );
 
       if (res.data.success) {
-        setApartmentOrder(res.data.data.orders);
+        setOrder(res.data.data.orders);
         setPagination(res.data.data.pagination);
         // REMOVED: setAllTimesSlote and setLocations
       }
     } catch (error) {
       setLoading(false);
       console.log(error);
-      setApartmentOrder([]);
+      setOrder([]);
       Swal.fire({
         title: "Error",
         text: "Failed to fetch orders",
@@ -142,7 +165,7 @@ const CorporateBookings = () => {
 
   useEffect(() => {
     getApartmentOrder();
-  }, [filters]); // Re-fetch orders when any filter changes
+  }, [filters, sortConfig]); // Re-fetch orders when any filter changes
 
   // --- Filter Handlers ---
   const handleFilterChange = (e) => {
@@ -269,8 +292,8 @@ const CorporateBookings = () => {
           "Sl.No": index + 1,
           "Delivery Date": moment(item?.deliveryDate).format("DD-MM-YYYY"),
           Session: item?.session || "N/A",
-          "Placed Date": moment(item?.createdAt).format("DD-MM-YYYY"),
-          "Placed Time": moment(item?.createdAt).format("h:mm A"),
+          "Placed On": moment(item?.createdAt).format("DD-MM-YYYY h:mm A"),
+          // "Placed Time": moment(item?.createdAt).format("h:mm A"),
           "Order ID": item?.orderid,
           "Customer Name": item?.username,
           "Hub Name": item?.hubId?.hubName || "N/A",
@@ -286,6 +309,7 @@ const CorporateBookings = () => {
           Phone: item?.Mobilenumber,
           Corporate: item?.companyName,
           "Delivery location": item?.delivarylocation,
+          "Address Type": item?.addressType,
           // "Delivery Method": item.deliveryMethod || "N/A",
           "Payment Method": item?.paymentmethod,
           "Delivery Amount": item?.deliveryCharge,
@@ -494,14 +518,45 @@ const CorporateBookings = () => {
               {/* === ALL COLUMNS KEPT + 2 NEW ADDED === */}
               <tr>
                 <th>S.No</th>
-                <th>Placed Date</th>
-                <th>Placed Time</th>
-                <th>Delivery Date</th> {/* NEW */}
-                <th>Session</th> {/* NEW */}
-                <th>Order ID</th>
+                <th
+                  onClick={() => handleSort("createdAt")}
+                  style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  Placed On {renderSortIcon("createdAt")}
+                </th>
+                {/* <th>Placed Time</th> */}
+                <th
+                  onClick={() => handleSort("deliveryDate")}
+                  style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  Delivery Date {renderSortIcon("deliveryDate")}
+                </th>{" "}
+                {/* NEW */}
+                <th
+                  onClick={() => handleSort("session")}
+                  style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  Session {renderSortIcon("session")}
+                </th>{" "}
+                {/* NEW */}
+                <th
+                  onClick={() => handleSort("orderid")}
+                  style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                >
+                  Order ID {renderSortIcon("orderid")}
+                </th>
                 <th>Customer Name</th>
                 <th>Total Order</th>
-                <th style={{ padding: "30px" }}>Order Status</th>
+                <th
+                  onClick={() => handleSort("status")}
+                  style={{
+                    padding: "30px",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Order Status {renderSortIcon("status")}
+                </th>
                 <th>Hub</th>
                 <th>Slots Details</th>
                 <th>Category Name</th>
@@ -510,6 +565,7 @@ const CorporateBookings = () => {
                 <th>Unit</th>
                 <th>Phone Number</th>
                 <th>Corporate</th>
+                <th>Address Type</th>
                 <th>Delivery location</th>
                 {/* <th>Delivery Method</th> */}
                 <th>Payment Method</th>
@@ -532,7 +588,7 @@ const CorporateBookings = () => {
                     <Spinner animation="border" variant="primary" />
                   </td>
                 </tr>
-              ) : ApartmentOrder.length === 0 ? (
+              ) : order.length === 0 ? (
                 <tr>
                   <td colSpan={28} className="text-center">
                     {" "}
@@ -541,18 +597,18 @@ const CorporateBookings = () => {
                   </td>
                 </tr>
               ) : (
-                ApartmentOrder.map((items, i) => {
+                order.map((items, i) => {
                   const serialNumber =
                     (pagination.currentPage - 1) * pagination.pageSize + i + 1;
                   return (
                     <tr key={items._id}>
                       <td>{serialNumber}</td>
                       <td style={{ paddingTop: "20px" }}>
-                        {moment(items?.createdAt).format("DD-MM-YYYY")}
+                        {moment(items?.createdAt).format("DD-MM-YYYY h:mm A")}
                       </td>
-                      <td style={{ paddingTop: "20px" }}>
+                      {/* <td style={{ paddingTop: "20px" }}>
                         {moment(items?.createdAt).format("h:mm A")}
-                      </td>
+                      </td> */}
                       {/* === NEW DATA CELLS === */}
                       <td style={{ paddingTop: "20px" }}>
                         {items?.deliveryDate
@@ -584,7 +640,7 @@ const CorporateBookings = () => {
                         </Button>
                       </td>
                       <td style={{ paddingTop: "20px" }}>
-                        {items?.hubId?.hubName || "N/A"}{" "}
+                        {items?.hubName || "N/A"}{" "}
                         {/* Using populated hub name */}
                       </td>
                       <td style={{ paddingTop: "20px" }}>{items?.slot}</td>
@@ -622,6 +678,9 @@ const CorporateBookings = () => {
                       </td>{" "}
                       {/* Using companyName */}
                       <td style={{ paddingTop: "20px" }}>
+                        {items?.addressType}
+                      </td>
+                      <td style={{ paddingTop: "20px" }}>
                         {items?.delivarylocation},{items?.addressline}
                       </td>
                       {/* <td style={{ paddingTop: "20px" }}>
@@ -643,35 +702,37 @@ const CorporateBookings = () => {
                         {items?.coupon || "No"}
                       </td>
                       <td style={{ paddingTop: "20px" }}>₹{items?.allTotal}</td>
-                     <td style={{ paddingTop: "20px", minWidth: "150px" }}>
-  {/* Food Rating */}
-  {items?.ratings?.order?.rating ? (
-    <div className="mb-2">
-      <strong>Food:</strong>
-      <div>{renderStars(items.ratings.order.rating)}</div>
-      <small className="text-muted">
-        "{items.ratings.order.comment || "No comment"}"
-      </small>
-    </div>
-  ) : null}
+                      <td style={{ paddingTop: "20px", minWidth: "150px" }}>
+                        {/* Food Rating */}
+                        {items?.ratings?.order?.rating ? (
+                          <div className="mb-2">
+                            <strong>Food:</strong>
+                            <div>{renderStars(items.ratings.order.rating)}</div>
+                            <small className="text-muted">
+                              "{items.ratings.order.comment || "No comment"}"
+                            </small>
+                          </div>
+                        ) : null}
 
-  {/* Delivery Rating */}
-  {items?.ratings?.delivery?.rating ? (
-    <div>
-      <strong>Delivery:</strong>
-      <div>{renderStars(items.ratings.delivery.rating)}</div>
-      <small className="text-muted">
-        "{items.ratings.delivery.comment || "No comment"}"
-      </small>
-    </div>
-  ) : null}
+                        {/* Delivery Rating */}
+                        {items?.ratings?.delivery?.rating ? (
+                          <div>
+                            <strong>Delivery:</strong>
+                            <div>
+                              {renderStars(items.ratings.delivery.rating)}
+                            </div>
+                            <small className="text-muted">
+                              "{items.ratings.delivery.comment || "No comment"}"
+                            </small>
+                          </div>
+                        ) : null}
 
-  {/* Fallback if neither exists */}
-  {!items?.ratings?.order?.rating &&
-    !items?.ratings?.delivery?.rating && (
-      <span className="text-muted">Not rated</span>
-    )}
-</td>
+                        {/* Fallback if neither exists */}
+                        {!items?.ratings?.order?.rating &&
+                          !items?.ratings?.delivery?.rating && (
+                            <span className="text-muted">Not rated</span>
+                          )}
+                      </td>
                       <td style={{ paddingTop: "5px" }}>
                         <Button onClick={() => handleShow(items)}>
                           <IoIosEye size={20} />
@@ -869,61 +930,63 @@ const CorporateBookings = () => {
                   </div>
                 </div>
 
-              <div className="row m-2 mt-3">
-  <h5 className="mb-3">Customer Feedback</h5>
-  
-  {/* Food Rating Section */}
-  <div className="col-md-6 mb-3">
-    <div className="p-2 border rounded">
-      <h6>Food Rating</h6>
-      {data?.ratings?.order?.rating ? (
-        <>
-          <div className="mb-1">
-            {renderStars(data.ratings.order.rating)}
-            <span className="ms-2 badge bg-success">
-              {data.ratings.order.rating}/5
-            </span>
-          </div>
-          <p className="small text-muted mb-0">
-            {data.ratings.order.comment || "No comment provided."}
-          </p>
-        </>
-      ) : (
-        <small className="text-muted">
-          {data?.ratings?.order?.status === "skipped" 
-            ? "Skipped by user" 
-            : "Pending / Not Rated"}
-        </small>
-      )}
-    </div>
-  </div>
+                <div className="row m-2 mt-3">
+                  <h5 className="mb-3">Customer Feedback</h5>
 
-  {/* Delivery Rating Section */}
-  <div className="col-md-6 mb-3">
-    <div className="p-2 border rounded">
-      <h6>Delivery Rating</h6>
-      {data?.ratings?.delivery?.rating ? (
-        <>
-          <div className="mb-1">
-            {renderStars(data.ratings.delivery.rating)}
-            <span className="ms-2 badge bg-primary">
-              {data.ratings.delivery.rating}/5
-            </span>
-          </div>
-          <p className="small text-muted mb-0">
-            {data.ratings.delivery.comment || "No comment provided."}
-          </p>
-        </>
-      ) : (
-        <small className="text-muted">
-          {data?.ratings?.delivery?.status === "skipped" 
-            ? "Skipped by user" 
-            : "Pending / Not Rated"}
-        </small>
-      )}
-    </div>
-  </div>
-</div>
+                  {/* Food Rating Section */}
+                  <div className="col-md-6 mb-3">
+                    <div className="p-2 border rounded">
+                      <h6>Food Rating</h6>
+                      {data?.ratings?.order?.rating ? (
+                        <>
+                          <div className="mb-1">
+                            {renderStars(data.ratings.order.rating)}
+                            <span className="ms-2 badge bg-success">
+                              {data.ratings.order.rating}/5
+                            </span>
+                          </div>
+                          <p className="small text-muted mb-0">
+                            {data.ratings.order.comment ||
+                              "No comment provided."}
+                          </p>
+                        </>
+                      ) : (
+                        <small className="text-muted">
+                          {data?.ratings?.order?.status === "skipped"
+                            ? "Skipped by user"
+                            : "Pending / Not Rated"}
+                        </small>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Delivery Rating Section */}
+                  <div className="col-md-6 mb-3">
+                    <div className="p-2 border rounded">
+                      <h6>Delivery Rating</h6>
+                      {data?.ratings?.delivery?.rating ? (
+                        <>
+                          <div className="mb-1">
+                            {renderStars(data.ratings.delivery.rating)}
+                            <span className="ms-2 badge bg-primary">
+                              {data.ratings.delivery.rating}/5
+                            </span>
+                          </div>
+                          <p className="small text-muted mb-0">
+                            {data.ratings.delivery.comment ||
+                              "No comment provided."}
+                          </p>
+                        </>
+                      ) : (
+                        <small className="text-muted">
+                          {data?.ratings?.delivery?.status === "skipped"
+                            ? "Skipped by user"
+                            : "Pending / Not Rated"}
+                        </small>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
