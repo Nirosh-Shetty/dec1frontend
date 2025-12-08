@@ -116,7 +116,9 @@ const AdminOrderAssignment = () => {
   const fetchRiders = useCallback(async () => {
     try {
       setIsRidersLoading(true);
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/riders");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/riders"
+      );
       if (Array.isArray(res.data?.riders)) {
         setAvailableRiders(res.data.riders);
       } else {
@@ -137,7 +139,9 @@ const AdminOrderAssignment = () => {
   // POLYGON FUNCTIONS - NEW
   const loadZones = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getZones");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getZones"
+      );
       if (Array.isArray(res.data)) {
         // Map backend zones to frontend format (ensure id field exists)
         const formattedZones = res.data.map((zone) => ({
@@ -280,7 +284,9 @@ const AdminOrderAssignment = () => {
     try {
       // Fetch full zone details with populated riders
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getZone/${zone.id || zone._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/getZone/${
+          zone.id || zone._id
+        }`
       );
       const fullZone = res.data;
 
@@ -315,7 +321,9 @@ const AdminOrderAssignment = () => {
   const handleViewZoneDetails = async (zone) => {
     try {
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getZone/${zone.id || zone._id}`
+        `https://dd-merge-backend-2.onrender.com/api/admin/getZone/${
+          zone.id || zone._id
+        }`
       );
       setZoneDetails(res.data);
       setShowZoneDetails(true);
@@ -387,67 +395,84 @@ const AdminOrderAssignment = () => {
     return 0.001;
   };
 
-  const offsetOverlappingMarkers = (ordersArray, currentZoom = 13) => {
-    const locationMap = new Map();
-    const offsetOrders = [];
-    const radius = calculateOffsetRadius(currentZoom);
+const offsetOverlappingMarkers = (ordersArray, currentZoom = 13) => {
+  if (!Array.isArray(ordersArray) || ordersArray.length === 0) {
+    return [];
+  }
 
-    ordersArray.forEach((order, index) => {
-      const lat = order.coordinates.coordinates[1];
-      const lng = order.coordinates.coordinates[0];
+  const locationMap = new Map();
+  const offsetOrders = [];
+  const radius = calculateOffsetRadius(currentZoom);
 
-      let foundGroup = null;
-      for (const [groupKey, group] of locationMap.entries()) {
-        const [groupLat, groupLng] = groupKey.split("_").map(Number);
-        const distance = Math.sqrt(
-          Math.pow(lat - groupLat, 2) + Math.pow(lng - groupLng, 2)
-        );
+  ordersArray.forEach((order, index) => {
+    // Safely extract coordinates with null checks
+    const lat = order.coordinates?.coordinates?.[1];
+    const lng = order.coordinates?.coordinates?.[0];
 
-        if (distance < 0.00009) {
-          foundGroup = group;
-          break;
-        }
+    // Validate coordinates
+    if (lat == null || lng == null || isNaN(lat) || isNaN(lng)) {
+      console.warn(`Order ${index} has invalid coordinates:`, {
+        orderId: order._id,
+        coordinates: order.coordinates,
+        lat,
+        lng
+      });
+      return; // Skip this order
+    }
+
+    let foundGroup = null;
+    for (const [groupKey, group] of locationMap.entries()) {
+      const [groupLat, groupLng] = groupKey.split("_").map(Number);
+      const distance = Math.sqrt(
+        Math.pow(lat - groupLat, 2) + Math.pow(lng - groupLng, 2)
+      );
+
+      if (distance < 0.00009) {
+        foundGroup = group;
+        break;
       }
+    }
 
-      if (!foundGroup) {
-        const locationKey = `${lat.toFixed(6)}_${lng.toFixed(6)}`;
-        locationMap.set(locationKey, []);
-        offsetOrders.push({
-          ...order,
-          originalIndex: index,
-          displayLat: lat,
-          displayLng: lng,
-          isGrouped: false,
-          groupCount: 1,
-          groupKey: locationKey,
-        });
-        locationMap.get(locationKey).push(offsetOrders.length - 1);
-      } else {
-        const groupIndex = foundGroup.length;
-        const angle = (360 / 8) * groupIndex;
-        const offsetLat = lat + radius * Math.cos((angle * Math.PI) / 180);
-        const offsetLng = lng + radius * Math.sin((angle * Math.PI) / 180);
+    if (!foundGroup) {
+      const locationKey = `${lat.toFixed(6)}_${lng.toFixed(6)}`;
+      locationMap.set(locationKey, []);
+      offsetOrders.push({
+        ...order,
+        originalIndex: index,
+        displayLat: lat,
+        displayLng: lng,
+        isGrouped: false,
+        groupCount: 1,
+        groupKey: locationKey,
+      });
+      locationMap.get(locationKey).push(offsetOrders.length - 1);
+    } else {
+      const groupIndex = foundGroup.length;
+      const angle = (360 / 8) * groupIndex;
+      const offsetLat = lat + radius * Math.cos((angle * Math.PI) / 180);
+      const offsetLng = lng + radius * Math.sin((angle * Math.PI) / 180);
 
-        offsetOrders.push({
-          ...order,
-          originalIndex: index,
-          displayLat: offsetLat,
-          displayLng: offsetLng,
-          isGrouped: true,
-          groupCount: foundGroup.length + 1,
-          groupKey: foundGroup[0].groupKey,
-        });
+      offsetOrders.push({
+        ...order,
+        originalIndex: index,
+        displayLat: offsetLat,
+        displayLng: offsetLng,
+        isGrouped: true,
+        groupCount: foundGroup.length + 1,
+        groupKey: foundGroup[0].groupKey,
+      });
 
-        const firstMarkerIndex = foundGroup[0];
-        offsetOrders[firstMarkerIndex].isGrouped = true;
-        offsetOrders[firstMarkerIndex].groupCount = foundGroup.length + 1;
+      const firstMarkerIndex = foundGroup[0];
+      offsetOrders[firstMarkerIndex].isGrouped = true;
+      offsetOrders[firstMarkerIndex].groupCount = foundGroup.length + 1;
 
-        foundGroup.push(offsetOrders.length - 1);
-      }
-    });
+      foundGroup.push(offsetOrders.length - 1);
+    }
+  });
 
-    return offsetOrders;
-  };
+  console.log("Offset orders processed:", offsetOrders.length);
+  return offsetOrders;
+};
 
   const createPinShapedMarker = (
     orderNumber,
@@ -608,6 +633,7 @@ const AdminOrderAssignment = () => {
         ordersWithCoordinates,
         zoom
       );
+      console.log("processed orders............" ,processedOrders)
       setOrders(processedOrders);
       setFilteredOrders(processedOrders);
 

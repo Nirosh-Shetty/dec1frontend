@@ -477,7 +477,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 1000;
+  z-index: 11000;
   overflow-y: auto; /* Allow scrolling for the overlay */
   padding: 20px 16px; /* Reduced top padding */
 }
@@ -921,6 +921,7 @@ button:disabled {
   padding: 16px 0;
   border-top: 1px solid #eee;
   margin-top: auto;
+  z-index: 10000; /* Higher than bottom-nav's 9999 */
 }
 
 .skip-btn {

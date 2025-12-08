@@ -149,94 +149,98 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [vegFilteredItems, selectedCategory]);
 
   // --- TABS COMPONENT (Modified to use parent state) ---
-  const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
-    return (
-      <div className="tabs-container2">
-        <div className="tabs-scroll-container">
-          <div className="tabs-scroll">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                className={`tab-button ${activeTab === tab ? "active" : ""}`}
-                onClick={() => onTabClick(tab)}
-              >
-                <span className="tab-button-text">{tab}</span>
-              </button>
-            ))}
-          </div>
+const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
+  return (
+    <div className="tabs-container2">
+      <div className="tabs-scroll-container">
+        <div className="tabs-scroll">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              className={`tab-button ${activeTab === tab ? "active" : ""}`}
+              onClick={() => onTabClick(tab)}
+            >
+              <span className="tab-button-text">{tab}</span>
+            </button>
+          ))}
         </div>
-        <style jsx>{`
-          .tabs-container2 {
-            background-color: ${Colors.creamWalls};
-            padding: 12px 4px;
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-          }
-          .tabs-scroll-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-          }
-          .tabs-scroll-container::-webkit-scrollbar {
-            display: none;
-          }
-          .tabs-scroll {
-            display: inline-flex;
-            min-width: 100%;
-            gap: 10px;
-            padding: 0 4px;
-          }
-          .tab-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            padding: 8px 24px;
-            border-radius: 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-height: 40px;
-          }
-          .tab-button:hover {
-            background-color: ${Colors.warmbeige}40;
-            transform: translateY(-1px);
-          }
-          .tab-button.active {
-            background-color: ${Colors.greenCardamom};
-            padding: 4px 8px;
-            box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
-            width: auto;
-            height: auto;
-            border-radius: 20px;
-          }
-          .tab-button.active:hover {
-            background-color: ${Colors.greenCardamom}E6;
-            transform: translateY(-1px) scale(1.02);
-          }
-          .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 18px;
-            letter-spacing: -0.7px;
-            color: ${Colors.primaryText};
-            transition: all 0.3s ease;
-          }
-          .tab-button.active .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 16px;
-            font-weight: 900;
-            line-height: 21px;
-            letter-spacing: -0.8px;
-            color: ${Colors.appForeground};
-          }
-        `}</style>
       </div>
-    );
-  };
+      <style jsx>{`
+        .tabs-container2 {
+          background-color: ${Colors.creamWalls};
+          border-bottom-left-radius: 16px;
+          border-bottom-right-radius: 16px;
+          position: relative;
+          border-bottom: 2px solid #fff;
+          box-shadow: 
+            0 1px 3px rgba(0, 0, 0, 0.1),
+            0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        .tabs-scroll-container {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .tabs-scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+        .tabs-scroll {
+          display: inline-flex;
+          min-width: 100%;
+          gap: 10px;
+          padding: 0 4px;
+        }
+        .tab-button {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          padding: 8px 24px;
+          border-radius: 20px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          white-space: nowrap;
+          flex-shrink: 0;
+          min-height: 40px;
+        }
+        .tab-button:hover {
+          background-color: ${Colors.warmbeige}40;
+          transform: translateY(-1px);
+        }
+        .tab-button.active {
+          background-color: ${Colors.greenCardamom};
+          padding: 4px 8px;
+          box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
+          width: auto;
+          height: auto;
+          border-radius: 20px;
+        }
+        .tab-button.active:hover {
+          background-color: ${Colors.greenCardamom}E6;
+          transform: translateY(-1px) scale(1.02);
+        }
+        .tab-button-text {
+          font-family: "Inter", sans-serif;
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.7px;
+          color: ${Colors.primaryText};
+          transition: all 0.3s ease;
+        }
+        .tab-button.active .tab-button-text {
+          font-family: "Inter", sans-serif;
+          font-size: 16px;
+          font-weight: 900;
+          line-height: 21px;
+          letter-spacing: -0.8px;
+          color: ${Colors.appForeground};
+        }
+      `}</style>
+    </div>
+  );
+};
 
   const isSameDay = (d1, d2) => {
     const a = new Date(d1);

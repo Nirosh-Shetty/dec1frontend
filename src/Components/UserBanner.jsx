@@ -831,53 +831,6 @@ const UserBanner = () => {
     fetchBanners();
   }, []);
 
-  // Initialize carousel programmatically
-  useEffect(() => {
-    if (banners.length > 1 && carouselRef.current) {
-      try {
-        const bootstrap = window.bootstrap;
-        if (bootstrap) {
-          // Dispose existing instance if any
-          if (carouselInstanceRef.current) {
-            try {
-              carouselInstanceRef.current.dispose();
-            } catch (e) {
-              // Ignore dispose errors
-            }
-          }
-
-          // Create new carousel instance
-          carouselInstanceRef.current = new bootstrap.Carousel(
-            carouselRef.current,
-            {
-              ride: "carousel",
-              interval: 4000,
-              touch: true,
-              wrap: true,
-            }
-          );
-
-          // Start the carousel
-          carouselInstanceRef.current.cycle();
-        }
-      } catch (error) {
-        console.error("Error initializing carousel:", error);
-      }
-    }
-
-    // Cleanup function
-    return () => {
-      if (carouselInstanceRef.current) {
-        try {
-          carouselInstanceRef.current.dispose();
-          carouselInstanceRef.current = null;
-        } catch (e) {
-          console.error("Error disposing carousel:", e);
-        }
-      }
-    };
-  }, [banners]);
-
   // Alternative approach: Use CSS-only carousel
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -907,38 +860,44 @@ const UserBanner = () => {
       >
         <Link to="/refer" style={{ textDecoration: "none" }}>
           <div
+            className="banner-container"
             style={{
               borderRadius: "15px",
               overflow: "hidden",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
               height: "200px",
               position: "relative",
-              backgroundImage: `url(${banners[0].BannerImage})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              animation: "bannerZoom 10s ease-in-out infinite",
             }}
           >
             <div
+              className="zoom-animation"
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background:
-                  "linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.1))",
+                width: "100%",
+                height: "100%",
+                backgroundImage: `url(${banners[0].BannerImage})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                animation: "zoomInOut 15s ease-in-out infinite",
               }}
-            />
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background:
+                    "linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.1))",
+                }}
+              />
+            </div>
           </div>
         </Link>
       </div>
     );
   }
-
-  // If multiple banners, use either Bootstrap or custom carousel
-  const useBootstrapCarousel = false; // Set to true to use Bootstrap, false for custom
 
   return (
     <div
@@ -952,15 +911,70 @@ const UserBanner = () => {
     >
       <style>
         {`
-          /* Common styles */
-          .banner-zoom {
-            animation: bannerZoom 10s ease-in-out infinite;
+          /* Smooth zoom animation */
+          @keyframes zoomInOut {
+            0%, 100% {
+              transform: scale(1);
+            }
+            50% {
+              transform: scale(1.1);
+            }
           }
 
-          @keyframes bannerZoom {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
+          /* Alternative slower animation */
+          @keyframes smoothZoom {
+            0% {
+              transform: scale(1);
+            }
+            25% {
+              transform: scale(1.05);
+            }
+            50% {
+              transform: scale(1.1);
+            }
+            75% {
+              transform: scale(1.05);
+            }
+            100% {
+              transform: scale(1);
+            }
+          }
+
+          /* Ken Burns effect for a more cinematic feel */
+          @keyframes kenBurns {
+            0% {
+              transform: scale(1) translate(0, 0);
+            }
+            50% {
+              transform: scale(1.1) translate(2%, 2%);
+            }
+            100% {
+              transform: scale(1) translate(0, 0);
+            }
+          }
+
+          /* Elegant slow zoom */
+          @keyframes elegantZoom {
+            0% {
+              transform: scale(1);
+              filter: brightness(1);
+            }
+            25% {
+              transform: scale(1.03);
+              filter: brightness(1.02);
+            }
+            50% {
+              transform: scale(1.06);
+              filter: brightness(1.04);
+            }
+            75% {
+              transform: scale(1.03);
+              filter: brightness(1.02);
+            }
+            100% {
+              transform: scale(1);
+              filter: brightness(1);
+            }
           }
 
           /* Custom carousel styles */
@@ -979,7 +993,7 @@ const UserBanner = () => {
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.8s ease-in-out;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -989,31 +1003,46 @@ const UserBanner = () => {
             opacity: 1;
           }
 
+          /* Apply zoom animation to active slide */
+          .custom-carousel-slide.active .zoom-background {
+            width: 100%;
+            height: 100%;
+            animation: elegantZoom 20s ease-in-out infinite;
+            will-change: transform;
+          }
+
           .custom-carousel-indicators {
             position: absolute;
-            bottom: 10px;
+            bottom: 15px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             z-index: 10;
           }
 
           .custom-indicator {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background-color: rgba(153, 197, 64, 0.6);
-            border: none;
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.8);
             padding: 0;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .custom-indicator:hover {
+            transform: scale(1.2);
+            background-color: rgba(255, 255, 255, 0.9);
           }
 
           .custom-indicator.active {
-            transform: scale(1.5);
+            transform: scale(1.4);
             background-color: #6B8E23;
+            border-color: #8BAB42;
+            box-shadow: 0 0 10px rgba(107, 142, 35, 0.7);
           }
 
           /* Mobile styles */
@@ -1021,127 +1050,88 @@ const UserBanner = () => {
             .custom-carousel {
               height: 140px;
             }
+            
+            @keyframes elegantZoom {
+              0% {
+                transform: scale(1);
+              }
+              50% {
+                transform: scale(1.08);
+              }
+              100% {
+                transform: scale(1);
+              }
+            }
+          }
+
+          /* Performance optimizations */
+          .zoom-background {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
           }
         `}
       </style>
 
-      {useBootstrapCarousel ? (
-        // Bootstrap carousel version
-        <div
-          id="mobileBannerCarousel"
-          className="carousel slide carousel-fade"
-          data-bs-ride="carousel"
-          data-bs-interval="4000"
-          data-bs-touch="true"
-          ref={carouselRef}
-        >
+      {/* Custom carousel version with smooth zoom */}
+      <div className="custom-carousel">
+        {banners.map((banner, index) => (
           <div
-            className="carousel-inner"
-            style={{
-              borderRadius: "15px",
-              overflow: "hidden",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-            }}
+            key={banner._id}
+            className={`custom-carousel-slide ${
+              index === currentSlide ? "active" : ""
+            }`}
           >
-            {banners.map((banner, index) => (
-              <div
-                key={banner._id}
-                className={`carousel-item ${index === 0 ? "active" : ""}`}
-              >
-                <Link to="/refer">
-                  <div
-                    className="banner-zoom"
-                    style={{
-                      height: "200px",
-                      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.1)), url(${banner.BannerImage})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  />
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <button
-            className="carousel-control-prev"
-            type="button"
-            data-bs-target="#mobileBannerCarousel"
-            data-bs-slide="prev"
-            style={{ width: "15%", opacity: "0.5" }}
-          >
-            <span
-              className="carousel-control-prev-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Previous</span>
-          </button>
-          <button
-            className="carousel-control-next"
-            type="button"
-            data-bs-target="#mobileBannerCarousel"
-            data-bs-slide="next"
-            style={{ width: "15%", opacity: "0.5" }}
-          >
-            <span
-              className="carousel-control-next-icon"
-              aria-hidden="true"
-            ></span>
-            <span className="visually-hidden">Next</span>
-          </button>
-          <div className="carousel-indicators">
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                data-bs-target="#mobileBannerCarousel"
-                data-bs-slide-to={index}
-                className={index === 0 ? "active" : ""}
-                aria-current={index === 0 ? "true" : "false"}
-                aria-label={`Slide ${index + 1}`}
-              ></button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        // Custom carousel version (more reliable)
-        <div className="custom-carousel">
-          {banners.map((banner, index) => (
-            <div
-              key={banner._id}
-              className={`custom-carousel-slide ${
-                index === currentSlide ? "active" : ""
-              }`}
+            <Link
+              to="/refer"
               style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.1)), url(${banner.BannerImage})`,
+                display: "block",
+                width: "100%",
+                height: "100%",
               }}
             >
-              <Link
-                to="/refer"
+              <div
+                className="zoom-background"
                 style={{
-                  display: "block",
                   width: "100%",
                   height: "100%",
+                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.15)), url(${banner.BannerImage})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
                 }}
-              />
-            </div>
-          ))}
-
-          <div className="custom-carousel-indicators">
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                className={`custom-indicator ${
-                  index === currentSlide ? "active" : ""
-                }`}
-                onClick={() => setCurrentSlide(index)}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+              >
+                {/* Optional overlay for better text readability if you add text later */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background:
+                      "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.05))",
+                  }}
+                />
+              </div>
+            </Link>
           </div>
+        ))}
+
+        <div className="custom-carousel-indicators">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              className={`custom-indicator ${
+                index === currentSlide ? "active" : ""
+              }`}
+              onClick={() => setCurrentSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };

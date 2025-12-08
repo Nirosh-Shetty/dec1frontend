@@ -1108,7 +1108,90 @@ const MyPlan = () => {
   const mobile = user?.Mobile;
   const username = user?.Fname;
 
-  async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
+  // async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
+  //   try {
+  //     const amount = plan.slotTotalAmount; // single plan only
+  //     const generateUniqueId = () => {
+  //       const timestamp = Date.now().toString().slice(-4);
+  //       const randomNumber = Math.floor(1000 + Math.random() * 9000);
+  //       return `${address?.prefixcode}${timestamp}${randomNumber}`;
+  //     };
+  //     const configObj = {
+  //       method: "post",
+  //       baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+  //       url: "/user/plan/create-from-plan",
+  //       headers: { "content-type": "application/json" },
+  //       data: {
+  //         userId,
+  //         planId: plan._id,
+  //         // optional discounts:
+  //         discountWallet,
+  //         coupon: 0,
+  //         // couponId: null,
+  //         // companyId: null,
+  //         // companyName: "Normal User",
+  //         // customerType: "Individual",
+  //         studentName: plan.studentName,
+  //         studentClass: plan.studentClass,
+  //         studentSection: plan.studentSection,
+  //         addressType: plan.addressType,
+  //         coordinates: plan.coordinates,
+  //         hubName: plan?.hubName, // if you have
+  //         username: username,
+  //         mobile: mobile,
+  //         deliveryNotes: deliveryNotes,
+  //         orderid: generateUniqueId(),
+  //       },
+  //     };
+  //     const config1 = {
+  //       url: "/user/addpaymentphonepay",
+  //       method: "post",
+  //       baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+  //       headers: { "content-type": "application/json" },
+  //       data: {
+  //         userId,
+  //         username,
+  //         Mobile: mobile,
+  //         amount,
+  //         transactionid: null,
+  //         orderid: generateUniqueId(),
+  //         config: JSON.stringify(configObj),
+  //         cartId: null,
+  //         offerconfig: null,
+  //         cart_id: null,
+  //       },
+  //     };
+
+  //     const res = await axios(configObj);
+  //     const redirectInfo = res.data?.url;
+  //     if (redirectInfo?.url) {
+  //       window.location.href = redirectInfo.url;
+  //     } else if (redirectInfo?.redirectUrl) {
+  //       window.location.href = redirectInfo.redirectUrl;
+  //     }
+  //   } catch (err) {
+  //     // setLoading(false);
+  //     console.error("pay plan error", err);
+  //     if (err.response?.data?.error === "OUT_OF_STOCK") {
+  //       Swal2.fire({
+  //         icon: "info",
+  //         title: "Item Unavailable",
+  //         text: err.response.data.message,
+  //         // text: 'Oops, That item just ran out. Please pick something else to continue.',
+  //         confirmButtonText: "See Other Options",
+  //         confirmButtonColor: "#d33",
+  //       }).then(() => {
+  //         if (isModalOpen) closeModal();
+  //         // fetchPlans();
+  //         navigate("/home");
+  //       });
+  //     } else {
+  //       toast.error(err.response?.data?.message || "Failed to start payment");
+  //     }
+  //   }
+  // }
+
+async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
       const amount = plan.slotTotalAmount; // single plan only
       const generateUniqueId = () => {
@@ -1164,11 +1247,49 @@ const MyPlan = () => {
 
       const res = await axios(configObj);
       const redirectInfo = res.data?.url;
-      if (redirectInfo?.url) {
-        window.location.href = redirectInfo.url;
-      } else if (redirectInfo?.redirectUrl) {
-        window.location.href = redirectInfo.redirectUrl;
-      }
+      
+      // Show success toast
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "success",
+        title: "Order",
+        text: "Order Successfully Created",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+        didClose: () => {
+          // Refresh data or page after toast closes
+          if (typeof fetchPlans === 'function') {
+            fetchPlans(); // Refresh plans data
+          }
+          // Optionally refresh other data or state
+        }
+      });
+
+      // Wait for toast to show, then refresh and redirect
+      setTimeout(() => {
+        // Refresh the current page data
+        if (typeof fetchPlans === 'function') {
+          fetchPlans(); // Refresh plans data
+        }
+        
+        // Clear any form data or reset state if needed
+        // setDeliveryNotes(''); // Example if you have state for delivery notes
+        // setSelectedPlan(null); // Example if you have state for selected plan
+        
+        // Navigate to payment gateway
+        if (redirectInfo?.url) {
+          window.location.href = redirectInfo.url;
+        } else if (redirectInfo?.redirectUrl) {
+          window.location.href = redirectInfo.redirectUrl;
+        }
+      }, 1500);
+      
     } catch (err) {
       // setLoading(false);
       console.error("pay plan error", err);
@@ -1182,7 +1303,7 @@ const MyPlan = () => {
           confirmButtonColor: "#d33",
         }).then(() => {
           if (isModalOpen) closeModal();
-          // fetchPlans();
+          // fetchPlans(); // Refresh after closing modal
           navigate("/home");
         });
       } else {
@@ -1587,6 +1708,7 @@ const MyPlan = () => {
                           </button>
                         )}
                       </div>
+                      
                     </div>
                   </>
                 );
