@@ -68,9 +68,8 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
     const key = dateToKeyUTC(dateObj);
     if (key !== todayUtcKey) return false;
     const hr = now().getHours();
-        //TODO: change this 12 and 19
-    if (session === "Lunch" && hr >= 24) return true; // block Lunch after 12:00 local
-    if (session === "Dinner" && hr >= 24) return true; // block Dinner after 19:00 local
+    if (session === "Lunch" && hr >= 12) return true; // block Lunch after 12:00 local
+    if (session === "Dinner" && hr >= 19) return true; // block Dinner after 19:00 local
     return false;
   };
 

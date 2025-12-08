@@ -74,6 +74,7 @@ import LeafWithLogo from "./Components/LeafWithLogo";
 import Validate from "./Components/Validate";
 // import { LoginPage } from "./Components/LoginPage";
 import ReferalZone from "./Components/ReferalScreen";
+import AdminFeedBack from './Components/Admin/AdminFeedBack'
 import AdminReferralDashboard from "./Components/Admin/AdminReferralDashboard";
 import LegalPage from "./Components/LegalPage";
 import AdminCategory from "./Components/Admin/AdminCategory";
@@ -348,6 +349,9 @@ function App() {
           <Route
             path="admin/referral-dashboard"
             element={<Main children={<AdminReferralDashboard />} />}
+          /><Route
+            path="admin/user-feedback"
+            element={<Main children={<AdminFeedBack />} />}
           />
           <Route
             path="admin/myplan-dashboard"

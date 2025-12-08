@@ -1238,9 +1238,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         if (!dateVal || !sessionVal) return false;
         const itemKey = toKey(dateVal);
         if (itemKey !== todayKey) return false;
-        //TODO: change this 19 and 12
-        if (hr >= 24 && sessionVal.toLowerCase() === "dinner") return true;
-        if (hr >= 24 && sessionVal.toLowerCase() === "lunch") return true;
+        if (hr >= 19 && sessionVal.toLowerCase() === "dinner") return true;
+        if (hr >= 12 && sessionVal.toLowerCase() === "lunch") return true;
         return false;
       };
 

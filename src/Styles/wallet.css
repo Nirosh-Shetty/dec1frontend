@@ -1014,7 +1014,7 @@ letter-spacing: -0.6px;
   }
   
   .d-flex.gap-2 {
-    margin-top: 12px;
+    /* margin-top: 12px; */
     width: 100%;
     justify-content: space-between;
   }
