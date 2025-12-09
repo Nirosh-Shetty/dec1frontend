@@ -816,7 +816,7 @@ export default function LeafWithLogo() {
                 }}
               >
                 <img
-                  src={"/assets/logo-container.png"}
+                  src={"/Assets/logo-container.png"}
                   width={LOGO_W}
                   height={LOGO_H}
                   alt="Logo"
