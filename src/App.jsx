@@ -116,7 +116,7 @@ const ThemeColorHandler = () => {
       } else if (location.pathname.includes("/profile")) {
         themeColor = "#6F42C1"; // Purple for profile
       } else if (location.pathname.includes("/")) {
-        themeColor = "#e6b800"; // Red for admin pages
+        themeColor = "#6B8E23"; // Red for admin pages
       }
 
       // Update meta theme-color
@@ -139,6 +139,7 @@ const ThemeColorHandler = () => {
 
   return null;
 };
+
 
 function App() {
   const [selectArea, setSelectArea] = useState("");
