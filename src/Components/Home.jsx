@@ -16,7 +16,7 @@ import RatingModal from "./RatingModal";
 import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
 import moment from "moment";
-import IsVeg from "../assets/isVegYes.svg";
+import IsVeg from "../assets/isVeg=yes.svg";
 import IsNonVeg from "../assets/isVeg=no.svg";
 import MultiCartDrawer from "./MultiCartDrawer";
 import DateSessionSelector from "./DateSessionSelector";
@@ -149,98 +149,97 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [vegFilteredItems, selectedCategory]);
 
   // --- TABS COMPONENT (Modified to use parent state) ---
-const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
-  return (
-    <div className="tabs-container2">
-      <div className="tabs-scroll-container">
-        <div className="tabs-scroll">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              className={`tab-button ${activeTab === tab ? "active" : ""}`}
-              onClick={() => onTabClick(tab)}
-            >
-              <span className="tab-button-text">{tab}</span>
-            </button>
-          ))}
+  const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
+    return (
+      <div className="tabs-container2">
+        <div className="tabs-scroll-container">
+          <div className="tabs-scroll">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                className={`tab-button ${activeTab === tab ? "active" : ""}`}
+                onClick={() => onTabClick(tab)}
+              >
+                <span className="tab-button-text">{tab}</span>
+              </button>
+            ))}
+          </div>
         </div>
+        <style jsx>{`
+          .tabs-container2 {
+            background-color: ${Colors.creamWalls};
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            position: relative;
+            border-bottom: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
+              0 2px 6px rgba(0, 0, 0, 0.05);
+          }
+          .tabs-scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .tabs-scroll-container::-webkit-scrollbar {
+            display: none;
+          }
+          .tabs-scroll {
+            display: inline-flex;
+            min-width: 100%;
+            gap: 10px;
+            padding: 0 4px;
+          }
+          .tab-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 24px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-height: 40px;
+          }
+          .tab-button:hover {
+            background-color: ${Colors.warmbeige}40;
+            transform: translateY(-1px);
+          }
+          .tab-button.active {
+            background-color: ${Colors.greenCardamom};
+            padding: 4px 8px;
+            box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+          }
+          .tab-button.active:hover {
+            background-color: ${Colors.greenCardamom}E6;
+            transform: translateY(-1px) scale(1.02);
+          }
+          .tab-button-text {
+            font-family: "Inter", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 18px;
+            letter-spacing: -0.7px;
+            color: ${Colors.primaryText};
+            transition: all 0.3s ease;
+          }
+          .tab-button.active .tab-button-text {
+            font-family: "Inter", sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 21px;
+            letter-spacing: -0.8px;
+            color: ${Colors.appForeground};
+          }
+        `}</style>
       </div>
-      <style jsx>{`
-        .tabs-container2 {
-          background-color: ${Colors.creamWalls};
-          border-bottom-left-radius: 16px;
-          border-bottom-right-radius: 16px;
-          position: relative;
-          border-bottom: 2px solid #fff;
-          box-shadow: 
-            0 1px 3px rgba(0, 0, 0, 0.1),
-            0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-        .tabs-scroll-container {
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-        }
-        .tabs-scroll-container::-webkit-scrollbar {
-          display: none;
-        }
-        .tabs-scroll {
-          display: inline-flex;
-          min-width: 100%;
-          gap: 10px;
-          padding: 0 4px;
-        }
-        .tab-button {
-          display: inline-flex;
-          justify-content: center;
-          align-items: center;
-          padding: 8px 24px;
-          border-radius: 20px;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          white-space: nowrap;
-          flex-shrink: 0;
-          min-height: 40px;
-        }
-        .tab-button:hover {
-          background-color: ${Colors.warmbeige}40;
-          transform: translateY(-1px);
-        }
-        .tab-button.active {
-          background-color: ${Colors.greenCardamom};
-          padding: 4px 8px;
-          box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
-          width: auto;
-          height: auto;
-          border-radius: 20px;
-        }
-        .tab-button.active:hover {
-          background-color: ${Colors.greenCardamom}E6;
-          transform: translateY(-1px) scale(1.02);
-        }
-        .tab-button-text {
-          font-family: "Inter", sans-serif;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 18px;
-          letter-spacing: -0.7px;
-          color: ${Colors.primaryText};
-          transition: all 0.3s ease;
-        }
-        .tab-button.active .tab-button-text {
-          font-family: "Inter", sans-serif;
-          font-size: 16px;
-          font-weight: 900;
-          line-height: 21px;
-          letter-spacing: -0.8px;
-          color: ${Colors.appForeground};
-        }
-      `}</style>
-    </div>
-  );
-};
+    );
+  };
 
   const isSameDay = (d1, d2) => {
     const a = new Date(d1);
@@ -828,7 +827,7 @@ const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
   const overallSubtotal = useMemo(() => {
     return groupedCarts.reduce((acc, slot) => acc + slot.subtotal, 0);
   }, [groupedCarts]);
-// console.log(address.location?.coordinates,'sfsdfdsf')
+  // console.log(address.location?.coordinates,'sfsdfdsf')
   const proceedToPlan = async () => {
     if (!user) {
       Swal2.fire({
@@ -872,7 +871,9 @@ const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
         addressId: address._id || "",
         addressline: `${address.fullAddress}`,
         addressType: address.addressType || "",
-        coordinates: address.location ? [address.location.lng, address.location.lat] : [0, 0],
+        coordinates: address.location
+          ? [address.location.lng, address.location.lat]
+          : [0, 0],
         hubId: address.hubId || "",
         hubName: address.hubName || "",
         studentInformation: address.studentInformation,
@@ -1299,6 +1300,9 @@ const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
     };
   }, [setCarts]);
 
+  // Render DateSessionSelector inline (no JS sticky in Home)
+  // The selector itself will handle sticky behavior if needed.
+
   return (
     <div>
       <ToastContainer />
@@ -1343,8 +1347,8 @@ const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
         </div>
       )}
 
-      {/* STICKY HEADER FOR SELECTORS */}
-      <div className="sticky-menu-header">
+      {/* Header for Date/Session selector (no sticky here) */}
+      <div className="sticky-menu-header" style={{ position: "relative" }}>
         <div style={{ position: "relative" }}>
           {user && !address && (
             <div
@@ -1453,7 +1457,6 @@ const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
         <div className="maincontainer">
           <div className="mobile-product-box " style={{ marginBottom: "30px" }}>
             <div style={{ marginBottom: "20px" }}>
-              {" "}
               {/* Pass Derived Tabs and State Handlers */}
               <TabsComponent
                 tabs={dynamicTabs}

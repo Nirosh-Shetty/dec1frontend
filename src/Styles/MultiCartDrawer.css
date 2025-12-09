@@ -275,7 +275,28 @@ padding-bottom: 0 !important;
   scale:0.7;
 }
 
-
+.cartbutton .back1{
+  z-index: 100;
+  /* display: none; */
+    /* outline: 2px solid white; */
+  border: 0.5px solid var(--secondary-text);
+  position:fixed;
+  bottom:51px !important;
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+  box-shadow: none !important;
+}
+.cartbutton .back2{
+  z-index: 99;
+  /* display: none; */
+  outline: 2px solid white;
+  border: 0.5px solid var(--secondary-text);
+  box-shadow: none !important;
+  position:fixed;
+  bottom:53px !important;
+    border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
 
 
 /* mobile responsiveness */

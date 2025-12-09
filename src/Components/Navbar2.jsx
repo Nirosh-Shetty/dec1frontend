@@ -283,8 +283,8 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
 
 // Helper components for list items
 const NavItem = ({ icon, text, onClick }) => (
-  <div className="nav-item" onClick={onClick}>
-    <div className="nav-item-content">
+  <div className="side-nav-item" onClick={onClick}>
+    <div className="side-nav-item-content">
       <span className="nav-icon">{icon}</span>
       <span>{text}</span>
     </div>
@@ -292,8 +292,8 @@ const NavItem = ({ icon, text, onClick }) => (
   </div>
 );
 const NavItemExternal = ({ icon, text, href }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="nav-item">
-    <div className="nav-item-content">
+  <a href={href} target="_blank" rel="noopener noreferrer" className="side-nav-item">
+    <div className="side-nav-item-content">
       <span className="nav-icon">{icon}</span>
       <span>{text}</span>
     </div>

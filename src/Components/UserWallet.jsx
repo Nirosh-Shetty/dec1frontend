@@ -72,7 +72,7 @@ const UserWallet = () => {
               </svg>
             </div>
             <h3
-              className="checkout-title"
+              className="tagline"
             >
               My Wallet
             </h3>

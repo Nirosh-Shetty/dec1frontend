@@ -87,6 +87,7 @@ import AdminOrderAssignment from "./Components/Admin/AdminOrderAssignment";
 import MyPlan from "./Components/MyPlan";
 import AdminPlanDashboard from "./Components/Admin/AdminPlanDashboard";
 import AdminFeedBack from "./Components/Admin/AdminFeedBack";
+import OnboardScreen from "./Components/OnboardScreen";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -139,7 +140,6 @@ const ThemeColorHandler = () => {
 
   return null;
 };
-
 
 function App() {
   const [selectArea, setSelectArea] = useState("");
@@ -303,6 +303,7 @@ function App() {
           <Route path="/legal-page" element={<LegalPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/chats" element={<ChatWithUs />} />
+          <Route path="/onboard" element={<OnboardScreen />} />
           <Route
             path="/profile"
             element={
@@ -367,6 +368,7 @@ function App() {
             path="/home_banner"
             element={<Main children={<HomeBanner />} />}
           />
+           
           <Route
             path="/apartmentlist"
             element={<Main children={<ApartmentList />} />}

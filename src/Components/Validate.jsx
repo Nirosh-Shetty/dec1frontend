@@ -116,7 +116,7 @@ export default function Validate() {
             if (hasAddresses) {
               window.location.replace("/home");
             } else {
-              window.location.replace("/location");
+              window.location.replace("/onboard");
             }
           }, 100);
           Swal2.fire({

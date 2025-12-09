@@ -98,7 +98,7 @@ function CorporateDashboard() {
           approximatetime: "30 mins",
           prefixcode: "CORP",
           mobile: 1234567890,
-          logo: "../assets/corporate_logo.jpeg",
+          logo: "../Assets/corporate_logo.jpeg",
           otp: 1234,
           status: true,
         };

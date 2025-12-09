@@ -152,7 +152,7 @@ const RatingModal = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex:1001
+        zIndex: 1001,
       }}
     >
       <Modal.Body

@@ -198,7 +198,7 @@ export default function ReferScreen() {
             */}
             <button onClick={() => navigate(-1)} className="refer-back-btn">
               <img
-                src="/Assets/checkoutback.svg"
+                src="/assets/checkoutback.svg"
                 alt="Back"
                 className="icon-img-l"
                 style={{
@@ -385,7 +385,7 @@ export default function ReferScreen() {
               subtitle="Friends who signed up but haven’t ordered yet"
               icon={
                 <img
-                  src="/Assets/pending.svg"
+                  src="/assets/pending.svg"
                   alt="Pending"
                   className="icon-img-m"
                 />
@@ -404,7 +404,7 @@ export default function ReferScreen() {
                     <div className="refer-left-block">
                       <div className="refer-name-row">
                         <img
-                          src="/Assets/airosend.svg"
+                          src="/assets/airosend.svg"
                           alt="Sent"
                           className="icon-img-s"
                         />
@@ -435,7 +435,7 @@ export default function ReferScreen() {
               subtitle="Friends who completed their first order"
               icon={
                 <img
-                  src="/Assets/success.svg"
+                  src="/assets/success.svg"
                   alt="Success"
                   className="icon-img-m"
                 />
@@ -454,7 +454,7 @@ export default function ReferScreen() {
                     <div className="refer-left-block">
                       <div className="refer-name-row">
                         <img
-                          src="/Assets/gifticon.svg"
+                          src="/assets/gifticon.svg"
                           alt="Gift"
                           className="icon-img-s"
                         />
@@ -486,7 +486,7 @@ export default function ReferScreen() {
             <>
               <p className='refer-code'>NAMABX</p>
               <img
-                src='/Assets/copycode.svg'
+                src='/assets/copycode.svg'
                 alt='Copy'
                 className='icon-img-l'
               />
@@ -497,7 +497,7 @@ export default function ReferScreen() {
         <button className="refer-whatsapp-btn" onClick={openWhatsApp}>
           <span className="refer-whatsapp-text">Invite on WhatsApp</span>
           <img
-            src="/Assets/whatsapp.svg"
+            src="/assets/whatsapp.svg"
             alt="WhatsApp"
             className="icon-img-l"
           />

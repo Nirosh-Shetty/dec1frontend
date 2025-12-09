@@ -233,6 +233,10 @@ const DateSessionSelector = ({
            <img src="/Assets/reset_to_now.svg" alt="reset now"></img>
           </span>
       </div>
+ {isFixedSession && (
+        <div style={{ height: sessionRect.height }} aria-hidden />
+      )}
+
 <div ref={sessionRef}
         style={
           isFixedSession

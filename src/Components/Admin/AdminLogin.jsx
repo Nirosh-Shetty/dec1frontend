@@ -79,7 +79,7 @@ function AdminLogin() {
                   <div className="d-flex">
                     <a href="/" className="tail-text">
                       <img
-                        src="../assets/dailydishlogo.jpeg"
+                        src="../Assets/dailydishlogo.jpeg"
                         alt="Logo"
                         className="admin-login-logo"
                       />

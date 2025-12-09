@@ -113,31 +113,36 @@
   gap: 12px;
 }
 
-.nav-item {
-  height: 56px;
-  background-color: #FAFAFA;
-  border-radius: 15px;
-  padding: 15px;
-  display: flex;
-  align-items: center;
+.side-nav-item {
   justify-content: space-between;
   text-decoration: none;
-  color: #333;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
   cursor: pointer;
   transition: background-color 0.2s;
+  gap: 8px;
+   background-color: #FAFAFA;
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  transition: transform 0.2s ease-in-out;
+  height: 56px;
+  font-weight: 500;
 }
 
-.nav-item:hover {
+.side-nav-item:hover {
   background-color: #f1f1f1;
   color: #333;
 }
 
-.nav-item-content {
+.side-nav-item-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
   font-weight: 500;
 }
 
@@ -165,12 +170,12 @@
   filter: brightness(0) invert(1); /* Changes black SVG to white */
 }
 
-.nav-item-content .icon-img-l,
+.side-nav-item-content .icon-img-l,
 .widget-card .icon-img-l {
   filter: invert(49%) sepia(21%) saturate(1054%) hue-rotate(43deg) brightness(91%) contrast(85%);
 }
 
-.nav-item > .icon-img-l {
+.side-nav-item > .icon-img-l {
    /* This filter converts black to #c0c0c0 */
   filter: invert(85%) sepia(0%) saturate(231%) hue-rotate(188deg) brightness(88%) contrast(93%);
 }

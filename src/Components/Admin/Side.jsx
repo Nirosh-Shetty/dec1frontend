@@ -150,7 +150,7 @@ const Side = () => {
                 <div className="">
                   <a href="/" className="tail-text">
                     <img
-                      src="../assets/dailydishlogo.jpeg"
+                      src="../Assets/dailydishlogo.jpeg"
                       alt="Logo"
                       className="admin-logo-img"
                       style={{ width: "300px", height: "65px", padding: "5px" }}
@@ -342,20 +342,20 @@ const Side = () => {
                   <span className="ms-2">Referral Dashboard</span>
                 </li>
               </Link>
-              <Link to="/admin/user-feedback" onClick={handleNavCollapse}>
-                <li className="a-ele ">
-                  <span>
-                    <FaGift style={{ fontSize: "20px" }} />
-                  </span>
-                  <span className="ms-2">User feedbacks</span>
-                </li>
-              </Link>
               <Link to="/admin/myplan-dashboard" onClick={handleNavCollapse}>
                 <li className="a-ele ">
                   <span>
                     <FaGift style={{ fontSize: "20px" }} />
                   </span>
                   <span className="ms-2">My Plan Dashboard</span>
+                </li>
+              </Link>
+              <Link to="/admin/user-feedback" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <FaGift style={{ fontSize: "20px" }} />
+                  </span>
+                  <span className="ms-2">User feedbacks</span>
                 </li>
               </Link>
               <Link to="/apartment-booking-list" onClick={handleNavCollapse}>

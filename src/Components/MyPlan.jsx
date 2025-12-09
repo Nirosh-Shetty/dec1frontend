@@ -8,7 +8,7 @@ import name from "./../assets/successGroup.png";
 import myplanlocation from "./../assets/myplanlocation.png";
 import myplancalender from "./../assets/myplancalender.png";
 import IsNonVeg from "./../assets/isVeg=no.svg";
-import IsVeg from "./../assets/isVegYes.svg";
+import IsVeg from "./../assets/isVeg=yes.svg";
 import myplancancelicon from "./../assets/myplancancelicon.png";
 // import myplandrop from "./../assets/myplandrop.png";
 import myplanseparator from "./../assets/myplanseparator.png";
@@ -470,9 +470,7 @@ const ViewPlanModal = ({
                             <div className="current-currency-text"></div>
                           </div>
                           <div className="plan-current-amount-text">
-                            <div>
-                              ₹{product.totalPrice?.toFixed(0)}
-                            </div>
+                            <div>₹{product.totalPrice?.toFixed(0)}</div>
                           </div>
                         </div>
                       </div>
@@ -1318,7 +1316,10 @@ const MyPlan = () => {
       <div className="checkoutcontainer">
         {/* Header */}
         <div className="mobile-banner-updated">
-          <div className="screen-checkout mb-2 checkout-header">
+          <div
+            className="screen-checkout mb-2 checkout-header d-flex align-items-center"
+            style={{ gap: "24px" }}
+          >
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1335,12 +1336,17 @@ const MyPlan = () => {
                 />
               </svg>
             </div>
-            <h3 className="checkout-title">My Plans</h3>
-            <div className="mb-3">
+            <div className="d-flex gap-1">
+              <h3 className="tagline">My Plans</h3>
               <img
                 src={pending}
                 alt=""
-                style={{ width: "20px", height: "20px" }}
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  position: "relative",
+                  top: "-6px",
+                }}
               />
             </div>
           </div>
@@ -1443,17 +1449,7 @@ const MyPlan = () => {
 
                 return (
                   <>
-                    <div
-                      key={plan._id}
-                      className="plan-card"
-                      style={
-                        isUnpaidEditable
-                          ? {
-                              borderTopRightRadius: 0,
-                            }
-                          : {}
-                      }
-                    >
+                    <div key={plan._id} className="plan-card">
                       {/* reminder for unpaid before cutoff */}
 
                       <div className="plan-header">
@@ -1461,9 +1457,7 @@ const MyPlan = () => {
                           <h3 className="session-title">{plan.session}</h3>
                           <div className="delivery-time-text">
                             {/* static for now; optionally store slot time in DB later */}
-                            <span className=" fw-semibold"
-                            
-                            >Delivery : </span>
+                            <span className=" fw-semibold">Delivery : </span>
 
                             <span className=" fw-medium">
                               {plan.session === "Lunch"
@@ -1630,8 +1624,8 @@ const MyPlan = () => {
                                     </span>
                                   ) : (
                                     // Show both prices with strikethrough for the higher one
-                                    <div className="d-flex gap-2">
-                                      <span className="actuall-amount">
+                                    <div className="d-flex gap-2 align-items-center">
+                                      <span className="actuall-amount d-flex align-items-center">
                                         ₹{plan.slotHubTotalAmount?.toFixed(0)}
                                       </span>
                                       <span className="pre-order-amount">
@@ -1650,8 +1644,8 @@ const MyPlan = () => {
                                     </span>
                                   ) : (
                                     // Show both prices with strikethrough for the higher one
-                                    <div className="d-flex gap-2">
-                                      <span className="actuall-amount">
+                                    <div className="d-flex gap-2 align-items-center">
+                                      <span className="actuall-amount align-items-center">
                                         ₹{plan.slotHubTotalAmount?.toFixed(0)}
                                       </span>
                                       <span className="pre-order-amount">
