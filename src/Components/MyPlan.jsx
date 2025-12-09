@@ -8,7 +8,7 @@ import name from "./../Assets/successGroup.png";
 import myplanlocation from "./../Assets/myplanlocation.png";
 import myplancalender from "./../Assets/myplancalender.png";
 import IsNonVeg from "./../Assets/isVeg=no.svg";
-import IsVeg from "./../Assets/isVeg=yes.svg";
+import IsVeg from "./../Assets/isVegYes.svg";
 import myplancancelicon from "./../Assets/myplancancelicon.png";
 // import myplandrop from "./../Assets/myplandrop.png";
 import myplanseparator from "./../Assets/myplanseparator.png";

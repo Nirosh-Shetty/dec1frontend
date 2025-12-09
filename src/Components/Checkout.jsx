@@ -9,7 +9,7 @@ import axios from "axios";
 import { WalletContext } from "../WalletContext";
 import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
-import IsVeg from "../Assets/isVeg=yes.svg";
+import IsVeg from "../Assets/isVegYes.svg";
 import IsNonVeg from "../Assets/isVeg=no.svg";
 import "../Styles/Normal.css";
 import { CircleCheck, ShieldAlert } from "lucide-react";
