@@ -32,7 +32,7 @@
 .order-row {
   display: flex;
   align-items: center;
-  width: 100%;
+  /* width: 100%; */
 }
 
 .clock-text {
@@ -43,12 +43,13 @@
 
 /* Veg button fixed size */
 .veg-btn {
-  background-color: #C0C0C0;
+  background-color: var(--cream-walls);
+  border: 2px solid var(--warm-beige);
   color: #2C2C2C;
   width: 72px;
   height: 55px;  
   border-radius: 18px;
-  border: none;
+  /* border: none; */
   padding: 4px 2px;
   font-family: Inter, sans-serif;
   font-weight: 400;
@@ -1107,7 +1108,7 @@ input[type="number"] {
   gap: 4px;
   background-color: #ffffff;
   border: none;
-  border-radius: 25px;
+  border-radius: 12px;
   padding: 8px 12px;
   cursor: pointer;
   box-shadow: 0 0 10px 4px rgba(255, 255, 255, 0.7);
@@ -1133,6 +1134,16 @@ input[type="number"] {
   -webkit-background-clip: text;
   color: transparent;
 }
+.banner-address-line{
+  font-size: 20px;
+  line-height: 25px;
+  letter-spacing: -0.8px;
+}
+
+.banner-user-details{
+  line-height: 15px;
+  letter-spacing: -0.6px;
+}
 
 
 @media screen and (max-width: 480px) {
@@ -1142,9 +1153,9 @@ input[type="number"] {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .referbtn{
+  /* .referbtn{
     margin-top: 17px;
-  }
+  } */
 }
 
 

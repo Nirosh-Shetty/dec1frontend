@@ -12,7 +12,9 @@ const getNextSevenDays = () => {
   const now = new Date();
   for (let i = 0; i < 7; i++) {
     // create date at UTC midnight for stability across timezones
-    const dUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + i));
+    const dUtc = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + i)
+    );
     result.push({
       label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : null,
       date: dUtc.getUTCDate(),
@@ -32,7 +34,12 @@ const dateToKeyUTC = (date) => {
   return `${y}-${m}-${d}`;
 };
 
-const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData = [] }) => {
+const DateSessionSelector = ({
+  onChange,
+  currentDate,
+  currentSession,
+  menuData = [],
+}) => {
   const dates = getNextSevenDays();
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -68,8 +75,8 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
     const key = dateToKeyUTC(dateObj);
     if (key !== todayUtcKey) return false;
     const hr = now().getHours();
-    if (session === "Lunch" && hr >= 12) return true; // block Lunch after 12:00 local
-    if (session === "Dinner" && hr >= 19) return true; // block Dinner after 19:00 local
+    if (session === "Lunch" && hr >= 24) return true; // block Lunch after 12:00 local
+    if (session === "Dinner" && hr >= 24) return true; // block Dinner after 19:00 local
     return false;
   };
 
@@ -78,15 +85,19 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
     const key = dateToKeyUTC(dateObj);
     const base = availability[key] || new Set();
     const result = new Set(base);
-    if (isSessionTimeBlocked(dateObj, "Lunch") && result.has("Lunch")) result.delete("Lunch");
-    if (isSessionTimeBlocked(dateObj, "Dinner") && result.has("Dinner")) result.delete("Dinner");
+    if (isSessionTimeBlocked(dateObj, "Lunch") && result.has("Lunch"))
+      result.delete("Lunch");
+    if (isSessionTimeBlocked(dateObj, "Dinner") && result.has("Dinner"))
+      result.delete("Dinner");
     return result;
   };
 
   // Find nearest available session/date starting from given date (inclusive)
   const findNextAvailable = (startDateObj, preferredSession = null) => {
     const startKey = dateToKeyUTC(startDateObj);
-    const startIndex = dates.findIndex((d) => dateToKeyUTC(d.dateObj) === startKey);
+    const startIndex = dates.findIndex(
+      (d) => dateToKeyUTC(d.dateObj) === startKey
+    );
     const from = startIndex >= 0 ? startIndex : 0;
     for (let offset = 0; offset < dates.length; offset++) {
       const idx = from + offset;
@@ -94,7 +105,8 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
       const dobj = dates[idx].dateObj;
       const sessions = sessionsForDate(dobj);
       if (sessions.size === 0) continue;
-      if (preferredSession && sessions.has(preferredSession)) return { dateObj: dobj, session: preferredSession };
+      if (preferredSession && sessions.has(preferredSession))
+        return { dateObj: dobj, session: preferredSession };
       if (sessions.has("Lunch")) return { dateObj: dobj, session: "Lunch" };
       if (sessions.has("Dinner")) return { dateObj: dobj, session: "Dinner" };
     }
@@ -115,7 +127,12 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
   const handleDateClick = (dateObj) => {
     const sessions = sessionsForDate(dateObj);
     if (!sessions || sessions.size === 0) return;
-    const sessionToUse = currentSession && sessions.has(currentSession) ? currentSession : sessions.has("Lunch") ? "Lunch" : "Dinner";
+    const sessionToUse =
+      currentSession && sessions.has(currentSession)
+        ? currentSession
+        : sessions.has("Lunch")
+        ? "Lunch"
+        : "Dinner";
     onChange(dateObj, sessionToUse);
   };
 
@@ -168,33 +185,94 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
     onChange(next[0].dateObj, "Lunch");
   };
 
+  // JS fallback sticky for session buttons: compute offsets and toggle fixed positioning
+  const sessionRef = useRef(null);
+  const [isFixedSession, setIsFixedSession] = useState(false);
+  const [sessionRect, setSessionRect] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    const compute = () => {
+      if (sessionRef.current) {
+        const r = sessionRef.current.getBoundingClientRect();
+        setSessionRect({
+          top: r.top + window.scrollY,
+          left: r.left,
+          width: r.width,
+          height: r.height,
+        });
+      }
+    };
+
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (sessionRect.top === 0) return;
+      const scrolled = window.scrollY || window.pageYOffset;
+      setIsFixedSession(scrolled >= sessionRect.top);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // initial check
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [sessionRect]);
+
   return (
     <div className="date-session-wrapper">
       <div className="reset-line">
         <span className="reset-btn" onClick={handleReset}>
-          Reset to now ↻
-        </span>
+          Reset to now 
+           <img src="/Assets/reset_to_now.svg" alt="reset now"></img>
+          </span>
       </div>
-
-      <div className="date-header">
+<div ref={sessionRef}
+        style={
+          isFixedSession
+            ? {
+                position: "fixed",
+                top: 0,
+                left: `${sessionRect.left}px`,
+                width: `${sessionRect.width}px`,
+                zIndex: 1100,
+                background: "inherit",
+              }
+            : undefined
+        }>
+    <div className="date-header" >
         <button
           className={`nav-btn ${!canScrollLeft ? "disabled" : ""}`}
           onClick={scrollLeft}
           disabled={!canScrollLeft}
           aria-label="scroll-left"
         >
-          <img src="/Assets/arrowCircleBrown.svg" style={{ transform: "rotate(180deg)" }} alt="prev" />
+          <img
+            src="/Assets/arrowCircleBrown.svg"
+            style={{ transform: "rotate(180deg)" }}
+            alt="prev"
+          />
         </button>
 
         <div className="date-strip" ref={scrollRef}>
           {dates.map((d, i) => {
             const sessions = sessionsForDate(d.dateObj);
             const isDisabled = sessions.size === 0;
-            const active = currentDate && dateToKeyUTC(d.dateObj) === dateToKeyUTC(currentDate);
+            const active =
+              currentDate &&
+              dateToKeyUTC(d.dateObj) === dateToKeyUTC(currentDate);
             return (
               <div
                 key={i}
-                className={`date-card ${active ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+                className={`date-card ${active ? "active" : ""} ${
+                  isDisabled ? "disabled" : ""
+                }`}
                 onClick={() => !isDisabled && handleDateClick(d.dateObj)}
               >
                 <div className="day">{d.label}</div>
@@ -215,32 +293,80 @@ const DateSessionSelector = ({ onChange, currentDate, currentSession, menuData =
         </button>
       </div>
 
-      <div className="session-container">
-        <div>
+      {/* spacer inserted when session becomes fixed to avoid layout jump */}
+      {/* {isFixedSession && (
+        <div style={{ height: sessionRect.height }} aria-hidden />
+      )} */}
 
-        </div>
-        <div className={`session-btn-wrapper ${currentSession === "Lunch" ? "active" : ""} ${currentDate && !sessionsForDate(currentDate).has("Lunch") ? "disabled" : ""}`}>
+      <div
+        className="session-container"
+        
+      >
+        <div></div>
+        <div
+          className={`session-btn-wrapper ${
+            currentSession === "Lunch" ? "active" : ""
+          } ${
+            currentDate && !sessionsForDate(currentDate).has("Lunch")
+              ? "disabled"
+              : ""
+          }`}
+        >
           <button
-            className={`session ${currentSession === "Lunch" ? "active" : ""} ${currentDate && !sessionsForDate(currentDate).has("Lunch") ? "disabled" : ""}`}
+            className={`session ${currentSession === "Lunch" ? "active" : ""} ${
+              currentDate && !sessionsForDate(currentDate).has("Lunch")
+                ? "disabled"
+                : ""
+            }`}
             onClick={() => handleSessionClick("Lunch")}
             disabled={currentDate && !sessionsForDate(currentDate).has("Lunch")}
           >
             <div className="title">Lunch</div>
-            <div className={`subtext ${currentSession === "Lunch" ? "active" : ""}`}>Order before 12:00 PM</div>
+            <div
+              className={`subtext ${
+                currentSession === "Lunch" ? "active" : ""
+              }`}
+            >
+              Order before 12:00 PM
+            </div>
           </button>
         </div>
 
-        <div className={`session-btn-wrapper ${currentSession === "Dinner" ? "active" : ""} ${currentDate && !sessionsForDate(currentDate).has("Dinner") ? "disabled" : ""}`}>
+        <div
+          className={`session-btn-wrapper ${
+            currentSession === "Dinner" ? "active" : ""
+          } ${
+            currentDate && !sessionsForDate(currentDate).has("Dinner")
+              ? "disabled"
+              : ""
+          }`}
+        >
           <button
-            className={`session ${currentSession === "Dinner" ? "active" : ""} ${currentDate && !sessionsForDate(currentDate).has("Dinner") ? "disabled" : ""}`}
+            className={`session ${
+              currentSession === "Dinner" ? "active" : ""
+            } ${
+              currentDate && !sessionsForDate(currentDate).has("Dinner")
+                ? "disabled"
+                : ""
+            }`}
             onClick={() => handleSessionClick("Dinner")}
-            disabled={currentDate && !sessionsForDate(currentDate).has("Dinner")}
+            disabled={
+              currentDate && !sessionsForDate(currentDate).has("Dinner")
+            }
           >
             <div className="title">Dinner</div>
-            <div className={`subtext ${currentSession === "Dinner" ? "active" : ""}`}>Order before 07:00 PM</div>
+            <div
+              className={`subtext ${
+                currentSession === "Dinner" ? "active" : ""
+              }`}
+            >
+              Order before 07:00 PM
+            </div>
           </button>
         </div>
       </div>
+</div>
+    
     </div>
   );
 };

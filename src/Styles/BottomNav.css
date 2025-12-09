@@ -47,13 +47,15 @@
 
 .nav-label {
   font-family: "Inter", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #777777;
 }
 
 .nav-item.active .nav-label {
   color: #6b8e23;
+  font-weight: bold;
+
 }
 
 /* Icons follow the same color as text using currentColor */

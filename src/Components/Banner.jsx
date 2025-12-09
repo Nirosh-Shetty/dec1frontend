@@ -664,14 +664,17 @@ const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
     <div>
       <div className="ban-container">
         <div className="mobile-banner-updated">
-          <div className="screen-3">
-            <div className="screen-2 mb-3">
+          <div className="screen-3" 
+          style={{ padding:"0 24px 8px 24px"}}>
+            <div className="screen-2 mb-3 mt-2 d-flex align-items-center">
               {/* <div className="w-100"> */}
-              <div className="d-flex flex-column align-items-start mt-2 gap-3">
+              {/* <div className="d-flex flex-column align-items-start gap-3"
+                  style={{ height:"100%" }}
+              > */}
                 <div
                   className="d-flex align-items-center gap-2 w-100"
                   onClick={handleLocationClick}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: "pointer"}}
                 >
                   <img
                     src={Selectlocation}
@@ -680,9 +683,13 @@ const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
                     style={{ width: "32px", height: "32px" }}
                   />
 
-                  <div className="d-flex flex-column cursor-pointer flex-grow-1">
+                  <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center"
+                  // style={{
+                  //   // height:"100%"
+                  // }}
+                  >
                     <p
-                      className="select-location-text fw-semibold text-truncate mb-0"
+                      className="select-location-text fw-semibold text-truncate mb-0 banner-address-line"
                       // style={{ maxWidth: "220px" }}
                       title={getDisplayAddress()}
                     >
@@ -691,7 +698,7 @@ const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
 
                     {user && (
                       <p
-                        className="select-location-text-small mb-0"
+                        className="select-location-text-small mb-0 banner-user-details"
                         style={{
                           color: "rgba(255, 255, 255, 0.8)",
                         }}
@@ -702,9 +709,10 @@ const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
                     )}
                   </div>
                 </div>
-              </div>
               {/* </div> */}
-              <div className="d-flex gap-1 justify-content-center align-items-center referbtn">
+              {/* </div> */}
+              <div className="d-flex gap-1 justify-content-center align-items-center referbtn"
+              >
                 {user && ( // Only show if user is logged in
                   <button
                     className="refer-earn-btn"
@@ -733,7 +741,8 @@ const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
               style={{ width: "100%" }}
             >
               {/* LEFT — text area */}
-              <div className="d-flex align-items-center flex-grow-1 min-w-0">
+              <div className="d-flex align-items-center flex-grow-1 min-w-0"
+              style={{gap:"4px"}}>
                 <img
                   src={clockone}
                   alt=""
@@ -745,11 +754,11 @@ const Banner = ({ Carts, getAllOffer, isVegOnly, setIsVegOnly }) => {
               </div>
 
               {/* RIGHT — Veg Only */}
-              <div className="veg-btn d-flex flex-column align-items-center ms-2">
+              <div className="veg-btn d-flex flex-column align-items-center ms-2" onClick={() => setIsVegOnly(!isVegOnly)} >
                 <h6 className="m-0 veg-title">Veg Only</h6>
                 <div
                   className="veg-btn-toggle"
-                  onClick={() => setIsVegOnly(!isVegOnly)} // 1. Toggle state on click
+                  // 1. Toggle state on click
                   style={{ cursor: "pointer" }}
                 >
                   <div

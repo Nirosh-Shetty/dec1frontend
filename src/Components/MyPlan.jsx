@@ -13,7 +13,7 @@ import myplancancelicon from "./../assets/myplancancelicon.png";
 // import myplandrop from "./../assets/myplandrop.png";
 import myplanseparator from "./../assets/myplanseparator.png";
 import myplanskip from "./../assets/myplanskip.png";
-// import myplancancel2 from "./../assets/myplancancelicon.png";
+import myplancancel3 from "./../assets/myplancancelicon.png";
 import myplancancel2 from "./../assets/mycancel.png";
 // import myplanblackedit from "./../assets/myplanblackedit.png";
 import BottomNav from "./BottomNav";
@@ -469,8 +469,8 @@ const ViewPlanModal = ({
                           <div className="plan-current-currency">
                             <div className="current-currency-text"></div>
                           </div>
-                          <div className="plan-current-amount">
-                            <div className="current-amount-text">
+                          <div className="plan-current-amount-text">
+                            <div>
                               ₹{product.totalPrice?.toFixed(0)}
                             </div>
                           </div>
@@ -713,9 +713,9 @@ const ViewPlanModal = ({
                   </span>
                 </div>
                 {/* {user.status === "Employee" ? ( */}
-                  <p className="wallet-subtext">Now you can pay with wallet</p>
-                 {/* ) : ( */}
-                  {/* {/* <p className="wallet-subtext">
+                <p className="wallet-subtext">Now you can pay with wallet</p>
+                {/* ) : ( */}
+                {/* {/* <p className="wallet-subtext">
                     Add ₹
                     {Math.max(
                       0,
@@ -884,7 +884,7 @@ const MyPlan = () => {
   } catch (e) {
     user = null;
   }
- const address = JSON.parse(
+  const address = JSON.parse(
     localStorage.getItem("primaryAddress") ??
       localStorage.getItem("currentLocation")
   );
@@ -1063,7 +1063,7 @@ const MyPlan = () => {
     } catch (err) {
       console.error("track order error", err);
       alert("Failed to fetch order details");
-    }finally {
+    } finally {
       setLoadingTrackId(null);
     }
   }
@@ -1191,7 +1191,7 @@ const MyPlan = () => {
   //   }
   // }
 
-async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
+  async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
       const amount = plan.slotTotalAmount; // single plan only
       const generateUniqueId = () => {
@@ -1226,6 +1226,8 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
           orderid: generateUniqueId(),
         },
       };
+
+      console.log(configObj, "configgggggggg");
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
@@ -1247,7 +1249,7 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
 
       const res = await axios(configObj);
       const redirectInfo = res.data?.url;
-      
+
       // Show success toast
       Swal2.fire({
         toast: true,
@@ -1264,24 +1266,24 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
         },
         didClose: () => {
           // Refresh data or page after toast closes
-          if (typeof fetchPlans === 'function') {
+          if (typeof fetchPlans === "function") {
             fetchPlans(); // Refresh plans data
           }
           // Optionally refresh other data or state
-        }
+        },
       });
 
       // Wait for toast to show, then refresh and redirect
       setTimeout(() => {
         // Refresh the current page data
-        if (typeof fetchPlans === 'function') {
+        if (typeof fetchPlans === "function") {
           fetchPlans(); // Refresh plans data
         }
-        
+
         // Clear any form data or reset state if needed
         // setDeliveryNotes(''); // Example if you have state for delivery notes
         // setSelectedPlan(null); // Example if you have state for selected plan
-        
+
         // Navigate to payment gateway
         if (redirectInfo?.url) {
           window.location.href = redirectInfo.url;
@@ -1289,7 +1291,6 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
           window.location.href = redirectInfo.redirectUrl;
         }
       }, 1500);
-      
     } catch (err) {
       // setLoading(false);
       console.error("pay plan error", err);
@@ -1343,35 +1344,38 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
               />
             </div>
           </div>
-        </div>
-        <div className="d-flex justify-content-end">
-          <div
-            onClick={() => navigate("/orders")}
-            style={{
-              cursor: "pointer",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              gap: "2px",
-            }}
-          >
-            <img
-              src={orderhistoryicon}
-              alt="My Orders"
-              className="icon-img-l"
-            />
-            <h6
+          <div className="d-flex justify-content-end align-items-center w-100">
+            <div
+              onClick={() => navigate("/orders")}
               style={{
-                color: "#2c2c2c",
-                fontSize: "16px",
-                fontWeight: "400",
-                fontFamily: "Inter",
-                textDecoration: "underline",
-                margin: 0, // Remove default margin
+                cursor: "pointer",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                gap: "2px",
+                marginLeft: "auto", // This pushes it to the right
+                marginRight: "15px",
               }}
             >
-              Order History
-            </h6>
+              <img
+                src={orderhistoryicon}
+                alt="My Orders"
+                className="icon-img-l"
+              />
+              <h6
+                style={{
+                  color: "#2c2c2c",
+                  fontSize: "16px",
+                  fontWeight: "400",
+                  fontFamily: "Inter",
+                  textDecoration: "underline",
+                  margin: 0,
+                  whiteSpace: "nowrap", // Prevents text wrapping
+                }}
+              >
+                Order History
+              </h6>
+            </div>
           </div>
         </div>
 
@@ -1457,7 +1461,9 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
                           <h3 className="session-title">{plan.session}</h3>
                           <div className="delivery-time-text">
                             {/* static for now; optionally store slot time in DB later */}
-                            <span className=" fw-semibold">Delivery : </span>
+                            <span className=" fw-semibold"
+                            
+                            >Delivery : </span>
 
                             <span className=" fw-medium">
                               {plan.session === "Lunch"
@@ -1678,10 +1684,10 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
                         )} */}
                         {/* {isPaidLocked && ( */}
                         {isPaidEditable && (
-                         // {true && (
-                           <button
+                          // {true && (
+                          <button
                             className="track-order-btn"
-                            disabled={loadingTrackId === plan._id} 
+                            disabled={loadingTrackId === plan._id}
                             onClick={() => handleTrackOrder(plan)}
                           >
                             {loadingTrackId === plan._id ? (
@@ -1708,7 +1714,6 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
                           </button>
                         )}
                       </div>
-                      
                     </div>
                   </>
                 );
@@ -1792,7 +1797,7 @@ async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
                       }}
                       className="track-close-modal-btn"
                     >
-                      <img src={myplancancel2} alt="" style={{ width: 24 }} />
+                      <img src={myplancancel3} alt="" style={{ width: 24 }} />
                     </button>
                   </div>
                   <div className="trackingTopRow1">

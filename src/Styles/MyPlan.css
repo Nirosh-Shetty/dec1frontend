@@ -80,6 +80,8 @@
   background-color: var(--cuminBrown);
   color: var(--app-foreground);
   border: 1.5px solid var(--steel-dark);
+   box-shadow: 0 0 1px 4px rgba(0, 0, 0, 0.25);
+box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
 }
 
 /* --- Order Card (List View) --- */
@@ -150,6 +152,8 @@
 .session-title {
   font-size: 20px;
   font-weight: 600;
+  letter-spacing: -0.8px;
+  line-height:25px;
   margin: 0;
   color: var(--cuminBrown)
 }
@@ -157,7 +161,9 @@
 .status-badge-confirmed {
   color: var(--success-green);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 15px;
+  letter-spacing: -0.7px;
   padding: 2px 4px;
   border-radius: 20px;
   display: flex;
@@ -168,7 +174,10 @@
 .status-badge-skipped {
   color: var(--turmeric-golden);
   font-size: 14px;
-  font-weight: 500;
+    font-weight: 600;
+  line-height: 15px;
+  letter-spacing: -0.7px;
+  /* font-weight: 500; */
   padding: 2px 4px;
   border-radius: 20px;
   display: flex;
@@ -179,7 +188,10 @@
 .status-badge-canceled {
   color: var(--turmeric-golden);
   font-size: 14px;
-  font-weight: 500;
+  /* font-weight: 500; */
+    font-weight: 600;
+  line-height: 15px;
+  letter-spacing: -0.7px;
   padding: 2px 4px;
   border-radius: 20px;
   display: flex;
@@ -190,12 +202,25 @@
 .status-badge-pending {
   color: var(--primary-text);
   font-size: 14px;
-  font-weight: 500;
+  /* font-weight: 500; */
+    font-weight: 600;
+  line-height: 15px;
+  letter-spacing: -0.7px;
   padding: 2px 4px;
   border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 4px;
+}
+.delivery-time-textv .fw-semibold{
+  font-weight: 600;
+  line-height: 15px;
+  letter-spacing: -0.7px;
+}
+.delivery-time-textv .fw-medium{
+  font-weight: 600;
+  line-height: 15px;
+  letter-spacing: -0.7px;
 }
 
 .delivery-time-text {
@@ -272,13 +297,18 @@
 
 .addressLine1 {
   font-size: 16px;
-  font-weight: 500;
-  line-height: 10px;
+  font-weight: 600;
+  line-height: 21px;
+  letter-spacing: -0.8px;
+  margin-bottom: 0 !important;
 }
 
 .addressLine2 {
   font-size: 10px;
-  margin-top: 8px;
+  /* margin-top: 8px; */
+  line-height: 11px;
+  letter-spacing: -0.5px;
+  font-weight: 600;
 }
 
 /* Spinner Animation */
@@ -345,6 +375,8 @@ button:disabled {
   background: var(--turmeric-golden);
   font-size: 10px;
   font-weight: 600;
+  line-height: 11px;
+  letter-spacing: -0.5px;
   padding: 2px 4px;
   border-radius: 6px;
 }
@@ -433,12 +465,22 @@ button:disabled {
 .actuall-amount {
   text-decoration: line-through;
   color: var(--secondary-text);
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: -0.6px;
+  font-weight: 500;
 }
 
 .pre-order-amount {
   border-radius: 4px;
   background-color: var(--turmeric-golden);
   padding: 2px;
+  font-size: 12px;
+}
+
+.hub-amount-text{
+  font-size: 10px;
+  font-family: 600;
 }
 
 @media (max-width: 480px) {
@@ -454,11 +496,6 @@ button:disabled {
     padding: 3px 6px;
     font-size: 12px;
     border-radius: 6px;
-  }
-
-  .actuall-amount,
-  .pre-order-amount {
-    font-size: 12px;
   }
 
   .pre-order-amount {
@@ -638,12 +675,15 @@ button:disabled {
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
-  width: 60%
+  width: 50%;
+  font-family:"Inter"
 }
 
 .plan-current-price {
+  font-size: 12px;
   font-weight: bold;
   line-height: 11px;
+  letter-spacing: -0.5px;
   color: var(--primary-text);
   display: flex;
   align-items: center;
@@ -662,9 +702,6 @@ button:disabled {
   text-decoration: line-through;
 }
 
-.plan-current-amount {
-  font-size: 10px;
-}
 
 .plan-current-currency {
   font-size: 14px;
@@ -696,8 +733,9 @@ button:disabled {
 .plan-item-controls {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 12px;
-  width: 32%
+  width: 50%
 }
 
 .header-right {
@@ -1045,22 +1083,6 @@ body.nav-hidden .fixed-bottom-bar {
   }
 
   .track-order-btn {
-    font-size: 12px;
-  }
-
-  .status-badge-pending {
-    font-size: 12px;
-  }
-
-  .status-badge-confirmed {
-    font-size: 12px;
-  }
-
-  .status-badge-skipped {
-    font-size: 12px;
-  }
-
-  .status-badge-canceled {
     font-size: 12px;
   }
 

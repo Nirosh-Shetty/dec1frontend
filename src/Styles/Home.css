@@ -1069,7 +1069,7 @@ body.nav-hidden .cartbtn {
 
   .mobile-product-box {
     display: block !important;
-    padding: 0 16px;
+    /* padding: 0 16px; */
     width: 100%;
     background: "#FFF8DC";
     padding-top: 16px;

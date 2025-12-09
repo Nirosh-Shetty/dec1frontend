@@ -74,23 +74,19 @@ import LeafWithLogo from "./Components/LeafWithLogo";
 import Validate from "./Components/Validate";
 // import { LoginPage } from "./Components/LoginPage";
 import ReferalZone from "./Components/ReferalScreen";
-import AdminFeedBack from './Components/Admin/AdminFeedBack'
 import AdminReferralDashboard from "./Components/Admin/AdminReferralDashboard";
 import LegalPage from "./Components/LegalPage";
 import AdminCategory from "./Components/Admin/AdminCategory";
 import PackerOrdersEnhanced from "./Components/Packer/Packers";
 import Location from "./Components/Location";
-import MenuUpload from "./Components/Admin/MenuUpload"
+import MenuUpload from "./Components/Admin/MenuUpload";
 import AddressManagement from "./Components/AddressManagement";
 import LocationRequest from "./Components/Admin/LocationRequest";
 import LocationConfirmationSimple from "./Components/CurrentLocation";
 import AdminOrderAssignment from "./Components/Admin/AdminOrderAssignment";
 import MyPlan from "./Components/MyPlan";
 import AdminPlanDashboard from "./Components/Admin/AdminPlanDashboard";
-
-
-
-
+import AdminFeedBack from "./Components/Admin/AdminFeedBack";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -164,7 +160,7 @@ function App() {
         <Routes>
           {/* <Route path="/" element={<LandingPage />} /> */}
           <Route path="/" element={<LeafWithLogo />} />
-           <Route path="/:referralCode" element={<LeafWithLogo />} />
+          <Route path="/:referralCode" element={<LeafWithLogo />} />
           <Route path="/otp-varification" element={<Validate />} />
           <Route
             path="/home"
@@ -198,7 +194,7 @@ function App() {
               </>
             }
           />
-              <Route
+          <Route
             path="/addresses"
             element={
               <>
@@ -212,7 +208,7 @@ function App() {
               </>
             }
           />
-            <Route
+          <Route
             path="/my-plan"
             element={
               <>
@@ -349,7 +345,8 @@ function App() {
           <Route
             path="admin/referral-dashboard"
             element={<Main children={<AdminReferralDashboard />} />}
-          /><Route
+          />
+          <Route
             path="admin/user-feedback"
             element={<Main children={<AdminFeedBack />} />}
           />
@@ -357,7 +354,7 @@ function App() {
             path="admin/myplan-dashboard"
             element={<Main children={<AdminPlanDashboard />} />}
           />
-            <Route
+          <Route
             path="admin/menu-upload"
             element={<Main children={<MenuUpload />} />}
           />
@@ -415,7 +412,7 @@ function App() {
             path="/corporate-booking-list"
             element={<Main children={<CorporateBookings />} />}
           />
-           <Route
+          <Route
             path="/corporate-booking-list-old"
             element={<Main children={<CorporateBookingsOld />} />}
           />
@@ -429,7 +426,10 @@ function App() {
           />
           <Route path="/webstory" element={<Main children={<WebStory />} />} />
           <Route path="/user-list" element={<Main children={<UserList />} />} />
-          <Route path="/category" element={<Main children={<AdminCategory />} />} />
+          <Route
+            path="/category"
+            element={<Main children={<AdminCategory />} />}
+          />
 
           <Route
             path="/admin-live-stream"
@@ -460,7 +460,7 @@ function App() {
             path="/location-add-request"
             element={<Main children={<LocationAddRequest />} />}
           />
-           <Route
+          <Route
             path="/location-request"
             element={<Main children={<LocationRequest />} />}
           />
@@ -499,14 +499,16 @@ function App() {
             element={<div>Profile Page (Placeholder)</div>}
           />
           <Route path="/location" element={<Location />} />
-          <Route path="/current-location" element={<LocationConfirmationSimple />} />
+          <Route
+            path="/current-location"
+            element={<LocationConfirmationSimple />}
+          />
           <Route path="/order-assignment" element={<AdminOrderAssignment />} />
-
 
           {/* Packer Routes */}
           <Route path="/packer-login" element={<PackerLogin />} />
           <Route path="/packers" element={<PackerOrdersEnhanced />} />
-          
+
           <Route path="/packer-dashboard" element={<PackerDashboard />} />
           <Route path="/packer-thermal-print" element={<MultipleInvoice />} />
 

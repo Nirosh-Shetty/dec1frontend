@@ -49,8 +49,8 @@
   opacity: 0.5;
   pointer-events: none;
   /* filter: none; */
-  filter: invert(60%) sepia(10%) saturate(0%) hue-rotate(180deg)
-    brightness(85%) contrast(85%);
+  filter: invert(60%) sepia(10%) saturate(0%) hue-rotate(180deg) brightness(85%)
+    contrast(85%);
 }
 
 /* Date scrolling strip */
@@ -91,11 +91,12 @@
 }
 
 .date-card.active {
-  font-family: 'inter', sans-serif;
+  font-family: "inter", sans-serif;
   background: var(--cuminBrown);
   color: #fff;
-  border: 2px solid var(--steel-light);
-  /* box-shadow: 0 3px 6px rgba(162, 83, 32, 0.3); */
+  border: 2px solid var(--steel-dark);
+  box-shadow: 0 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25);
 }
 
 .date-card.disabled {
@@ -105,7 +106,7 @@
   border-color: var(--secondary-text);
   cursor: not-allowed;
   /* opacity: 0.8; */
-  background-color: var(--steel-light)
+  background-color: var(--steel-light);
 }
 
 .date-card .day {
@@ -147,8 +148,21 @@
 .session-container {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
+  padding: 0px;
+  border-radius: 20px;
+  box-shadow: 0 5px 8px 0.5px rgba(55, 55, 55, 0.25);
+  /* margin-top: 16px; */
   /* gap: 10px; */
+}
+
+/* Make the session buttons stick to the top when scrolled into view */
+.date-session-wrapper .session-container {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 10; /* above most content */
+  background: inherit; /* keep wrapper background */
+  padding-top: 6px;
 }
 
 .session-btn-wrapper {
@@ -158,9 +172,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  padding: 9px 9px 0 9px;
+  /* border-top-left-radius: 10px;
+  border-top-right-radius: 10px; */
+  border-radius: 10px;
+  padding: 9px 9px 9px 9px;
   transition: all 0.5s;
   border-top: 2px solid transparent;
 }
@@ -168,6 +183,7 @@
 .session-btn-wrapper.active {
   background: var(--cream-walls);
   border-top: 2px solid var(--cuminBrown);
+  /* border-bottom: 2px solid var(--cuminBrown); */
 }
 
 .session-btn-wrapper.disabled {
@@ -181,15 +197,23 @@
   border: 1px solid var(--copper-accents);
   border-radius: 12px;
   text-align: center;
-  padding: 12px 10px;
+  /* padding: 12px 10px; */
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* gap:3px; */
+  flex-direction: column;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .session.active {
   background: var(--cuminBrown);
-  color: white;
+  color: var(--app-foreground);
   border: 2px solid var(--steel-light);
+  box-shadow: 0 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25);
 }
 
 .session.disabled {
@@ -200,7 +224,7 @@
   border-color: var(--secondary-text);
   cursor: not-allowed;
   /* opacity: 0.8; */
-  background-color: var(--steel-light)
+  background-color: var(--steel-light);
 }
 
 .session .title {
@@ -212,10 +236,11 @@
   font-size: 10px;
   opacity: 0.8;
   line-height: 12px;
+  margin-top: 0 !important;
 }
 
-.subtext.active{
-  color:var(--Primary-Text);
+.subtext.active {
+  color: var(--Primary-Text);
 }
 
 /* small visual hint when both sessions missing */
