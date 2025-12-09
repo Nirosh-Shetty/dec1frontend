@@ -84,7 +84,7 @@ const CorporateLayout = (props) => {
                 <div className="">
                   <a href="/corporate-dashboard" className="tail-text">
                     <img
-                      src="../Assets/dailydishlogo.jpeg"
+                      src="../assets/dailydishlogo.jpeg"
                       alt="Logo"
                       className="admin-logo-img"
                       style={{ width: "300px", height: "65px", padding: "5px" }}
@@ -238,7 +238,7 @@ const CorporateLayout = (props) => {
             
 
              <img
-              src="../Assets/user.png"
+              src="../assets/user.png"
               style={{ height: "50px", width: "50px" }}
             /> 
           </div> */}

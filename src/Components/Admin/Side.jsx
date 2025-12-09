@@ -150,7 +150,7 @@ const Side = () => {
                 <div className="">
                   <a href="/" className="tail-text">
                     <img
-                      src="../Assets/dailydishlogo.jpeg"
+                      src="../assets/dailydishlogo.jpeg"
                       alt="Logo"
                       className="admin-logo-img"
                       style={{ width: "300px", height: "65px", padding: "5px" }}

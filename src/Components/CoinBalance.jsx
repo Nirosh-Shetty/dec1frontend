@@ -4,7 +4,7 @@ import { Card, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../Styles/coin-balance.css";
 import { BiInfoCircle } from "react-icons/bi";
-import coinsgif from "./../Assets/coinsgif.gif";
+import coinsgif from "./../assets/coinsgif.gif";
 import moment from "moment";
 import { RxCross2 } from "react-icons/rx";
 

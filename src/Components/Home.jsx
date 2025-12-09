@@ -16,11 +16,11 @@ import RatingModal from "./RatingModal";
 import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
 import moment from "moment";
-import IsVeg from "../Assets/isVegYes.svg";
-import IsNonVeg from "../Assets/isVeg=no.svg";
+import IsVeg from "../assets/isVegYes.svg";
+import IsNonVeg from "../assets/isVeg=no.svg";
 import MultiCartDrawer from "./MultiCartDrawer";
 import DateSessionSelector from "./DateSessionSelector";
-import chef from "./../Assets/chef_3.png";
+import chef from "./../assets/chef_3.png";
 import { Colors, FontFamily } from "../Helper/themes";
 import BottomNav from "./BottomNav";
 

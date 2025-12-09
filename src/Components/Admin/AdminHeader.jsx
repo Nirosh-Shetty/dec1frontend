@@ -104,7 +104,7 @@ if(!admincheck){
             
 
              <img
-              src="../Assets/user.png"
+              src="../assets/user.png"
               style={{ height: "50px", width: "50px" }}
             /> 
           </div> */}

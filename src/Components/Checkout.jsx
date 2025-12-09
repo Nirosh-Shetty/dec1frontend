@@ -9,11 +9,11 @@ import axios from "axios";
 import { WalletContext } from "../WalletContext";
 import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
-import IsVeg from "../Assets/isVegYes.svg";
-import IsNonVeg from "../Assets/isVeg=no.svg";
+import IsVeg from "../assets/isVegYes.svg";
+import IsNonVeg from "../assets/isVeg=no.svg";
 import "../Styles/Normal.css";
 import { CircleCheck, ShieldAlert } from "lucide-react";
-import cross from "../Assets/cross.png";
+import cross from "../assets/cross.png";
 import LocationModal from "./LocationModal";
 
 // --- NEW: Import the new component and its CSS ---

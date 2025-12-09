@@ -11,7 +11,7 @@ import "../Styles/ReferScreen.css";
 
 // Add this line after your imports
 // Import animation data
-import referralAnimation from "../Assets/referral.json";
+import referralAnimation from "../assets/referral.json";
 axios.defaults.baseURL = "https://dd-merge-backend-2.onrender.com/api";
 
 export default function ReferScreen() {

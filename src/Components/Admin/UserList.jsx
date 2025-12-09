@@ -755,7 +755,7 @@ const UserList = () => {
                   <div className="order-icond-text d-flex">
                     <div className="col-md-2">
                       <img
-                        src="../Assets/leafies.jpg"
+                        src="../assets/leafies.jpg"
                         alt={item.name}
                         style={{ width: "90px", height: "80px" }}
                       />
