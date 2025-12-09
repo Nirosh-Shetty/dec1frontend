@@ -1503,7 +1503,7 @@ const MyPlan = () => {
                               alt=""
                               style={{ width: "15px", height: "15px" }}
                             />{" "}
-                            Payment Pending
+                            Pending
                           </div>
                         )}
                         {selectedTab === "upcoming" && (
