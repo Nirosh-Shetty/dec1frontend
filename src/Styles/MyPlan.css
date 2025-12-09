@@ -652,6 +652,7 @@ button:disabled {
 }
 
 .plan-item {
+  font-family: "Inter";
   padding-bottom: 6px;
   border-bottom: 0.1px solid #6b6b6b52;
   display: flex;
@@ -734,7 +735,7 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  /* gap: 12px; */
   width: 50%
 }
 
@@ -1078,17 +1079,17 @@ body.nav-hidden .fixed-bottom-bar {
 
 /* Mobile optimizations */
 @media screen and (max-width: 576px) {
-  .plan-card {
+  /* .plan-card {
     max-width: 370px;
-  }
+  } */
 
   .track-order-btn {
     font-size: 12px;
   }
 
-  .plan-item {
+  /* .plan-item {
     width: 350px;
-  }
+  } */
 
   .plan-item-controls {
     width: 50%;
