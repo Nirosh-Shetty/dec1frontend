@@ -27,13 +27,13 @@ import swal from "sweetalert";
 import { FaSquareWhatsapp } from "react-icons/fa6";
 import { WalletContext } from "../WalletContext";
 
-import Selectlocation from "../assets/selectlocation.svg";
-import UserIcons from "../assets/userp.svg";
-import clockone from "./../assets/mynaui_clock-one.png";
-import switch2 from "./../assets/switch.png";
+import Selectlocation from "../Assets/selectlocation.svg";
+import UserIcons from "../Assets/userp.svg";
+import clockone from "./../Assets/mynaui_clock-one.png";
+import switch2 from "./../Assets/switch.png";
 
-// import SearchIcon from "../assets/search.svg";
-// import Logo from "../assets/logo-container.svg";
+// import SearchIcon from "../Assets/search.svg";
+// import Logo from "../Assets/logo-container.svg";
 import UserBanner from "./UserBanner";
 import ProfileOffcanvas from "./Navbar2";
 import LocationModal from "./LocationModal";

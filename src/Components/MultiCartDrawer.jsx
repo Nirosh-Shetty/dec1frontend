@@ -4,7 +4,7 @@ import moment from 'moment';
 import { FaAngleUp, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import "../Styles/MultiCartDrawer.css";
-import MyMeal from "../assets/mymeal.svg";
+import MyMeal from "../Assets/mymeal.svg";
 import Swal2 from "sweetalert2";
 
 const MultiCartDrawer = ({

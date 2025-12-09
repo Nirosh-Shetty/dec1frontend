@@ -9,15 +9,15 @@
 //   FaPlus,
 //   FaTimesCircle,
 // } from "react-icons/fa";
-// import locationpng from "./../assets/deliverylocation.svg";
-// import homeimg from "./../assets/ion_home-outline.png";
-// import homeimg2 from "./../assets/ion_home-outline-white.svg";
-// import apartmentimg from "./../assets/apartment.png";
-// import apartmentimg2 from "./../assets/tabler_building-skyscraper-white.svg";
-// import workimg from "./../assets/streamline-ultimate_work-from-home-user-sofa.png";
-// import workimg2 from "./../assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
-// import schoolimg from "./../assets/streamline-ultimate-color_study-exam-math.png";
-// import schoolimg2 from "./../assets/streamline-ultimate-color_study-exam-math-white.png";
+// import locationpng from "./../Assets/deliverylocation.svg";
+// import homeimg from "./../Assets/ion_home-outline.png";
+// import homeimg2 from "./../Assets/ion_home-outline-white.svg";
+// import apartmentimg from "./../Assets/apartment.png";
+// import apartmentimg2 from "./../Assets/tabler_building-skyscraper-white.svg";
+// import workimg from "./../Assets/streamline-ultimate_work-from-home-user-sofa.png";
+// import workimg2 from "./../Assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
+// import schoolimg from "./../Assets/streamline-ultimate-color_study-exam-math.png";
+// import schoolimg2 from "./../Assets/streamline-ultimate-color_study-exam-math-white.png";
 // import "../Styles/wallet.css";
 // import "./AddressManagement.css";
 
@@ -648,15 +648,15 @@ import {
   FaPlus,
   FaTimesCircle,
 } from "react-icons/fa";
-import locationpng from "./../assets/deliverylocation.svg";
-import homeimg from "./../assets/ion_home-outline.png";
-import homeimg2 from "./../assets/ion_home-outline-white.svg";
-import apartmentimg from "./../assets/apartment.png";
-import apartmentimg2 from "./../assets/tabler_building-skyscraper-white.svg";
-import workimg from "./../assets/streamline-ultimate_work-from-home-user-sofa.png";
-import workimg2 from "./../assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
-import schoolimg from "./../assets/streamline-ultimate-color_study-exam-math.png";
-import schoolimg2 from "./../assets/streamline-ultimate-color_study-exam-math-white.png";
+import locationpng from "./../Assets/deliverylocation.svg";
+import homeimg from "./../Assets/ion_home-outline.png";
+import homeimg2 from "./../Assets/ion_home-outline-white.svg";
+import apartmentimg from "./../Assets/apartment.png";
+import apartmentimg2 from "./../Assets/tabler_building-skyscraper-white.svg";
+import workimg from "./../Assets/streamline-ultimate_work-from-home-user-sofa.png";
+import workimg2 from "./../Assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
+import schoolimg from "./../Assets/streamline-ultimate-color_study-exam-math.png";
+import schoolimg2 from "./../Assets/streamline-ultimate-color_study-exam-math-white.png";
 import "../Styles/wallet.css";
 import "./AddressManagement.css";
 

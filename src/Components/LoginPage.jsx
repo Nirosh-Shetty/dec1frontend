@@ -3,7 +3,7 @@
 import { BaseLogo } from "./BaseLogo";
 import { PhoneTypography } from "./PhoneTypography";
 // import image1 from "./image.svg";
-import levels from "../assets/leaf-banana.svg";
+import levels from "../Assets/leaf-banana.svg";
 // import marginLine from "./margin-line.svg";
 import "../Styles/login.css";
 

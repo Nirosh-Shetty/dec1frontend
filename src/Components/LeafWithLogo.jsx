@@ -3,15 +3,15 @@
 // import { motion, AnimatePresence } from "framer-motion";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // // import { faGoogle, faCcDiscover } from "@fortawesome/free-brands-svg-icons";
-// import Logo from "../assets/logo-container.svg";
-// // import LeafSvg from "../assets/leafbanana.svg";
+// import Logo from "../Assets/logo-container.svg";
+// // import LeafSvg from "../Assets/leafbanana.svg";
 // import { Colors } from "../Helper/themes";
 // import "../Styles/LeafWithLogo.css";
 // import Swal2 from "sweetalert2";
 // import axios from "axios";
 // import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-// import success from "./../assets/success-green.png";
-// import tasty from "./../assets/tasty.png";
+// import success from "./../Assets/success-green.png";
+// import tasty from "./../Assets/tasty.png";
 
 // const LOGO_BASE_W = 768;
 // const LOGO_BASE_H = 475;
@@ -537,14 +537,14 @@ import React, { useMemo, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Logo from "../assets/logo-container.svg";
+// import Logo from "../Assets/logo-container.png";
 import { Colors } from "../Helper/themes";
 import "../Styles/LeafWithLogo.css";
 import Swal2 from "sweetalert2";
 import axios from "axios";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import success from "./../assets/success-green.png";
-import tasty from "./../assets/tasty.png";
+import success from "./../Assets/success-green.png";
+import tasty from "./../Assets/tasty.png";
 
 const LOGO_BASE_W = 768;
 const LOGO_BASE_H = 475;
@@ -816,7 +816,7 @@ export default function LeafWithLogo() {
                 }}
               >
                 <img
-                  src={Logo}
+                  src={"../Assets/logo-container.png"}
                   width={LOGO_W}
                   height={LOGO_H}
                   alt="Logo"

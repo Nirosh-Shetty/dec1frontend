@@ -64,6 +64,7 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
       className="profile-offcanvas"
       style={{
         backgroundColor: "#F8F6F0",
+        zIndex:10000
       }}
     >
       <Offcanvas.Body className="p-0">

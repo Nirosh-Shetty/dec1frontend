@@ -722,19 +722,19 @@
 //   FaSearch,
 // } from "react-icons/fa";
 // import { CircleCheck } from "lucide-react";
-// import locationpng from "./../assets/deliverylocation.svg";
-// import homeimg from "./../assets/ion_home-outline.png";
-// import homeimg2 from "./../assets/ion_home-outline-white.svg";
-// import apartmentimg from "./../assets/apartment.png";
-// import apartmentimg2 from "./../assets/tabler_building-skyscraper-white.svg";
-// import workimg from "./../assets/streamline-ultimate_work-from-home-user-sofa.png";
-// import workimg2 from "./../assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
-// import schoolimg from "./../assets/streamline-ultimate-color_study-exam-math.png";
-// import schoolimg2 from "./../assets/streamline-ultimate-color_study-exam-math-white.png";
-// import cross from "./../assets/cross.png";
-// import spilt from "./../assets/spilt.png";
-// import secure from "./../assets/secure.png";
-// import warning from "./../assets/warning.png";
+// import locationpng from "./../Assets/deliverylocation.svg";
+// import homeimg from "./../Assets/ion_home-outline.png";
+// import homeimg2 from "./../Assets/ion_home-outline-white.svg";
+// import apartmentimg from "./../Assets/apartment.png";
+// import apartmentimg2 from "./../Assets/tabler_building-skyscraper-white.svg";
+// import workimg from "./../Assets/streamline-ultimate_work-from-home-user-sofa.png";
+// import workimg2 from "./../Assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
+// import schoolimg from "./../Assets/streamline-ultimate-color_study-exam-math.png";
+// import schoolimg2 from "./../Assets/streamline-ultimate-color_study-exam-math-white.png";
+// import cross from "./../Assets/cross.png";
+// import spilt from "./../Assets/spilt.png";
+// import secure from "./../Assets/secure.png";
+// import warning from "./../Assets/warning.png";
 
 // const LocationModal = ({ show, onClose }) => {
 //   const navigate = useNavigate();
@@ -2367,18 +2367,18 @@
 //   FaTimesCircle,
 // } from "react-icons/fa";
 // import { CircleCheck } from "lucide-react";
-// import locationpng from "./../assets/deliverylocation.svg";
-// import homeimg from "./../assets/ion_home-outline.png";
-// import homeimg2 from "./../assets/ion_home-outline-white.svg";
-// import apartmentimg from "./../assets/apartment.png";
-// import apartmentimg2 from "./../assets/tabler_building-skyscraper-white.svg";
-// import workimg from "./../assets/streamline-ultimate_work-from-home-user-sofa.png";
-// import workimg2 from "./../assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
-// import schoolimg from "./../assets/streamline-ultimate-color_study-exam-math.png";
-// import schoolimg2 from "./../assets/streamline-ultimate-color_study-exam-math-white.png";
-// import cross from "./../assets/cross.png";
-// import spilt from "./../assets/spilt.png";
-// import secure from "./../assets/secure.png";
+// import locationpng from "./../Assets/deliverylocation.svg";
+// import homeimg from "./../Assets/ion_home-outline.png";
+// import homeimg2 from "./../Assets/ion_home-outline-white.svg";
+// import apartmentimg from "./../Assets/apartment.png";
+// import apartmentimg2 from "./../Assets/tabler_building-skyscraper-white.svg";
+// import workimg from "./../Assets/streamline-ultimate_work-from-home-user-sofa.png";
+// import workimg2 from "./../Assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
+// import schoolimg from "./../Assets/streamline-ultimate-color_study-exam-math.png";
+// import schoolimg2 from "./../Assets/streamline-ultimate-color_study-exam-math-white.png";
+// import cross from "./../Assets/cross.png";
+// import spilt from "./../Assets/spilt.png";
+// import secure from "./../Assets/secure.png";
 
 // const LocationModal = ({ show, onClose }) => {
 //   const navigate = useNavigate();
@@ -4208,18 +4208,18 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import { CircleCheck } from "lucide-react";
-import locationpng from "./../assets/deliverylocation.svg";
-import homeimg from "./../assets/ion_home-outline.png";
-import homeimg2 from "./../assets/ion_home-outline-white.svg";
-import apartmentimg from "./../assets/apartment.png";
-import apartmentimg2 from "./../assets/tabler_building-skyscraper-white.svg";
-import workimg from "./../assets/streamline-ultimate_work-from-home-user-sofa.png";
-import workimg2 from "./../assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
-import schoolimg from "./../assets/streamline-ultimate-color_study-exam-math.png";
-import schoolimg2 from "./../assets/streamline-ultimate-color_study-exam-math-white.png";
-import cross from "./../assets/cross.png";
-import spilt from "./../assets/spilt.png";
-import secure from "./../assets/secure.png";
+import locationpng from "./../Assets/deliverylocation.svg";
+import homeimg from "./../Assets/ion_home-outline.png";
+import homeimg2 from "./../Assets/ion_home-outline-white.svg";
+import apartmentimg from "./../Assets/apartment.png";
+import apartmentimg2 from "./../Assets/tabler_building-skyscraper-white.svg";
+import workimg from "./../Assets/streamline-ultimate_work-from-home-user-sofa.png";
+import workimg2 from "./../Assets/streamline-ultimate_work-from-home-user-sofa-white.svg";
+import schoolimg from "./../Assets/streamline-ultimate-color_study-exam-math.png";
+import schoolimg2 from "./../Assets/streamline-ultimate-color_study-exam-math-white.png";
+import cross from "./../Assets/cross.png";
+import spilt from "./../Assets/spilt.png";
+import secure from "./../Assets/secure.png";
 
 const LocationModal = ({ show, onClose }) => {
   const navigate = useNavigate();
