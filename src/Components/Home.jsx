@@ -477,7 +477,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
-
+    console.log(storedCart)
     const addonedCarts = async () => {
       try {
         await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
