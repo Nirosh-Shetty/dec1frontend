@@ -23,6 +23,9 @@ import DateSessionSelector from "./DateSessionSelector";
 import chef from "./../assets/chef_3.png";
 import { Colors, FontFamily } from "../Helper/themes";
 import BottomNav from "./BottomNav";
+import LocationRequiredPopup from "./LocationRequiredPopup";
+import { MdAddLocationAlt } from "react-icons/md";
+
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const navigate = useNavigate();
@@ -61,6 +64,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     return "Lunch";
   });
 
+  // State for location popup
+  const [showLocationPopup, setShowLocationPopup] = useState(false);
+
   const handleSelectionChange = (date1, session1) => {
     console.log("Selection changed:", date1, session1);
     setSelectedDate(date1);
@@ -69,6 +75,18 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setSelectedCategory("All");
     window.scrollTo(0, 0);
   };
+
+  // Check if user is logged in but has no address selected
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && !address) {
+      // Show popup after a short delay to ensure page is loaded
+      const timer = setTimeout(() => {
+        setShowLocationPopup(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [address]);
 
   // --- 1. FETCH DATA (Only when Hub Changes) ---
   useEffect(() => {
@@ -2129,6 +2147,149 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           </div>
         </Drawer>
       </div>
+
+      {/* Location Selection Popup */}
+      <LocationRequiredPopup 
+        show={showLocationPopup} 
+        onClose={() => setShowLocationPopup(false)} 
+      />
+
+      {false && showLocationPopup && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 3000,
+            padding: "20px",
+          }}
+          onClick={() => setShowLocationPopup(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              padding: "24px",
+              maxWidth: "400px",
+              width: "100%",
+              textAlign: "center",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              animation: "modalFadeIn 0.3s ease-out",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                fontSize: "48px",
+                marginBottom: "16px",
+                color: "#6B8E23",
+              }}
+            >
+              <MdAddLocationAlt />
+            </div>
+            <h3
+              style={{
+                marginBottom: "12px",
+                color: "#333",
+                fontSize: "20px",
+                fontWeight: "600",
+                fontFamily: "Inter",
+              }}
+            >
+              Add Location to See Menu
+            </h3>
+            <p
+              style={{
+                marginBottom: "24px",
+                color: "#666",
+                fontSize: "14px",
+                lineHeight: "1.5",
+                fontFamily: "Inter",
+              }}
+            >
+              Please add your delivery location to view available menu items and place orders.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                marginTop: "12px",
+              }}
+            >
+              <button
+                onClick={() => {
+                  setShowLocationPopup(false);
+                  navigate("/location");
+                }}
+                style={{
+                  backgroundColor: "#6B8E23",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "14px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                  fontFamily: "Inter",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#5a7a1a";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#6B8E23";
+                }}
+              >
+                Add Location
+              </button>
+              <button
+                onClick={() => setShowLocationPopup(false)}
+                style={{
+                  backgroundColor: "transparent",
+                  color: "#666",
+                  border: "1px solid #ddd",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  fontFamily: "Inter",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#f5f5f5";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+
+          <style jsx>{`
+            @keyframes modalFadeIn {
+              from {
+                opacity: 0;
+                transform: scale(0.9);
+              }
+              to {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+          `}</style>
+        </div>
+      )}
+
       <BottomNav />
     </div>
   );

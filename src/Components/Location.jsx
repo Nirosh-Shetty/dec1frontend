@@ -15,7 +15,7 @@ import spilt from "./../assets/spilt.png";
 import secure from "./../assets/secure.png";
 import warning from "./../assets/warning.png";
 import axios from "axios";
-import { MdMyLocation } from "react-icons/md";
+import { MdAddLocationAlt, MdMyLocation } from "react-icons/md";
 import "./../Styles/Location.css";
 
 const LocationConfirmation = () => {
@@ -38,6 +38,9 @@ const LocationConfirmation = () => {
   // Location permission states
   const [showLocationPermission, setShowLocationPermission] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   // Address form state
   const [hub, setHub] = useState([]);
@@ -82,19 +85,71 @@ const LocationConfirmation = () => {
   const fixedPinRef = useRef(null);
   const fixedMessageRef = useRef(null);
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
+  const API_KEY = process.env.REACT_APP_MAP_KEY;
 
   // Track if we're editing an address
   const [isEditing, setIsEditing] = useState(false);
 
+  // Check if user is new (has no saved addresses)
+  const checkIfNewUser = useCallback(async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?._id) {
+        setIsNewUser(false);
+        return;
+      }
+
+      // Also check if there's already a primary address in localStorage
+      const primaryAddress = localStorage.getItem("primaryAddress");
+      const currentLocation = localStorage.getItem("currentLocation");
+      
+      if (primaryAddress || currentLocation) {
+        setIsNewUser(false);
+        return;
+      }
+
+      const response = await fetch(
+        `https://dd-merge-backend-2.onrender.com/api/User/customers/${user._id}/addresses`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        const hasAddresses = result.success && result.addresses && result.addresses.length > 0;
+        const isNew = !hasAddresses;
+        console.log("User address check:", { hasAddresses, isNew });
+        setIsNewUser(isNew);
+      } else {
+        console.log("API failed, assuming new user");
+        setIsNewUser(true); // Assume new user if API fails
+      }
+    } catch (error) {
+      console.error("Error checking user addresses:", error);
+      setIsNewUser(true); // Assume new user if error occurs
+    }
+  }, []);
+
   // Check location permission on component mount
   useEffect(() => {
     checkLocationPermission();
+    checkIfNewUser();
 
     // Prevent back navigation if location not confirmed
     const handleBackButton = (e) => {
-      if (!isConfirmed) {
-        e.preventDefault();
+      e.preventDefault();
+      
+      // If user is new (has no saved addresses) and hasn't saved any address, show confirmation modal
+      if (isNewUser) {
+        console.log("New user detected, showing back confirmation modal");
+        setShowBackConfirmModal(true);
+        // Push state again to prevent actual navigation
+        window.history.pushState(null, null, window.location.pathname);
+      } else {
+        // For existing users or confirmed locations, navigate normally
+        console.log("Existing user or has addresses, navigating to home");
         navigate("/home");
       }
     };
@@ -105,12 +160,18 @@ const LocationConfirmation = () => {
     return () => {
       window.removeEventListener("popstate", handleBackButton);
     };
-  }, [isConfirmed]);
+  }, [isConfirmed, isNewUser, checkIfNewUser, navigate]);
+
+  // Re-check new user status when component mounts or user changes
+  useEffect(() => {
+    checkIfNewUser();
+  }, [checkIfNewUser]);
 
   // Check location permission
   const checkLocationPermission = () => {
     if (!navigator.geolocation) {
       setLocationDenied(true);
+      setLocationPermissionDenied(true);
       setShowLocationPermission(true);
       return;
     }
@@ -121,6 +182,7 @@ const LocationConfirmation = () => {
       .then((result) => {
         if (result.state === "denied") {
           setLocationDenied(true);
+          setLocationPermissionDenied(true);
           setShowLocationPermission(true);
         } else if (result.state === "prompt") {
           setShowLocationPermission(true);
@@ -135,12 +197,14 @@ const LocationConfirmation = () => {
   // Handle allow location
   const handleAllowLocation = () => {
     setShowLocationPermission(false);
+    setLocationPermissionDenied(false); // Reset permission denied state
     getCurrentLocation();
   };
 
   // Handle deny location
   const handleDenyLocation = () => {
     setLocationDenied(true);
+    setLocationPermissionDenied(true);
     setShowLocationPermission(false);
     const defaultLocation = { lat: 40.7128, lng: -74.006 };
     setCurrentLocation(defaultLocation);
@@ -152,6 +216,7 @@ const LocationConfirmation = () => {
 
   const handleRetryLocation = () => {
     setShowLocationPermission(false);
+    setLocationPermissionDenied(false); // Reset permission denied state
 
     // First, ensure the script is loaded
     if (!scriptLoaded) {
@@ -532,14 +597,24 @@ const LocationConfirmation = () => {
         setCurrentLocation(location);
         setSelectedLocation(location);
         setLocationDenied(false);
+        setLocationPermissionDenied(false); // Reset permission denied state on success
 
         // Validate serviceability for current location
         validateServiceability(location);
       },
       (error) => {
         console.error("Error getting location:", error);
-        setError(`Unable to retrieve your location: ${error.message}`);
-        setLocationDenied(true);
+        
+        // Check if error is due to permission denied
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationPermissionDenied(true);
+          setLocationDenied(true);
+          setError("Location access denied by user");
+        } else {
+          // Other errors (timeout, unavailable, etc.) - don't show permission denied popup
+          setLocationDenied(true);
+          setError(`Unable to retrieve your location: ${error.message}`);
+        }
 
         const defaultLocation = { lat: 40.7128, lng: -74.006 };
         setCurrentLocation(defaultLocation);
@@ -685,10 +760,13 @@ const LocationConfirmation = () => {
             (error) => {
               console.error("Error getting location:", error);
 
-              // Show error - restore icon
-              alert(
-                "Unable to get your location. Please check location permissions."
-              );
+              // Check if error is due to permission denied
+              if (error.code === error.PERMISSION_DENIED) {
+                setLocationPermissionDenied(true);
+                alert("Location access denied. Please enable location permissions in your browser settings.");
+              } else {
+                alert("Unable to get your location. Please try again.");
+              }
 
               locationButton.innerHTML = `
           <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="24px" width="24px" xmlns="http://www.w3.org/2000/svg">
@@ -1516,6 +1594,9 @@ const LocationConfirmation = () => {
         // Update localStorage with the new primary address
         localStorage.setItem("primaryAddress", JSON.stringify(addressData));
 
+        // Update new user status since address was saved
+        setIsNewUser(false);
+
         navigate("/home", {
           state: {
             userLocation: selectedLocation,
@@ -1574,6 +1655,23 @@ const LocationConfirmation = () => {
     setShowAddressForm(false);
     setIsConfirmed(false);
   };
+
+  // Handle back confirmation - logout user
+  const handleConfirmGoBack = useCallback(() => {
+    // Clear all user data and logout
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Navigate to login/home page
+    navigate("/", { replace: true });
+  }, [navigate]);
+
+  // Handle cancel go back - close modal
+  const handleCancelGoBack = useCallback(() => {
+    setShowBackConfirmModal(false);
+    // Push state again to maintain the current page
+    window.history.pushState(null, null, window.location.pathname);
+  }, []);
 
   // Generate full address based on type
   const generateFullAddress = () => {
@@ -1930,9 +2028,14 @@ const LocationConfirmation = () => {
         },
         (error) => {
           console.error("Error getting current location:", error);
-          setError(
-            "Unable to detect your current location. Please make sure location services are enabled."
-          );
+          
+          // Check if error is due to permission denied
+          if (error.code === error.PERMISSION_DENIED) {
+            setLocationPermissionDenied(true);
+            setError("Location access denied. Please enable location permissions in your browser settings.");
+          } else {
+            setError("Unable to detect your current location. Please make sure location services are enabled.");
+          }
         },
         {
           enableHighAccuracy: true,
@@ -1990,7 +2093,8 @@ const LocationConfirmation = () => {
                 color: "#ff6b6b",
               }}
             >
-              📍
+                            <MdAddLocationAlt />
+              
             </div>
             <h3
               style={{
@@ -2049,7 +2153,7 @@ const LocationConfirmation = () => {
       )}
 
       {/* Location Denied Popup */}
-      {locationDenied && !showLocationPermission && (
+      {locationPermissionDenied && !showLocationPermission && (
         <div
           style={{
             position: "fixed",
@@ -3602,11 +3706,141 @@ const LocationConfirmation = () => {
         </div>
       )} */}
 
+      {/* Back Confirmation Modal for New Users */}
+      {showBackConfirmModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 3000,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              padding: "24px",
+              maxWidth: "400px",
+              width: "100%",
+              textAlign: "center",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              animation: "modalFadeIn 0.3s ease-out",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "48px",
+                marginBottom: "16px",
+                color: "#ff6b6b",
+              }}
+            >
+              ⚠️
+            </div>
+            <h3
+              style={{
+                marginBottom: "12px",
+                color: "#333",
+                fontSize: "20px",
+                fontWeight: "600",
+                fontFamily: "Inter",
+              }}
+            >
+              Are you sure you want to go back?
+            </h3>
+            <p
+              style={{
+                marginBottom: "24px",
+                color: "#666",
+                fontSize: "14px",
+                lineHeight: "1.5",
+                fontFamily: "Inter",
+              }}
+            >
+              You haven't added a delivery location yet. Going back will log you out and you'll need to sign in again.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                marginTop: "12px",
+              }}
+            >
+              <button
+                onClick={handleConfirmGoBack}
+                style={{
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "14px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                  fontFamily: "Inter",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#c82333";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#dc3545";
+                }}
+              >
+                Yes, Log me out
+              </button>
+              <button
+                onClick={handleCancelGoBack}
+                style={{
+                  backgroundColor: "#6B8E23",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "14px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                  fontFamily: "Inter",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#5a7a1a";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#6B8E23";
+                }}
+              >
+                No, Stay here
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>
         {`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+          }
+          
+          @keyframes modalFadeIn {
+            from {
+              opacity: 0;
+              transform: scale(0.9);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
           }
           
           /* Smooth transitions for map elements */
