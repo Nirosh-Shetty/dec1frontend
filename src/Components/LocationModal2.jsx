@@ -474,7 +474,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
         // Update UI immediately
         setPrimaryAddressId(address._id);
         localStorage.setItem("primaryAddress", JSON.stringify(address));
-
+        localStorage.removeItem("cart")
         // Update cache
         const cachedAddresses = localStorage.getItem(`addresses_${customerId}`);
         if (cachedAddresses) {

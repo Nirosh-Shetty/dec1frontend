@@ -25,13 +25,18 @@ export default function Validate() {
   const inputs = useRef([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
-
+useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.token) {
+        navigate("/home", { replace: true });
+    }
+}, [navigate]);
   const handleVerify = useCallback(
     async (code) => {
+      if (loader) return;
       setLoader(true);
       try {
         const capturedReferralCode = localStorage.getItem("referralCode");
-
         const payload = {
           Mobile: phone,
           otp: code,
@@ -114,9 +119,9 @@ export default function Validate() {
 
           setTimeout(() => {
             if (hasAddresses) {
-              window.location.replace("/home");
+              navigate("/home", { replace: true }); // replace: true prevents adding to history stack
             } else {
-              window.location.replace("/onboard");
+              navigate("/onboard", { replace: true });
             }
           }, 100);
           Swal2.fire({
