@@ -198,6 +198,7 @@ padding-bottom: 0 !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
+  z-index:10000
 }
 
 /* inner green pill inside the glass bar */
@@ -305,7 +306,7 @@ padding-bottom: 0 !important;
   .green-pill { padding: 8px; }
   .left-badge { padding: 6px 10px; font-size: 13px; }
   .pill-text { font-size: 13px; }
-  .all-slots-bubble { bottom: 9%; padding: 6px 10px; font-size: 13px; }
+  .all-slots-bubble { bottom: 14%; padding: 6px 10px; font-size: 13px; }
 }
 .mc-cartbtn *{
     font-family: 'Inter';

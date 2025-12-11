@@ -4353,23 +4353,34 @@ const getIndianTime = () => {
   return new Date(utc + istOffset * 60000);
 };
 
-// Get current session based on Indian time
+// Get current session based on Indian time with updated cutoff times
 const getCurrentSession = () => {
   const now = getIndianTime();
   const hours = now.getHours();
   const minutes = now.getMinutes();
   const currentTime = hours * 60 + minutes; // Convert to minutes for easier comparison
 
-  // Lunch session: 7:00 AM (420) to 3:30 PM (1050)
-  // Dinner session: 3:30 PM (1050) to 10:00 PM (1320)
-  if (currentTime >= 420 && currentTime < 1050) {
-    // 7:00 AM to 3:30 PM
+  // Updated cutoff times as per requirement:
+  // Lunch: Auto-selected until 3:00 PM IST (900 minutes)
+  // Dinner: Auto-selected after 3:30 PM IST (930 minutes)
+  const lunchCutoff = 15 * 60; // 3:00 PM IST (900 minutes)
+  const dinnerStart = 15 * 60 + 30; // 3:30 PM IST (930 minutes)
+  
+  console.log(`IST Time: ${hours}:${minutes.toString().padStart(2, '0')}, Total minutes: ${currentTime}`);
+  console.log(`Lunch cutoff: ${lunchCutoff}, Dinner start: ${dinnerStart}`);
+
+  if (currentTime < lunchCutoff) {
+    // Before 3:00 PM IST - Auto-select Lunch
+    console.log("Auto-selecting Lunch (before 3:00 PM IST)");
     return "Lunch";
-  } else if (currentTime >= 1050 && currentTime < 1320) {
-    // 3:30 PM to 10:00 PM
+  } else if (currentTime >= dinnerStart) {
+    // After 3:30 PM IST - Auto-select Dinner
+    console.log("Auto-selecting Dinner (after 3:30 PM IST)");
     return "Dinner";
   } else {
-    return "Dinner"; // Default to Dinner for other hours (10 PM to 7 AM)
+    // Between 3:00 PM and 3:30 PM IST - Transition period, default to Lunch
+    console.log("Transition period (3:00-3:30 PM IST), defaulting to Lunch");
+    return "Lunch";
   }
 };
 

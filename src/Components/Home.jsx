@@ -219,7 +219,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             flex-shrink: 0;
-            min-height: 40px;
+            min-height: 25px;
           }
           .tab-button:hover {
             background-color: ${Colors.warmbeige}40;
@@ -343,6 +343,20 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const onClose = () => {
     setOpen(false);
   };
+
+  // Add body class when drawer is open to control z-index of other elements
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add('drawer-open');
+    } else {
+      document.body.classList.remove('drawer-open');
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('drawer-open');
+    };
+  }, [open]);
   const [show4, setShow4] = useState(false);
   const handleClose4 = () => setShow4(false);
   const [show3, setShow3] = useState(false);
@@ -477,7 +491,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
-    console.log(storedCart)
+
     const addonedCarts = async () => {
       try {
         await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
@@ -1955,6 +1969,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           key="bottom"
           height={600}
           className="description-product"
+          style={{ zIndex: 99999 }}
+          zIndex={99999}
         >
           <div className="modal-container-food">
             <button className="custom-close-btn" onClick={onClose}>
@@ -2147,6 +2163,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           </div>
         </Drawer>
       </div>
+
+
 
       {/* Location Selection Popup */}
       <LocationRequiredPopup 

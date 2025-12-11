@@ -1505,12 +1505,60 @@ body.nav-hidden .cartbtn {
   position: relative !important;
 }
 
+.description-product{
+   z-index: 99999 !important;
+   position: relative !important;
+}
+
+/* Ensure Ant Design Drawer appears above BottomNav and DateSessionSelector */
+.ant-drawer.description-product {
+   z-index: 99999 !important;
+}
+
+.ant-drawer-content-wrapper.description-product {
+   z-index: 99999 !important;
+}
+
+.ant-drawer-body {
+   z-index: 99999 !important;
+}
+
+/* Force the drawer wrapper to have the highest z-index */
+.ant-drawer-wrapper-body {
+   z-index: 99999 !important;
+}
+
+/* Ensure the drawer mask also has high z-index */
+.ant-drawer-mask {
+   z-index: 99998 !important;
+}
+
+/* Override any conflicting z-index from other components */
+.description-product * {
+   position: relative;
+}
+
+/* When drawer is open, ensure it's above everything */
+body.drawer-open .bottom-nav-container {
+   z-index: 9997 !important;
+}
+
+body.drawer-open .sticky-menu-header {
+   z-index: 98 !important;
+}
+
+/* Additional specificity for drawer z-index */
+body.drawer-open .ant-drawer.description-product {
+   z-index: 99999 !important;
+}
+
 /* Modal container */
 .modal-container-food {
   position: relative;
   /* padding-top: 60px;
   padding-bottom: 60px; */
   min-height: 100%;
+  
 }
 
 /* Custom close button - Simple and smooth */

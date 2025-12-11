@@ -9,7 +9,7 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  z-index: 9999;
+  z-index: 9998;
   transition: transform 0.3s ease-in-out;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;

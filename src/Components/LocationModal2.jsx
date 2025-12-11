@@ -670,7 +670,7 @@ const LocationModal2 = ({ show, onClose, onAddressAdded }) => {
         right: 0,
         bottom: 0,
         backgroundColor: "rgba(0,0,0,0.5)",
-        zIndex: 1050,
+        zIndex: 10500,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
