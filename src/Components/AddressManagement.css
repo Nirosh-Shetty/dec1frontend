@@ -45,3 +45,14 @@
   background-color: #6B8E23 !important;
   color: white !important;
 }
+
+.no-hover-btn,
+.no-hover-btn:hover,
+.no-hover-btn:focus,
+.no-hover-btn:active,
+.no-hover-btn:visited {
+  background-color: #6B8E23 !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
