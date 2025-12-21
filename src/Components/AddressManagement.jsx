@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, Button, Spinner, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -561,8 +559,9 @@ const AddressManagement = () => {
             style={{
               display: "grid",
               display: window.innerWidth <= 768 ? "flex" : "grid",
-              flexWrap:window.innerWidth <= 768 ? "wrap" : "nowrap",
-              justifyContent:window.innerWidth <= 768 ? "flex-start" : "stretch",
+              flexWrap: window.innerWidth <= 768 ? "wrap" : "nowrap",
+              justifyContent:
+                window.innerWidth <= 768 ? "flex-start" : "stretch",
               alignItems: "stretch",
               gridTemplateColumns: "repeat(4, 1fr)",
               gap: "8px",
@@ -601,30 +600,24 @@ const AddressManagement = () => {
                   }}
                 />
                 <span
-                              style={{
-                                fontSize:
-                                  window.innerWidth <= 360
-                                    ? "10px"
-                                    : window.innerWidth <= 768
-                                    ? "11px"
-                                    : "14px",
-                                fontWeight: "500",
-                                fontFamily: "Inter",
-                                color:
-                                  selectedType === type.key ? "#fff" : "#000",
-                                textAlign: "center",
-                                lineHeight: "1.3",
-                                whiteSpace:
-                                  window.innerWidth <= 768
-                                    ? "nowrap"
-                                    : "normal",
-                                wordBreak:
-                                  window.innerWidth <= 768
-                                    ? "normal"
-                                    : "break-word",
-                                // padding: "0 4px",
-                              }}
-                            >
+                  style={{
+                    fontSize:
+                      window.innerWidth <= 360
+                        ? "10px"
+                        : window.innerWidth <= 768
+                        ? "11px"
+                        : "14px",
+                    fontWeight: "500",
+                    fontFamily: "Inter",
+                    color: selectedType === type.key ? "#fff" : "#000",
+                    textAlign: "center",
+                    lineHeight: "1.3",
+                    whiteSpace: window.innerWidth <= 768 ? "nowrap" : "normal",
+                    wordBreak:
+                      window.innerWidth <= 768 ? "normal" : "break-word",
+                    // padding: "0 4px",
+                  }}
+                >
                   {type.label}
                 </span>
               </button>
@@ -645,7 +638,7 @@ const AddressManagement = () => {
               <h5>No Addresses Saved</h5>
               <p className="text-muted">
                 Add your first delivery address to get started
-              </p> 
+              </p>
               <Button
                 variant="outline-success"
                 onClick={handleAddAddress}

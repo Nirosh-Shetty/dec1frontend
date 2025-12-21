@@ -1,5 +1,7 @@
+// ValidateModal.jsx - Complete component with border and box-shadow removed
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -10,27 +12,59 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp as faWhatsappBrand } from "@fortawesome/free-brands-svg-icons";
 import { Colors } from "../Helper/themes";
-import "../Styles/Validate.css"; // We'll create this CSS file
 import Swal2 from "sweetalert2";
 import axios from "axios";
+import "./../Styles/validateModal.css";
 
-export default function Validate() {
+const ValidateModal = ({
+  show,
+  onHide,
+  phone,
+  Fname,
+  onVerificationSuccess,
+}) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { phone, Fname } = location.state || {};
   const [loader, setLoader] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [countdown, setCountdown] = useState(15);
   const [currentInputIndex, setCurrentInputIndex] = useState(0);
   const inputs = useRef([]);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [modalHeight, setModalHeight] = useState("70vh");
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  // Check if user is already logged in (similar to Validate.jsx)
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.token) {
       navigate("/", { replace: true });
     }
   }, [navigate]);
+
+  // Handle keyboard visibility
+  useEffect(() => {
+    const handleResize = () => {
+      const visualViewport = window.visualViewport;
+      if (visualViewport) {
+        const heightReduction = window.innerHeight - visualViewport.height;
+        const isKeyboardOpen = heightReduction > 100;
+
+        setKeyboardVisible(isKeyboardOpen);
+
+        if (isKeyboardOpen) {
+          setModalHeight(`${visualViewport.height * 0.8}px`);
+        } else {
+          setModalHeight("70vh");
+        }
+      }
+    };
+
+    if (show && window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+      return () =>
+        window.visualViewport.removeEventListener("resize", handleResize);
+    }
+  }, [show]);
+
   const handleVerify = useCallback(
     async (code) => {
       if (loader) return;
@@ -65,10 +99,9 @@ export default function Validate() {
 
           if (capturedReferralCode) {
             localStorage.removeItem("referralCode");
-            console.log("Referral code used and cleared.");
           }
 
-          // ✅ Fix: Properly handle fetch response
+          // ✅ Fix: Properly handle fetch response (from Validate.jsx)
           if (userData?.primaryAddress) {
             try {
               const response = await fetch(
@@ -81,16 +114,11 @@ export default function Validate() {
 
               if (response.ok) {
                 const addressData = await response.json();
-                console.log(
-                  "Primary address set:",
-                  addressData?.primaryAddress
-                );
                 localStorage.setItem(
                   "primaryAddress",
                   JSON.stringify(addressData?.primaryAddress)
                 );
               } else {
-                console.warn("Failed to set primary address:", response.status);
                 // Don't crash if this fails - just use user data as fallback
                 localStorage.setItem(
                   "primaryAddress",
@@ -98,7 +126,6 @@ export default function Validate() {
                 );
               }
             } catch (fetchError) {
-              console.error("Error setting primary address:", fetchError);
               // Fallback to user data
               localStorage.setItem(
                 "primaryAddress",
@@ -113,17 +140,17 @@ export default function Validate() {
             );
           }
 
-          // ✅ Redirect logic based on address availability
+          // ✅ HAS ADDRESSES LOGIC ADDED HERE (from Validate.jsx)
           const hasAddresses =
             Array.isArray(userData.addresses) && userData.addresses.length > 0;
 
-          setTimeout(() => {
-            if (hasAddresses) {
-              navigate("/home", { replace: true });
-            } else {
-              navigate("/location", { replace: true });
-            }
-          }, 100);
+          // Notify parent component of successful verification
+          if (onVerificationSuccess) {
+            onVerificationSuccess({ userData, hasAddresses });
+          }
+
+          onHide(); // Close the modal
+
           Swal2.fire({
             toast: true,
             position: "bottom",
@@ -137,6 +164,126 @@ export default function Validate() {
               title: "me-small-toast-title",
             },
           });
+
+          // ✅ Check for post-login destination
+          const postLoginDestination = localStorage.getItem(
+            "postLoginDestination"
+          );
+          console.log(
+            "🔍 ValidateModal - postLoginDestination:",
+            postLoginDestination
+          );
+          console.log("🔍 ValidateModal - hasAddresses:", hasAddresses);
+
+          // ✅ Redirect logic based on address availability and intended destination
+          setTimeout(() => {
+            if (hasAddresses) {
+              // User has addresses
+              const primaryAddress = JSON.parse(
+                localStorage.getItem("primaryAddress") || "null"
+              );
+              const currentLocation = JSON.parse(
+                localStorage.getItem("currentLocation") || "null"
+              );
+
+              console.log("🔍 ValidateModal - primaryAddress:", primaryAddress);
+              console.log(
+                "🔍 ValidateModal - currentLocation:",
+                currentLocation
+              );
+
+              // Debug address fields
+              if (primaryAddress) {
+                console.log(
+                  "🔍 ValidateModal - primaryAddress.fullAddress:",
+                  primaryAddress.fullAddress
+                );
+                console.log(
+                  "🔍 ValidateModal - primaryAddress.address:",
+                  primaryAddress.address
+                );
+              }
+              if (currentLocation) {
+                console.log(
+                  "🔍 ValidateModal - currentLocation.fullAddress:",
+                  currentLocation.fullAddress
+                );
+                console.log(
+                  "🔍 ValidateModal - currentLocation.address:",
+                  currentLocation.address
+                );
+              }
+
+              // Prioritize primary address over pre-login location
+              if (primaryAddress) {
+                // User has primary address - use it and clear any pre-login location
+                console.log(
+                  "🔄 ValidateModal - Using primary address after login"
+                );
+
+                // Convert primary address to currentLocation format if needed
+                const locationData = {
+                  location: primaryAddress.location || {
+                    type: "Point",
+                    coordinates: [
+                      primaryAddress.lng || 0,
+                      primaryAddress.lat || 0,
+                    ],
+                  },
+                  fullAddress:
+                    primaryAddress.fullAddress || primaryAddress.address,
+                  hubName: primaryAddress.hubName || "",
+                  hubId: primaryAddress.hubId || "",
+                  isAutoDetected: false,
+                  timestamp: new Date().toISOString(),
+                };
+
+                localStorage.setItem(
+                  "currentLocation",
+                  JSON.stringify(locationData)
+                );
+                localStorage.setItem("locationManuallySelected", "true");
+
+                // Dispatch event to update other components
+                window.dispatchEvent(new Event("locationUpdated"));
+              }
+
+              // Re-check currentLocation after potential update
+              const updatedCurrentLocation = JSON.parse(
+                localStorage.getItem("currentLocation") || "null"
+              );
+
+              if (!primaryAddress && !updatedCurrentLocation) {
+                // Has addresses but none selected - go to location (keep destination for later)
+                console.log(
+                  "➡️ ValidateModal - Navigating to /location (no selected address)"
+                );
+                navigate("/location", { replace: true });
+              } else {
+                // Has address selected - check if user wants to proceed to MyPlan
+                if (postLoginDestination === "my-plan") {
+                  localStorage.setItem("triggerProceedToPlan", "true");
+                  localStorage.removeItem("postLoginDestination");
+                  console.log(
+                    "➡️ ValidateModal - Navigating to / (will auto-proceed to MyPlan)"
+                  );
+                  navigate("/", { replace: true });
+                } else {
+                  // Navigate to home normally for users with addresses
+                  console.log(
+                    "➡️ ValidateModal - User has addresses, navigating to home"
+                  );
+                  navigate("/", { replace: true });
+                }
+              }
+            } else {
+              // No addresses - go to location (destination will be handled there)
+              console.log(
+                "➡️ ValidateModal - Navigating to /location (no addresses)"
+              );
+              navigate("/location", { replace: true });
+            }
+          }, 100);
         }
       } catch (error) {
         setLoader(false);
@@ -159,9 +306,10 @@ export default function Validate() {
         });
       }
     },
-    [phone, Fname, navigate]
+    [phone, Fname, onVerificationSuccess, onHide, loader, navigate]
   );
 
+  // Countdown timer (from Validate.jsx)
   useEffect(() => {
     if (countdown === 0) return; // stop countdown
 
@@ -220,7 +368,7 @@ export default function Validate() {
     }
   };
 
-  // Enhanced paste handler for better mobile support
+  // Enhanced paste handler for better mobile support (from Validate.jsx)
   const handleInputPaste = async (e, idx) => {
     e.preventDefault();
     let pastedData = "";
@@ -302,7 +450,7 @@ export default function Validate() {
     }
   };
 
-  // Enhanced paste button click with better mobile support
+  // Enhanced paste button click with better mobile support (from Validate.jsx)
   const handlePasteButton = useCallback(async () => {
     try {
       let pastedData = "";
@@ -442,7 +590,7 @@ export default function Validate() {
     }
   }, [handleVerify]);
 
-  // Listen for backspace
+  // Listen for backspace (from Validate.jsx)
   const handleKeyDown = (e, idx) => {
     if (e.key === "Backspace") {
       e.preventDefault();
@@ -488,7 +636,7 @@ export default function Validate() {
     setCurrentInputIndex(idx);
   };
 
-  // Global paste handler and keyboard shortcuts
+  // Global paste handler and keyboard shortcuts - MOVED BELOW handleVerify
   useEffect(() => {
     const handleGlobalPaste = async (e) => {
       // Only handle paste if we're not already in an input
@@ -634,99 +782,322 @@ export default function Validate() {
   };
 
   return (
-    <div className="validate-container">
-      {/* Header */}
-      <div className="validate-header">
-        <button onClick={() => navigate(-1)} className="back-button">
-          <FontAwesomeIcon
-            icon={faArrowLeft}
-            size="lg"
-            height={24}
-            width={24}
-            className="back-button-icon"
-          />
-        </button>
-        <div className="header-center">
-          <h1 className="validate-title">OTP Verification</h1>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="validate-content">
-        <p className="validate-subtitle">
-          We have sent a One-Time Password to{" "}
-        </p>
-
-        <div className="phone-display">
-          <FontAwesomeIcon
-            icon={faWhatsappBrand}
-            className="whatsapp-icon"
-            color="#2C2C2C"
-          />
-          <span className="phone-number">+91 {phone}</span>
-        </div>
-
-        <div className="otp-container">
-          {otp.map((digit, i) => (
-            <input
-              key={i}
-              ref={(ref) => (inputs.current[i] = ref)}
-              className={`otp-input ${currentInputIndex === i ? "active" : ""}`}
-              type="text"
-              inputMode="numeric"
-              maxLength={i === 0 ? 6 : 1}
-              value={digit}
-              onChange={(e) => handleChange(e.target.value, i)}
-              onKeyDown={(e) => handleKeyDown(e, i)}
-              onPaste={(e) => handleInputPaste(e, i)}
-              onFocus={() => handleInputFocus(i)}
-              autoComplete="off"
-              placeholder="*"
+    <Modal
+      show={show}
+      onHide={onHide}
+      centered={false}
+      className="validate-modal-bottom"
+      dialogClassName="bottom-modal-dialog"
+      contentClassName="bottom-modal-content"
+      backdropClassName="validate-modal-backdrop"
+      animation={false}
+      style={{
+        position: "fixed",
+        zIndex: 9999999,
+      }}
+    >
+      <div
+        className="validate-container-modal"
+        style={{
+          backgroundColor: "#F8F6F0", // Beige/cream background
+          minHeight: modalHeight,
+          maxHeight: modalHeight,
+          overflowY: "auto",
+          borderRadius: "20px 20px 0 0",
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto",
+          paddingBottom: keyboardVisible ? "20px" : "0",
+        }}
+      >
+        {/* Header */}
+        <div
+          className="validate-header"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "10px 24px 12px 12px",
+            gap: "16px",
+            backgroundColor: "#F8F6F0", // Same beige/cream background
+            borderBottom: "0.4px solid #6B6B6B",
+            borderBottomLeftRadius: "24px",
+            borderBottomRightRadius: "24px",
+            flexShrink: 0,
+            boxShadow: "0 4px 6px rgba(107, 107, 107, 0.3)",
+            width: "100%",
+            margin: "0",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
+          <button
+            onClick={onHide}
+            className="back-button"
+            style={{
+              background: "none",
+              border: "none",
+              padding: "0",
+              cursor: "pointer",
+              color: "#2C2C2C",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "color 0.2s ease",
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faTimes}
+              size="lg"
+              height={24}
+              width={24}
+              className="back-button-icon"
+              style={{ color: "#2C2C2C", height: "36px", width: "36px" }}
             />
-          ))}
-        </div>
-
-        <div className="resend-section">
-          <span className="resend-text">Didn't get the OTP? </span>
-          <div className="resend-timer-wrapper">
-            {countdown > 0 ? (
-              <span className="resend-timer">
-                Resend it in{" "}
-                <span className="resend-countdown">{countdown}s</span>
-              </span>
-            ) : (
-              <button onClick={handleResendOTP} className="resend-button">
-                {loader ? (
-                  <FontAwesomeIcon
-                    icon={faSpinner}
-                    size="lg"
-                    color={Colors.warmWood}
-                    className="spinning"
-                  />
-                ) : (
-                  <span className="resend-now">Resend OTP</span>
-                )}
-              </button>
-            )}
+          </button>
+          <div
+            className="header-center"
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
+          >
+            <h1
+              className="validate-title"
+              style={{
+                fontSize: "20px",
+                fontWeight: "500",
+                lineHeight: "26px",
+                letterSpacing: "-1px",
+                color: "#2C2C2C",
+                margin: "0",
+              }}
+            >
+              OTP Verification
+            </h1>
           </div>
         </div>
 
-        {/* Paste Button */}
-        {/* <div className="paste-section">
-          <button onClick={handlePasteButton} className="paste-button">
-            <FontAwesomeIcon icon={faPaste} />
-            <span>Paste</span>
-          </button>
-        </div> */}
+        {/* Main Content */}
+        <div
+          className="validate-content"
+          style={{
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            width: "100%",
+            margin: "0",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+            position: "relative",
+            zIndex: 5,
+            backgroundColor: "#F8F6F0", // Same beige/cream background
+            flex: 1,
+          }}
+        >
+          <p
+            className="validate-subtitle"
+            style={{
+              fontSize: "16px",
+              fontWeight: "400",
+              lineHeight: "21px",
+              letterSpacing: "-0.8px",
+              color: "#2C2C2C",
+              textAlign: "center",
+              margin: "16px 0 8px 0",
+            }}
+          >
+            We have sent a One-Time Password to{" "}
+          </p>
 
-        {/* <button className="verify-button" onClick={handleVerify}>
-          <span className="verify-text">Verify</span>
-        </button>
+          <div
+            className="phone-display"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: "36px",
+              gap: "6px",
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faWhatsappBrand}
+              className="whatsapp-icon"
+              style={{ width: "24px", height: "24px", color: "#2C2C2C" }}
+            />
+            <span
+              className="phone-number"
+              style={{
+                fontSize: "16px",
+                fontWeight: "400",
+                lineHeight: "21px",
+                letterSpacing: "-0.8px",
+                color: "#2C2C2C",
+              }}
+            >
+              +91 {phone}
+            </span>
+          </div>
 
-        <button onClick={() => navigate(-1)} className="other-login-button">
-          <span className="other-login-text">Other login methods</span>
-        </button> */}
+          {/* OTP Input Section - Border and BoxShadow removed */}
+          <div
+            className="otp-container"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "24px 0",
+              gap: "12px",
+            }}
+          >
+            {otp.map((digit, i) => (
+              <input
+                key={i}
+                ref={(ref) => (inputs.current[i] = ref)}
+                className={`otp-input ${
+                  currentInputIndex === i ? "active" : ""
+                }`}
+                type="text"
+                inputMode="numeric"
+                maxLength={i === 0 ? 6 : 1}
+                value={digit}
+                onChange={(e) => handleChange(e.target.value, i)}
+                onKeyDown={(e) => handleKeyDown(e, i)}
+                onPaste={(e) => handleInputPaste(e, i)}
+                onFocus={() => handleInputFocus(i)}
+                autoComplete="off"
+                placeholder="*"
+                style={{
+                  display: "flex",
+                  width: "48px",
+                  height: "48px",
+                  padding: "10px 0",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: "8px",
+                  borderRadius: "16px",
+                  border: "none", // Removed border
+                  background: "#FAFAFA",
+                  padding: "10px 16px",
+                  color: "#2C2C2C",
+                  fontFamily: "Inter",
+                  fontSize: "22px",
+                  fontWeight: "700",
+                  lineHeight: "27px",
+                  letterSpacing: "-0.88px",
+                  cursor: "pointer",
+                  userSelect: "none",
+                  outline: "none",
+                  textAlign: "center",
+                  boxSizing: "border-box",
+                  ...(currentInputIndex === i && {
+                    transform: "scale(1.05)",
+                  }),
+                }}
+              />
+            ))}
+          </div>
+
+          <div
+            className="resend-section"
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              alignItems: "center",
+              marginBottom: "24px",
+              gap: "4px",
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              className="resend-text"
+              style={{
+                fontSize: "16px",
+                fontWeight: "500",
+                lineHeight: "21px",
+                letterSpacing: "-0.8px",
+                color: "#2C2C2C",
+              }}
+            >
+              Didn't get the OTP?{" "}
+            </span>
+            <div
+              className="resend-timer-wrapper"
+              style={{
+                minWidth: "130px",
+                display: "flex",
+                alignItems: "flex-start",
+              }}
+            >
+              {countdown > 0 ? (
+                <span
+                  className="resend-timer"
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "400",
+                    lineHeight: "18px",
+                    letterSpacing: "-0.7px",
+                    color: "#6B6B6B",
+                  }}
+                >
+                  Resend it in{" "}
+                  <span
+                    className="resend-countdown"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      lineHeight: "18px",
+                      letterSpacing: "-0.7px",
+                      color: "#6B6B6B",
+                    }}
+                  >
+                    {countdown}s
+                  </span>
+                </span>
+              ) : (
+                <button
+                  onClick={handleResendOTP}
+                  className="resend-button"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: "0",
+                    cursor: "pointer",
+                  }}
+                >
+                  {loader ? (
+                    <FontAwesomeIcon
+                      icon={faSpinner}
+                      spin
+                      style={{
+                        fontSize: "16px",
+                        color: "#2C2C2C",
+                      }}
+                    />
+                  ) : (
+                    <span
+                      className="resend-now"
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "400",
+                        lineHeight: "18px",
+                        letterSpacing: "-0.7px",
+                        color: "#6B6B6B",
+                      }}
+                    >
+                      Resend OTP
+                    </span>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </Modal>
   );
-}
+};
+
+export default ValidateModal;

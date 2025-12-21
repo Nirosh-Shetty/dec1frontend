@@ -111,7 +111,7 @@ const ViewPlanModal = ({
   // Find this function in MyPlan.jsx
   const handleAddMore = async () => {
     await handleSetPrimary(localPlan.addressId);
-    navigate("/home", {
+    navigate("/", {
       state: {
         targetDate: localPlan.deliveryDate,
         targetSession: localPlan.session,
@@ -1304,7 +1304,7 @@ const MyPlan = () => {
         }).then(() => {
           if (isModalOpen) closeModal();
           // fetchPlans(); // Refresh after closing modal
-          navigate("/home");
+          navigate("/");
         });
       } else {
         toast.error(err.response?.data?.message || "Failed to start payment");
@@ -1976,235 +1976,281 @@ const MyPlan = () => {
       </Modal>
       {/* Quick Answers modal (opened from header pending icon) */}
       <Modal
-  show={showQuickAnswers}
-  onHide={() => setShowQuickAnswers(false)}
-  centered
-  dialogClassName="quick-answers-modal"
-  style={{zIndex:"10000"}}
->
-  <Modal.Header closeButton>
-    <Modal.Title style={{ fontSize: 14, color: "#222", lineHeight: 1.5 }}>
-      🥗 Meal Planning — quick answers 📅🚚
-    </Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
-    <div style={{ fontSize: 14, color: "#222", lineHeight: 1.5 }}>
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        1. How do daily plans work?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        We show your Lunch and Dinner plans for Today, Tomorrow, and the
-        days ahead so you can confirm them whenever you're ready.
-      </p>
+        show={showQuickAnswers}
+        onHide={() => setShowQuickAnswers(false)}
+        centered
+        dialogClassName="quick-answers-modal"
+        style={{ zIndex: "10000" }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontSize: 14, color: "#222", lineHeight: 1.5 }}>
+            🥗 Meal Planning — quick answers 📅🚚
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
+          <div style={{ fontSize: 14, color: "#222", lineHeight: 1.5 }}>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              1. How do daily plans work?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              We show your Lunch and Dinner plans for Today, Tomorrow, and the
+              days ahead so you can confirm them whenever you're ready.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        2. Why do cutoff times matter?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        They tell you how long a plan stays at its lower pre-order price.
-        Cutoff times always apply to that plan's date, so there's no
-        confusion across days.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              2. Why do cutoff times matter?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              They tell you how long a plan stays at its lower pre-order price.
+              Cutoff times always apply to that plan's date, so there's no
+              confusion across days.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        3. What is "View Plan"?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        View Plan shows all details for that meal — items, bill,
-        discounts, and your wallet use. You can change items here and pay
-        any balance if needed.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              3. What is "View Plan"?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              View Plan shows all details for that meal — items, bill,
+              discounts, and your wallet use. You can change items here and pay
+              any balance if needed.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        4. Why confirm early?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        Early confirmations help us plan fresh batches and keep prices
-        low. Post that, plans are subject to availabilities. Lunch has a 6
-        AM cutoff for pre-order pricing (about 7 hours before delivery).
-        Dinner has a 3 PM same-day cutoff.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              4. Why confirm early?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              Early confirmations help us plan fresh batches and keep prices
+              low. Post that, plans are subject to availabilities. Lunch has a 6
+              AM cutoff for pre-order pricing (about 7 hours before delivery).
+              Dinner has a 3 PM same-day cutoff.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        5. What do "Pending" and "Confirmed" mean?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        Pending = Not paid yet. You can skip or ignore it anytime.
-        Confirmed = Paid and reserved for that day.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              5. What do "Pending" and "Confirmed" mean?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              Pending = Not paid yet. You can skip or ignore it anytime.
+              Confirmed = Paid and reserved for that day.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        6. Can I cancel a confirmed plan?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        Yes, up to 2 hours before the delivery window. We refund the full
-        amount to your wallet for future orders.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              6. Can I cancel a confirmed plan?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              Yes, up to 2 hours before the delivery window. We refund the full
+              amount to your wallet for future orders.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        7. What happens after I confirm?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        Your order is scheduled. We start processing it about an hour
-        before delivery and update you automatically. Once processing
-        begins, it can't be cancelled.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              7. What happens after I confirm?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              Your order is scheduled. We start processing it about an hour
+              before delivery and update you automatically. Once processing
+              begins, it can't be cancelled.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        8. How do discounts work?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        If a meal shows a pre-order price, confirm before the cutoff time
-        from the same date of order to get the lower price. After the
-        cutoff, the plan switches to the regular price.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              8. How do discounts work?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              If a meal shows a pre-order price, confirm before the cutoff time
+              from the same date of order to get the lower price. After the
+              cutoff, the plan switches to the regular price.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        9. Where does my refund go?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        All payments are safe. Refunds (when allowed) go to your wallet.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              9. Where does my refund go?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              All payments are safe. Refunds (when allowed) go to your wallet.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        10. Where can I see past orders?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        Delivered meals move to My Orders / Order History automatically.
-      </p>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              10. Where can I see past orders?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              Delivered meals move to My Orders / Order History automatically.
+            </p>
 
-      <h5 style={{ 
-        fontFamily: "'Inter', sans-serif", 
-        fontWeight: "bold", 
-        fontSize: "12px",
-        marginBottom: "4px",
-        marginTop: "16px"
-      }}>
-        11. What if I forget to confirm?
-      </h5>
-      <p style={{ 
-        fontStyle: "italic",
-        marginBottom: "8px"
-      }}>
-        Nothing happens. Your plan stays Pending — you won't be charged
-        unless you confirm.
-      </p>
-    </div>
-  </Modal.Body>
- <Modal.Footer style={{ 
-    display: "flex", 
-    justifyContent: "center", 
-    borderTop: "none",
-    paddingTop: "0"
-  }}>
-    <button
-      style={{ 
-        backgroundColor: "#6B8E23", 
-        border: "none", 
-        color: "white",
-        padding: "10px 24px",
-        borderRadius: "6px",
-        cursor: "pointer",
-        fontSize: "16px",
-        fontWeight: "600",
-        width: "120px"
-      }}
-      onClick={() => setShowQuickAnswers(false)}
-    >
-      Got it
-    </button>
-  </Modal.Footer>
-</Modal>
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              11. What if I forget to confirm?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                marginBottom: "8px",
+              }}
+            >
+              Nothing happens. Your plan stays Pending — you won't be charged
+              unless you confirm.
+            </p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            borderTop: "none",
+            paddingTop: "0",
+          }}
+        >
+          <button
+            style={{
+              backgroundColor: "#6B8E23",
+              border: "none",
+              color: "white",
+              padding: "10px 24px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "16px",
+              fontWeight: "600",
+              width: "120px",
+            }}
+            onClick={() => setShowQuickAnswers(false)}
+          >
+            Got it
+          </button>
+        </Modal.Footer>
+      </Modal>
 
       <BottomNav />
     </div>

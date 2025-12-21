@@ -750,6 +750,8 @@ const LocationConfirmationSimple = () => {
         // Save to localStorage in the exact format
         try {
           localStorage.setItem("currentLocation", JSON.stringify(locationData));
+          // Set manual location flag to prevent auto-detection
+          localStorage.setItem("locationManuallySelected", "true");
         } catch (storageError) {
           console.warn(
             "Failed to save location to localStorage:",
@@ -758,7 +760,8 @@ const LocationConfirmationSimple = () => {
         }
 
         // Navigate to home
-        navigate("/home");
+        // navigate("/home");
+        navigate("/");
       }
       // If location is not serviceable, show service request modal (same as location.jsx)
       else if (isServiceable === false) {
@@ -958,7 +961,7 @@ const LocationConfirmationSimple = () => {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
         backgroundColor: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",

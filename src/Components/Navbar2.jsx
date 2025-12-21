@@ -250,7 +250,7 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                 <NavItem
                   icon={<Lock size={20} />}
                   text="Login"
-                  onClick={() => handleLinkClick("/")}
+                  onClick={() => handleLinkClick("/login")}
                 />
                 <NavItem
                   icon={<Youtube size={20} />}

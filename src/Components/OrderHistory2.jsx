@@ -476,7 +476,7 @@ const OrderHistory = () => {
       <Container className="ordermain">
         <div className="mycart">
           <h5>My Orders </h5>
-          <a href="/home">
+          <a href="/">
             <RxCross2 style={{ fontSize: "18px" }} />
           </a>
         </div>

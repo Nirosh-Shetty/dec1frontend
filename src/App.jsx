@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -88,6 +89,8 @@ import MyPlan from "./Components/MyPlan";
 import AdminPlanDashboard from "./Components/Admin/AdminPlanDashboard";
 import AdminFeedBack from "./Components/Admin/AdminFeedBack";
 import OnboardScreen from "./Components/OnboardScreen";
+import UpdateLocation from "./Components/UpdateLocation";
+import SplashScreen from "./Components/SplashScreen";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -160,7 +163,11 @@ function App() {
         <ThemeColorHandler />
         <Routes>
           {/* <Route path="/" element={<LandingPage />} /> */}
-          <Route path="/" element={<LeafWithLogo />} />
+          <Route path="/login" element={<LeafWithLogo />} />
+             <Route path="/splash" element={<SplashScreen />} />
+          
+          {/* Redirect from root to splash, then splash redirects to home */}
+          <Route path="/" element={<Navigate to="/splash" replace />} />
           <Route path="/:referralCode" element={<LeafWithLogo />} />
           <Route path="/otp-varification" element={<Validate />} />
           <Route
@@ -501,7 +508,8 @@ function App() {
             path="/corporate/profile"
             element={<div>Profile Page (Placeholder)</div>}
           />
-          <Route path="/location" element={<Location />} />
+          {/* <Route path="/location" element={<Location />} /> */}
+          <Route path="/location" element={<UpdateLocation />} />
           <Route
             path="/current-location"
             element={<LocationConfirmationSimple />}

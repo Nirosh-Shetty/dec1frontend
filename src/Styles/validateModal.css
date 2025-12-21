@@ -1,0 +1,87 @@
+/* ValidateModal Styles */
+.validate-modal-bottom .modal-dialog {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  height: 70vh !important;
+  max-height: 70vh !important;
+  z-index: 9999999 !important;
+  transform: none !important;
+  transition: height 0.3s ease !important;
+}
+
+/* Remove white background from modal content */
+.validate-modal-bottom .modal-content {
+  border-radius: 20px 20px 0 0 !important;
+  border: none !important;
+  /* box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important; */
+  overflow: hidden !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 9999999 !important;
+  background-color: transparent !important; /* Remove white background */
+    max-width: 600px !important; /* Fixed max width */
+  margin: 0 auto !important; /* Center the content */
+ 
+}
+
+.validate-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  z-index: 9999998 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+/* Animation for slide up */
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.validate-modal-bottom.modal.show .modal-dialog {
+  animation: modalSlideUp 0.3s ease-out !important;
+  transform: translateY(0) !important;
+}
+
+/* Custom scrollbar for the modal */
+.validate-container-modal {
+  scrollbar-width: thin;
+  scrollbar-color: #6B8E23 #f1f1f1;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  background-color: #F8F6F0 !important; /* Ensure beige background */
+}
+
+.validate-container-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.validate-container-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.validate-container-modal::-webkit-scrollbar-thumb {
+  background: #6B8E23;
+  border-radius: 10px;
+}
+
+.validate-container-modal::-webkit-scrollbar-thumb:hover {
+  background: #556B1F;
+}
+
+/* Remove any remaining white backgrounds */
+.validate-header,
+.validate-content {
+  background-color: #F8F6F0 !important;
+}

@@ -61,7 +61,7 @@ const BottomNav = () => {
     if (user && !address) {
       setShowLocationPopup(true);
     } else {
-      navigate("/home");
+      navigate("/");
     }
   };
 
@@ -90,12 +90,12 @@ const BottomNav = () => {
      </div>
 
      {/* Location Selection Popup */}
-     <LocationRequiredPopup 
+     {/* <LocationRequiredPopup 
        show={showLocationPopup} 
        onClose={() => setShowLocationPopup(false)} 
-     />
+     /> */}
 
-     {false && showLocationPopup && (
+     {/* {false && showLocationPopup && (
        <div
          style={{
            position: "fixed",
@@ -230,7 +230,7 @@ const BottomNav = () => {
            }
          `}</style>
        </div>
-     )}
+     )} */}
     </div>
   );
 };

@@ -85,7 +85,7 @@ const PaymentSuccess = () => {
       setPaymentStatus("FAILED");
     } else {
       // No params? Probably manual navigation, go home
-      navigate("/home");
+      navigate("/");
     }
     // eslint-disable-next-line
   }, [transactionId, userId, code]);

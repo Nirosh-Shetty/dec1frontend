@@ -1,4 +1,11 @@
-import { useContext, useEffect, useMemo, useState, useRef } from "react";
+import {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { Container } from "react-bootstrap";
 import { FaEye, FaEyeSlash, FaLock, FaUser, FaAngleUp } from "react-icons/fa";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
@@ -26,7 +33,6 @@ import BottomNav from "./BottomNav";
 import LocationRequiredPopup from "./LocationRequiredPopup";
 import { MdAddLocationAlt } from "react-icons/md";
 
-
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,10 +47,61 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [isVegOnly, setIsVegOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const address = JSON.parse(
-    localStorage.getItem("primaryAddress") ??
-      localStorage.getItem("currentLocation")
-  );
+  const [address, setAddress] = useState(null);
+
+  useEffect(() => {
+    const primaryAddress = localStorage.getItem("primaryAddress");
+    const currentLocation = localStorage.getItem("currentLocation");
+
+    if (primaryAddress && primaryAddress !== "null") {
+      setAddress(JSON.parse(primaryAddress));
+    } else if (currentLocation && currentLocation !== "null") {
+      setAddress(JSON.parse(currentLocation));
+    }
+  }, []);
+
+  console.log(address, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+  // Add a function to refresh address from localStorage
+  const refreshAddress = () => {
+    const primaryAddress = localStorage.getItem("primaryAddress");
+    const currentLocation = localStorage.getItem("currentLocation");
+
+    if (primaryAddress) {
+      setAddress(JSON.parse(primaryAddress));
+    } else if (currentLocation) {
+      setAddress(JSON.parse(currentLocation));
+    } else {
+      setAddress(null);
+    }
+  };
+
+  // Listen for location updates from Banner
+  useEffect(() => {
+    const handleLocationUpdated = () => {
+      console.log("Location updated event received");
+      refreshAddress();
+    };
+
+    // Listen for custom event from Banner
+    window.addEventListener("locationUpdated", handleLocationUpdated);
+
+    // Also listen for localStorage changes
+    const handleStorageChange = (e) => {
+      if (e.key === "currentLocation" || e.key === "primaryAddress") {
+        refreshAddress();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("locationUpdated", handleLocationUpdated);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  // Removed: useEffect that depends on user - moved to after user declaration
 
   // --- DATE & SESSION STATE ---
   const getNormalizedToday = () => {
@@ -89,6 +146,42 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [address]);
 
   // --- 1. FETCH DATA (Only when Hub Changes) ---
+  // useEffect(() => {
+  //   if (!address || !address.hubId) {
+  //     setAllHubMenuData([]);
+  //     setloader(false);
+  //     return;
+  //   }
+
+  //   const fetchAllMenuData = async () => {
+  //     setloader(true);
+  //     try {
+  //       const res = await axios.get(
+  //         "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
+  //         {
+  //           params: {
+  //             hubId: address.hubId,
+  //           },
+  //         }
+  //       );
+
+  //       if (res.status === 200) {
+  //         setAllHubMenuData(res.data.menu);
+  //       } else {
+  //         setAllHubMenuData([]);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //       setAllHubMenuData([]);
+  //     } finally {
+  //       setloader(false);
+  //     }
+  //   };
+
+  //   fetchAllMenuData();
+  // }, [address?.hubId]);
+
+  // Update the fetch menu effect to depend on address?.hubId
   useEffect(() => {
     if (!address || !address.hubId) {
       setAllHubMenuData([]);
@@ -99,6 +192,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const fetchAllMenuData = async () => {
       setloader(true);
       try {
+        console.log("Fetching menu for hub:", address.hubId);
+
         const res = await axios.get(
           "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
           {
@@ -109,12 +204,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         );
 
         if (res.status === 200) {
+          console.log("Menu data received:", res.data.menu.length, "items");
           setAllHubMenuData(res.data.menu);
         } else {
           setAllHubMenuData([]);
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching menu:", error);
         setAllHubMenuData([]);
       } finally {
         setloader(false);
@@ -122,7 +218,35 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     };
 
     fetchAllMenuData();
-  }, [address?.hubId]);
+  }, [address?.hubId]); // This will re-run whenever hubId changes
+
+  const handleLocationDetected = useCallback(
+    (newLocation) => {
+      console.log("Location detected from Banner:", newLocation);
+
+      // Check if location was manually selected - don't override manual selection
+      const manualLocationFlag = localStorage.getItem(
+        "locationManuallySelected"
+      );
+      if (manualLocationFlag === "true") {
+        console.log(
+          "Location was manually selected, ignoring auto-detected location"
+        );
+        return;
+      }
+
+      setAddress(newLocation);
+
+      // Save to localStorage for persistence
+      if (newLocation) {
+        localStorage.setItem("currentLocation", JSON.stringify(newLocation));
+      }
+
+      // Dispatch event for other components
+      window.dispatchEvent(new Event("locationUpdated"));
+    },
+    [setAddress]
+  );
 
   // --- 2. CORE FILTERING LOGIC (The "Magic" Part) ---
 
@@ -347,14 +471,14 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // Add body class when drawer is open to control z-index of other elements
   useEffect(() => {
     if (open) {
-      document.body.classList.add('drawer-open');
+      document.body.classList.add("drawer-open");
     } else {
-      document.body.classList.remove('drawer-open');
+      document.body.classList.remove("drawer-open");
     }
-    
+
     // Cleanup on unmount
     return () => {
-      document.body.classList.remove('drawer-open');
+      document.body.classList.remove("drawer-open");
     };
   }, [open]);
   const [show4, setShow4] = useState(false);
@@ -366,27 +490,34 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const handleShow2 = () => setShow2(true);
 
   const user = JSON.parse(localStorage.getItem("user"));
+
+  // Refresh address when user logs in/out
+  useEffect(() => {
+    console.log("User state changed, refreshing address");
+    refreshAddress();
+  }, [user]);
+
   const addCart1 = async (item, checkOf, matchedLocation) => {
     const isPreOrder = isFutureDate(selectedDate);
-    if (!user) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Please login!`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-      });
-      setTimeout(() => {
-        navigate("/", { replace: true });
-      }, 1000);
-      return;
-    }
+    // if (!user) {
+    //   Swal2.fire({
+    //     toast: true,
+    //     position: "bottom",
+    //     icon: "info",
+    //     title: `Please login!`,
+    //     showConfirmButton: false,
+    //     timer: 3000,
+    //     timerProgressBar: true,
+    //     customClass: {
+    //       popup: "me-small-toast",
+    //       title: "me-small-toast-title",
+    //     },
+    //   });
+    //   setTimeout(() => {
+    //     navigate("/", { replace: true });
+    //   }, 1000);
+    //   return;
+    // }
 
     if (
       !isPreOrder &&
@@ -408,22 +539,22 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       return;
     }
 
-    if (checkOf && !user) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Please login!`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-      });
-      return;
-    }
+    // if (checkOf && !user) {
+    //   Swal2.fire({
+    //     toast: true,
+    //     position: "bottom",
+    //     icon: "info",
+    //     title: `Please login!`,
+    //     showConfirmButton: false,
+    //     timer: 3000,
+    //     timerProgressBar: true,
+    //     customClass: {
+    //       popup: "me-small-toast",
+    //       title: "me-small-toast-title",
+    //     },
+    //   });
+    //   return;
+    // }
 
     // determine applied price
     const eff = getEffectivePrice(item, matchedLocation, selectedSession, true);
@@ -861,7 +992,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [groupedCarts]);
   // console.log(address.location?.coordinates,'sfsdfdsf')
   const proceedToPlan = async () => {
+    console.log("🚀 proceedToPlan called");
+    console.log("🚀 user:", user);
+    console.log("🚀 Carts.length:", Carts.length);
+    console.log("🚀 address:", address);
+
     if (!user) {
+      console.log("❌ proceedToPlan - No user");
       Swal2.fire({
         toast: true,
         position: "bottom",
@@ -878,10 +1015,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       return;
     }
     if (Carts.length === 0) {
+      console.log("❌ proceedToPlan - No cart items");
       return;
     }
 
     if (!address) {
+      console.log("❌ proceedToPlan - No address");
       Swal2.fire({
         toast: true,
         position: "bottom",
@@ -897,6 +1036,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       });
       return;
     }
+    console.log("✅ proceedToPlan - All checks passed, proceeding...");
     setloader(true);
     try {
       const addressDetails = {
@@ -917,6 +1057,14 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         companyId: address.companyId || "",
       };
 
+      console.log("🚀 proceedToPlan - Making API call with:", {
+        userId: user._id,
+        mobile: user.Mobile,
+        username: user.Fname,
+        itemsCount: Carts.length,
+        addressDetails: addressDetails,
+      });
+
       const res = await axios.post(
         "https://dd-merge-backend-2.onrender.com/api/user/plan/add-to-plan",
         {
@@ -928,13 +1076,18 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         }
       );
 
+      console.log("🚀 proceedToPlan - API response:", res.status);
+
       if (res.status === 200) {
+        console.log(
+          "✅ proceedToPlan - Success! Clearing cart and navigating to /my-plan"
+        );
         localStorage.removeItem("cart");
         setCarts([]);
         navigate("/my-plan");
       }
     } catch (error) {
-      console.error(error);
+      console.error("❌ proceedToPlan - Error:", error);
     } finally {
       setloader(false);
     }
@@ -1213,9 +1366,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         if (!address) {
           handleClose2();
           handleClose3();
-          return navigate("/home");
+          return navigate("/");
         }
-        navigate("/home");
+        navigate("/");
         handleClose2();
         setOTP("");
         setMobile(" ");
@@ -1332,6 +1485,106 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     };
   }, [setCarts]);
 
+  // Check for triggerProceedToPlan flag after user adds address
+  useEffect(() => {
+    const shouldTriggerPlan = localStorage.getItem("triggerProceedToPlan");
+    console.log("🔍 Home - Checking triggerProceedToPlan:", shouldTriggerPlan);
+    console.log("🔍 Home - address:", address);
+    console.log("🔍 Home - Carts.length:", Carts.length);
+
+    if (shouldTriggerPlan === "true") {
+      // Also check localStorage directly in case Carts prop is not updated yet
+      const cartFromStorage = JSON.parse(localStorage.getItem("cart") || "[]");
+      console.log("🔍 Home - cartFromStorage.length:", cartFromStorage.length);
+
+      if (address && (Carts.length > 0 || cartFromStorage.length > 0)) {
+        console.log("🎯 Home - Triggering proceedToPlan automatically");
+        localStorage.removeItem("triggerProceedToPlan");
+        // Small delay to ensure everything is loaded
+        setTimeout(() => {
+          proceedToPlan();
+        }, 500);
+      } else {
+        console.log("⏳ Home - Waiting for address or cart items...");
+        // If we have the flag but missing address or cart, keep checking
+        if (!address) {
+          console.log("❌ Home - No address found");
+        }
+        if (Carts.length === 0 && cartFromStorage.length === 0) {
+          console.log("❌ Home - No cart items found in state or localStorage");
+        }
+      }
+    }
+
+    // REMOVED: Fallback logic that was auto-proceeding to MyPlan
+    // This was causing unwanted navigation to MyPlan when users added location after adding items
+    // Now MyPlan navigation only happens when user explicitly clicks "My Plan" button
+
+    // Clean up the justAddedAddress flag if it exists
+    if (sessionStorage.getItem("justAddedAddress") === "true") {
+      console.log("🧹 Home - Cleaning up justAddedAddress flag");
+      sessionStorage.removeItem("justAddedAddress");
+    }
+  }, [address, Carts]);
+
+  // Also check immediately on mount with a delay to handle timing issues
+  useEffect(() => {
+    const checkTriggerFlag = () => {
+      const shouldTriggerPlan = localStorage.getItem("triggerProceedToPlan");
+      if (shouldTriggerPlan === "true") {
+        console.log("🔍 Home - Found triggerProceedToPlan flag on mount");
+        // Set up a periodic check with multiple attempts
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const intervalCheck = setInterval(() => {
+          attempts++;
+          const currentAddress = JSON.parse(
+            localStorage.getItem("primaryAddress") ||
+              localStorage.getItem("currentLocation") ||
+              "null"
+          );
+          const currentCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+          console.log(
+            `🔍 Home - Attempt ${attempts} - address:`,
+            currentAddress
+          );
+          console.log(
+            `🔍 Home - Attempt ${attempts} - cart length:`,
+            currentCart.length
+          );
+
+          if (currentAddress && currentCart.length > 0) {
+            console.log(
+              "🎯 Home - Triggering proceedToPlan from periodic check"
+            );
+            localStorage.removeItem("triggerProceedToPlan");
+            clearInterval(intervalCheck);
+            proceedToPlan();
+          } else if (attempts >= maxAttempts) {
+            console.log("❌ Home - Max attempts reached, clearing flag");
+            localStorage.removeItem("triggerProceedToPlan");
+            clearInterval(intervalCheck);
+          }
+        }, 500); // Check every 500ms
+      }
+    };
+
+    // Initial check after a short delay
+    setTimeout(checkTriggerFlag, 100);
+
+    // TEMPORARY TEST: Add a manual trigger for testing
+    // You can remove this after testing
+    setTimeout(() => {
+      if (window.location.search.includes("testMyPlan=true")) {
+        console.log("🧪 TEST: Manually setting triggerProceedToPlan flag");
+        localStorage.setItem("triggerProceedToPlan", "true");
+        checkTriggerFlag();
+      }
+    }, 2000);
+  }, []);
+
   // Render DateSessionSelector inline (no JS sticky in Home)
   // The selector itself will handle sticky behavior if needed.
 
@@ -1343,9 +1596,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         <Banner
           Carts={Carts}
           getAllOffer={getAllOffer}
-          // Pass the toggle state and setter to Banner
           isVegOnly={isVegOnly}
           setIsVegOnly={setIsVegOnly}
+          onLocationDetected={handleLocationDetected} // Add this prop
         />
       </div>
 
@@ -2164,15 +2417,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         </Drawer>
       </div>
 
-
-
       {/* Location Selection Popup */}
-      <LocationRequiredPopup 
+      {/* <LocationRequiredPopup 
         show={showLocationPopup} 
         onClose={() => setShowLocationPopup(false)} 
-      />
+      /> */}
 
-      {false && showLocationPopup && (
+      {/* {false && showLocationPopup && (
         <div
           style={{
             position: "fixed",
@@ -2306,7 +2557,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             }
           `}</style>
         </div>
-      )}
+      )} */}
 
       <BottomNav />
     </div>

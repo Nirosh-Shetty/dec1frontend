@@ -38,7 +38,8 @@ const LocationConfirmation = () => {
   // Location permission states
   const [showLocationPermission, setShowLocationPermission] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
-  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
+  const [locationPermissionDenied, setLocationPermissionDenied] =
+    useState(false);
   const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
 
@@ -102,7 +103,7 @@ const LocationConfirmation = () => {
       // Also check if there's already a primary address in localStorage
       const primaryAddress = localStorage.getItem("primaryAddress");
       const currentLocation = localStorage.getItem("currentLocation");
-      
+
       if (primaryAddress || currentLocation) {
         setIsNewUser(false);
         return;
@@ -118,7 +119,8 @@ const LocationConfirmation = () => {
 
       if (response.ok) {
         const result = await response.json();
-        const hasAddresses = result.success && result.addresses && result.addresses.length > 0;
+        const hasAddresses =
+          result.success && result.addresses && result.addresses.length > 0;
         const isNew = !hasAddresses;
         console.log("User address check:", { hasAddresses, isNew });
         setIsNewUser(isNew);
@@ -140,7 +142,7 @@ const LocationConfirmation = () => {
     // Prevent back navigation if location not confirmed
     const handleBackButton = (e) => {
       e.preventDefault();
-      
+
       // If user is new (has no saved addresses) and hasn't saved any address, show confirmation modal
       if (isNewUser) {
         console.log("New user detected, showing back confirmation modal");
@@ -604,7 +606,7 @@ const LocationConfirmation = () => {
       },
       (error) => {
         console.error("Error getting location:", error);
-        
+
         // Check if error is due to permission denied
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermissionDenied(true);
@@ -763,7 +765,9 @@ const LocationConfirmation = () => {
               // Check if error is due to permission denied
               if (error.code === error.PERMISSION_DENIED) {
                 setLocationPermissionDenied(true);
-                alert("Location access denied. Please enable location permissions in your browser settings.");
+                alert(
+                  "Location access denied. Please enable location permissions in your browser settings."
+                );
               } else {
                 alert("Unable to get your location. Please try again.");
               }
@@ -1661,7 +1665,7 @@ const LocationConfirmation = () => {
     // Clear all user data and logout
     localStorage.clear();
     sessionStorage.clear();
-    
+
     // Navigate to login/home page
     navigate("/", { replace: true });
   }, [navigate]);
@@ -2028,13 +2032,17 @@ const LocationConfirmation = () => {
         },
         (error) => {
           console.error("Error getting current location:", error);
-          
+
           // Check if error is due to permission denied
           if (error.code === error.PERMISSION_DENIED) {
             setLocationPermissionDenied(true);
-            setError("Location access denied. Please enable location permissions in your browser settings.");
+            setError(
+              "Location access denied. Please enable location permissions in your browser settings."
+            );
           } else {
-            setError("Unable to detect your current location. Please make sure location services are enabled.");
+            setError(
+              "Unable to detect your current location. Please make sure location services are enabled."
+            );
           }
         },
         {
@@ -2093,8 +2101,7 @@ const LocationConfirmation = () => {
                 color: "#ff6b6b",
               }}
             >
-                            <MdAddLocationAlt />
-              
+              <MdAddLocationAlt />
             </div>
             <h3
               style={{
@@ -3764,7 +3771,8 @@ const LocationConfirmation = () => {
                 fontFamily: "Inter",
               }}
             >
-              You haven't added a delivery location yet. Going back will log you out and you'll need to sign in again.
+              You haven't added a delivery location yet. Going back will log you
+              out and you'll need to sign in again.
             </p>
             <div
               style={{

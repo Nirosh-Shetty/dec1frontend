@@ -2198,11 +2198,6 @@
 
 // export default DashboardPage;
 
-
-
-
-
-
 // import React, { useState, useEffect, useRef } from "react";
 // import { Link, useLocation, useNavigate } from "react-router-dom";
 // import {
@@ -4310,12 +4305,6 @@
 
 // export default DashboardPage;
 
-
-
-
-
-
-
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -4365,8 +4354,12 @@ const getCurrentSession = () => {
   // Dinner: Auto-selected after 3:30 PM IST (930 minutes)
   const lunchCutoff = 15 * 60; // 3:00 PM IST (900 minutes)
   const dinnerStart = 15 * 60 + 30; // 3:30 PM IST (930 minutes)
-  
-  console.log(`IST Time: ${hours}:${minutes.toString().padStart(2, '0')}, Total minutes: ${currentTime}`);
+
+  console.log(
+    `IST Time: ${hours}:${minutes
+      .toString()
+      .padStart(2, "0")}, Total minutes: ${currentTime}`
+  );
   console.log(`Lunch cutoff: ${lunchCutoff}, Dinner start: ${dinnerStart}`);
 
   if (currentTime < lunchCutoff) {

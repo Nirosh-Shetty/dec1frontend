@@ -361,6 +361,218 @@ html, body {
   }
   
   .otp-button {
-    width: 100%;
+    width: 30%;
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Enhanced CSS for keyboard handling */
+.signin-modal-bottom .modal-dialog {
+  position: fixed !important;
+  bottom: 0 !important;
+  margin: 0 auto !important; /* Add this for center alignment */
+  max-width: 100% !important;
+  width: 100% !important; /* Make it full width */
+  height: 70vh !important;
+  max-height: 70vh !important;
+  z-index: 9999999 !important;
+  transform: none !important;
+  transition: height 0.3s ease !important;
+  display: flex !important;
+  justify-content: center !important; /* Center horizontally */
+  align-items: flex-end !important; /* Align to bottom */
+}
+
+/* Center the content properly on larger screens */
+.signin-modal-bottom .modal-content {
+  border-radius: 20px 20px 0 0 !important;
+  border: none !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 9999999 !important;
+  width: 100% !important;
+  max-width: 600px !important; /* Fixed max width */
+  margin: 0 auto !important; /* Center the content */
+}
+
+/* Adjust height when keyboard is open */
+.keyboard-open .signin-modal-bottom .modal-dialog {
+  height: auto !important;
+  max-height: 90vh !important;
+  top: auto !important;
+  bottom: 0 !important;
+}
+
+/* Blurry backdrop effect */
+.signin-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important; /* Reduced opacity for better blur effect */
+  backdrop-filter: blur(100px) !important; /* Add blur effect */
+  -webkit-backdrop-filter: blur(10px) !important; /* Safari support */
+  z-index: 9999998 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(10px)) {
+  .signin-modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8) !important; /* Darker fallback */
+  }
+}
+
+/* Animation for slide up */
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.signin-modal-bottom.modal.show .modal-dialog {
+  animation: modalSlideUp 0.3s ease-out !important;
+  transform: translateY(0) !important;
+}
+
+/* Improved scroll behavior for keyboard */
+.login-container-modal {
+  scrollbar-width: thin;
+  scrollbar-color: #6B8E23 #f1f1f1;
+  -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
+  overscroll-behavior: contain !important; /* Prevent page scroll when modal is scrolling */
+}
+
+.login-container-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.login-container-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.login-container-modal::-webkit-scrollbar-thumb {
+  background: #6B8E23;
+  border-radius: 10px;
+}
+
+.login-container-modal::-webkit-scrollbar-thumb:hover {
+  background: #556B1F;
+}
+
+/* Input focus styles for better visibility */
+.customer-name-input:focus,
+.phone-input:focus {
+  border-color: #6B8E23 !important;
+  box-shadow: 0 0 0 3px rgba(107, 142, 35, 0.2) !important;
+  outline: none !important;
+}
+
+/* Prevent zoom on iOS inputs */
+@media screen and (max-width: 480px) {
+  .customer-name-input,
+  .phone-input {
+    font-size: 16px !important; /* Prevent iOS zoom */
+    max-height: 44px !important;
+  }
+  
+  input[type="tel"],
+  input[type="text"] {
+    font-size: 16px !important;
+  }
+  
+  .signin-modal-bottom .modal-dialog {
+    padding: 0 !important; /* Remove padding on mobile */
+  }
+}
+
+/* Responsive adjustments for keyboard */
+@media (max-width: 480px) {
+  .signin-modal-bottom .modal-dialog {
+    height: 75vh !important;
+    max-height: 75vh !important;
+  }
+  
+  /* When keyboard is open */
+  .keyboard-open .signin-modal-bottom .modal-dialog {
+    height: calc(100vh - 100px) !important; /* Adjust based on keyboard height */
+    max-height: calc(100vh - 100px) !important;
+  }
+  
+  .phone-row {
+    /* flex-direction: column !important; */
+    gap: 12px !important;
+  }
+  
+  .otp-button {
+    width: 30% !important;
+    margin-top: 8px !important;
+  }
+  
+  .customer-name-input {
+    width: 100% !important;
+  }
+  
+  /* Make inputs more touch-friendly */
+  .customer-name-input,
+  .input-group-phone {
+    min-height: 50px !important;
+    padding: 12px 16px !important;
+  }
+}
+
+/* Make sure modal takes full width on mobile */
+@media (max-width: 400px) {
+  .signin-modal-bottom .modal-dialog {
+    max-width: 100vw !important;
+  }
+  
+  .login-container-modal {
+    max-width: 100vw !important;
+  }
+}
+
+/* Center the modal properly on larger screens */
+@media (min-width: 401px) {
+  .signin-modal-bottom .modal-dialog {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+  }
+  
+  .signin-modal-bottom .modal-content {
+    margin: 0 auto !important;
+  }
+}
+
+/* Extra padding at bottom when keyboard is open */
+.keyboard-open .login-container-modal {
+  padding-bottom: 100px !important;
+}
+
+/* Ensure the modal stays centered on all screen sizes */
+.signin-modal-bottom {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-end !important;
 }
