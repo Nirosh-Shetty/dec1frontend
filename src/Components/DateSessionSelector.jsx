@@ -75,8 +75,9 @@ const DateSessionSelector = ({
     const key = dateToKeyUTC(dateObj);
     if (key !== todayUtcKey) return false;
     const hr = now().getHours();
-    if (session === "Lunch" && hr >= 24) return true; // block Lunch after 12:00 local
-    if (session === "Dinner" && hr >= 24) return true; // block Dinner after 19:00 local
+    const min = now().getMinutes();
+    if (session === "Lunch" && (hr > 8 || (hr === 8 && min >= 0))) return true; // block Lunch after 8:00am
+    if (session === "Dinner" && (hr > 16 || (hr === 16 && min >= 0))) return true; // block Dinner after 4:00pm
     return false;
   };
 
@@ -331,7 +332,7 @@ const DateSessionSelector = ({
                 currentSession === "Lunch" ? "active" : ""
               }`}
             >
-              Order before 12:00 PM
+              Order before 8:00 AM
             </div>
           </button>
         </div>
@@ -364,7 +365,7 @@ const DateSessionSelector = ({
                 currentSession === "Dinner" ? "active" : ""
               }`}
             >
-              Order before 07:00 PM
+              Order before 04:00 PM
             </div>
           </button>
         </div>

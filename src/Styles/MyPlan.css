@@ -372,7 +372,8 @@ button:disabled {
 
 .reminder-banner {
   color: var(--primary-text);
-  background: var(--turmeric-golden);
+  background: var(--cream-walls);
+  border: 2px solid var(--warm-beige);
   font-size: 10px;
   font-weight: 600;
   line-height: 11px;

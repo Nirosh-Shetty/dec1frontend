@@ -34,6 +34,40 @@ import LocationRequiredPopup from "./LocationRequiredPopup";
 import { MdAddLocationAlt } from "react-icons/md";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
+  // Store user in state to avoid infinite render loop
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  });
+
+  // Listen for user changes in localStorage
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === "user") {
+        try {
+          setUser(JSON.parse(e.newValue));
+        } catch {
+          setUser(null);
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  // Provide a function to update user state and localStorage together
+  const updateUser = (userObj) => {
+    setUser(userObj);
+    if (userObj) {
+      localStorage.setItem("user", JSON.stringify(userObj));
+    } else {
+      localStorage.removeItem("user");
+    }
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -135,7 +169,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   // Check if user is logged in but has no address selected
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
     if (user && !address) {
       // Show popup after a short delay to ensure page is loaded
       const timer = setTimeout(() => {
@@ -143,7 +176,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [address]);
+  }, [user, address]);
 
   // --- 1. FETCH DATA (Only when Hub Changes) ---
   // useEffect(() => {
@@ -394,38 +427,31 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const today = new Date();
     return !isSameDay(deliveryDate, today) && new Date(deliveryDate) > today;
   };
-  // Helper: determine if an item is preorder according to session cutoff rules
-  const isPreOrderFor = (deliveryDate, session) => {
-    if (!deliveryDate) return false;
+
+  // Helper: enforce cutoff for Lunch (8am) and Dinner (4pm)
+  const isBeforeCutoff = (deliveryDate, session) => {
+    if (!deliveryDate || !session) return false;
     const now = new Date();
     const delivery = new Date(deliveryDate);
+    delivery.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const delDay = new Date(delivery);
-    delDay.setHours(0, 0, 0, 0);
-
-    if (delDay.getTime() > today.getTime()) return true; // future date => preorder
-    if (delDay.getTime() < today.getTime()) return false; // past
-
-    // same day -> check cutoff by session
-    const s = (session || "").toLowerCase();
-    if (s === "lunch") {
-      // Preorder allowed until 6:00 AM
-      return now.getHours() < 6;
+    if (delivery.getTime() > today.getTime()) return true; // future date
+    if (delivery.getTime() < today.getTime()) return false; // past
+    if (session.toLowerCase() === "lunch") {
+      return now.getHours() < 8;
     }
-    if (s === "dinner") {
-      // Preorder allowed until 3:00 PM
-      return now.getHours() < 15;
+    if (session.toLowerCase() === "dinner") {
+      return now.getHours() < 16;
     }
     return false;
   };
 
-  // Helper: get effective hub/preorder price for display or calculations
+  // Helper: always use preorder price if available and before cutoff
   const getEffectivePrice = (
     item,
     matchedLocation,
-    session,
-    usePreorderIfAvailable = true
+    session
   ) => {
     const hubPrice =
       (matchedLocation &&
@@ -439,13 +465,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       item?.preOrderPrice ||
       item?.preorderPrice ||
       0;
-    const isPre = isPreOrderFor(
+    const beforeCutoff = isBeforeCutoff(
       item?.deliveryDate || item?.deliveryDateISO,
       session
     );
-    if (usePreorderIfAvailable && isPre && preOrderPrice > 0)
-      return { price: preOrderPrice, isPre };
-    return { price: hubPrice, isPre };
+    if (beforeCutoff && preOrderPrice > 0)
+      return { price: preOrderPrice };
+    return { price: hubPrice };
   };
 
   const [cartCount, setCartCount] = useState(0);
@@ -489,40 +515,33 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const handleClose2 = () => setShow2(false);
   const handleShow2 = () => setShow2(true);
 
-  const user = JSON.parse(localStorage.getItem("user"));
 
   // Refresh address when user logs in/out
   useEffect(() => {
     console.log("User state changed, refreshing address");
     refreshAddress();
-  }, [user]);
+  }, [user?._id]);
+
 
   const addCart1 = async (item, checkOf, matchedLocation) => {
-    const isPreOrder = isFutureDate(selectedDate);
-    // if (!user) {
-    //   Swal2.fire({
-    //     toast: true,
-    //     position: "bottom",
-    //     icon: "info",
-    //     title: `Please login!`,
-    //     showConfirmButton: false,
-    //     timer: 3000,
-    //     timerProgressBar: true,
-    //     customClass: {
-    //       popup: "me-small-toast",
-    //       title: "me-small-toast-title",
-    //     },
-    //   });
-    //   setTimeout(() => {
-    //     navigate("/", { replace: true });
-    //   }, 1000);
-    //   return;
-    // }
-
-    if (
-      !isPreOrder &&
-      (!matchedLocation || matchedLocation?.Remainingstock === 0)
-    ) {
+    // Enforce cutoff for adding to cart
+    if (!isBeforeCutoff(selectedDate, selectedSession)) {
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "info",
+        title: `Cutoff time passed. Cannot add to cart.`,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+      });
+      return;
+    }
+    if (!matchedLocation || matchedLocation?.Remainingstock === 0) {
       Swal2.fire({
         toast: true,
         position: "bottom",
@@ -557,7 +576,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     // }
 
     // determine applied price
-    const eff = getEffectivePrice(item, matchedLocation, selectedSession, true);
+    const eff = getEffectivePrice(item, matchedLocation, selectedSession);
     const appliedPrice = checkOf ? checkOf?.price : eff.price;
 
     const newCartItem = {
@@ -628,7 +647,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
-          lastUpdated: Date.now,
+          lastUpdated: Date.now(),
           username: user?.Fname,
           mobile: user?.Mobile,
         });
@@ -636,10 +655,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         console.log(error);
       }
     };
-    if (Carts && Carts.length > 0) {
+    if (Carts && Carts.length > 0 && user?._id) {
       addonedCarts();
     }
-  }, [JSON.stringify(Carts)]);
+  }, [JSON.stringify(Carts), user?._id]);
 
   const updateCartData = (updatedCart) => {
     console.log("Updating cart data:", updatedCart);
@@ -651,8 +670,24 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const increaseQuantity = (foodItemId, checkOf, item, matchedLocation) => {
     const maxStock = matchedLocation?.Remainingstock || 0;
     const selectedDateISO = selectedDate.toISOString();
-    const isPreOrder = isFutureDate(selectedDate);
+    // const isPreOrder = isFutureDate(selectedDate);
     if (!checkOf) {
+      if (!isBeforeCutoff(selectedDate, selectedSession)) {
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: `Cutoff time passed. Cannot increase quantity.`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
       const updatedCart = Carts.map((cartItem) => {
         if (
           cartItem.foodItemId === foodItemId &&
@@ -660,7 +695,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           cartItem.session === selectedSession &&
           !cartItem.extra
         ) {
-          if (isPreOrder || cartItem.Quantity < maxStock) {
+          if (cartItem.Quantity < maxStock) {
             return {
               ...cartItem,
               Quantity: cartItem.Quantity + 1,
@@ -684,7 +719,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         }
         return cartItem;
       });
-
       updateCartData(updatedCart);
     } else {
       const offerPr = Carts.find(
@@ -1348,7 +1382,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       };
       const res = await axios(config);
       if (res.status === 200) {
-        localStorage.setItem("user", JSON.stringify(res.data.details));
+        updateUser(res.data.details);
         Swal2.fire({
           toast: true,
           position: "bottom",
@@ -1371,7 +1405,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         navigate("/");
         handleClose2();
         setOTP("");
-        setMobile(" ");
+        setMobile("");
       }
     } catch (error) {
       Swal2.fire({
@@ -1403,15 +1437,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // Automatically remove today's Lunch/Dinner cart items after cutoff times
   useEffect(() => {
     if (!Carts || !setCarts) return;
-
     const toKey = (date) => new Date(date).toISOString().slice(0, 10);
     const cleanup = () => {
       const now = new Date();
       const todayKey = toKey(now);
-      const hr = now.getHours();
-
       let removed = [];
-
       const shouldRemove = (item) => {
         if (!item) return false;
         const dateVal =
@@ -1428,11 +1458,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         if (!dateVal || !sessionVal) return false;
         const itemKey = toKey(dateVal);
         if (itemKey !== todayKey) return false;
-        if (hr >= 19 && sessionVal.toLowerCase() === "dinner") return true;
-        if (hr >= 12 && sessionVal.toLowerCase() === "lunch") return true;
-        return false;
+        // Remove if after cutoff
+        return !isBeforeCutoff(dateVal, sessionVal);
       };
-
       const newCarts = [];
       Carts.forEach((it) => {
         if (shouldRemove(it)) {
@@ -1441,16 +1469,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           newCarts.push(it);
         }
       });
-
       if (removed.length > 0) {
         setCarts(newCarts);
       }
     };
-
     cleanup();
     const id = setInterval(cleanup, 60 * 5000);
     return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Carts, setCarts]);
 
   const lastCartRawRef = useRef(null);
@@ -1754,10 +1779,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
               <div className="row">
                 {/* RENDER THE FILTERED LIST */}
                 {finalDisplayItems?.map((item, i) => {
-                  const isPreOrder = isPreOrderFor(
-                    item?.deliveryDate || item?.deliveryDateISO,
-                    item?.session
-                  );
+                  // const isPreOrder = isPreOrderFor(
+                  //   item?.deliveryDate || item?.deliveryDateISO,
+                  //   item?.session
+                  // );
                   let matchedLocation = item.locationPrice?.[0];
                   const checkOf = AllOffer?.find(
                     (ele) => ele?.foodItemId == item?._id?.toString()
@@ -1906,19 +1931,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
                           {address && (
                             <div>
-                              {isPreOrder && (
-                                <div className="guaranteed-label">
-                                  Guaranteed Availability{" "}
-                                </div>
-                              )}
+                              {/* All orders are preorder only; remove isPreOrder/instant UI */}
                               {checkOf && <BiSolidOffer color="green" />}
-                              {!isPreOrder && (
-                                <div className="remaining-stock-label">
-                                  {`${
-                                    matchedLocation?.Remainingstock || 0
-                                  } servings Left`}
-                                </div>
-                              )}
                               {/* </div> */}
                             </div>
                           )}
@@ -1926,17 +1940,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           <div className="d-flex justify-content-center mb-2">
                             {getCartQuantity(item?._id) === 0 ? (
                               // Item not in cart
-                              address &&
-                              !isPreOrder &&
-                              (matchedLocation?.Remainingstock <= 0 ||
-                                !matchedLocation?.Remainingstock) ? (
-                                // Sold Out Button
-                                <button className="sold-out-btn" disabled>
-                                  <span className="sold-out-btn-text">
-                                    Sold Out
-                                  </span>
-                                </button>
-                              ) : gifUrl === "Closed.gif" ? (
+                              address && gifUrl === "Closed.gif" ? (
                                 <button
                                   className="add-to-cart-btn-disabled"
                                   disabled
@@ -1958,25 +1962,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                     opacity: user && !address ? 0.5 : 1,
                                   }}
                                 >
-                                  {isPreOrder ? (
-                                    <div className="pick-btn-text">
-                                      <span className="pick-btn-text1">
-                                        PICK
-                                      </span>
-                                      <span className="pick-btn-text2">
-                                        {`for ${new Date(
-                                          item.deliveryDate
-                                        ).toLocaleDateString("en-GB", {
-                                          day: "2-digit",
-                                          month: "short",
-                                        })}`}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <span className="add-to-cart-btn-text">
-                                      Add
-                                    </span>
-                                  )}
+                                  <span className="add-to-cart-btn-text">
+                                    Add
+                                  </span>
 
                                   <span className="add-to-cart-btn-icon">
                                     {" "}
@@ -2027,15 +2015,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 >
                                   <FaPlus />
                                 </div>
-                              </button>
-                            ) : !isPreOrder &&
-                              (matchedLocation?.Remainingstock <= 0 ||
-                                !matchedLocation?.Remainingstock) ? (
-                              // Sold Out button (for items in cart but quantity is 0)
-                              <button className="sold-out-btn" disabled>
-                                <span className="sold-out-btn-text">
-                                  Sold Out
-                                </span>
                               </button>
                             ) : gifUrl === "Closed.gif" ? (
                               <button className="add-to-cart-btn" disabled>
@@ -2299,10 +2278,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
                   const stockCount = matchedLocation?.Remainingstock || 0;
 
-                  const isPreOrderDrawer = isPreOrderFor(
-                    foodData?.deliveryDate || foodData?.deliveryDateISO,
-                    foodData?.session
-                  );
+                  // const isPreOrderDrawer = isPreOrderFor(
+                  //   foodData?.deliveryDate || foodData?.deliveryDateISO,
+                  //   foodData?.session
+                  // );
 
                   return (
                     <>
@@ -2327,8 +2306,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                   style={{ marginRight: "5px" }}
                                 />
                               )}{" "}
-                              {!isPreOrderDrawer &&
-                                `${stockCount} servings left!`}
+                              {/* {!isPreOrderDrawer &&
+                                `${stockCount} servings left!`} */}
                             </>
                           ) : (
                             "Sold Out"

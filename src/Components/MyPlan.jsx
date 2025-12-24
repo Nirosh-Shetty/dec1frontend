@@ -63,13 +63,21 @@ const ViewPlanModal = ({
     // setDeliveryNotes(plan.deliveryNotes || "");
   }, [plan]);
 
+  // Only allow editing if before cutoff (8am Lunch, 4pm Dinner)
+  function getCutoffTime(deliveryDate, session) {
+    const cutoff = new Date(deliveryDate);
+    if (session === "Lunch") {
+      cutoff.setHours(8, 0, 0, 0);
+    } else {
+      cutoff.setHours(16, 0, 0, 0);
+    }
+    return cutoff;
+  }
+
+  const now = new Date();
+  const cutoffTime = getCutoffTime(localPlan.deliveryDate, localPlan.session);
   const isEditable =
-    localPlan.status === "Pending Payment" &&
-    new Date() < new Date(localPlan.paymentDeadline);
-  // compute stored preorderCutoff if available for UI hints
-  const localPreorderCutoff = localPlan.preorderCutoff
-    ? new Date(localPlan.preorderCutoff)
-    : null;
+    localPlan.status === "Pending Payment" && now < cutoffTime;
 
   async function changeQuantity(foodItemId, delta) {
     if (!isEditable) return;
@@ -210,35 +218,29 @@ const ViewPlanModal = ({
   // Payable amount after wallet deduction
   const payableAmount = Math.max(
     0,
-    (localPlan.slotTotalAmount || 0) - walletDeduction
+    (localPlan.slotTotalAmount || 0) - walletDeduction - (localPlan.preorderDiscount || 0)
   );
-
+ 
   if (!isOpen || !localPlan) return null;
 
   const toggleBillingDetails = () => setIsBillingOpen((p) => !p);
 
-  const now = new Date();
-  const deadline = localPlan.paymentDeadline
-    ? new Date(localPlan.paymentDeadline)
-    : null;
-
-  const isBeforeDeadline = deadline ? now < deadline : true;
+  // Payment/editing allowed only before cutoff
   const isUnpaidEditable =
-    localPlan.status === "Pending Payment" && isBeforeDeadline;
-  const isPaidEditable = localPlan.status === "Confirmed" && isBeforeDeadline;
-  const isPaidLocked = localPlan.status === "Confirmed" && !isBeforeDeadline;
+    localPlan.status === "Pending Payment" && now < cutoffTime;
+  const isPaidEditable = localPlan.status === "Confirmed" && now < cutoffTime;
+  const isPaidLocked = localPlan.status === "Confirmed" && now >= cutoffTime;
 
-  const getTimeRemainingToDeadline = () => {
-    if (!deadline) return { days: 0, hours: 0 };
-    const diff = deadline - now;
-    if (diff <= 0) return { days: 0, hours: 0 };
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    return { days, hours };
+  const getTimeRemainingToCutoff = () => {
+    const diff = cutoffTime - now;
+    if (diff <= 0) return { days: 0, hours: 0, mins: 0, isExpired: true };
+    const totalMinutes = Math.floor(diff / (1000 * 60));
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const mins = totalMinutes % 60;
+    return { days, hours, mins, isExpired: false };
   };
-
-  const { days, hours } = getTimeRemainingToDeadline();
+  const { days, hours, mins, isExpired } = getTimeRemainingToCutoff();
 
   const handleSkipOrCancel = async () => {
     try {
@@ -453,18 +455,17 @@ const ViewPlanModal = ({
                         </div>
                       </div>
                       <div className="price-container vertical">
-                        {localPlan.orderType === "PreOrder" && (
-                          <div className="plan-actual-price">
-                            <div className="plan-current-currency">
-                              <div className="current-currency-text">₹</div>
-                            </div>
-                            <div className="plan-hub-amount">
-                              <div className="hub-amount-text">
-                                {product.hubTotalPrice?.toFixed(0)}
-                              </div>
+                        {/* Always show preorder price, as only preorder is allowed */}
+                        <div className="plan-actual-price">
+                          <div className="plan-current-currency">
+                            <div className="current-currency-text">₹</div>
+                          </div>
+                          <div className="plan-hub-amount">
+                            <div className="hub-amount-text">
+                              {product.hubTotalPrice?.toFixed(0)}
                             </div>
                           </div>
-                        )}
+                        </div>
                         <div className="plan-current-price">
                           <div className="plan-current-currency">
                             <div className="current-currency-text"></div>
@@ -596,7 +597,7 @@ const ViewPlanModal = ({
                 </div>
 
                 {/* Change Button */}
-                {/* <div className="change-button">
+                <div className="change-button">
                   <div className="change-icon">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -624,7 +625,7 @@ const ViewPlanModal = ({
                       </span>
                     </div>
                   </div>
-                </div> */}
+                </div>
               </div>
 
               <img className="separator-line" src={myplanseparator} alt="" />
@@ -751,13 +752,18 @@ const ViewPlanModal = ({
               <span>Total Order value</span>
               <span> ₹{localPlan?.slotTotalAmount}</span>
             </div>
-            {localPlan.orderType === "PreOrder" && (
+            <div className="billing-details-row">
+              <span>Pre-Order Savings</span>
+              <span>
+                - ₹
+                {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount}
+              </span>
+            </div>
+            {/* Show preorder discount if present and > 0 */}
+            {(localPlan.preorderDiscount && localPlan.preorderDiscount > 0) && (
               <div className="billing-details-row">
-                <span>Pre-Order Savings</span>
-                <span>
-                  - ₹
-                  {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount}
-                </span>
+                <span>Preorder Discount</span>
+                <span style={{ color: '#388e3c', fontWeight: 600 }}>- ₹{localPlan.preorderDiscount || 0}</span>
               </div>
             )}
             <div className="billing-details-row">
@@ -978,39 +984,19 @@ const MyPlan = () => {
     // Normalize to start of the day in local time
     deliveryDate.setHours(0, 0, 0, 0);
 
-    // Prefer stored cutoff/deadline if they exist on the plan document
-    let targetTime = null;
-    if (plan.orderType === "PreOrder") {
-      if (plan.preorderCutoff) {
-        targetTime = new Date(plan.preorderCutoff);
-      } else {
-        targetTime = new Date(deliveryDate.getTime());
-        if (plan.session === "Lunch") targetTime.setHours(6, 0, 0, 0);
-        else targetTime.setHours(15, 0, 0, 0);
-      }
-    } else {
-      // Instant / after cutoff → prefer stored paymentDeadline for visual
-      if (plan.paymentDeadline) {
-        targetTime = new Date(plan.paymentDeadline);
-      } else {
-        targetTime = new Date(deliveryDate.getTime());
-        if (plan.session === "Lunch") targetTime.setHours(12, 0, 0, 0);
-        else targetTime.setHours(19, 0, 0, 0);
-      }
-    }
+    // Only use cutoff time for all plans (preorder only)
+    let targetTime = new Date(deliveryDate.getTime());
+    if (plan.session === "Lunch") targetTime.setHours(8, 0, 0, 0);
+    else targetTime.setHours(16, 0, 0, 0);
 
     const diffMs = targetTime.getTime() - now.getTime();
-
     if (diffMs <= 0) {
       return { days: 0, hours: 0, mins: 0, isExpired: true };
     }
-
-    // Work purely in minutes to avoid float mess
     const totalMinutes = Math.floor(diffMs / (1000 * 60));
     const days = Math.floor(totalMinutes / (60 * 24));
     const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
     const mins = totalMinutes % 60;
-
     return {
       days,
       hours,
@@ -1578,25 +1564,29 @@ const MyPlan = () => {
                                   } ${hours}h ${mins}m`}
                             </div>
                           )} */}
-                          {isUnpaidEditable &&
-                            !isExpired &&
-                            plan.orderType === "PreOrder" && (
-                              <div className="d-flex gap-1">
-                                <img
-                                  src={discount}
-                                  alt=""
-                                  style={{ width: "15px", height: "15px" }}
-                                />
-                                <div className="reminder-banner">
-                                  {`Before ${
-                                    plan.session === "Lunch" ? "6AM" : "3PM"
-                                  }, pay ₹ ${(
-                                    plan.slotHubTotalAmount -
-                                    plan.slotTotalAmount
-                                  ).toFixed(0)} less`}
-                                </div>
+                          {isUnpaidEditable && !isExpired && (
+                            <div className="d-flex gap-1">
+                              {/* <img
+                                src={discount}
+                                alt=""
+                                style={{ width: "15px", height: "15px" }}
+                              /> */}
+                              <div className="reminder-banner">
+                                {`Confirm before ${
+                                  plan.session === "Lunch" ? "8AM" : "4PM"
+                                }`}
                               </div>
-                            )}
+                              {/* <div className="reminder-banner">
+                                {`Before ${
+                                  plan.session === "Lunch" ? "8AM" : "4PM"
+                                }, pay ₹ ${(
+                                  plan.slotHubTotalAmount -
+                                  plan.slotTotalAmount
+                                ).toFixed(0)} less
+                                `}
+                              </div> */}
+                            </div>
+                          )}
                           {isUnpaidEditable && (
                             <button
                               className="pay-btn"
@@ -1617,47 +1607,22 @@ const MyPlan = () => {
                                   </span>
                                 </div>
                               )} */}
-                              {plan.orderType === "PreOrder" ? (
-                                <div className="price-pill">
-                                  {plan.slotHubTotalAmount ===
-                                  plan.slotTotalAmount ? (
-                                    // Show only one price without strikethrough when amounts are equal
-                                    <span>
+                              <div className="price-pill">
+                                {plan.slotHubTotalAmount === plan.slotTotalAmount ? (
+                                  <span>
+                                    ₹{plan.slotTotalAmount?.toFixed(0)}
+                                  </span>
+                                ) : (
+                                  <div className="d-flex gap-2 align-items-center">
+                                    <span className="actuall-amount d-flex align-items-center">
+                                      ₹{plan.slotHubTotalAmount?.toFixed(0)}
+                                    </span>
+                                    <span className="pre-order-amount">
                                       ₹{plan.slotTotalAmount?.toFixed(0)}
                                     </span>
-                                  ) : (
-                                    // Show both prices with strikethrough for the higher one
-                                    <div className="d-flex gap-2 align-items-center">
-                                      <span className="actuall-amount d-flex align-items-center">
-                                        ₹{plan.slotHubTotalAmount?.toFixed(0)}
-                                      </span>
-                                      <span className="pre-order-amount">
-                                        ₹{plan.slotTotalAmount?.toFixed(0)}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="price-pill">
-                                  {plan.slotHubTotalAmount ===
-                                  plan.slotTotalAmount ? (
-                                    // Show only one price without strikethrough when amounts are equal
-                                    <span>
-                                      ₹{plan.slotTotalAmount?.toFixed(0)}
-                                    </span>
-                                  ) : (
-                                    // Show both prices with strikethrough for the higher one
-                                    <div className="d-flex gap-2 align-items-center">
-                                      <span className="actuall-amount align-items-center">
-                                        ₹{plan.slotHubTotalAmount?.toFixed(0)}
-                                      </span>
-                                      <span className="pre-order-amount">
-                                        ₹{plan.slotTotalAmount?.toFixed(0)}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
+                                  </div>
+                                )}
+                              </div>
                             </button>
                           )}
                         </div>
@@ -2158,9 +2123,7 @@ const MyPlan = () => {
                 marginBottom: "8px",
               }}
             >
-              If a meal shows a pre-order price, confirm before the cutoff time
-              from the same date of order to get the lower price. After the
-              cutoff, the plan switches to the regular price.
+              You must confirm and pay before the cutoff time: 8am for Lunch, 4pm for Dinner. After the cutoff, you cannot edit or pay for the plan.
             </p>
 
             <h5
