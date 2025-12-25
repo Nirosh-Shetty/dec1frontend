@@ -931,7 +931,11 @@ const handleAddressChange = async() => {
         onClose={() => setShowAddMoreModal(false)}
         planId={localPlan._id}
         userId={userId}
-        onItemsUpdated={() => {
+        onItemsUpdated={(updatedPlan) => {
+          // Update localPlan immediately with fresh data from backend
+          if (updatedPlan) {
+            setLocalPlan(updatedPlan);
+          }
           setShowAddMoreModal(false);
           if (onPlanUpdated) onPlanUpdated();
         }}

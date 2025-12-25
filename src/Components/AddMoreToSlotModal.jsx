@@ -80,7 +80,8 @@ const AddMoreToSlotModal = ({
 
       if (response.data.success) {
         toast.success("Items updated successfully!");
-        onItemsUpdated && onItemsUpdated();
+        // Pass the updated plan back to parent
+        onItemsUpdated && onItemsUpdated(response.data.data);
         onClose();
       }
     } catch (err) {
@@ -174,6 +175,17 @@ const AddMoreToSlotModal = ({
 
                 {/* Quantity Controls */}
                 <div className="add-more-quantity-control">
+                    {quantities[item._id]==0?
+                    <button className="add-btn"
+                    onClick={() =>
+                      handleQuantityChange(
+                        item._id,
+                         1
+                      )
+                    }>
+                        Add
+                    </button>
+                    : <>
                   <button
                     className="qty-btn"
                     onClick={() =>
@@ -205,6 +217,8 @@ const AddMoreToSlotModal = ({
                   >
                     +
                   </button>
+                  </>}
+                
                 </div>
               </div>
             ))}

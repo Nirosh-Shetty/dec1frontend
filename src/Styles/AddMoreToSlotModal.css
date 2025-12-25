@@ -1,15 +1,17 @@
+/* --- Overlay & Modal Container --- */
 .add-more-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6); /* Slightly darker for better focus */
   display: flex;
-  align-items: flex-end;
+  align-items: center; /* Center on desktop */
   justify-content: center;
   z-index: 10000;
   padding: 20px;
+  backdrop-filter: blur(2px); /* Modern frosted glass effect */
 }
 
 .add-more-modal-content {
@@ -17,84 +19,93 @@
   border-radius: 16px;
   width: 100%;
   max-width: 600px;
-  max-height: 90vh;
+  height: 80vh; /* Fixed height for consistency */
+  max-height: 800px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Smoother animation */
+  overflow: hidden; /* Contains children */
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* Header */
+/* --- Header --- */
 .add-more-modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-shrink: 0;
+  background: #fff;
 }
 
 .add-more-modal-header h3 {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
-  color: #2c2c2c;
+  font-weight: 700;
+  color: #1a1a1a;
 }
 
 .close-btn {
-  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f5f5f5;
+  transition: background 0.2s;
 }
+.close-btn:active { background: #e0e0e0; }
 
-/* Items List */
+/* --- Items List (Scrollable Area) --- */
 .add-more-items-list {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* Smooth scrolling for iOS */
+  -webkit-overflow-scrolling: touch; 
 }
 
+/* --- Item Card --- */
 .add-more-item-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border: 1px solid #e8e8e8;
+  align-items: stretch; /* Ensure equal height */
+  padding: 10px;
+  border: 1px solid #eee;
   border-radius: 12px;
-  background: #f9f9f9;
-  transition: all 0.2s ease;
+  background: #fff;
+  transition: transform 0.2s ease, border-color 0.2s;
 }
 
-.add-more-item-card:hover {
+/* Focus state for accessibility/active touch */
+.add-more-item-card:focus-within {
   border-color: #6b8e23;
-  background: #fafbf8;
+  background: #fcfdf9;
 }
 
 .add-more-item-info {
   display: flex;
   gap: 12px;
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* Prevents flex items from overflowing */
 }
 
+/* Image - Fixed Size */
 .add-more-item-image {
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
+  background: #f0f0f0;
 }
 
 .add-more-item-image img {
@@ -103,229 +114,241 @@
   object-fit: cover;
 }
 
+/* Details */
 .add-more-item-details {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center; /* Center content vertically */
+  min-width: 0;
 }
 
 .add-more-item-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start; /* Align top in case name wraps */
+  gap: 6px;
   margin-bottom: 4px;
 }
 
 .add-more-veg-icon {
   width: 14px;
   height: 14px;
+  margin-top: 3px; /* Align with text baseline */
+  flex-shrink: 0;
 }
 
 .add-more-item-name {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: #2c2c2c;
-  white-space: nowrap;
+  color: #333;
+  line-height: 1.3;
+  /* Limit to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .add-more-item-category {
-  margin: 2px 0 4px 0;
+  margin: 0 0 6px 0;
   font-size: 12px;
-  color: #666;
+  color: #888;
 }
 
 .add-more-item-prices {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
 }
 
 .add-more-price-preorder {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #6b8e23;
 }
 
 .add-more-price-original {
   font-size: 12px;
-  color: #999;
+  color: #aaa;
   text-decoration: line-through;
 }
 
-/* Quantity Control */
+/* --- Quantity Control --- */
 .add-more-quantity-control {
   display: flex;
+  flex-direction: column; /* Stack vert on desktop if needed, or row */
   align-items: center;
-  gap: 4px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 4px;
+  justify-content: center;
+  margin-left: 8px;
   flex-shrink: 0;
 }
 
+/* The Pill Shape Container */
+.qty-pill {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
 .qty-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: none;
-  background: #f0f0f0;
-  color: #333;
+  background: #fff;
+  color: #6b8e23;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.1s;
 }
 
-.qty-btn:hover {
-  background: #6b8e23;
-  color: white;
-}
+.qty-btn:active { background: #f0f0f0; }
 
 .qty-input {
-  width: 40px;
-  height: 30px;
+  width: 30px;
+  height: 32px;
   border: none;
   text-align: center;
   font-size: 14px;
   font-weight: 600;
-  background: transparent;
   color: #333;
+  background: #fff;
+  padding: 0;
 }
 
-.qty-input:focus {
-  outline: none;
+/* Remove Arrows from Number Input */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
+.qty-input { -moz-appearance: textfield; }
 
-/* Empty State */
-.add-more-empty-state {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #999;
-  font-size: 14px;
-  padding: 40px 20px;
-  text-align: center;
-}
 
-/* Loading State */
-.add-more-loading {
+/* --- Loading & Empty States --- */
+.add-more-loading, .add-more-empty-state {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 40px 20px;
+  gap: 15px;
+  padding: 40px;
+  color: #888;
 }
 
-.add-more-loading .spinner-border {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: #6b8e23;
-}
-
-.add-more-loading p {
-  color: #666;
-  font-size: 14px;
-  margin: 0;
-}
-
-/* Footer */
+/* --- Footer --- */
 .add-more-modal-footer {
   padding: 16px 20px;
-  border-top: 1px solid #f0f0f0;
+  background: #fff;
+  border-top: 1px solid #eee;
   display: flex;
   gap: 12px;
-  flex-shrink: 0;
+  /* Fix to bottom on mobile implies z-index handling */
+  z-index: 10;
 }
 
-.add-more-cancel-btn,
-.add-more-submit-btn {
+.add-more-cancel-btn, .add-more-submit-btn {
   flex: 1;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
   font-weight: 600;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
 .add-more-cancel-btn {
-  background: #f0f0f0;
-  color: #333;
+  background: #f5f5f5;
+  color: #555;
 }
 
-.add-more-cancel-btn:hover {
-  background: #e0e0e0;
+.add-more-quantity-control .add-btn{
+    background-color: var(--success-green);
+    border: none;
+    color: white;
+    width: 86px;
+    height: 32px;
+    border-radius: 8px;
+    text-align: center;
 }
 
 .add-more-submit-btn {
   background: #6b8e23;
   color: white;
+  box-shadow: 0 4px 12px rgba(107, 142, 35, 0.3);
 }
 
-.add-more-submit-btn:hover:not(:disabled) {
-  background: #5a7a1c;
-}
-
-.add-more-submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.button-loader {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive */
+/* --- MOBILE SPECIFIC STYLES --- */
 @media (max-width: 600px) {
   .add-more-modal-overlay {
     padding: 0;
+    align-items: flex-end; /* Align to bottom */
   }
 
   .add-more-modal-content {
+    width: 100%;
     max-width: 100%;
-    border-radius: 16px 16px 0 0;
+    height: 85vh; /* Take up 85% of screen height */
+    max-height: none;
+    border-radius: 20px 20px 0 0; /* Rounded top only */
+    animation: slideUpMobile 0.3s ease-out;
+  }
+
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* Compact List for Mobile */
+  .add-more-items-list {
+    padding: 12px;
   }
 
   .add-more-item-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    /* Keep row layout on mobile! Don't switch to column. */
+    flex-direction: row; 
+    align-items: center;
+    padding: 8px;
+    gap: 10px;
   }
 
+  /* Smaller image for mobile list */
   .add-more-item-image {
-    width: 100%;
-    /* height: 150px; */
+    width: 70px;
+    height: 70px;
   }
 
+  .add-more-item-name {
+    font-size: 14px;
+  }
+  
+  /* Horizontal Quantity Control on Mobile */
   .add-more-quantity-control {
-    align-self: flex-end;
+    flex-direction: row;
+    margin-left: 0;
+  }
+  
+  .qty-pill {
+    /* Slightly smaller pill on mobile */
+    height: 30px;
+  }
+  
+  .qty-btn {
+    width: 28px;
+    height: 30px;
+    font-size: 16px;
+  }
+  
+  .add-more-modal-footer {
+    padding-bottom: max(16px, env(safe-area-inset-bottom)); /* iPhone Home Bar safety */
   }
 }
