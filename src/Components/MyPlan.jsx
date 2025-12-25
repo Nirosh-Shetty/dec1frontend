@@ -223,9 +223,9 @@ const ViewPlanModal = ({
   // Payable amount after wallet deduction
   const payableAmount = Math.max(
     0,
-    (localPlan.slotTotalAmount || 0) - walletDeduction - (localPlan.preorderDiscount || 0)
-  );
- 
+    ((localPlan.payableAmount || 0) - walletDeduction)
+  )
+
   if (!isOpen || !localPlan) return null;
 
   const toggleBillingDetails = () => setIsBillingOpen((p) => !p);
@@ -1251,7 +1251,7 @@ const MyPlan = () => {
 
   async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
-      const amount = plan.slotTotalAmount; // single plan only
+      const amount = plan.payableAmount; // single plan only
       const generateUniqueId = () => {
         const timestamp = Date.now().toString().slice(-4);
         const randomNumber = Math.floor(1000 + Math.random() * 9000);
@@ -1496,7 +1496,11 @@ const MyPlan = () => {
                 const now = new Date();
                 const deadline = new Date(plan.paymentDeadline);
                 const isBeforeDeadline = now < deadline;
-
+                const payableAmount = Math.max(
+                  0,
+                  plan.slotTotalAmount -
+                    (plan.discountWallet || 0) - (plan.preorderDiscount || 0)
+                ).toFixed(0);
                 const isUnpaidEditable =
                   plan.status === "Pending Payment" && isBeforeDeadline;
 
@@ -1681,7 +1685,7 @@ const MyPlan = () => {
                                 </div>
                               )} */}
                               <div className="price-pill">
-                                {plan.slotHubTotalAmount === plan.slotTotalAmount ? (
+                                {plan.slotHubTotalAmount === payableAmount ? (
                                   <span>
                                     ₹{plan.slotTotalAmount?.toFixed(0)}
                                   </span>
@@ -1691,7 +1695,7 @@ const MyPlan = () => {
                                       ₹{plan.slotHubTotalAmount?.toFixed(0)}
                                     </span>
                                     <span className="pre-order-amount">
-                                      ₹{plan.slotTotalAmount?.toFixed(0)}
+                                      ₹{payableAmount}
                                     </span>
                                   </div>
                                 )}
