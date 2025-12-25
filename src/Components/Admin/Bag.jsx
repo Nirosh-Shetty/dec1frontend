@@ -94,7 +94,9 @@ function Bag() {
 
   const getBags = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getbags"
+      );
       if (res.status === 200) {
         setBagList(res.data.bags.reverse());
         setNoChangeData(res.data.bags.reverse());

@@ -1997,13 +1997,13 @@ body.drawer-open .ant-drawer.description-product {
 
 .guaranteed-label {
   font-size: 10px;
-  color: var(--secondary-text);
+  color: #3A8DAD;
   /* border: 1px solid var(--success-green); */
-   border: 0.4px solid var(--success-green); /* or the exact green code */
-  box-shadow: 0 0 0 0.4px var(--success-green); /* fake outside stroke */
+   /* border: 0.4px solid var(--success-green);  */
+  /* box-shadow: 0 0 0 0.4px var(--success-green);  */
   border-radius: 8px;
   padding: 1px 6px;
-  width: 126px;
+  width: 135px;
   height: 13px;
   margin: auto;
   margin-bottom: 4px;

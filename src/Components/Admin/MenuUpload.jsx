@@ -7,9 +7,11 @@ import { Box } from "@mui/material";
 import axios from "axios";
 
 // 2. Define ALL your API URLs
-const SAVE_API_URL = "https://dd-merge-backend-2.onrender.com/api/admin/hub-menu"; // This is for SAVING (from our plan)
+const SAVE_API_URL =
+  "https://dd-merge-backend-2.onrender.com/api/admin/hub-menu"; // This is for SAVING (from our plan)
 const HUBS_API = "https://dd-merge-backend-2.onrender.com/api/Hub/hubs"; // This is your live API
-const PRODUCTS_API = "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems"; // This is your live API
+const PRODUCTS_API =
+  "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems"; // This is your live API
 
 const MenuUpload = () => {
   const navigate = useNavigate();

@@ -10,15 +10,33 @@
   justify-content: space-evenly;
   align-items: center;
   z-index: 9998;
-  transition: transform 0.3s ease-in-out;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   border-top: 1px solid #f0f0f0;
+  /* Ensure it stays fixed at bottom */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* Hide on scroll down */
-.bottom-nav-hidden {
+/* Remove the hide class since it's always visible */
+/* .bottom-nav-hidden {
   transform: translateY(100%);
+} */
+
+/* Add safe area inset for modern mobile devices with notches */
+@supports (padding: max(0px)) {
+  .bottom-nav-container {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    height: calc(70px + max(0px, env(safe-area-inset-bottom)));
+  }
+}
+
+/* Ensure body has enough padding to prevent content from hiding behind nav */
+body.nav-visible,
+body {
+  padding-bottom: 70px;
 }
 
 /* Inner buttons: small, light, no big background */
@@ -55,7 +73,6 @@
 .nav-item.active .nav-label {
   color: #6b8e23;
   font-weight: bold;
-
 }
 
 /* Icons follow the same color as text using currentColor */
@@ -69,10 +86,22 @@
   transform: scale(1.05);
 }
 
-/* Centered narrow bar on larger screens (no red background anywhere) */
+/* Centered narrow bar on larger screens */
 @media screen and (min-width: 799px) {
   .bottom-nav-container {
     width: 33%;
     margin: 0 auto;
+  }
+  
+  body.nav-visible,
+  body {
+    padding-bottom: 70px;
+  }
+}
+
+/* Mobile specific adjustments */
+@media screen and (max-width: 798px) {
+  .bottom-nav-container {
+    width: 100%;
   }
 }

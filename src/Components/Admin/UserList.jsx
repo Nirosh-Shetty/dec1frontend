@@ -138,7 +138,9 @@ const UserList = () => {
   const [ApartmentOrder, setApartmentOrder] = useState([]);
   const getApartmentOrder = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getallorders");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getallorders"
+      );
       if (res.status === 200) {
         setApartmentOrder(res.data.order.reverse());
       }

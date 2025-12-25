@@ -16,6 +16,14 @@
   align-items: center;
 }
 
+.ban-container2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+}
+
 .screen-2 {
   display: flex;
   /* width: 30%; */
@@ -38,16 +46,16 @@
 .clock-text {
   font-size: 18px;
   color: #fafafa;
-  white-space: nowrap;      /* keep text on one line */
+  white-space: nowrap; /* keep text on one line */
 }
 
 /* Veg button fixed size */
 .veg-btn {
   background-color: var(--cream-walls);
   border: 2px solid var(--warm-beige);
-  color: #2C2C2C;
-  width: 72px;
-  height: 55px;  
+  color: #2c2c2c;
+  width: 136px;
+  height: 36px;
   border-radius: 18px;
   /* border: none; */
   padding: 4px 2px;
@@ -59,8 +67,9 @@
   align-items: center;
   justify-content: space-evenly;
   gap: 2px;
+  margin-right: -400px;
 }
-.veg-btn-toggle{
+.veg-btn-toggle {
   background: white;
   border-radius: 16px;
   border: var(--secondary-text) solid 1px;
@@ -71,7 +80,7 @@
   /* align-items: center; */
   /* justify-content: center; */
 }
-.veg-btn-switch{
+.veg-btn-switch {
   background-color: var(--secondary-text);
   border-radius: 16px;
   width: 40px;
@@ -94,22 +103,28 @@
   .clock-text {
     font-size: 14px;
   }
+  .veg-btn{
+    margin-right: -230px;
+  }
 }
 
+@media (max-width: 576px) {
+  .veg-btn{
+    margin-right: -230px;
+  }
+}
 
-
-.screen-3{
+.screen-3 {
   display: flex;
   flex-direction: column;
   padding: 12px 24px 24px 24px;
-   flex-shrink: 0;
+  flex-shrink: 0;
   /* border-radius: 0 0 16px 16px; */
   background: var(--success-green, #6b8e23);
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
   gap: 0px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
-
 
 .custom-logo {
   width: 164px;
@@ -549,6 +564,9 @@ input[type="number"] {
   .ban-container {
     width: 100%;
   }
+  .ban-container2 {
+    width: 100%;
+  }
 
   .banner-container {
     display: none;
@@ -558,8 +576,8 @@ input[type="number"] {
   .mobile-banner {
     display: block !important;
     width: 100% !important;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 4px;   /* default 16px */
+    padding-right: 6px;  /* default 16px */
     /* background-color: rgb(237, 234, 234); */
   }
   .mobile-banner-updated {
@@ -567,12 +585,9 @@ input[type="number"] {
     width: 100% !important;
     position: sticky;
     top: 0;
-      z-index: 100;
+    z-index: 100;
     /* background-color: rgb(237, 234, 234); */
   }
-
-
-  
 
   .screen-2 {
     display: flex;
@@ -588,25 +603,24 @@ input[type="number"] {
     flex-wrap: nowrap;
   }
 
-  .clock-text{
+  .clock-text {
     font-size: 24px;
     color: #fafafa;
     margin-top: 4px;
   }
 
-  .screen-3{
-  display: flex;
-  flex-direction: column;
-  padding: 12px 16px 24px 24px;
-   flex-shrink: 0;
-  /* border-radius: 0 0 16px 16px; */
-  background: var(--success-green, #6b8e23);
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-  
+  .screen-3 {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px 24px 24px;
+    flex-shrink: 0;
+    /* border-radius: 0 0 16px 16px; */
+    background: var(--success-green, #6b8e23);
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    gap: 12px;
+    /* margin-bottom: 10px; */
+            height: 70px
+  }
 
   .mobile-user-screen2 {
     width: 40px;
@@ -875,16 +889,16 @@ input[type="number"] {
       gap: 24px;
     }
 
-    .clock-text{
+    .clock-text {
       font-size: 15px;
       color: #fafafa;
       margin-top: 4px;
     }
-    .screen-3{
-   /* padding: 8px 12px 16px 12px; */
+    .screen-3 {
+      /* padding: 8px 12px 16px 12px; */
       gap: 0px;
-      margin-bottom: 10px;
-}
+      /* margin-bottom: 10px; */
+    }
     .profile-icon-container {
       min-width: 40px;
     }
@@ -902,7 +916,7 @@ input[type="number"] {
 
     .select-location-text {
       font-size: 16px;
-      max-width: 100px !important;
+      /* max-width: 100px !important; */
     }
     .locationselector {
       height: 40px;
@@ -1100,7 +1114,6 @@ input[type="number"] {
   }
 }
 
-
 .refer-earn-btn {
   width: 120px;
   display: flex;
@@ -1135,28 +1148,33 @@ input[type="number"] {
   -webkit-background-clip: text;
   color: transparent;
 }
-.banner-address-line{
+.banner-address-line {
   font-size: 20px;
   line-height: 25px;
   letter-spacing: -0.8px;
 }
 
-.banner-user-details{
+.banner-user-details {
   line-height: 15px;
   letter-spacing: -0.6px;
 }
 
-
 @media screen and (max-width: 480px) {
-  .select-location-text{
-    max-width: 130px;
+  .select-location-text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: block;
   }
-  /* .referbtn{
-    margin-top: 17px;
-  } */
-}
 
+  /* LOGIN button present */
+  .select-location-text.with-login-btn {
+    max-width: 145px;
+  }
+
+  /* User icon present */
+  .select-location-text.with-user-icon {
+    max-width: 195px;
+  }
+}
 

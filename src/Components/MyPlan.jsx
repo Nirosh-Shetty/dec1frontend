@@ -26,6 +26,9 @@ import discount from "./../assets/discount.png";
 import myplancancel from "./../assets/myplancancel.png";
 import "./../Styles/Normal.css";
 import orderhistoryicon from "./../assets/orderhistory.png";
+import LocationModal2 from "./LocationModal2";
+import AddMoreToSlotModal from "./AddMoreToSlotModal";
+import "../Styles/AddMoreToSlotModal.css";
 
 const formatDate = (isoString) => {
   const d = new Date(isoString);
@@ -197,6 +200,8 @@ const ViewPlanModal = ({
 
   const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showAddMoreModal, setShowAddMoreModal] = useState(false);
   // Wallet selection state (use WalletContext for live data)
   const { wallet, walletSeting } = useContext(WalletContext);
   const walletBalance = wallet?.balance || 0;
@@ -241,14 +246,54 @@ const ViewPlanModal = ({
     return { days, hours, mins, isExpired: false };
   };
   const { days, hours, mins, isExpired } = getTimeRemainingToCutoff();
+const handleAddressChange = async() => {
+  try {
+    // await axios.patch(`https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
+    setShowLocationModal(true);
+  } catch (error) {
+    Swal2.fire("Error", "Unable to Change Address", "error");
+  }
+};
+
+  const handleAddressSelected = async (address) => {
+    try {
+      setLoading(true);
+      // Call backend to update plan address
+      const response = await axios.post(
+        "https://dd-merge-backend-2.onrender.com/api/user/plan/update-address",
+        {
+          planId: localPlan._id,
+          userId,
+          addressId: address._id,
+        }
+      );
+
+      if (response.data.success) {
+        // Update local plan with new address data
+        const updatedPlan = response.data.data;
+        setLocalPlan(updatedPlan);
+        setShowLocationModal(false);
+        toast.success("Address updated successfully!");
+        onPlanUpdated && onPlanUpdated();
+      }
+    } catch (err) {
+      console.error("Error updating address:", err);
+      toast.error(err?.response?.data?.error || "Failed to update address");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSkipOrCancel = async () => {
     try {
       setLoading(true);
-      await axios.post("https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel", {
-        planId: plan._id,
-        userId,
-      });
+      await axios.post(
+        "https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel",
+        {
+          planId: plan._id,
+          userId,
+        }
+      );
       onPlanUpdated && onPlanUpdated();
       onClose();
     } catch (err) {
@@ -482,18 +527,19 @@ const ViewPlanModal = ({
 
                 {/* Total row */}
                 <div className="plan-cart-footer">
-                  {/* <div className="add-more-section"> */}
-                  {/* <div className="plan-add-more-btn"> */}
-                  {/* <div className="add-more-content"> */}
-                  {/* <div className="add-more-text-container"> */}
-                  {/* you can wire this to "add more items for this slot" */}
-                  {/* <span className="add-more-label" onClick={handleAddMore}>
+                   {/* <span className="add-more-label">
                         Add More
                       </span> */}
-                  {/* </div> */}
-                  {/* </div> */}
-                  {/* </div> */}
-                  {/* </div> */}
+                  {isEditable && (
+                    <div className="add-more-section">
+                      <button
+                        className="add-more-btn"
+                        onClick={() => setShowAddMoreModal(true)}
+                      >
+                        Add More
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -617,8 +663,9 @@ const ViewPlanModal = ({
                   <div className="change-badge" data-text-role="Badge/Chip">
                     <div className="change-text">
                       <span
-                        // If you don't have setShowLocationModal, change this to: onClick={() => {}}
-                        onClick={() => {}}
+                        onClick={() => {
+                          handleAddressChange();
+                        }}
                         style={{ cursor: "pointer" }}
                       >
                         Change
@@ -707,8 +754,7 @@ const ViewPlanModal = ({
                 <div className="wallet-header">
                   <span className="wallet-title">Apply Wallet Credit</span>
                   <span className="wallet-amount">
-                    ₹{walletBalance.toFixed(0)}
-                    available
+                    ₹{walletBalance.toFixed(0)} available
                   </span>
                 </div>
                 {/* {user.status === "Employee" ? ( */}
@@ -752,13 +798,16 @@ const ViewPlanModal = ({
               <span>Total Order value</span>
               <span> ₹{localPlan?.slotTotalAmount}</span>
             </div>
+              {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount>0&&
             <div className="billing-details-row">
-              <span>Pre-Order Savings</span>
+               <span>Pre-Order Savings</span>
               <span>
                 - ₹
                 {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount}
               </span>
             </div>
+              }
+             
             {/* Show preorder discount if present and > 0 */}
             {(localPlan.preorderDiscount && localPlan.preorderDiscount > 0) && (
               <div className="billing-details-row">
@@ -867,6 +916,26 @@ const ViewPlanModal = ({
           )}
         </div>
       </div>
+
+      {/* Location Modal */}
+      <LocationModal2
+        show={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        onAddressSelected={handleAddressSelected}
+        selectedLocationId={localPlan?.addressId}
+      />
+
+      {/* Add More Items Modal */}
+      <AddMoreToSlotModal
+        show={showAddMoreModal}
+        onClose={() => setShowAddMoreModal(false)}
+        planId={localPlan._id}
+        userId={userId}
+        onItemsUpdated={() => {
+          setShowAddMoreModal(false);
+          if (onPlanUpdated) onPlanUpdated();
+        }}
+      />
     </div>
   );
 };

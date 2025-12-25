@@ -125,9 +125,12 @@ const SalesReport = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs", {
-        headers: { Authorization: `Bearer ${"token"}` },
-      });
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs",
+        {
+          headers: { Authorization: `Bearer ${"token"}` },
+        }
+      );
       setHubs(res.data);
     } catch (error) {
       alert(error?.response?.data?.message || "Failed to fetch hubs.", "error");

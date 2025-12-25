@@ -721,14 +721,12 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
             onSuccess(userData);
           }
 
-          // Check for post-login destination
-          const postLoginDestination = localStorage.getItem(
-            "postLoginDestination"
-          );
+          // Clean up any post-login destination flags
+          localStorage.removeItem("postLoginDestination");
 
           // Handle the address flow
           if (!hasAddresses) {
-            // No addresses - redirect to location page (destination will be handled there)
+            // No addresses - redirect to location page
             navigate("/location");
           } else {
             // Has addresses - prioritize primary address over pre-login location
@@ -774,17 +772,9 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
             if (!primaryAddress && !currentLocation) {
               // No address selected - redirect to location
               navigate("/location");
-            } else if (postLoginDestination === "my-plan") {
-              // Address exists and user wants to go to My Plan
-              localStorage.removeItem("postLoginDestination");
-              if (proceedToPlan) {
-                proceedToPlan();
-              }
             } else {
-              // Normal flow - proceed to plan or home
-              if (proceedToPlan) {
-                proceedToPlan();
-              }
+              // Always navigate to home after login
+              navigate("/");
             }
           }
         }}

@@ -81,7 +81,9 @@ const BookingList = () => {
   const [Addproducts, setAddproducts] = useState([]);
   const getAddproducts = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems"
+      );
       if (res.status === 200) {
         setAddproducts(res.data.data);
         setNoChangeData(res.data.data);

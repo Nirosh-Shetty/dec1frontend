@@ -125,7 +125,9 @@ const Add_Products = () => {
   const getAddproducts = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItems"
+      );
       if (res.status === 200) {
         setAddproducts(res.data.data);
         setNoChangeData(res.data.data);
@@ -164,7 +166,9 @@ const Add_Products = () => {
   const getGst = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getgst");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getgst"
+      );
       if (res.status === 200) {
         setGstList(res.data.gst.reverse());
         setGST(res.data.gst.reverse()[0] || 0);
@@ -179,7 +183,9 @@ const Add_Products = () => {
   // Get Tags
   const getTags = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/food-tags");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/food-tags"
+      );
       if (res.status === 200) setTagsList(res.data.data || []);
     } catch (error) {
       console.error("Error fetching tags", error);
@@ -490,9 +496,12 @@ const Add_Products = () => {
   const markAllSoldOut = async () => {
     try {
       setIsLoading(true);
-      await axios.put(`https://dd-merge-backend-2.onrender.com/api/admin/makeSoldout`, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.put(
+        `https://dd-merge-backend-2.onrender.com/api/admin/makeSoldout`,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       alert("All products marked as sold out");
       await getAddproducts();
     } catch (error) {

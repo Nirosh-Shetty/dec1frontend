@@ -218,7 +218,10 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
 
   const getCatrDeatils = () => {
     axios
-      .get("https://dd-merge-backend-2.onrender.com/api/addcart/getcart/" + user?._id)
+      .get(
+        "https://dd-merge-backend-2.onrender.com/api/addcart/getcart/" +
+          user?._id
+      )
       .then(function (response) {
         setCarts(response.data.success);
         setCartstatus(response.data.success);

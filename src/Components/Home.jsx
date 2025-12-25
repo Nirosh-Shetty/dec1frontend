@@ -32,6 +32,7 @@ import { Colors, FontFamily } from "../Helper/themes";
 import BottomNav from "./BottomNav";
 import LocationRequiredPopup from "./LocationRequiredPopup";
 import { MdAddLocationAlt } from "react-icons/md";
+import availabity from "./../assets/weui_done2-filled.png";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // Store user in state to avoid infinite render loop
@@ -94,21 +95,21 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
   }, []);
 
-  console.log(address, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  // console.log(address, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
   // Add a function to refresh address from localStorage
-  const refreshAddress = () => {
+  const refreshAddress = useCallback(() => {
     const primaryAddress = localStorage.getItem("primaryAddress");
     const currentLocation = localStorage.getItem("currentLocation");
 
-    if (primaryAddress) {
+    if (primaryAddress && primaryAddress !== "null") {
       setAddress(JSON.parse(primaryAddress));
-    } else if (currentLocation) {
+    } else if (currentLocation && currentLocation !== "null") {
       setAddress(JSON.parse(currentLocation));
     } else {
       setAddress(null);
     }
-  };
+  }, []);
 
   // Listen for location updates from Banner
   useEffect(() => {
@@ -515,13 +516,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const handleClose2 = () => setShow2(false);
   const handleShow2 = () => setShow2(true);
 
+  // const user = JSON.parse(localStorage.getItem("user"));
 
   // Refresh address when user logs in/out
   useEffect(() => {
     console.log("User state changed, refreshing address");
     refreshAddress();
-  }, [user?._id]);
-
+  }, [user]);
 
   const addCart1 = async (item, checkOf, matchedLocation) => {
     // Enforce cutoff for adding to cart
@@ -647,7 +648,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
-          lastUpdated: Date.now(),
+          lastUpdated: Date.now,
           username: user?.Fname,
           mobile: user?.Mobile,
         });
@@ -1510,104 +1511,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     };
   }, [setCarts]);
 
-  // Check for triggerProceedToPlan flag after user adds address
+  // Remove auto-proceed to MyPlan logic - users should manually click "Move to My Plans"
+  // This prevents unwanted navigation to MyPlan when users add location after adding items
   useEffect(() => {
-    const shouldTriggerPlan = localStorage.getItem("triggerProceedToPlan");
-    console.log("🔍 Home - Checking triggerProceedToPlan:", shouldTriggerPlan);
-    console.log("🔍 Home - address:", address);
-    console.log("🔍 Home - Carts.length:", Carts.length);
-
-    if (shouldTriggerPlan === "true") {
-      // Also check localStorage directly in case Carts prop is not updated yet
-      const cartFromStorage = JSON.parse(localStorage.getItem("cart") || "[]");
-      console.log("🔍 Home - cartFromStorage.length:", cartFromStorage.length);
-
-      if (address && (Carts.length > 0 || cartFromStorage.length > 0)) {
-        console.log("🎯 Home - Triggering proceedToPlan automatically");
-        localStorage.removeItem("triggerProceedToPlan");
-        // Small delay to ensure everything is loaded
-        setTimeout(() => {
-          proceedToPlan();
-        }, 500);
-      } else {
-        console.log("⏳ Home - Waiting for address or cart items...");
-        // If we have the flag but missing address or cart, keep checking
-        if (!address) {
-          console.log("❌ Home - No address found");
-        }
-        if (Carts.length === 0 && cartFromStorage.length === 0) {
-          console.log("❌ Home - No cart items found in state or localStorage");
-        }
-      }
-    }
-
-    // REMOVED: Fallback logic that was auto-proceeding to MyPlan
-    // This was causing unwanted navigation to MyPlan when users added location after adding items
-    // Now MyPlan navigation only happens when user explicitly clicks "My Plan" button
-
-    // Clean up the justAddedAddress flag if it exists
-    if (sessionStorage.getItem("justAddedAddress") === "true") {
-      console.log("🧹 Home - Cleaning up justAddedAddress flag");
-      sessionStorage.removeItem("justAddedAddress");
-    }
-  }, [address, Carts]);
-
-  // Also check immediately on mount with a delay to handle timing issues
-  useEffect(() => {
-    const checkTriggerFlag = () => {
-      const shouldTriggerPlan = localStorage.getItem("triggerProceedToPlan");
-      if (shouldTriggerPlan === "true") {
-        console.log("🔍 Home - Found triggerProceedToPlan flag on mount");
-        // Set up a periodic check with multiple attempts
-        let attempts = 0;
-        const maxAttempts = 10;
-
-        const intervalCheck = setInterval(() => {
-          attempts++;
-          const currentAddress = JSON.parse(
-            localStorage.getItem("primaryAddress") ||
-              localStorage.getItem("currentLocation") ||
-              "null"
-          );
-          const currentCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-          console.log(
-            `🔍 Home - Attempt ${attempts} - address:`,
-            currentAddress
-          );
-          console.log(
-            `🔍 Home - Attempt ${attempts} - cart length:`,
-            currentCart.length
-          );
-
-          if (currentAddress && currentCart.length > 0) {
-            console.log(
-              "🎯 Home - Triggering proceedToPlan from periodic check"
-            );
-            localStorage.removeItem("triggerProceedToPlan");
-            clearInterval(intervalCheck);
-            proceedToPlan();
-          } else if (attempts >= maxAttempts) {
-            console.log("❌ Home - Max attempts reached, clearing flag");
-            localStorage.removeItem("triggerProceedToPlan");
-            clearInterval(intervalCheck);
-          }
-        }, 500); // Check every 500ms
-      }
-    };
-
-    // Initial check after a short delay
-    setTimeout(checkTriggerFlag, 100);
-
-    // TEMPORARY TEST: Add a manual trigger for testing
-    // You can remove this after testing
-    setTimeout(() => {
-      if (window.location.search.includes("testMyPlan=true")) {
-        console.log("🧪 TEST: Manually setting triggerProceedToPlan flag");
-        localStorage.setItem("triggerProceedToPlan", "true");
-        checkTriggerFlag();
-      }
-    }, 2000);
+    // Clean up any leftover flags
+    localStorage.removeItem("triggerProceedToPlan");
+    sessionStorage.removeItem("justAddedAddress");
   }, []);
 
   // Render DateSessionSelector inline (no JS sticky in Home)
@@ -1931,7 +1840,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
                           {address && (
                             <div>
-                              {/* All orders are preorder only; remove isPreOrder/instant UI */}
+                                <div className="guaranteed-label">
+                                  Guaranteed Availability{" "}
+                                </div>
                               {checkOf && <BiSolidOffer color="green" />}
                               {/* </div> */}
                             </div>
@@ -1962,9 +1873,20 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                     opacity: user && !address ? 0.5 : 1,
                                   }}
                                 >
-                                  <span className="add-to-cart-btn-text">
-                                    Add
-                                  </span>
+                                    <div className="pick-btn-text">
+                                      <span className="pick-btn-text1">
+                                        PICK
+                                      </span>
+                                      <span className="pick-btn-text2">
+                                        {`for ${new Date(
+                                          item.deliveryDate
+                                        ).toLocaleDateString("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                        })}`}
+                                      </span>
+                                    </div>
+                                  
 
                                   <span className="add-to-cart-btn-icon">
                                     {" "}

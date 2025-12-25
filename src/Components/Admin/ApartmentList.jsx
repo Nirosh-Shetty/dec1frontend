@@ -100,7 +100,9 @@ const ApartmentList = () => {
   const [AddApartment, setAddApartment] = useState([]);
   const getAddApartment = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getapartment");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment"
+      );
       if (res.status === 200) {
         setAddApartment(res.data.corporatedata.reverse());
         setNoChangeData(res.data.corporatedata);

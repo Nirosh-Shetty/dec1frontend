@@ -129,9 +129,12 @@ const HubList = () => {
   const getHubs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setHubs(res.data);
       setNoChangeData(res.data);
     } catch (error) {

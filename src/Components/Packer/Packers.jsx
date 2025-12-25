@@ -25,7 +25,8 @@ import { Link } from "react-router-dom";
 
 // Constants
 const API_BASE_URL = "https://dd-merge-backend-2.onrender.com/api/packer";
-const ADMIN_ORDERS_URL = "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders2";
+const ADMIN_ORDERS_URL =
+  "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders2";
 const PACKING_GROUPED_URL = `${API_BASE_URL}/packing/today/grouped`;
 const HUBS_API_URL = "https://dd-merge-backend-2.onrender.com/api/Hub/hubs";
 const SWR_KEY = "packer:combined";

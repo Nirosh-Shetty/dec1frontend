@@ -1,0 +1,295 @@
+/* CookingPromo.css */
+.cooking-promo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 20px;
+}
+
+.promo-container {
+  max-width: 613px;
+  width: 100%;
+  background: #FFF8DC;
+  border-radius: 20px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.main-heading {
+  padding: 20px 40px 20px 40px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.plan-ahead {
+  font-size: 30px;
+  font-weight:900;
+  color: #6b8e23;
+  margin: 0 0 5px 0;
+  line-height: 1.1;
+  animation: slideInLeft 0.6s ease-out;
+  font-family: 'Inter';
+}
+
+.confirm-before {
+  font-size: 25px;
+  font-weight: 900;
+  color: #6b8e23;
+  margin: 0;
+  line-height: 1.1;
+  animation: slideInRight 0.6s ease-out 0.2s both;
+}
+
+.features-list {
+  padding: 0 40px 20px 40px;
+  animation: fadeIn 0.8s ease-out 0.4s both;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.5s ease-out forwards;
+  font-weight: 500;
+}
+
+.feature-item:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.feature-item:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.feature-item:nth-child(3) {
+  animation-delay: 0.9s;
+}
+
+.bullet {
+  color: #666;
+  margin: 0 12px 0 0;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.feature-text {
+  margin-right: 15px;
+  font-size: 14px;
+}
+
+.offer-section {
+  background: #F5DEB3;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 0 0 20px 20px;
+  height: 40px;
+  width: 100%;
+  padding-bottom: 20px;
+  opacity: 0;
+  transform: translateY(-20px);
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.offer-section.offer-visible {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 80px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.rupee-symbol {
+  font-size: 2.2rem;
+  color: #6b8e23;
+  font-weight: bold;
+  margin: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.offer-section.offer-visible .rupee-symbol {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.offer-section.offer-visible .rupee-symbol:nth-child(1) {
+  transition-delay: 0.3s;
+}
+
+.offer-section.offer-visible .rupee-symbol:nth-child(3) {
+  transition-delay: 0.5s;
+}
+
+.offer-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.5s ease-out 0.2s;
+}
+
+.offer-text2{
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Inter';
+  color: #333;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.5s ease-out 0.4s;
+}
+
+
+.offer-section.offer-visible .offer-text {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.offer-section.offer-visible .offer-text2 {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 80px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .plan-ahead,
+  .confirm-before {
+    /* font-size: 2.5rem; */
+  }
+
+  .feature-item {
+    /* font-size: 1.1rem; */
+    flex-wrap: wrap;
+  }
+
+  .offer-text {
+    /* font-size: 1.3rem; */
+  }
+
+  .main-heading,
+  .features-list {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .offer-section {
+    padding: 15px 25px;
+  }
+  
+  .offer-section.offer-visible {
+    padding: 15px 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .plan-ahead{
+    font-size: 28px;
+  }
+  .confirm-before {
+    font-size: 24px;
+  }
+
+  .feature-item {
+    font-size: 14px;
+  }
+
+  .offer-text {
+    font-size: 11px;
+  }
+
+  .offer-text2 {
+    font-size: 11px;
+  }
+
+  .rupee-symbol {
+    font-size: 1.5rem;
+  }
+
+  .main-heading,
+  .features-list {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .offer-section {
+    padding: 12px 20px;
+  }
+  
+  .offer-section.offer-visible {
+    padding: 12px 20px;
+  }
+}

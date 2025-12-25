@@ -807,14 +807,20 @@ import { Link } from "react-router-dom";
 const UserBanner = () => {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
-  const carouselRef = useRef(null);
-  const carouselInstanceRef = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Touch/swipe handling
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
 
   // Fetch banners on component mount
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/banners");
+        const res = await axios.get(
+          "https://dd-merge-backend-2.onrender.com/api/admin/banners"
+        );
         if (res.status === 200) {
           const bannerData = res.data.getbanner || [];
           setBanners(
@@ -831,9 +837,7 @@ const UserBanner = () => {
     fetchBanners();
   }, []);
 
-  // Alternative approach: Use CSS-only carousel
-  const [currentSlide, setCurrentSlide] = useState(0);
-
+  // Auto-slide functionality
   useEffect(() => {
     if (banners.length <= 1) return;
 
@@ -843,6 +847,33 @@ const UserBanner = () => {
 
     return () => clearInterval(interval);
   }, [banners.length]);
+
+  // Touch handlers for swipe functionality
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && banners.length > 1) {
+      // Swipe left - next slide
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }
+    if (isRightSwipe && banners.length > 1) {
+      // Swipe right - previous slide
+      setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
+    }
+  };
 
   if (loading || banners.length === 0) return null;
 
@@ -864,13 +895,13 @@ const UserBanner = () => {
             style={{
               borderRadius: "15px",
               overflow: "hidden",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              // boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              border: "5px solid #cccccc",
               height: "200px",
               position: "relative",
             }}
           >
             <div
-              className="zoom-animation"
               style={{
                 width: "100%",
                 height: "100%",
@@ -878,7 +909,6 @@ const UserBanner = () => {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
-                animation: "zoomInOut 15s ease-in-out infinite",
               }}
             >
               <div
@@ -911,79 +941,15 @@ const UserBanner = () => {
     >
       <style>
         {`
-          /* Smooth zoom animation */
-          @keyframes zoomInOut {
-            0%, 100% {
-              transform: scale(1);
-            }
-            50% {
-              transform: scale(1.1);
-            }
-          }
-
-          /* Alternative slower animation */
-          @keyframes smoothZoom {
-            0% {
-              transform: scale(1);
-            }
-            25% {
-              transform: scale(1.05);
-            }
-            50% {
-              transform: scale(1.1);
-            }
-            75% {
-              transform: scale(1.05);
-            }
-            100% {
-              transform: scale(1);
-            }
-          }
-
-          /* Ken Burns effect for a more cinematic feel */
-          @keyframes kenBurns {
-            0% {
-              transform: scale(1) translate(0, 0);
-            }
-            50% {
-              transform: scale(1.1) translate(2%, 2%);
-            }
-            100% {
-              transform: scale(1) translate(0, 0);
-            }
-          }
-
-          /* Elegant slow zoom */
-          @keyframes elegantZoom {
-            0% {
-              transform: scale(1);
-              filter: brightness(1);
-            }
-            25% {
-              transform: scale(1.03);
-              filter: brightness(1.02);
-            }
-            50% {
-              transform: scale(1.06);
-              filter: brightness(1.04);
-            }
-            75% {
-              transform: scale(1.03);
-              filter: brightness(1.02);
-            }
-            100% {
-              transform: scale(1);
-              filter: brightness(1);
-            }
-          }
-
           /* Custom carousel styles */
           .custom-carousel {
             position: relative;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 5px solid #cccccc;
             height: 200px;
+            touch-action: pan-y pinch-zoom;
           }
 
           .custom-carousel-slide {
@@ -1001,14 +967,6 @@ const UserBanner = () => {
 
           .custom-carousel-slide.active {
             opacity: 1;
-          }
-
-          /* Apply zoom animation to active slide */
-          .custom-carousel-slide.active .zoom-background {
-            width: 100%;
-            height: 100%;
-            animation: elegantZoom 20s ease-in-out infinite;
-            will-change: transform;
           }
 
           .custom-carousel-indicators {
@@ -1050,32 +1008,17 @@ const UserBanner = () => {
             .custom-carousel {
               height: 140px;
             }
-            
-            @keyframes elegantZoom {
-              0% {
-                transform: scale(1);
-              }
-              50% {
-                transform: scale(1.08);
-              }
-              100% {
-                transform: scale(1);
-              }
-            }
-          }
-
-          /* Performance optimizations */
-          .zoom-background {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
           }
         `}
       </style>
 
-      {/* Custom carousel version with smooth zoom */}
-      <div className="custom-carousel">
+      {/* Custom carousel version without animation */}
+      <div
+        className="custom-carousel"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         {banners.map((banner, index) => (
           <div
             key={banner._id}
@@ -1092,7 +1035,6 @@ const UserBanner = () => {
               }}
             >
               <div
-                className="zoom-background"
                 style={{
                   width: "100%",
                   height: "100%",

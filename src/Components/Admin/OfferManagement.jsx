@@ -537,7 +537,9 @@ const OfferForm = () => {
 
   const getOffers = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/offers");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/offers"
+      );
       if (res.status === 200) {
         setOffers(res.data.data);
       }
@@ -548,7 +550,9 @@ const OfferForm = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs"
+      );
       if (res.status === 200) {
         setHubsData(res.data);
       }
@@ -698,14 +702,17 @@ const OfferForm = () => {
         getOffers();
         setEditingOffer(null);
       } else {
-        response = await axios.post("https://dd-merge-backend-2.onrender.com/api/admin/offers", {
-          products: formattedProducts,
-          startDate,
-          endDate,
-          hubId: selectedHubId,
-          hubName: selectedHub?.hubName,
-          locations: selectedLocations,
-        });
+        response = await axios.post(
+          "https://dd-merge-backend-2.onrender.com/api/admin/offers",
+          {
+            products: formattedProducts,
+            startDate,
+            endDate,
+            hubId: selectedHubId,
+            hubName: selectedHub?.hubName,
+            locations: selectedLocations,
+          }
+        );
         getOffers();
       }
       Swal.fire({
@@ -770,7 +777,9 @@ const OfferForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`https://dd-merge-backend-2.onrender.com/api/admin/offers/${offerId}`);
+        await axios.delete(
+          `https://dd-merge-backend-2.onrender.com/api/admin/offers/${offerId}`
+        );
         getOffers();
         Swal.fire({
           title: "Deleted!",
@@ -1177,7 +1186,9 @@ const BannerForm = () => {
   const [viewingBanner, setViewingBanner] = useState(null);
   const getBanners = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/banners");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/banners"
+      );
       if (res.status === 200) {
         setExistingBanners(res.data.getbanner);
       }
@@ -1264,9 +1275,13 @@ const BannerForm = () => {
       } else {
         responses = await Promise.all(
           formDataArray.map((formData) =>
-            axios.post("https://dd-merge-backend-2.onrender.com/api/admin/banners", formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            })
+            axios.post(
+              "https://dd-merge-backend-2.onrender.com/api/admin/banners",
+              formData,
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+              }
+            )
           )
         );
         getBanners();
@@ -1622,7 +1637,8 @@ const Reports = () => {
 
   const handleExport = async () => {
     try {
-      window.location.href = "https://dd-merge-backend-2.onrender.com/api/admin/reports/export";
+      window.location.href =
+        "https://dd-merge-backend-2.onrender.com/api/admin/reports/export";
       Swal.fire({
         title: "Success",
         text: "Exporting data as CSV...",

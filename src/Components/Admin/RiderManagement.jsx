@@ -53,7 +53,9 @@ const RiderManagement = () => {
   const fetchHubOptions = async () => {
     try {
       setHubLoading(true);
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs"
+      );
       if (res.status === 200) {
         setHubOptions(res.data || []);
       }
@@ -74,12 +76,15 @@ const RiderManagement = () => {
   const fetchRiders = async (opts = { showLoader: true }) => {
     try {
       if (opts.showLoader) setLoading(true);
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/riders", {
-        params: {
-          status: statusFilter,
-          search: search.trim() || undefined,
-        },
-      });
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/riders",
+        {
+          params: {
+            status: statusFilter,
+            search: search.trim() || undefined,
+          },
+        }
+      );
       if (res.status === 200) {
         setRiders(res.data?.riders || []);
         setPageNumber(0);

@@ -1,23 +1,22 @@
-Reset default margins and ensure mobile-friendly scaling
-
-
-html, body {
+Reset default margins and ensure mobile-friendly scaling html,
+body {
   height: 100%;
   overflow-x: hidden;
 }
 
-#root, .App, .login-page-wrapper {
+#root,
+.App,
+.login-page-wrapper {
   height: 100%;
   overflow: hidden;
 }
-
 
 .login-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   min-height: 100vh;
-  background-color: #F8F6F0; /* Colors.warmmarble */
+  background-color: #f8f6f0; /* Colors.warmmarble */
   justify-content: space-between;
   width: 100%;
   max-width: 400px; /* Fixed mobile width */
@@ -41,7 +40,7 @@ html, body {
   height: 202px;
   justify-content: center;
   align-items: center;
-  background-color: #6B8E23; /* Colors.turmericGolden */
+  background-color: #6b8e23; /* Colors.turmericGolden */
   /* border-bottom-left-radius: 16px; */
   /* border-bottom-right-radius: 16px; */
   box-shadow: 0 4px 6px rgba(107, 107, 107, 0.3); /* Colors.secondaryText */
@@ -97,7 +96,7 @@ html, body {
 .divider-line {
   flex: 1;
   height: 0.4px;
-  background-color: #6B6B6B; /* Colors.secondaryText */
+  background-color: #6b6b6b; /* Colors.secondaryText */
 }
 
 .divider-badge {
@@ -109,7 +108,7 @@ html, body {
   font-weight: 500;
   line-height: 11px;
   letter-spacing: -0.5px;
-  color: #6B6B6B; /* Colors.secondaryText */
+  color: #6b6b6b; /* Colors.secondaryText */
 }
 
 .customer-name {
@@ -127,19 +126,19 @@ html, body {
   align-items: center;
   /* flex: 0.48; */
   border-radius: 18px;
-  border: 1px solid var(--success-green, #6B8E23);
-  background: var(--app-foreground, #FAFAFA);
+  border: 1px solid var(--success-green, #6b8e23);
+  background: var(--app-foreground, #fafafa);
   font-size: 16px;
   font-weight: 400;
   line-height: 21px;
   letter-spacing: -0.8px;
-  color: #2C2C2C;
+  color: #2c2c2c;
   outline: none;
   width: 66%;
 }
 
 .customer-name-input::placeholder {
-  color: #C0C0C0;
+  color: #c0c0c0;
 }
 
 .phone-row {
@@ -158,8 +157,8 @@ html, body {
   gap: 8px;
   flex: 1;
   border-radius: 18px;
-  border: 1px solid var(--success-green, #6B8E23);
-  background: var(--app-foreground, #FAFAFA);
+  border: 1px solid var(--success-green, #6b8e23);
+  background: var(--app-foreground, #fafafa);
 }
 
 .prefix-box-phone {
@@ -167,12 +166,12 @@ html, body {
   padding: 2px 4px;
   align-items: center;
   border-radius: 10px;
-  border: 0.4px solid var(--steel_dark, #C0C0C0);
-  background: var(--warm-beige, #F5DEB3);
+  border: 0.4px solid var(--steel_dark, #c0c0c0);
+  background: var(--warm-beige, #f5deb3);
 }
 
 .prefix-text-phone {
-  color: var(--Primary-Text, #2C2C2C);
+  color: var(--Primary-Text, #2c2c2c);
   text-align: center;
   font-family: Inter;
   font-size: 14px;
@@ -188,15 +187,15 @@ html, body {
   font-weight: 400;
   line-height: 21px;
   letter-spacing: -0.8px;
-  color: #2C2C2C; /* Colors.primaryText */
+  color: #2c2c2c; /* Colors.primaryText */
   border: none;
   outline: none;
   width: 100%;
-  background: var(--app-foreground, #FAFAFA);
+  background: var(--app-foreground, #fafafa);
 }
 
 .phone-input::placeholder {
-  color: #C0C0C0; /* Colors.secondaryText */
+  color: #c0c0c0; /* Colors.secondaryText */
 }
 
 .otp-button {
@@ -206,20 +205,20 @@ html, body {
   justify-content: center;
   align-items: center;
   border-radius: 18px;
-  border: 2px solid var(--warm-beige, #F5DEB3);
-  background: var(--cream-walls, #FFF8DC);
+  border: 2px solid var(--warm-beige, #f5deb3);
+  background: var(--cream-walls, #fff8dc);
   cursor: pointer;
   white-space: nowrap;
 }
 
 .otp-button:hover {
-  background: var(--warm-beige, #F5DEB3);
+  background: var(--warm-beige, #f5deb3);
   transform: translateY(-1px);
   transition: all 0.2s ease;
 }
 
 .otp-text {
-  color: var(--Primary-Text, #2C2C2C);
+  color: var(--Primary-Text, #2c2c2c);
   font-family: Inter;
   font-size: 16px;
   font-style: normal;
@@ -236,7 +235,7 @@ html, body {
 }
 
 .social-login-button {
-  background-color: #FAFAFA; /* Colors.appForeground */
+  background-color: #fafafa; /* Colors.appForeground */
   border-radius: 50%;
   border: none;
   padding: 10px;
@@ -250,7 +249,7 @@ html, body {
 }
 
 .social-login-button:hover {
-  background-color: #F5DEB3;
+  background-color: #f5deb3;
   transform: translateY(-2px);
 }
 
@@ -268,7 +267,7 @@ html, body {
   font-weight: 500;
   line-height: 21px;
   letter-spacing: -0.8px;
-  color: #6B8E23; /* Colors.greenCardamom */
+  color: #6b8e23; /* Colors.greenCardamom */
   text-decoration: underline;
   margin: 16px 0 32px;
   background: none;
@@ -278,7 +277,7 @@ html, body {
 }
 
 .guest-text:hover {
-  color: #556B1F;
+  color: #556b1f;
 }
 
 .terms-and-conditions-text {
@@ -286,12 +285,12 @@ html, body {
   font-weight: 500;
   line-height: 11px;
   letter-spacing: -0.5px;
-  color: #6B6B6B; /* Colors.secondaryText */
+  color: #6b6b6b; /* Colors.secondaryText */
   text-align: center;
 }
 
 .link-text-terms {
-  color: #6B8E23 !important; /* Colors.greenCardamom */
+  color: #6b8e23 !important; /* Colors.greenCardamom */
   text-decoration: underline !important;
   font-weight: 700;
   cursor: pointer;
@@ -299,18 +298,16 @@ html, body {
 }
 
 .link-text-terms:hover {
-  color: #556B1F !important;
+  color: #556b1f !important;
 }
-
-
 
 /* Force mobile view on all screen sizes */
 @media (min-width: 401px) {
-.login-container {
-  max-width: 400px; /* Keep consistent mobile width */
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Add subtle shadow for desktop */
-  overflow: hidden !important;
-}
+  .login-container {
+    max-width: 400px; /* Keep consistent mobile width */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Add subtle shadow for desktop */
+    overflow: hidden !important;
+  }
 }
 
 /* Mobile optimizations - remove margin for leaf logo box */
@@ -322,12 +319,12 @@ html, body {
     padding: 0;
     overflow: hidden !important;
   }
-  
+
   .header-wrapper {
     margin: 0 !important;
     padding: 0;
   }
-  
+
   .login-header {
     padding: 16px !important;
     margin: 0 !important;
@@ -336,7 +333,7 @@ html, body {
     justify-content: center !important;
     align-items: center !important;
   }
-  
+
   .logo-container {
     margin: 0 !important;
     padding: 0 !important;
@@ -354,28 +351,16 @@ html, body {
     max-width: 100%;
     overflow: hidden !important;
   }
-  
+
   .phone-row {
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .otp-button {
     width: 30%;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* Enhanced CSS for keyboard handling */
 .signin-modal-bottom .modal-dialog {
@@ -418,7 +403,12 @@ html, body {
 
 /* Blurry backdrop effect */
 .signin-modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.5) !important; /* Reduced opacity for better blur effect */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ) !important; /* Reduced opacity for better blur effect */
   backdrop-filter: blur(100px) !important; /* Add blur effect */
   -webkit-backdrop-filter: blur(10px) !important; /* Safari support */
   z-index: 9999998 !important;
@@ -454,7 +444,7 @@ html, body {
 /* Improved scroll behavior for keyboard */
 .login-container-modal {
   scrollbar-width: thin;
-  scrollbar-color: #6B8E23 #f1f1f1;
+  scrollbar-color: #6b8e23 #f1f1f1;
   -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
   overscroll-behavior: contain !important; /* Prevent page scroll when modal is scrolling */
 }
@@ -469,20 +459,25 @@ html, body {
 }
 
 .login-container-modal::-webkit-scrollbar-thumb {
-  background: #6B8E23;
+  background: #6b8e23;
   border-radius: 10px;
 }
 
 .login-container-modal::-webkit-scrollbar-thumb:hover {
-  background: #556B1F;
+  background: #556b1f;
 }
 
 /* Input focus styles for better visibility */
-.customer-name-input:focus,
-.phone-input:focus {
-  border-color: #6B8E23 !important;
+.customer-name-input:focus {
+  border-color: #6b8e23 !important;
   box-shadow: 0 0 0 3px rgba(107, 142, 35, 0.2) !important;
   outline: none !important;
+}
+
+.phone-input:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Prevent zoom on iOS inputs */
@@ -492,12 +487,12 @@ html, body {
     font-size: 16px !important; /* Prevent iOS zoom */
     max-height: 44px !important;
   }
-  
+
   input[type="tel"],
   input[type="text"] {
     font-size: 16px !important;
   }
-  
+
   .signin-modal-bottom .modal-dialog {
     padding: 0 !important; /* Remove padding on mobile */
   }
@@ -509,27 +504,29 @@ html, body {
     height: 75vh !important;
     max-height: 75vh !important;
   }
-  
+
   /* When keyboard is open */
   .keyboard-open .signin-modal-bottom .modal-dialog {
-    height: calc(100vh - 100px) !important; /* Adjust based on keyboard height */
+    height: calc(
+      100vh - 100px
+    ) !important; /* Adjust based on keyboard height */
     max-height: calc(100vh - 100px) !important;
   }
-  
+
   .phone-row {
     /* flex-direction: column !important; */
     gap: 12px !important;
   }
-  
+
   .otp-button {
     width: 30% !important;
     margin-top: 8px !important;
   }
-  
+
   .customer-name-input {
     width: 100% !important;
   }
-  
+
   /* Make inputs more touch-friendly */
   .customer-name-input,
   .input-group-phone {
@@ -543,7 +540,7 @@ html, body {
   .signin-modal-bottom .modal-dialog {
     max-width: 100vw !important;
   }
-  
+
   .login-container-modal {
     max-width: 100vw !important;
   }
@@ -559,7 +556,7 @@ html, body {
     right: 0 !important;
     transform: none !important;
   }
-  
+
   .signin-modal-bottom .modal-content {
     margin: 0 auto !important;
   }

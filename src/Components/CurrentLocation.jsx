@@ -761,7 +761,7 @@ const LocationConfirmationSimple = () => {
 
         // Navigate to home
         // navigate("/home");
-        navigate("/");
+        navigate("/home");
       }
       // If location is not serviceable, show service request modal (same as location.jsx)
       else if (isServiceable === false) {
@@ -961,10 +961,12 @@ const LocationConfirmationSimple = () => {
   return (
     <div
       style={{
-        height: "100vh",
+        height: "100dvh",
         backgroundColor: "#f5f5f5",
         fontFamily: "Arial, sans-serif",
         position: "relative",
+        // maxWidth: "402px",
+        margin: "0 auto",
       }}
     >
       {/* Location Disabled Popup */}
@@ -1251,7 +1253,7 @@ const LocationConfirmationSimple = () => {
 
       {/* Main Content - Vertical Layout */}
       <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+        style={{ display: "flex", flexDirection: "column", height: "98dvh" }}
       >
         {/* Top Panel - Map */}
         <div
@@ -1259,7 +1261,7 @@ const LocationConfirmationSimple = () => {
             flex: "1",
             position: "relative",
             backgroundColor: "#e9ecef",
-            minHeight: "50vh",
+            minHeight: "48vh",
           }}
         >
           <div

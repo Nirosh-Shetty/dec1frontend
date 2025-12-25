@@ -15,7 +15,9 @@ const Footer = () => {
   const [Addsocial, setAddsocial] = useState([]);
   const getAddsocial = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getsocial");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getsocial"
+      );
       if (res.status === 200) {
         setAddsocial(res.data.getsocial);
       }

@@ -485,16 +485,13 @@
 // export default MultiCartDrawer;
 
 import { useState } from "react";
-import { Drawer } from "antd";
 import moment from "moment";
 import { FaAngleUp, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../Styles/MultiCartDrawer.css";
 import MyMeal from "../assets/mymeal.svg";
 import Swal2 from "sweetalert2";
-
-// Import SignInModal component
-import SignInModal from "./SignInModal"; // You'll need to create this component
+import arrow from "./../assets/material-symbols_arrow-back-rounded.png";
 
 const MultiCartDrawer = ({
   proceedToPlan,
@@ -510,7 +507,6 @@ const MultiCartDrawer = ({
   );
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [showSignInModal, setShowSignInModal] = useState(false); // State for sign-in modal
 
   const formatSlotDate = (date) => {
     const today = moment().startOf("day");
@@ -522,6 +518,8 @@ const MultiCartDrawer = ({
   };
 
   const handleSlotDetailClick = (slot) => {
+    console.log("Details clicked for slot:", slot);
+    console.log("Calling onJumpToSlot with:", slot.date, slot.session);
     onJumpToSlot(slot.date, slot.session);
     setIsDrawerOpen(false);
   };
@@ -533,12 +531,32 @@ const MultiCartDrawer = ({
 
   // Handle "My Meal" click for non-logged in users
   const handleMyMealClickForGuest = () => {
-    // Store the intended destination for after login/address setup
-    localStorage.setItem("postLoginDestination", "my-plan");
-    console.log("🎯 MultiCartDrawer - Set postLoginDestination to my-plan");
+    // Navigate to login page without setting destination flag
+    navigate("/login");
+    setIsDrawerOpen(false); // Close drawer if open
+  };
 
-    // Show sign-in modal at bottom
-    setShowSignInModal(true);
+  // Handle "Move to My Plans" click for logged in users
+  const handleMoveToMyPlans = () => {
+    if (user && !address) {
+      // If user doesn't have address, show toast message
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "info",
+        title: `Please add your delivery address first!`,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+      });
+      return;
+    }
+    // Directly proceed to plan
+    proceedToPlan();
   };
 
   if (overallTotalItems === 0) {
@@ -547,16 +565,16 @@ const MultiCartDrawer = ({
 
   return (
     <>
-      {/* small "All Slots" bubble above closed bar */}
+      {/* small "View All" bubble above closed bar */}
       {isDrawerOpen || (
         <>
           {groupedCarts.length > 1 && (
             <>
               <div
-                className="all-slots-bubble"
+                className="view-all-bubble"
                 onClick={() => setIsDrawerOpen(true)}
               >
-                All Slots
+                View All
                 <img src="/Assets/arrowup.svg" />
               </div>
             </>
@@ -570,46 +588,30 @@ const MultiCartDrawer = ({
             >
               <div className="d-flex justify-content-between align-items-center flex-row">
                 <div className="d-flex gap-1 align-items-center flex-row">
-                  {/* <p className="cart-slot-type">{SloteType}</p> */}
                   <div className="cart-items-price">
-                    {overallTotalItems} items | ₹{overallSubtotal.toFixed(0)}
+                    {/* {overallTotalItems} items | ₹{overallSubtotal.toFixed(0)} */}
+                    Picked : {groupedCarts.length} meals
                   </div>
                 </div>
                 {user ? (
-                  <a
-                    onClick={() => {
-                      if (!(user && !address)) {
-                        // Directly proceed to plan without showing address confirmation
-                        proceedToPlan();
-                      }
-                    }}
-                    style={{
-                      color: "unset",
-                      textDecoration: "none",
-                      opacity: user && !address ? 0.5 : 1,
-                      pointerEvents: user && !address ? "none" : "auto",
-                    }}
+                  <div
+                    className="d-flex gap-2 viewcartbtn align-items-center"
+                    onClick={handleMoveToMyPlans}
                   >
-                    <div className="d-flex gap-1 align-content-center ">
-                      <div className="my-meal-icon">
-                        <img src={MyMeal} alt="" />
-                        <div className="red-icon"></div>
-                      </div>
-
-                      <div className="my-meal-text">My Meal</div>
+                    <div className="my-meal-text">
+                      <img src={arrow} alt="Arrow" className="button-arrow" />
+                      Move to My Plans
                     </div>
-                  </a>
+                  </div>
                 ) : (
                   <div
-                    className="d-flex gap-2 viewcartbtn"
-                    onClick={handleMyMealClickForGuest} // Use the new handler
+                    className="d-flex gap-2 viewcartbtn align-items-center"
+                    onClick={handleMyMealClickForGuest}
                   >
-                    <div className="my-meal-icon">
-                      <img src={MyMeal} alt="My Meal" />
-                      <div className="red-icon"></div>
+                    <div className="my-meal-text">
+                      <img src={arrow} alt="Arrow" className="button-arrow" />
+                      Login to continue
                     </div>
-
-                    <div className="my-meal-text">My Meal</div>
                   </div>
                 )}
               </div>
@@ -618,91 +620,78 @@ const MultiCartDrawer = ({
         </>
       )}
 
-      {/* Expanded drawer */}
-      <Drawer
-        placement="bottom"
-        closable={false}
-        onClose={() => setIsDrawerOpen(false)}
-        open={isDrawerOpen}
-        height={Math.min(700, groupedCarts.length * 92 + 170)}
-        className="multi-cart-drawer"
-      >
-        {/* center close circle overlapping */}
-        <div
-          className="center-close-circle"
-          onClick={() => setIsDrawerOpen(false)}
-        >
-          <FaTimes size={18} color="#fff" />
-        </div>
-        <div className=" multi-cart-drawer-content">
-          <div className="multi-cart-header">
-            <div className="checkout-top" onClick={proceedToPlan}>
-              Add to Myplan{" "}
-              <img
-                src="/Assets/checkoutback.svg"
-                style={{ transform: "rotate(0deg)" }}
-              />
-            </div>
-          </div>
+      {/* Manual drawer implementation */}
+      {isDrawerOpen && (
+        <div className="manual-drawer-overlay">
+          <div className="manual-drawer">
+            <div className="multi-cart-drawer-content">
+              {/* Close button at top center */}
+              <div className="top-close-section">
+                <button
+                  className="close-button-top"
+                  onClick={() => setIsDrawerOpen(false)}
+                >
+                  <FaTimes size={20} />
+                </button>
+              </div>
 
-          <div className="slot-list-container">
-            {groupedCarts.map((slot, index) => (
-              <div className="cartbutton">
-                <div className="mc-cartbtn">
-                  <div className="d-flex justify-content-around align-items-center gap-2">
-                    <div className="d-flex gap-1 align-items-center">
-                      <div className="cart-items-price">
-                        {slot.totalItems} items | ₹{slot.subtotal.toFixed(0)}
-                      </div>
-                    </div>
-                    <div className="slot-title-details">
-                      <div className="slot-session-date">
-                        <span className="session-name">{slot.session}</span>
-                        <span className="date-name">
-                          - {formatSlotDate(slot.date)}
-                        </span>
-                      </div>
-                    </div>
-                    <a
-                      onClick={() => {
-                        handleSlotDetailClick(slot);
-                      }}
-                      style={{
-                        color: "unset",
-                        textDecoration: "none",
-                      }}
-                    >
-                      <div className="d-flex gap-1 align-content-center ">
-                        <div className="my-meal-icon">
-                          <img src={MyMeal} alt="" />
-                        </div>
-
-                        <div className="my-meal-text">Details</div>
-                      </div>
-                    </a>
-                  </div>
+              <div className="multi-cart-header">
+                <div
+                  className="checkout-top"
+                  onClick={() => {
+                    user ? handleMoveToMyPlans() : handleMyMealClickForGuest();
+                  }}
+                >
+                  <img src={arrow} alt="arrow" className="header-arrow" />
+                  {user ? "Move to My Plans" : "Login to continue"}
                 </div>
               </div>
-            ))}
+
+              <div className="slot-list-container">
+                {groupedCarts.map((slot, index) => (
+                  <div className="cartbutton" key={index}>
+                    <div className="mc-cartbtn">
+                      <div className="d-flex justify-content-around align-items-center gap-2">
+                        <div className="d-flex gap-1 align-items-center">
+                          <div className="cart-items-price">
+                            {slot.totalItems} items | ₹
+                            {slot.subtotal.toFixed(0)}
+                          </div>
+                        </div>
+                        <div className="slot-title-details">
+                          <div className="slot-session-date">
+                            <span className="session-name">{slot.session}</span>
+                            <span className="date-name">
+                              {formatSlotDate(slot.date)}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleSlotDetailClick(slot)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "unset",
+                            cursor: "pointer",
+                            padding: 0,
+                          }}
+                        >
+                          <div className="d-flex gap-1 align-content-center ">
+                            <div className="my-meal-icon">
+                              <img src={MyMeal} alt="" />
+                            </div>
+                            <div className="my-meal-text">Details</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </Drawer>
-
-      {/* Sign In Modal - appears at bottom half */}
-      <SignInModal
-        show={showSignInModal}
-        onHide={() => {
-          setShowSignInModal(false);
-          // Clear the destination if user cancels
-          localStorage.removeItem("postLoginDestination");
-        }}
-        onSuccess={() => {
-          // After successful login, proceed to plan
-          setShowSignInModal(false);
-          proceedToPlan();
-        }}
-        proceedToPlan={proceedToPlan}
-      />
+      )}
     </>
   );
 };

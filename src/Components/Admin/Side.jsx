@@ -36,7 +36,9 @@ const Side = () => {
   const [AddApartment, setAddApartment] = useState([]);
   const getAddApartment = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getapartment");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment"
+      );
       if (res.status === 200) {
         setAddApartment(res.data.corporatedata.reverse());
       }
@@ -70,7 +72,9 @@ const Side = () => {
   const [AddCorporate, setAddCorporate] = useState([]);
   const getAddCorporate = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcorporate");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate"
+      );
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
       }
@@ -106,7 +110,9 @@ const Side = () => {
   const [Adduser, setAdduser] = useState([]);
   const getAdduser = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/User/registeruser");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/User/registeruser"
+      );
       if (res.status === 200) {
         setAdduser(res.data.success.reverse());
       }

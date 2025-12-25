@@ -17,6 +17,7 @@ import warning from "./../assets/warning.png";
 import axios from "axios";
 import { MdAddLocationAlt, MdMyLocation } from "react-icons/md";
 import "./../Styles/Location.css";
+import no_location from "./../assets/red-location.png";
 
 const UpdateLocation = () => {
   const navigate = useNavigate();
@@ -91,10 +92,10 @@ const UpdateLocation = () => {
   useEffect(() => {
     checkLocationPermission();
 
-    // Prevent back navigation
+    // Handle back navigation to go to /home
     const handleBackButton = (e) => {
       e.preventDefault();
-      window.history.pushState(null, null, window.location.pathname);
+      navigate("/home");
     };
 
     window.history.pushState(null, null, window.location.pathname);
@@ -664,10 +665,10 @@ const UpdateLocation = () => {
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
-        zoomControl: true,
+        zoomControl: false,
         rotateControl: false,
         scaleControl: false,
-        panControl: false,
+        // panControl: false,
         styles: [
           {
             featureType: "poi",
@@ -678,6 +679,7 @@ const UpdateLocation = () => {
         backgroundColor: "#f5f5f5",
         disableDefaultUI: false,
         gestureHandling: "greedy",
+        disableDefaultUI: true, // This will disable all default UI controls
       });
 
       mapInstanceRef.current = map;
@@ -1397,33 +1399,16 @@ const UpdateLocation = () => {
         // Set manual location flag to prevent auto-detection
         localStorage.setItem("locationManuallySelected", "true");
 
-        // Check for post-login destination
-        const postLoginDestination = localStorage.getItem(
-          "postLoginDestination"
-        );
+        // Clean up any post-login destination flags
+        localStorage.removeItem("postLoginDestination");
 
-        console.log(
-          "🔍 UpdateLocation - postLoginDestination:",
-          postLoginDestination
-        );
-
-        if (postLoginDestination === "my-plan") {
-          // Set a flag to trigger proceedToPlan after navigation
-          localStorage.setItem("triggerProceedToPlan", "true");
-          localStorage.removeItem("postLoginDestination");
-          console.log("✅ Navigating to / with triggerProceedToPlan flag");
-        }
-
-        // Flag removed - no longer needed since fallback auto-MyPlan logic was removed
-
-        // Always navigate to home, but with different state
-        navigate("/", {
+        // Always navigate to home after adding location
+        navigate("/home", {
           state: {
             userLocation: selectedLocation,
             userAddress: address,
             addressData: addressData,
             isPrimary: true,
-            shouldProceedToPlan: postLoginDestination === "my-plan",
           },
         });
       } else {
@@ -2371,39 +2356,33 @@ const UpdateLocation = () => {
             style={{
               backgroundColor: "#f8f9fa",
               borderRadius: "8px",
-              padding: "16px",
-              marginBottom: "24px",
+              padding: window.innerWidth <= 480 ? "8px 10px" : "10px 12px",
+              marginBottom: window.innerWidth <= 480 ? "12px" : "16px",
               border: "1px solid #e0e0e0",
             }}
           >
             <div
               style={{
                 display: "flex",
-                alignItems: "flex-start",
-                gap: "12px",
+                alignItems: "center", // center for one line
+                gap: window.innerWidth <= 480 ? "6px" : "8px",
               }}
             >
+              <MapPin size={16} color="#4caf50" />
+
               <div
                 style={{
-                  fontSize: "20px",
-                  color: "#4caf50",
-                  flexShrink: 0,
-                  marginTop: "2px",
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: window.innerWidth <= 480 ? "12px" : "14px",
+                  color: "#666",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  lineHeight: "1.2",
                 }}
               >
-                <MapPin size={20} color="#4caf50" />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: window.innerWidth <= 480 ? "12px" : "14px",
-                    color: "#666",
-                    lineHeight: "1.4",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {address || "Detecting address..."}
-                </div>
+                {address || "Detecting address..."}
               </div>
             </div>
           </div>
@@ -2456,7 +2435,7 @@ const UpdateLocation = () => {
           {isServiceable === true || isServiceable === null ? (
             <form onSubmit={handleSaveAddress}>
               {/* Address Type Selection */}
-              <div style={{ marginBottom: "24px" }}>
+              <div style={{ marginBottom: "10px" }}>
                 <div
                   style={{
                     display: window.innerWidth <= 768 ? "flex" : "grid",
@@ -2601,7 +2580,7 @@ const UpdateLocation = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      navigate(-1);
+                      navigate("/home");
                     }}
                     style={{
                       backgroundColor: "transparent",

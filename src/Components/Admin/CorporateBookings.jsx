@@ -151,7 +151,9 @@ const CorporateBookings = () => {
   // Fetch Hubs (from original)
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs"
+      );
       setHubs(res.data);
     } catch (error) {
       console.error("Failed to fetch hubs:", error);

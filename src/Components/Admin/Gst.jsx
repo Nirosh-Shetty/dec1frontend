@@ -56,7 +56,9 @@ function Gst() {
   const [nochangedata, setNoChangeData] = useState([]);
   const getGst = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getgst");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getgst"
+      );
       if (res.status === 200) {
         setGstList(res.data.gst.reverse());
         setNoChangeData(res.data.gst.reverse());

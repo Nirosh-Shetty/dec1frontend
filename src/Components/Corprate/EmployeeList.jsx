@@ -129,7 +129,8 @@ const EmployeeList = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/User/getUserByCompany/" + corporate._id
+        "https://dd-merge-backend-2.onrender.com/api/User/getUserByCompany/" +
+          corporate._id
       );
       if (res.status === 200) {
         setEmployees(res.data.success);
@@ -186,13 +187,16 @@ const EmployeeList = () => {
   const handleEditEmployee = async () => {
     setEditEmployeeLoading(true);
     try {
-      const res = await axios.put(`https://dd-merge-backend-2.onrender.com/api/User/updateuser`, {
-        Fname: editEmployee.Fname,
-        Mobile: editEmployee.Mobile,
-        employeeId: editEmployee.employeeId,
-        subsidyAmount: Number(editEmployee.subsidyAmount),
-        userId: selectedEmployee?._id,
-      });
+      const res = await axios.put(
+        `https://dd-merge-backend-2.onrender.com/api/User/updateuser`,
+        {
+          Fname: editEmployee.Fname,
+          Mobile: editEmployee.Mobile,
+          employeeId: editEmployee.employeeId,
+          subsidyAmount: Number(editEmployee.subsidyAmount),
+          userId: selectedEmployee?._id,
+        }
+      );
       if (res.status === 200) {
         alert("Employee updated successfully");
         setShowEditEmployee(false);

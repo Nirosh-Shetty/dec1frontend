@@ -4517,7 +4517,9 @@ const DashboardPage = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/Hub/hubs"
+      );
       const allHubs = res.data;
 
       // Filter hubs based on packer's assigned hubs
@@ -4694,7 +4696,9 @@ const DashboardPage = () => {
 
   const getBegs = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getbags"
+      );
       if (res.status == 200) {
         setAllBags(res.data.bags);
       }

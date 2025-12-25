@@ -62,6 +62,16 @@ const AddressManagement = () => {
     };
   };
 
+  // Clear cache function
+  const clearCache = () => {
+    const customerId = getCustomerId();
+    if (customerId) {
+      localStorage.removeItem(`addresses_${customerId}`);
+      localStorage.removeItem(`addresses_timestamp_${customerId}`);
+    }
+    hasFetchedRef.current = false;
+  };
+
   // Background fetch to update cache
   const fetchAddressesInBackground = useCallback(async (customerId) => {
     try {
@@ -75,7 +85,8 @@ const AddressManagement = () => {
 
       if (response.ok) {
         const result = await response.json();
-        if (result.success) {
+        // The API returns the user object with addresses property
+        if (result && Array.isArray(result.addresses)) {
           const addresses = result.addresses || [];
           const primaryId = result.primaryAddress || null;
 
@@ -149,24 +160,37 @@ const AddressManagement = () => {
 
       const result = await response.json();
 
-      if (result.success) {
-        const addresses = result.addresses || [];
-        const primaryId = result.primaryAddress || null;
+      // THE FIX: Based on your data, the API returns the user object
+      // with addresses array and primaryAddress field
+      let addressesArray = [];
+      let primaryId = null;
 
-        setAddresses(addresses);
-        setPrimaryAddressId(primaryId);
+      // Check if result has addresses directly (user object)
+      if (result && Array.isArray(result.addresses)) {
+        addressesArray = result.addresses;
+        primaryId = result.primaryAddress || null;
+      }
+      // Fallback: check for success field structure
+      else if (result.success && Array.isArray(result.addresses)) {
+        addressesArray = result.addresses;
+        primaryId = result.primaryAddress || null;
+      }
 
-        // Cache the results
-        localStorage.setItem(
-          `addresses_${customerId}`,
-          JSON.stringify({ addresses, primaryAddress: primaryId })
-        );
-        localStorage.setItem(
-          `addresses_timestamp_${customerId}`,
-          Date.now().toString()
-        );
-      } else {
-        throw new Error(result.message || "Failed to fetch addresses");
+      setAddresses(addressesArray);
+      setPrimaryAddressId(primaryId);
+
+      // Cache the results
+      localStorage.setItem(
+        `addresses_${customerId}`,
+        JSON.stringify({ addresses: addressesArray, primaryAddress: primaryId })
+      );
+      localStorage.setItem(
+        `addresses_timestamp_${customerId}`,
+        Date.now().toString()
+      );
+
+      if (addressesArray.length === 0) {
+        showAlert("No addresses found. Add your first address!", "info");
       }
     } catch (error) {
       if (error.name !== "AbortError") {
@@ -179,6 +203,8 @@ const AddressManagement = () => {
   }, [fetchAddressesInBackground]);
 
   useEffect(() => {
+    // Clear cache on component mount to force fresh fetch
+    clearCache();
     fetchAddresses();
 
     return () => {
@@ -197,7 +223,6 @@ const AddressManagement = () => {
   };
 
   const handleEditAddress = (address) => {
-    console.log("edit address ", address);
     navigate("/location", {
       state: {
         editingAddress: address,
@@ -535,8 +560,41 @@ const AddressManagement = () => {
                 <div className="d-flex align-items-center mt-1">
                   <FaCheckCircle className="text-success me-2" />
                   <span style={{ fontWeight: "500" }}>
-                    {addresses.find((addr) => addr._id === primaryAddressId)
-                      ?.houseName || "Primary Address"}
+                    {(() => {
+                      const primaryAddress = addresses.find(
+                        (addr) => addr._id === primaryAddressId
+                      );
+                      if (!primaryAddress) return "Primary Address";
+
+                      switch (primaryAddress.addressType) {
+                        case "Home":
+                          return (
+                            primaryAddress.homeName ||
+                            primaryAddress.houseName ||
+                            "Home Address"
+                          );
+                        case "PG":
+                          return (
+                            primaryAddress.apartmentName ||
+                            primaryAddress.houseName ||
+                            "Apartment Address"
+                          );
+                        case "School":
+                          return (
+                            primaryAddress.schoolName ||
+                            primaryAddress.houseName ||
+                            "School Address"
+                          );
+                        case "Work":
+                          return (
+                            primaryAddress.companyName ||
+                            primaryAddress.houseName ||
+                            "Work Address"
+                          );
+                        default:
+                          return primaryAddress.houseName || "Primary Address";
+                      }
+                    })()}
                   </span>
                 </div>
               </div>
@@ -615,7 +673,6 @@ const AddressManagement = () => {
                     whiteSpace: window.innerWidth <= 768 ? "nowrap" : "normal",
                     wordBreak:
                       window.innerWidth <= 768 ? "normal" : "break-word",
-                    // padding: "0 4px",
                   }}
                 >
                   {type.label}

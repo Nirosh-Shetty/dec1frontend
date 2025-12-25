@@ -166,16 +166,9 @@ const ValidateModal = ({
           });
 
           // ✅ Check for post-login destination
-          const postLoginDestination = localStorage.getItem(
-            "postLoginDestination"
-          );
-          console.log(
-            "🔍 ValidateModal - postLoginDestination:",
-            postLoginDestination
-          );
           console.log("🔍 ValidateModal - hasAddresses:", hasAddresses);
 
-          // ✅ Redirect logic based on address availability and intended destination
+          // ✅ Always redirect to home after login, regardless of address status
           setTimeout(() => {
             if (hasAddresses) {
               // User has addresses
@@ -247,42 +240,14 @@ const ValidateModal = ({
                 // Dispatch event to update other components
                 window.dispatchEvent(new Event("locationUpdated"));
               }
-
-              // Re-check currentLocation after potential update
-              const updatedCurrentLocation = JSON.parse(
-                localStorage.getItem("currentLocation") || "null"
-              );
-
-              if (!primaryAddress && !updatedCurrentLocation) {
-                // Has addresses but none selected - go to location (keep destination for later)
-                console.log(
-                  "➡️ ValidateModal - Navigating to /location (no selected address)"
-                );
-                navigate("/location", { replace: true });
-              } else {
-                // Has address selected - check if user wants to proceed to MyPlan
-                if (postLoginDestination === "my-plan") {
-                  localStorage.setItem("triggerProceedToPlan", "true");
-                  localStorage.removeItem("postLoginDestination");
-                  console.log(
-                    "➡️ ValidateModal - Navigating to / (will auto-proceed to MyPlan)"
-                  );
-                  navigate("/", { replace: true });
-                } else {
-                  // Navigate to home normally for users with addresses
-                  console.log(
-                    "➡️ ValidateModal - User has addresses, navigating to home"
-                  );
-                  navigate("/", { replace: true });
-                }
-              }
-            } else {
-              // No addresses - go to location (destination will be handled there)
-              console.log(
-                "➡️ ValidateModal - Navigating to /location (no addresses)"
-              );
-              navigate("/location", { replace: true });
             }
+
+            // Clean up any post-login destination flags
+            localStorage.removeItem("postLoginDestination");
+
+            // Always navigate to home after login
+            console.log("➡️ ValidateModal - Navigating to home after login");
+            navigate("/", { replace: true });
           }, 100);
         }
       } catch (error) {

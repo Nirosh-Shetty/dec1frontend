@@ -102,9 +102,12 @@ const AdminCategory = () => {
         );
         setPackersEditId(null);
       } else {
-        await axios.post("https://dd-merge-backend-2.onrender.com/api/admin/addcategory", {
-          CategoryName: packersCategoryName,
-        });
+        await axios.post(
+          "https://dd-merge-backend-2.onrender.com/api/admin/addcategory",
+          {
+            CategoryName: packersCategoryName,
+          }
+        );
       }
       setPackersCategoryName("");
       fetchPackersCategories();

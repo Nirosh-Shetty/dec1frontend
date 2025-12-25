@@ -2653,7 +2653,7 @@ import Swal2 from "sweetalert2";
 import swal from "sweetalert";
 import { FaSquareWhatsapp } from "react-icons/fa6";
 import { WalletContext } from "../WalletContext";
-
+import usericon from "./../assets/login_profile.png";
 import Selectlocation from "../assets/selectlocation.svg";
 import UserIcons from "../assets/userp.svg";
 import clockone from "./../assets/mynaui_clock-one.png";
@@ -2661,6 +2661,7 @@ import clockone from "./../assets/mynaui_clock-one.png";
 import UserBanner from "./UserBanner";
 import ProfileOffcanvas from "./Navbar2";
 import LocationModal2 from "./LocationModal2";
+import CookingPromo from "./CookingPromo";
 
 function useWindowWidth() {
   const [w, setW] = React.useState(
@@ -3922,7 +3923,9 @@ const Banner = ({
                 <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center">
                   <div className="d-flex align-items-center">
                     <p
-                      className="select-location-text fw-semibold text-truncate mb-0 banner-address-line"
+                      className={`select-location-text fw-semibold text-truncate mb-0 banner-address-line ${
+                        user ? "with-user-icon" : "with-login-btn"
+                      }`}
                       title={getAddressTooltip()}
                       style={{ opacity: isLocationEnabled ? 1 : 0.7 }}
                     >
@@ -4003,12 +4006,40 @@ const Banner = ({
                   <span className="refer-earn-text">Refer & Earn</span>
                 </button> */}
 
-                <img
-                  src={UserIcons}
-                  alt="user-icon"
-                  onClick={handleShow8}
-                  className="p-2"
-                />
+                {user ? (
+                  <img
+                    src={UserIcons}
+                    alt="user-icon"
+                    onClick={handleShow8}
+                    className="p-2"
+                  />
+                ) : (
+                  <button
+                    className="d-flex gap-2 justify-content-center align-items-center"
+                    style={{
+                      background: "#FFF8DC",
+                      border: "2px solid #F5DEB3",
+                      color: "#2c2c2c",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      fontFamily: "Inter",
+                      fontWeight: "600",
+                      width: "106px",
+                      height: "44px",
+                      borderRadius: "18px",
+                    }}
+                    onClick={() => {
+                      navigate("/login");
+                    }}
+                  >
+                    <img
+                      src={usericon}
+                      alt=""
+                      style={{ width: "27px", height: "27px" }}
+                    />
+                    LOGIN
+                  </button>
+                )}
               </div>
             </div>
 
@@ -4050,6 +4081,9 @@ const Banner = ({
               </div>
             </div> */}
           </div>
+          <div style={{ marginBottom: "10px" }}>
+            <CookingPromo />
+          </div>
         </div>
 
         {/* Serviceability Popup - Only show when explicitly not serviceable */}
@@ -4061,7 +4095,7 @@ const Banner = ({
               right: 0,
               bottom: 0,
               padding: isSmall ? "0 12px 16px" : "0 16px 20px",
-              zIndex: 999999,
+              zIndex: 999990,
               display: "flex",
               justifyContent: "center",
               pointerEvents: "none",
@@ -4518,11 +4552,35 @@ const Banner = ({
         </Modal>
       </div>
 
-      <div className="ban-container">
+      <div className="ban-container2">
         <div className="mobile-banner" style={{ position: "relative" }}>
           <UserBanner />
         </div>
+        {/* <div style={{ alignSelf: "end", marginRight: "16px" }}> */}
+        <div
+          className="veg-btn d-flex flex-row align-items-center ms-2"
+          onClick={() => setIsVegOnly(!isVegOnly)}
+        >
+          <h6 className="m-0 veg-title">Veg Only</h6>
+          <div
+            className="veg-btn-toggle"
+            // 1. Toggle state on click
+            style={{ cursor: "pointer" }}
+          >
+            <div
+              className="veg-btn-switch"
+              style={{
+                // 2. Dynamic styling for animation and color
+                transform: isVegOnly ? "translateX(18px)" : "translateX(0)",
+                backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d", // Green when Active, Grey when inactive
+                transition: "all 0.3s ease", // Smooth sliding effect
+              }}
+            ></div>
+          </div>
+        </div>
+        {/* </div> */}
       </div>
+
       <LocationModal2
         show={showLocationModal}
         onClose={() => {

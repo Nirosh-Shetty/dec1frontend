@@ -786,7 +786,7 @@ export default function LeafWithLogo() {
   };
 
   return (
-    <div className="login-page-wrapper">
+    <div className="login-page-wrapper" style={{ height: "100vh" }}>
       <div className="login-container">
         <motion.div
           className="header-wrapper"
@@ -948,7 +948,13 @@ export default function LeafWithLogo() {
                 placeholder="Enter phone number"
                 type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                maxLength={10}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ""); // allow digits only
+                  if (value.length <= 10) {
+                    setPhone(value);
+                  }
+                }}
               />
             </div>
             <button

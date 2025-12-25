@@ -487,12 +487,15 @@ function OrderHistory() {
     const comment = isFoodRating ? foodReview : deliveryReview;
 
     try {
-      await axios.put(`https://dd-merge-backend-2.onrender.com/api/admin/submitOrderRating`, {
-        orderId: currentOrderId,
-        ratingType,
-        rating,
-        comment,
-      });
+      await axios.put(
+        `https://dd-merge-backend-2.onrender.com/api/admin/submitOrderRating`,
+        {
+          orderId: currentOrderId,
+          ratingType,
+          rating,
+          comment,
+        }
+      );
 
       setOrderRating(currentOrderId, ratingType, rating);
       setOrders(
