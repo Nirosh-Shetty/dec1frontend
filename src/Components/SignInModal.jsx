@@ -321,7 +321,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
                   }}
                 >
                   <img
-                    src={"/assets/logo-container.png"}
+                    src={"/Assets/logo-container.png"}
                     alt="Logo"
                     style={{
                       width: "70%",
