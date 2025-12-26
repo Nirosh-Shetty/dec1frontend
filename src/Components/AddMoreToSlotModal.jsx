@@ -157,7 +157,7 @@ const AddMoreToSlotModal = ({
                       <h5 className="add-more-item-name">{item.foodname}</h5>
                     </div>
                     <p className="add-more-item-category">
-                      {item.foodcategory}
+                      {item.menuCategory}
                     </p>
                     <div className="add-more-item-prices">
                       <span className="add-more-price-preorder">
