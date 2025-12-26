@@ -1878,12 +1878,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                         PICK
                                       </span>
                                       <span className="pick-btn-text2">
-                                        {`for ${new Date(
+                                        {/* {`for ${new Date(
                                           item.deliveryDate
                                         ).toLocaleDateString("en-GB", {
                                           day: "2-digit",
                                           month: "short",
-                                        })}`}
+                                        })}`} */}
+                                        Confirm Later
                                       </span>
                                     </div>
                                   
