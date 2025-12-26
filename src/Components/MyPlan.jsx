@@ -527,15 +527,24 @@ const handleAddressChange = async() => {
 
                 {/* Total row */}
                 <div className="plan-cart-footer">
-                   {/* <span className="add-more-label">
-                        Add More
-                      </span> */}
                   {isEditable && (
-                    <div className="add-more-section">
+                    <div className="plan-add-more-section">
                       <button
-                        className="add-more-btn"
+                        className="plan-add-more-btn"
                         onClick={() => setShowAddMoreModal(true)}
                       >
+                          <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="26"
+                          height="26"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                        >
+                          <path
+                            d="M9 3C12.3082 3 15 5.69175 15 9C15 12.3082 12.3082 15 9 15C5.69175 15 3 12.3082 3 9C3 5.69175 5.69175 3 9 3ZM9 1.5C4.85775 1.5 1.5 4.85775 1.5 9C1.5 13.1423 4.85775 16.5 9 16.5C13.1423 16.5 16.5 13.1423 16.5 9C16.5 4.85775 13.1423 1.5 9 1.5ZM12.75 8.25H9.75V5.25H8.25V8.25H5.25V9.75H8.25V12.75H9.75V9.75H12.75V8.25Z"
+                            fill="#6b8e23"
+                          />
+                        </svg>
                         Add More
                       </button>
                     </div>

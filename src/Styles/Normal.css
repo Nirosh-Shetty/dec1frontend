@@ -591,14 +591,14 @@
   gap: 24px;
 }
 
-.add-more-section {
+/* .add-more-section {
   padding-left: 8px;
   padding-right: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-}
+} */
 
 .add-more-btn {
   border-radius: 25px;
@@ -766,14 +766,14 @@ body {
 }
 
 
-.add-more-section {
+/* .add-more-section {
   padding-left: 8px;
   padding-right: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-}
+} */
 
 .add-more-btn {
   border-radius: 25px;
@@ -834,7 +834,6 @@ body {
   font-weight: 500;
   font-family: 'Inter', sans-serif;
   line-height: 0.75;
-  border:2px solid black;
 }
 
 .total-section {
