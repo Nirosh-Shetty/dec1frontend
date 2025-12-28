@@ -79,8 +79,7 @@ const ViewPlanModal = ({
 
   const now = new Date();
   const cutoffTime = getCutoffTime(localPlan.deliveryDate, localPlan.session);
-  const isEditable =
-    localPlan.status === "Pending Payment" && now < cutoffTime;
+  const isEditable = localPlan.status === "Pending Payment" && now < cutoffTime;
 
   async function changeQuantity(foodItemId, delta) {
     if (!isEditable) return;
@@ -223,8 +222,8 @@ const ViewPlanModal = ({
   // Payable amount after wallet deduction
   const payableAmount = Math.max(
     0,
-    ((localPlan.payableAmount || 0) - walletDeduction)
-  )
+    (localPlan.payableAmount || 0) - walletDeduction
+  );
 
   if (!isOpen || !localPlan) return null;
 
@@ -246,14 +245,14 @@ const ViewPlanModal = ({
     return { days, hours, mins, isExpired: false };
   };
   const { days, hours, mins, isExpired } = getTimeRemainingToCutoff();
-const handleAddressChange = async() => {
-  try {
-    // await axios.patch(`https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
-    setShowLocationModal(true);
-  } catch (error) {
-    Swal2.fire("Error", "Unable to Change Address", "error");
-  }
-};
+  const handleAddressChange = async () => {
+    try {
+      // await axios.patch(`https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
+      setShowLocationModal(true);
+    } catch (error) {
+      Swal2.fire("Error", "Unable to Change Address", "error");
+    }
+  };
 
   const handleAddressSelected = async (address) => {
     try {
@@ -501,16 +500,20 @@ const handleAddressChange = async() => {
                       </div>
                       <div className="price-container vertical">
                         {/* Always show preorder price, as only preorder is allowed */}
-                        <div className="plan-actual-price">
-                          <div className="plan-current-currency">
-                            <div className="current-currency-text">₹</div>
-                          </div>
-                          <div className="plan-hub-amount">
-                            <div className="hub-amount-text">
-                              {product.hubTotalPrice?.toFixed(0)}
+                        {product.hubTotalPrice?.toFixed(0) <
+                          product.totalPrice?.toFixed(0) && (
+                          <div className="plan-actual-price">
+                            <div className="plan-current-currency">
+                              <div className="current-currency-text">₹</div>
+                            </div>
+                            <div className="plan-hub-amount">
+                              <div className="hub-amount-text">
+                                {product.hubTotalPrice?.toFixed(0)}
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )}
+
                         <div className="plan-current-price">
                           <div className="plan-current-currency">
                             <div className="current-currency-text"></div>
@@ -533,7 +536,7 @@ const handleAddressChange = async() => {
                         className="plan-add-more-btn"
                         onClick={() => setShowAddMoreModal(true)}
                       >
-                          <svg
+                        <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="26"
                           height="26"
@@ -807,7 +810,7 @@ const handleAddressChange = async() => {
               <span>Total Order value</span>
               <span> ₹{localPlan?.slotTotalAmount}</span>
             </div>
-              {(localPlan?.slotHubTotalAmount < localPlan?.slotTotalAmount) && (
+            {localPlan?.slotHubTotalAmount < localPlan?.slotTotalAmount && (
               <div className="billing-details-row">
                 <span>Pre-Order Savings</span>
                 <span>
@@ -816,12 +819,14 @@ const handleAddressChange = async() => {
                 </span>
               </div>
             )}
-             
+
             {/* Show preorder discount if present and > 0 */}
-            {(localPlan?.preorderDiscount > 0) && (
+            {localPlan?.preorderDiscount > 0 && (
               <div className="billing-details-row">
                 <span>Preorder Discount</span>
-                <span style={{ color: '#388e3c', fontWeight: 600 }}>- ₹{localPlan.preorderDiscount}</span>
+                <span style={{ color: "#388e3c", fontWeight: 600 }}>
+                  - ₹{localPlan.preorderDiscount}
+                </span>
               </div>
             )}
             <div className="billing-details-row">
@@ -1508,7 +1513,8 @@ const MyPlan = () => {
                 const payableAmount = Math.max(
                   0,
                   plan.slotTotalAmount -
-                    (plan.discountWallet || 0) - (plan.preorderDiscount || 0)
+                    (plan.discountWallet || 0) -
+                    (plan.preorderDiscount || 0)
                 ).toFixed(0);
                 const isUnpaidEditable =
                   plan.status === "Pending Payment" && isBeforeDeadline;
@@ -2209,7 +2215,9 @@ const MyPlan = () => {
                 marginBottom: "8px",
               }}
             >
-              You must confirm and pay before the cutoff time: 8am for Lunch, 4pm for Dinner. After the cutoff, you cannot edit or pay for the plan.
+              You must confirm and pay before the cutoff time: 8am for Lunch,
+              4pm for Dinner. After the cutoff, you cannot edit or pay for the
+              plan.
             </p>
 
             <h5
