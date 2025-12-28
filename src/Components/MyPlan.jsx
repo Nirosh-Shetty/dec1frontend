@@ -807,21 +807,21 @@ const handleAddressChange = async() => {
               <span>Total Order value</span>
               <span> ₹{localPlan?.slotTotalAmount}</span>
             </div>
-              {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount>0&&
-            <div className="billing-details-row">
-               <span>Pre-Order Savings</span>
-              <span>
-                - ₹
-                {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount}
-              </span>
-            </div>
-              }
+              {(localPlan?.slotHubTotalAmount < localPlan?.slotTotalAmount) && (
+              <div className="billing-details-row">
+                <span>Pre-Order Savings</span>
+                <span>
+                  - ₹
+                  {localPlan?.slotHubTotalAmount - localPlan?.slotTotalAmount}
+                </span>
+              </div>
+            )}
              
             {/* Show preorder discount if present and > 0 */}
-            {(localPlan.preorderDiscount && localPlan.preorderDiscount > 0) && (
+            {(localPlan?.preorderDiscount > 0) && (
               <div className="billing-details-row">
                 <span>Preorder Discount</span>
-                <span style={{ color: '#388e3c', fontWeight: 600 }}>- ₹{localPlan.preorderDiscount || 0}</span>
+                <span style={{ color: '#388e3c', fontWeight: 600 }}>- ₹{localPlan.preorderDiscount}</span>
               </div>
             )}
             <div className="billing-details-row">
