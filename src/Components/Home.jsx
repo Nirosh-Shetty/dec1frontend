@@ -139,11 +139,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // Removed: useEffect that depends on user - moved to after user declaration
 
   // --- DATE & SESSION STATE ---
-  const getNormalizedToday = () => {
-    const today = new Date();
-    return new Date(
-      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
-    );
+ const getNormalizedToday = () => {
+      const now = new Date();
+      return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   };
 
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -447,13 +445,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
     return false;
   };
-
+  console.log(address, "address");
   // Helper: always use preorder price if available and before cutoff
-  const getEffectivePrice = (
-    item,
-    matchedLocation,
-    session
-  ) => {
+  const getEffectivePrice = (item, matchedLocation, session) => {
     const hubPrice =
       (matchedLocation &&
         (matchedLocation.hubPrice || matchedLocation.basePrice)) ||
@@ -470,8 +464,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       item?.deliveryDate || item?.deliveryDateISO,
       session
     );
-    if (beforeCutoff && preOrderPrice > 0)
-      return { price: preOrderPrice };
+    if (beforeCutoff && preOrderPrice > 0) return { price: preOrderPrice };
     return { price: hubPrice };
   };
 
@@ -490,7 +483,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setFoodData(food);
     setOpen(true);
   };
-
   const onClose = () => {
     setOpen(false);
   };
@@ -1078,9 +1070,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         addressId: address._id || "",
         addressline: `${address.fullAddress}`,
         addressType: address.addressType || "",
-        coordinates: address.location
-          ? [address.location.lng, address.location.lat]
-          : [0, 0],
+        coordinates: address.location?.coordinates || [0, 0],
         hubId: address.hubId || "",
         hubName: address.hubName || "",
         studentInformation: address.studentInformation,
@@ -1840,9 +1830,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
                           {address && (
                             <div>
-                                <div className="guaranteed-label">
-                                  Guaranteed Availability{" "}
-                                </div>
+                              <div className="guaranteed-label">
+                                Guaranteed Availability{" "}
+                              </div>
                               {checkOf && <BiSolidOffer color="green" />}
                               {/* </div> */}
                             </div>
@@ -1873,21 +1863,18 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                     opacity: user && !address ? 0.5 : 1,
                                   }}
                                 >
-                                    <div className="pick-btn-text">
-                                      <span className="pick-btn-text1">
-                                        PICK
-                                      </span>
-                                      <span className="pick-btn-text2">
-                                        {/* {`for ${new Date(
+                                  <div className="pick-btn-text">
+                                    <span className="pick-btn-text1">PICK</span>
+                                    <span className="pick-btn-text2">
+                                      {/* {`for ${new Date(
                                           item.deliveryDate
                                         ).toLocaleDateString("en-GB", {
                                           day: "2-digit",
                                           month: "short",
                                         })}`} */}
-                                        Confirm Later
-                                      </span>
-                                    </div>
-                                  
+                                      Confirm Later
+                                    </span>
+                                  </div>
 
                                   <span className="add-to-cart-btn-icon">
                                     {" "}

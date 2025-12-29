@@ -303,34 +303,34 @@ const ViewPlanModal = ({
   };
 
   // Payment handler: if payableAmount is 0, skip gateway and call /create-from-plan
-  const handlePay = async () => {
-    if (payableAmount === 0) {
-      // Directly create order from plan (like Checkout)
-      try {
-        setLoading(true);
-        const res = await axios.post("/api/user/myplan/create-from-plan", {
-          userId,
-          planId: localPlan._id,
-          discountWallet: walletDeduction,
-        });
-        setLoading(false);
-        if (res.data.success) {
-          toast.success("Order placed successfully!");
-          onPlanUpdated && onPlanUpdated();
-          onClose();
-        } else {
-          toast.error(res.data.message || "Order failed");
-        }
-      } catch (err) {
-        setLoading(false);
-        toast.error("Order failed");
-      }
-    } else {
-      // Proceed to payment gateway as usual
-      onPlanUpdated &&
-        onPlanUpdated("pay", { ...plan, discountWallet: walletDeduction });
-    }
-  };
+  // const handlePay = async () => {
+  //   if (payableAmount === 0) {
+  //     // Directly create order from plan (like Checkout)
+  //     try {
+  //       setLoading(true);
+  //       const res = await axios.post("/api/user/myplan/create-from-plan", {
+  //         userId,
+  //         planId: localPlan._id,
+  //         discountWallet: walletDeduction,
+  //       });
+  //       setLoading(false);
+  //       if (res.data.success) {
+  //         toast.success("Order placed successfully!");
+  //         onPlanUpdated && onPlanUpdated();
+  //         onClose();
+  //       } else {
+  //         toast.error(res.data.message || "Order failed");
+  //       }
+  //     } catch (err) {
+  //       setLoading(false);
+  //       toast.error("Order failed");
+  //     }
+  //   } else {
+  //     // Proceed to payment gateway as usual
+  //     onPlanUpdated &&
+  //       onPlanUpdated("pay", { ...plan, discountWallet: walletDeduction });
+  //   }
+  // };
 
   return (
     <div className="plan-modal-overlay" onClick={onClose}>
@@ -1513,9 +1513,9 @@ const MyPlan = () => {
                 const isBeforeDeadline = now < deadline;
                 const payableAmount = Math.max(
                   0,
-                  plan.slotTotalAmount -
-                    (plan.discountWallet || 0) -
-                    (plan.preorderDiscount || 0)
+                  plan.payableAmount -
+                    (plan.discountWallet || 0) 
+                    // -(plan.preorderDiscount || 0)
                 ).toFixed(0);
                 const isUnpaidEditable =
                   plan.status === "Pending Payment" && isBeforeDeadline;

@@ -9,15 +9,17 @@ import "../Styles/DateSessionSelector.css";
 
 const getNextSevenDays = () => {
   const result = [];
-  const now = new Date();
+  const now = new Date(); // Browser time (Dec 30 00:28)
+  
   for (let i = 0; i < 7; i++) {
-    // create date at UTC midnight for stability across timezones
+    // This ensures if my laptop says 30th, the key is generated for 30th.
     const dUtc = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + i)
+      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + i)
     );
+    
     result.push({
       label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : null,
-      date: dUtc.getUTCDate(),
+      date: dUtc.getUTCDate(), // This will now be 30, 31, 1...
       month: dUtc.toLocaleString("default", { month: "short" }),
       weekday: dUtc.toLocaleString("default", { weekday: "long" }),
       dateObj: dUtc,
