@@ -206,9 +206,7 @@ const CorporateList = () => {
   const getAddCorporate = async () => {
     try {
       setLoading(true);
-      let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate"
-      );
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcorporate");
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
         setNoChangeData(res.data.corporatedata);

@@ -56,9 +56,7 @@ const Slot = () => {
   const [AddSlots, setAddSlots] = useState([]);
   const getAddSlots = async () => {
     try {
-      let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getslots"
-      );
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getslots");
       if (res.status === 200) {
         setAddSlots(res.data.Newaddress);
         setNoChangeData1(res.data.Newaddress);

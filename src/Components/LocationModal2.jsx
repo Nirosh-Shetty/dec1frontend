@@ -1102,13 +1102,9 @@ const LocationModal2 = ({
                             backgroundColor: isSelected
                               ? "#6B8E23"
                               : "transparent",
-                            border: isSelected
-                              ? "none"
-                              : "1px solid #6B8E23",
+                            border: isSelected ? "none" : "1px solid #6B8E23",
                             borderRadius: "8px",
-                            color: isSelected
-                              ? "white"
-                              : "#6B8E23",
+                            color: isSelected ? "white" : "#6B8E23",
                             fontSize: isMobile ? "12px" : "13px",
                             fontWeight: "500",
                             padding: isMobile ? "8px 12px" : "10px 16px",
@@ -1127,19 +1123,13 @@ const LocationModal2 = ({
                             gap: "6px",
                           }}
                           onMouseEnter={(e) => {
-                            if (
-                              !isSelected &&
-                              !actionLoading
-                            ) {
+                            if (!isSelected && !actionLoading) {
                               e.target.style.backgroundColor = "#6B8E23";
                               e.target.style.color = "white";
                             }
                           }}
                           onMouseLeave={(e) => {
-                            if (
-                              !isSelected &&
-                              !actionLoading
-                            ) {
+                            if (!isSelected && !actionLoading) {
                               e.target.style.backgroundColor = "transparent";
                               e.target.style.color = "#6B8E23";
                             }
@@ -1350,7 +1340,6 @@ const LocationModal2 = ({
 };
 
 export default LocationModal2;
-
 
 // import React, { useState, useEffect, useRef, useCallback } from "react";
 // import { useNavigate } from "react-router-dom";
@@ -2506,4 +2495,3 @@ export default LocationModal2;
 // };
 
 // export default LocationModal2;
-

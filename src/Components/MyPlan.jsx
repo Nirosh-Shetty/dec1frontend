@@ -1736,7 +1736,7 @@ const MyPlan = () => {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="price-container" >
+                                  <div className="price-container" style={{color:"black"}}>
                                     <div className="final-price-box1">
                                       ₹{payableAmount}
                                     </div>

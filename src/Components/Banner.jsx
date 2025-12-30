@@ -2999,130 +2999,379 @@ const Banner = ({
   };
 
   // Handle service request submission
+  // const handleServiceRequest = async () => {
+  //   // Convert to string and handle null/undefined
+  //   const name = String(serviceRequestName || "");
+  //   const phone = String(serviceRequestPhone || "");
+
+  //   if (!name.trim()) {
+  //     Swal2.fire({
+  //       toast: true,
+  //       position: "bottom",
+  //       icon: "error",
+  //       title: "Please enter your name",
+  //       showConfirmButton: false,
+  //       timer: 3000,
+  //       customClass: {
+  //         popup: "me-small-toast",
+  //         title: "me-small-toast-title",
+  //       },
+  //     });
+  //     return;
+  //   }
+
+  //   if (!phone.trim()) {
+  //     Swal2.fire({
+  //       toast: true,
+  //       position: "bottom",
+  //       icon: "error",
+  //       title: "Please enter your phone number",
+  //       showConfirmButton: false,
+  //       timer: 3000,
+  //       customClass: {
+  //         popup: "me-small-toast",
+  //         title: "me-small-toast-title",
+  //       },
+  //     });
+  //     return;
+  //   }
+
+  //   // Basic phone validation
+  //   const phoneRegex = /^[0-9]{10}$/;
+  //   if (!phoneRegex.test(phone.trim())) {
+  //     Swal2.fire({
+  //       toast: true,
+  //       position: "bottom",
+  //       icon: "error",
+  //       title: "Please enter a valid 10-digit phone number",
+  //       showConfirmButton: false,
+  //       timer: 3000,
+  //       customClass: {
+  //         popup: "me-small-toast",
+  //         title: "me-small-toast-title",
+  //       },
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsSubmittingRequest(true);
+
+  //     const requestData = {
+  //       name: name.trim(),
+  //       phone: phone.trim(),
+  //       location: {
+  //         lat: currentLocation?.lat || 0,
+  //         lng: currentLocation?.lng || 0,
+  //       },
+  //       address: currentLocation?.fullAddress || "Address not available",
+  //       customerId: user?._id || null,
+  //     };
+
+  //     console.log("Submitting service request:", requestData);
+
+  //     const response = await fetch(
+  //       "https://dd-merge-backend-2.onrender.com/api/service-requests",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(requestData),
+  //       }
+  //     );
+
+  //     const result = await response.json();
+
+  //     if (result.success) {
+  //       // Close the service request popup first
+  //       setShowServiceablePopup(false);
+  //       setServiceRequestName("");
+  //       setServiceRequestPhone("");
+
+  //       // Show success popup with improved mobile responsiveness
+  //       await Swal2.fire({
+  //         title: "🎉 Request Submitted Successfully!",
+  //         html: `
+  //           <div style="text-align: center; padding: ${
+  //             isSmall ? "8px" : "12px"
+  //           };">
+  //             <div style="font-size: ${
+  //               isSmall ? "16px" : "18px"
+  //             }; color: #6B8E23; margin-bottom: ${
+  //           isSmall ? "12px" : "15px"
+  //         }; font-weight: 600;">
+  //               ✅ Your service request has been successfully submitted!
+  //             </div>
+  //             <div style="font-size: ${
+  //               isSmall ? "13px" : "14px"
+  //             }; color: #666; line-height: 1.5; margin-bottom: ${
+  //           isSmall ? "12px" : "15px"
+  //         };">
+  //               <p style="margin: ${
+  //                 isSmall ? "8px 0" : "10px 0"
+  //               }; font-weight: 600;">What happens next?</p>
+  //               <div style="text-align: left; margin: 0 auto; max-width: ${
+  //                 isSmall ? "280px" : "320px"
+  //               };">
+  //                 <p style="margin: ${
+  //                   isSmall ? "6px 0" : "8px 0"
+  //                 };">• Our team will review your location</p>
+  //                 <p style="margin: ${
+  //                   isSmall ? "6px 0" : "8px 0"
+  //                 };">• We'll contact you within 24 hours</p>
+  //                 <p style="margin: ${
+  //                   isSmall ? "6px 0" : "8px 0"
+  //                 };">• You'll be notified when service starts in your area</p>
+  //               </div>
+  //             </div>
+  //             <div style="font-size: ${
+  //               isSmall ? "11px" : "12px"
+  //             }; color: #999; margin-top: ${
+  //           isSmall ? "12px" : "15px"
+  //         }; padding: ${
+  //           isSmall ? "8px" : "10px"
+  //         }; background: #f8f9fa; border-radius: 8px; line-height: 1.4;">
+  //               Thank you for your interest in DailyDish! We're excited to serve you soon. 🍽️
+  //             </div>
+  //           </div>
+  //         `,
+  //         icon: "success",
+  //         confirmButtonText: "Got it!",
+  //         confirmButtonColor: "#6B8E23",
+  //         width: isSmall ? "90%" : "500px",
+  //         padding: isSmall ? "1rem" : "1.5rem",
+  //         customClass: {
+  //           popup: "custom-success-popup",
+  //           title: "custom-success-title",
+  //           confirmButton: "custom-success-button",
+  //           htmlContainer: "custom-success-content",
+  //         },
+  //         showClass: {
+  //           popup: "animate__animated animate__fadeInUp animate__faster",
+  //         },
+  //         hideClass: {
+  //           popup: "animate__animated animate__fadeOutDown animate__faster",
+  //         },
+  //         backdrop: true,
+  //         allowOutsideClick: true,
+  //         allowEscapeKey: true,
+  //         focusConfirm: true,
+  //       });
+  //     } else {
+  //       throw new Error(result.message || "Failed to submit request");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting service request:", error);
+  //     Swal2.fire({
+  //       toast: true,
+  //       position: "bottom",
+  //       icon: "error",
+  //       title: error.message || "Failed to submit request. Please try again.",
+  //       showConfirmButton: false,
+  //       timer: 4000,
+  //       timerProgressBar: true,
+  //       customClass: {
+  //         popup: "me-small-toast",
+  //         title: "me-small-toast-title",
+  //       },
+  //     });
+  //   } finally {
+  //     setIsSubmittingRequest(false);
+  //   }
+  // };
+
   const handleServiceRequest = async () => {
-    // Convert to string and handle null/undefined
-    const name = String(serviceRequestName || "");
-    const phone = String(serviceRequestPhone || "");
+  // Convert to string and handle null/undefined
+  const name = String(serviceRequestName || "");
+  const phone = String(serviceRequestPhone || "");
 
-    if (!name.trim()) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: "Please enter your name",
-        showConfirmButton: false,
-        timer: 3000,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
+  if (!name.trim()) {
+    Swal2.fire({
+      toast: true,
+      position: "bottom",
+      icon: "error",
+      title: "Please enter your name",
+      showConfirmButton: false,
+      timer: 3000,
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+    return;
+  }
+
+  if (!phone.trim()) {
+    Swal2.fire({
+      toast: true,
+      position: "bottom",
+      icon: "error",
+      title: "Please enter your phone number",
+      showConfirmButton: false,
+      timer: 3000,
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+    return;
+  }
+
+  // Basic phone validation
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phoneRegex.test(phone.trim())) {
+    Swal2.fire({
+      toast: true,
+      position: "bottom",
+      icon: "error",
+      title: "Please enter a valid 10-digit phone number",
+      showConfirmButton: false,
+      timer: 3000,
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+    return;
+  }
+
+  try {
+    setIsSubmittingRequest(true);
+
+    const requestData = {
+      name: name.trim(),
+      phone: phone.trim(),
+      location: {
+        lat: currentLocation?.lat || 0,
+        lng: currentLocation?.lng || 0,
+      },
+      address: currentLocation?.fullAddress || "Address not available",
+      customerId: user?._id || null,
+    };
+
+    console.log("Submitting service request:", requestData);
+
+    const response = await fetch(
+      "https://dd-merge-backend-2.onrender.com/api/service-requests",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      });
-      return;
-    }
+        body: JSON.stringify(requestData),
+      }
+    );
 
-    if (!phone.trim()) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: "Please enter your phone number",
-        showConfirmButton: false,
-        timer: 3000,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-      });
-      return;
-    }
+    const result = await response.json();
 
-    // Basic phone validation
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone.trim())) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: "Please enter a valid 10-digit phone number",
-        showConfirmButton: false,
-        timer: 3000,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-      });
-      return;
-    }
+    if (response.status === 409) {
+  // Handle duplicate request case
+  setIsSubmittingRequest(false);
+  setShowServiceablePopup(false);
+  
+  setTimeout(() => {
+    Swal2.fire({
+      // title: "⏳ Already Requested",
+      html: `
+        <div style="text-align: center; padding: 16px;">
+          <h4 style="color: #856404; margin: 0 0 12px 0;">Request Already Exists</h4>
+          <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
+            You've already submitted a service request for this location.
+          </p>
+          <p style="color: #888; font-size: 12px;">
+            Our team will contact you once service is available in your area.
+          </p>
+        </div>
+      `,
+      confirmButtonText: "OK",
+      confirmButtonColor: "#856404",
+      width: isSmall ? "300px" : "360px",
+      showCloseButton: true,
+      backdrop: true,
+    });
+  }, 300);
+  
+  return;
+}
 
-    try {
-      setIsSubmittingRequest(true);
-
-      const requestData = {
+    if (result.success) {
+      // Store the success data first
+      const successData = {
         name: name.trim(),
         phone: phone.trim(),
-        location: {
-          lat: currentLocation?.lat || 0,
-          lng: currentLocation?.lng || 0,
-        },
         address: currentLocation?.fullAddress || "Address not available",
-        customerId: user?._id || null,
       };
-
-      console.log("Submitting service request:", requestData);
-
-      const response = await fetch(
-        "https://dd-merge-backend-2.onrender.com/api/service-requests",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (result.success) {
-        Swal2.fire({
-          toast: true,
-          position: "bottom",
-          icon: "success",
-          title:
-            "Request submitted successfully! We'll notify you when we start operations in your area.",
-          showConfirmButton: false,
-          timer: 4000,
-          customClass: {
-            popup: "me-small-toast",
-            title: "me-small-toast-title",
-          },
-        });
-
-        // Reset and close popup
-        setShowServiceablePopup(false);
-        setServiceRequestName("");
-        setServiceRequestPhone("");
-      } else {
-        throw new Error(result.message || "Failed to submit request");
-      }
-    } catch (error) {
-      console.error("Error submitting service request:", error);
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: error.message || "Failed to submit request. Please try again.",
-        showConfirmButton: false,
-        timer: 3000,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-      });
-    } finally {
+      
+      // Close the service request popup
+      setShowServiceablePopup(false);
+      
+      // Clear form fields
+      setServiceRequestName("");
+      setServiceRequestPhone("");
+      
+      // Reset submitting state
       setIsSubmittingRequest(false);
+      
+      // Wait for modal to fully close before showing success
+      setTimeout(() => {
+        // Use a simpler Swal2 configuration without custom classes
+        Swal2.fire({
+          // title: "🎉 Request Submitted Successfully!",
+          html: `
+            <div style="text-align: center; padding: ${isSmall ? "8px" : "12px"};">
+              <div style="font-size: ${isSmall ? "16px" : "18px"}; color: #6B8E23; margin-bottom: ${isSmall ? "12px" : "15px"}; font-weight: 600;">
+                ✅ Your service request has been successfully submitted!
+              </div>
+              <div style="font-size: ${isSmall ? "13px" : "14px"}; color: #666; line-height: 1.5; margin-bottom: ${isSmall ? "12px" : "15px"};">
+                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"}; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                  <p style="margin: 6px 0;"><strong>Name:</strong> ${successData.name}</p>
+                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${successData.phone}</p>
+                  <p style="margin: 6px 0;"><strong>Address:</strong> ${successData.address}</p>
+                </div>
+                <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
+                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"};">
+                  <p style="margin: 4px 0;">• Our team will review your location</p>
+                  <p style="margin: 4px 0;">• We'll contact you within 24 hours</p>
+                  <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
+                </div>
+              </div>
+            </div>
+          `,
+          icon: "success",
+          confirmButtonText: "Got it!",
+          confirmButtonColor: "#6B8E23",
+          width: isSmall ? "90%" : "500px",
+          padding: isSmall ? "1rem" : "1.5rem",
+          backdrop: true,
+          allowOutsideClick: true,
+          allowEscapeKey: true,
+          focusConfirm: true,
+          showConfirmButton: true,
+        });
+      }, 500); // Increased delay to ensure modal is fully closed
+    } else {
+      throw new Error(result.message || "Failed to submit request");
     }
-  };
+  } catch (error) {
+    console.error("Error submitting service request:", error);
+    setIsSubmittingRequest(false);
+    
+    Swal2.fire({
+      toast: true,
+      position: "bottom",
+      icon: "error",
+      title: error.message || "Failed to submit request. Please try again.",
+      showConfirmButton: false,
+      timer: 4000,
+      timerProgressBar: true,
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+  }
+};
 
   // Function to handle Request Location click
   const handleRequestLocationClick = () => {
@@ -3433,9 +3682,7 @@ const Banner = ({
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment"
-      );
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -3451,9 +3698,7 @@ const Banner = ({
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate"
-      );
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -3471,9 +3716,7 @@ const Banner = ({
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/admin/getstories"
-        );
+        let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getstories");
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -3642,17 +3885,14 @@ const Banner = ({
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(
-        `https://dd-merge-backend-2.onrender.com/api/user/addressadd`,
-        {
-          Name: user?.Fname,
-          Number: user?.Mobile,
-          userId: user?._id,
-          ApartmentName: data?.Apartmentname,
-          addresstype: addresstype,
-          addressid: data?._id,
-        }
-      );
+      let res = await axios.post(`https://dd-merge-backend-2.onrender.com/api/user/addressadd`, {
+        Name: user?.Fname,
+        Number: user?.Mobile,
+        userId: user?._id,
+        ApartmentName: data?.Apartmentname,
+        addresstype: addresstype,
+        addressid: data?._id,
+      });
     } catch (error) {
       // console.log(error);
     }

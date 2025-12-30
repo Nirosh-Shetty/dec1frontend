@@ -41,9 +41,7 @@ const Dashboard = () => {
   const [Adduser, setAdduser] = useState([]);
   const getAdduser = async () => {
     try {
-      let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/User/registeruser"
-      );
+      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/User/registeruser");
       if (res.status === 200) {
         setAdduser(res.data.success.reverse());
       }

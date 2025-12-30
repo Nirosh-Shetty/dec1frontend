@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal2 from "sweetalert2"; // Add this import
 
 const LocationConfirmationSimple = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const isSmall = windowWidth <= 768;
+  
   const navigate = useNavigate();
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [address, setAddress] = useState("");
@@ -791,88 +802,151 @@ const LocationConfirmationSimple = () => {
   };
 
   // Handle service request (same as location.jsx)
-  const handleServiceRequest = async () => {
-    // Convert to string and handle null/undefined
-    const name = String(serviceRequestName || "");
-    const phone = String(serviceRequestPhone || "");
+const handleServiceRequest = async () => {
+  // Convert to string and handle null/undefined
+  const name = String(serviceRequestName || "");
+  const phone = String(serviceRequestPhone || "");
 
-    if (!name.trim()) {
-      setError("Please enter your name");
-      return;
-    }
+  if (!name.trim()) {
+    setError("Please enter your name");
+    return;
+  }
 
-    if (!phone.trim()) {
-      setError("Please enter your phone number");
-      return;
-    }
+  if (!phone.trim()) {
+    setError("Please enter your phone number");
+    return;
+  }
 
-    // Basic phone validation
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone.trim())) {
-      setError("Please enter a valid 10-digit phone number");
-      return;
-    }
+  // Basic phone validation
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phoneRegex.test(phone.trim())) {
+    setError("Please enter a valid 10-digit phone number");
+    return;
+  }
 
-    try {
-      setIsSubmittingRequest(true);
-      setError(""); // Clear any previous errors
+  try {
+    setIsSubmittingRequest(true);
+    setError(""); // Clear any previous errors
 
-      const user = JSON.parse(localStorage.getItem("user"));
+    const requestData = {
+      name: name.trim(),
+      phone: phone.trim(),
+      location: selectedLocation,
+      address: address,
+    };
 
-      if (!user || !user._id) {
-        setError("User not found. Please login again.");
-        return;
+    console.log("Submitting service request:", requestData);
+
+    const response = await fetch(
+      "https://dd-merge-backend-2.onrender.com/api/service-requests",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
       }
+    );
 
-      const customerId = user._id;
+    const result = await response.json();
 
-      const requestData = {
-        customerId,
+        if (response.status === 409) {
+      // Handle duplicate request case
+      setIsSubmittingRequest(false);
+      setShowServiceablePopup(false);
+      
+      setTimeout(() => {
+        Swal2.fire({
+          // title: "⏳ Already Requested",
+          html: `
+            <div style="text-align: center; padding: 16px;">
+              <h4 style="color: #856404; margin: 0 0 12px 0;">Request Already Exists</h4>
+              <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
+                You've already submitted a service request for this location.
+              </p>
+              <p style="color: #888; font-size: 12px;">
+                Our team will contact you once service is available in your area.
+              </p>
+            </div>
+          `,
+          confirmButtonText: "OK",
+          confirmButtonColor: "#856404",
+          width: isSmall ? "300px" : "360px",
+          showCloseButton: true,
+          backdrop: true,
+        });
+      }, 300);
+      
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(result.message || `Server error: ${response.status}`);
+    }
+
+    if (result.success) {
+      // Store the success data
+      const successData = {
         name: name.trim(),
         phone: phone.trim(),
-        location: selectedLocation,
-        address: address,
+        address: address || "Address not available",
       };
-
-      console.log("Submitting service request:", requestData);
-
-      const response = await fetch(
-        "https://dd-merge-backend-2.onrender.com/api/service-requests",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Show success message
-        alert(
-          "Thank you! Your request has been submitted successfully. We'll notify you when we start operations in your area."
-        );
-
-        // Reset and redirect
-        setShowServiceablePopup(false);
-        setServiceRequestName("");
-        setServiceRequestPhone("");
-
-        // Redirect to location page
-        navigate("/location");
-      } else {
-        throw new Error(result.message || "Failed to submit request");
-      }
-    } catch (error) {
-      console.error("Error submitting service request:", error);
-      setError(error.message || "Failed to submit request. Please try again.");
-    } finally {
+      
+      // Close the service request popup
+      setShowServiceablePopup(false);
+      
+      // Clear form fields
+      setServiceRequestName("");
+      setServiceRequestPhone("");
+      
+      // Reset submitting state
       setIsSubmittingRequest(false);
+      
+      // Wait for modal to fully close before showing success
+      setTimeout(() => {
+        Swal2.fire({
+          html: `
+            <div style="text-align: center; padding: ${isSmall ? "8px" : "12px"};">
+              <div style="font-size: ${isSmall ? "16px" : "18px"}; color: #6B8E23; margin-bottom: ${isSmall ? "12px" : "15px"}; font-weight: 600;">
+                ✅ Your service request has been successfully submitted!
+              </div>
+              <div style="font-size: ${isSmall ? "13px" : "14px"}; color: #666; line-height: 1.5; margin-bottom: ${isSmall ? "12px" : "15px"};">
+                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"}; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                  <p style="margin: 6px 0;"><strong>Name:</strong> ${successData.name}</p>
+                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${successData.phone}</p>
+                  <p style="margin: 6px 0;"><strong>Address:</strong> ${successData.address}</p>
+                </div>
+                <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
+                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"};">
+                  <p style="margin: 4px 0;">• Our team will review your location</p>
+                  <p style="margin: 4px 0;">• We'll contact you within 24 hours</p>
+                  <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
+                </div>
+              </div>
+            </div>
+          `,
+          icon: "success",
+          confirmButtonText: "Got it!",
+          confirmButtonColor: "#6B8E23",
+          width: isSmall ? "90%" : "500px",
+          padding: isSmall ? "1rem" : "1.5rem",
+          backdrop: true,
+          allowOutsideClick: true,
+          allowEscapeKey: true,
+          focusConfirm: true,
+          showConfirmButton: true,
+        });
+      }, 500);
+    } else {
+      throw new Error(result.message || "Failed to submit request");
     }
-  };
-
+  } catch (error) {
+    console.error("Error submitting service request:", error);
+    setError(error.message || "Failed to submit request. Please try again.");
+  } finally {
+    setIsSubmittingRequest(false);
+  }
+};
   // Handle cancel service request
   const handleCancelServiceRequest = () => {
     setShowServiceablePopup(false);
@@ -1063,193 +1137,200 @@ const LocationConfirmationSimple = () => {
       )}
 
       {/* Serviceability Popup (same as location.jsx) */}
-      {showServiceablePopup && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 3000,
-            padding: "20px",
-          }}
-        >
-          <div
+     {/* Serviceability Popup */}
+{showServiceablePopup && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.7)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 3000,
+      padding: "20px",
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: "#F8F6F0",
+        borderRadius: "16px",
+        padding: "24px",
+        maxWidth: "400px",
+        width: "100%",
+        textAlign: "center",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "48px",
+          marginBottom: "16px",
+          color: "#ffa500",
+        }}
+      >
+        📍
+      </div>
+      <h3
+        style={{
+          marginBottom: "12px",
+          color: "#333",
+          fontSize: "20px",
+          fontWeight: "600",
+        }}
+      >
+        Coming Soon to Your Area!
+      </h3>
+      <p
+        style={{
+          marginBottom: "16px",
+          color: "#666",
+          fontSize: "14px",
+          lineHeight: "1.5",
+        }}
+      >
+        We're not currently operating in this location, but we're expanding
+        rapidly! Let us know you're interested, and we'll notify you as soon as
+        we launch in your area.
+      </p>
+
+      <div style={{ marginBottom: "20px", textAlign: "left" }}>
+        <div style={{ marginBottom: "12px" }}>
+          <label
             style={{
-              backgroundColor: "#F8F6F0",
-              borderRadius: "16px",
-              padding: "24px",
-              maxWidth: "400px",
-              width: "100%",
-              textAlign: "center",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              display: "block",
+              marginBottom: "4px",
+              fontSize: "14px",
+              fontWeight: "500",
             }}
           >
-            <div
-              style={{
-                fontSize: "48px",
-                marginBottom: "16px",
-                color: "#ffa500",
-              }}
-            >
-              📍
-            </div>
-            <h3
-              style={{
-                marginBottom: "12px",
-                color: "#333",
-                fontSize: "20px",
-                fontWeight: "600",
-              }}
-            >
-              Coming Soon to Your Area!
-            </h3>
-            <p
-              style={{
-                marginBottom: "16px",
-                color: "#666",
-                fontSize: "14px",
-                lineHeight: "1.5",
-              }}
-            >
-              We're not currently operating in this location, but we're
-              expanding rapidly! Let us know you're interested, and we'll notify
-              you as soon as we launch in your area.
-            </p>
-
-            <div style={{ marginBottom: "20px", textAlign: "left" }}>
-              <div style={{ marginBottom: "12px" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "4px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  value={serviceRequestName}
-                  onChange={(e) => setServiceRequestName(e.target.value)}
-                  placeholder="Enter your name"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: "16px" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "4px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
-                >
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  value={serviceRequestPhone}
-                  onChange={(e) => setServiceRequestPhone(e.target.value)}
-                  placeholder="Enter your phone number"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
-
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "#666",
-                  marginBottom: "16px",
-                }}
-              >
-                <strong>Selected Location:</strong> {address}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-              }}
-            >
-              <button
-                onClick={handleServiceRequest}
-                disabled={
-                  isSubmittingRequest ||
-                  !serviceRequestName ||
-                  !serviceRequestPhone
-                }
-                style={{
-                  backgroundColor:
-                    isSubmittingRequest ||
-                    !serviceRequestName ||
-                    !serviceRequestPhone
-                      ? "#ccc"
-                      : "#6B8E23",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "12px",
-                  padding: "14px",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  cursor:
-                    isSubmittingRequest ||
-                    !serviceRequestName ||
-                    !serviceRequestPhone
-                      ? "not-allowed"
-                      : "pointer",
-                  transition: "background-color 0.2s",
-                }}
-              >
-                {isSubmittingRequest ? "Submitting..." : "Request Location"}
-              </button>
-              <button
-                onClick={handleCancelServiceRequest}
-                style={{
-                  backgroundColor: "transparent",
-                  color: "#666",
-                  border: "1px solid #ddd",
-                  borderRadius: "12px",
-                  padding: "14px",
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f5f5f5";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+            Your Name *
+          </label>
+          <input
+            type="text"
+            value={serviceRequestName}
+            onChange={(e) => setServiceRequestName(e.target.value)}
+            placeholder="Enter your name"
+            style={{
+              width: "100%",
+              padding: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
         </div>
-      )}
+
+        <div style={{ marginBottom: "16px" }}>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "4px",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            Phone Number *
+          </label>
+          <input
+            type="tel"
+            value={serviceRequestPhone}
+            onChange={(e) => setServiceRequestPhone(e.target.value)}
+            placeholder="Enter your phone number"
+            style={{
+              width: "100%",
+              padding: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              fontSize: "14px",
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            fontSize: "12px",
+            color: "#666",
+            marginBottom: "16px",
+          }}
+        >
+          <strong>Selected Location:</strong> {address}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+        }}
+      >
+        {/* FIXED: Make sure this button has the correct onClick handler */}
+        <button
+          onClick={handleServiceRequest}  // Make sure this is the correct function name
+          disabled={
+            isSubmittingRequest ||
+            !serviceRequestName.trim() ||
+            !serviceRequestPhone.trim()
+          }
+          style={{
+            backgroundColor:
+              isSubmittingRequest ||
+              !serviceRequestName.trim() ||
+              !serviceRequestPhone.trim()
+                ? "#ccc"
+                : "#6B8E23",
+            color: "white",
+            border: "none",
+            borderRadius: "12px",
+            padding: "14px",
+            fontSize: "16px",
+            fontWeight: "600",
+            cursor:
+              isSubmittingRequest ||
+              !serviceRequestName.trim() ||
+              !serviceRequestPhone.trim()
+                ? "not-allowed"
+                : "pointer",
+            transition: "background-color 0.2s",
+          }}
+        >
+          {isSubmittingRequest ? "Submitting..." : "Request Location"}
+        </button>
+        
+        <button
+          onClick={() => {
+            setShowServiceablePopup(false);
+            setServiceRequestName("");
+            setServiceRequestPhone("");
+          }}
+          style={{
+            backgroundColor: "transparent",
+            color: "#666",
+            border: "1px solid #ddd",
+            borderRadius: "12px",
+            padding: "14px",
+            fontSize: "16px",
+            fontWeight: "500",
+            cursor: "pointer",
+            transition: "background-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "#f5f5f5";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "transparent";
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Main Content - Vertical Layout */}
       <div

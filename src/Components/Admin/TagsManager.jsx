@@ -13,9 +13,7 @@ const TagsManager = () => {
 
   const load = async () => {
     try {
-      const res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/food-tags"
-      );
+      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/food-tags");
       setTags(res.data.data || []);
     } catch (e) {
       console.error(e);
@@ -29,14 +27,11 @@ const TagsManager = () => {
   const createTag = async () => {
     try {
       if (!name) return alert("Tag name required");
-      await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/admin/food-tags",
-        {
-          tagName: name,
-          description: desc,
-          tagColor: color,
-        }
-      );
+      await axios.post("https://dd-merge-backend-2.onrender.com/api/admin/food-tags", {
+        tagName: name,
+        description: desc,
+        tagColor: color,
+      });
       setName("");
       setDesc("");
       setColor("");
@@ -75,9 +70,7 @@ const TagsManager = () => {
   const deleteTag = async (id) => {
     // if (!confirm('Delete this tag?')) return;
     try {
-      await axios.delete(
-        `https://dd-merge-backend-2.onrender.com/api/admin/food-tags/${id}`
-      );
+      await axios.delete(`https://dd-merge-backend-2.onrender.com/api/admin/food-tags/${id}`);
       load();
     } catch (e) {
       alert("Error deleting");

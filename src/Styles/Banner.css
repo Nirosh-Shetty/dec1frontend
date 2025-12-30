@@ -21,7 +21,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
 }
 
 .screen-2 {
@@ -103,13 +102,13 @@
   .clock-text {
     font-size: 14px;
   }
-  .veg-btn{
+  .veg-btn {
     margin-right: -230px;
   }
 }
 
 @media (max-width: 576px) {
-  .veg-btn{
+  .veg-btn {
     margin-right: -230px;
   }
 }
@@ -576,8 +575,8 @@ input[type="number"] {
   .mobile-banner {
     display: block !important;
     width: 100% !important;
-    padding-left: 4px;   /* default 16px */
-    padding-right: 6px;  /* default 16px */
+    padding-left: 4px; /* default 16px */
+    padding-right: 6px; /* default 16px */
     /* background-color: rgb(237, 234, 234); */
   }
   .mobile-banner-updated {
@@ -619,7 +618,7 @@ input[type="number"] {
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
     gap: 12px;
     /* margin-bottom: 10px; */
-            height: 70px
+    height: 70px;
   }
 
   .mobile-user-screen2 {
@@ -1178,3 +1177,88 @@ input[type="number"] {
   }
 }
 
+/* Custom SweetAlert2 Success Popup Styles */
+.custom-success-popup {
+  border-radius: 16px !important;
+  padding: 0 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.custom-success-title {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #2c2c2c !important;
+  margin-bottom: 10px !important;
+}
+
+.custom-success-button {
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(107, 142, 35, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-success-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(107, 142, 35, 0.4) !important;
+}
+
+/* Mobile responsive SweetAlert2 styles */
+@media screen and (max-width: 768px) {
+  .custom-success-popup {
+    width: 90% !important;
+    margin: 0 5% !important;
+  }
+
+  .custom-success-title {
+    font-size: 20px !important;
+  }
+
+  .custom-success-button {
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .custom-success-popup {
+    width: 95% !important;
+    margin: 0 2.5% !important;
+  }
+
+  .custom-success-title {
+    font-size: 18px !important;
+  }
+
+  .custom-success-button {
+    padding: 12px 18px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Toast notification styles for mobile */
+.me-small-toast {
+  width: auto !important;
+  max-width: 90% !important;
+  font-size: 14px !important;
+}
+
+.me-small-toast-title {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+@media screen and (max-width: 480px) {
+  .me-small-toast {
+    width: 95% !important;
+    max-width: 95% !important;
+    font-size: 13px !important;
+  }
+
+  .me-small-toast-title {
+    font-size: 13px !important;
+  }
+}

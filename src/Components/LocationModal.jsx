@@ -4863,16 +4863,13 @@ const LocationModal = ({ show, onClose }) => {
 
       console.log("Final address data being sent:", addressData);
 
-      const response = await fetch(
-        "https://dd-merge-backend-2.onrender.com/api/User/addresses",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(addressData),
-        }
-      );
+      const response = await fetch("https://dd-merge-backend-2.onrender.com/api/User/addresses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(addressData),
+      });
 
       const result = await response.json();
       console.log("API Response:", result);
