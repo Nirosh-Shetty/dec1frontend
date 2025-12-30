@@ -526,6 +526,17 @@ button:disabled {
   border: 2px solid #f5deb3;
 }
 
+.final-price-box1 {
+  /* background: #ffc107; */
+  color: #000;
+  font-size: 18px;
+  font-weight: 600;
+  /* padding: 6px 12px; */
+  border-radius: 8px;
+  min-width: fit-content;
+  /* border: 2px solid #f5deb3; */
+}
+
 .price-pill {
   background: var(--app-foreground);
   color: var(--primary-text);

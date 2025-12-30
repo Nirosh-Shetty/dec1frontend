@@ -981,7 +981,7 @@ const MyPlan = () => {
       localStorage.getItem("currentLocation")
   );
 
-  console.log(address);
+  // console.log(address);
   const userId = user ? user._id : null;
   // console.log('UW3MR',JSON.stringify(userId))
 
@@ -1726,7 +1726,7 @@ const MyPlan = () => {
                                 <div className="and-pay-text">& Pay</div>
                               </div>
                               <div className="pay-btn-right">
-                                {plan.slotHubTotalAmount !== payableAmount ? (
+                                {plan.slotHubTotalAmount > payableAmount ? (
                                   <div className="price-container">
                                     <span className="original-price">
                                       ₹{plan.slotHubTotalAmount?.toFixed(0)}
@@ -1736,8 +1736,8 @@ const MyPlan = () => {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="price-container">
-                                    <div className="final-price-box">
+                                  <div className="price-container" >
+                                    <div className="final-price-box1">
                                       ₹{payableAmount}
                                     </div>
                                   </div>
