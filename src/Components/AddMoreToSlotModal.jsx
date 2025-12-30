@@ -9,7 +9,7 @@ const AddMoreToSlotModal = ({
   show,
   onClose,
   planId,
-//   hubId,
+  //   hubId,
   userId,
   onItemsUpdated,
 }) => {
@@ -86,9 +86,7 @@ const AddMoreToSlotModal = ({
       }
     } catch (err) {
       console.error("Error updating items:", err);
-      toast.error(
-        err?.response?.data?.error || "Failed to update items"
-      );
+      toast.error(err?.response?.data?.error || "Failed to update items");
     } finally {
       setUpdating(false);
     }
@@ -175,50 +173,51 @@ const AddMoreToSlotModal = ({
 
                 {/* Quantity Controls */}
                 <div className="add-more-quantity-control">
-                    {quantities[item._id]==0?
-                    <button className="add-btn"
-                    onClick={() =>
-                      handleQuantityChange(
-                        item._id,
-                         1
-                      )
-                    }>
-                        Add
+                  {quantities[item._id] == 0 ? (
+                    <button
+                      className="add-btn"
+                      onClick={() => handleQuantityChange(item._id, 1)}
+                    >
+                      Add
                     </button>
-                    : <>
-                  <button
-                    className="qty-btn"
-                    onClick={() =>
-                      handleQuantityChange(
-                        item._id,
-                        (quantities[item._id] || 0) - 1
-                      )
-                    }
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    className="qty-input"
-                    value={quantities[item._id] || 0}
-                    onChange={(e) =>
-                      handleQuantityChange(item._id, parseInt(e.target.value) || 0)
-                    }
-                    min="0"
-                  />
-                  <button
-                    className="qty-btn"
-                    onClick={() =>
-                      handleQuantityChange(
-                        item._id,
-                        (quantities[item._id] || 0) + 1
-                      )
-                    }
-                  >
-                    +
-                  </button>
-                  </>}
-                
+                  ) : (
+                    <>
+                      <button
+                        className="qty-btn"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item._id,
+                            (quantities[item._id] || 0) - 1
+                          )
+                        }
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        className="qty-input"
+                        value={quantities[item._id] || 0}
+                        onChange={(e) =>
+                          handleQuantityChange(
+                            item._id,
+                            parseInt(e.target.value) || 0
+                          )
+                        }
+                        min="0"
+                      />
+                      <button
+                        className="qty-btn"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item._id,
+                            (quantities[item._id] || 0) + 1
+                          )
+                        }
+                      >
+                        +
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

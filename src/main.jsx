@@ -7,10 +7,10 @@ import GlobalZoomDisable from './GlobalZoomDisable.jsx'
 
 createRoot(document.getElementById('root')).render(
    <React.StrictMode>
-    <GlobalZoomDisable>
+    {/* <GlobalZoomDisable> */}
     <WalletProvider>
       <App />
       </WalletProvider>
-    </GlobalZoomDisable>
+    {/* </GlobalZoomDisable> */}
   </React.StrictMode>
 )

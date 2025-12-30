@@ -506,7 +506,6 @@ const ViewPlanModal = ({
                             <div className="plan-current-currency">
                               <div className="current-currency-text">₹</div>
                             </div>
-                            
                             <div className="plan-hub-amount">
                               <div className="hub-amount-text">
                                 {product.hubTotalPrice?.toFixed(0)}

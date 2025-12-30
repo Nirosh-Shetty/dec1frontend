@@ -102,7 +102,7 @@ const Statusbar = () => {
             />
           </div>
         </div>
-
+        
         <Carousel
           interval={null}
           controls={true}

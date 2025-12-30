@@ -3433,7 +3433,9 @@ const Banner = ({
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getapartment");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getapartment"
+      );
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -3449,7 +3451,9 @@ const Banner = ({
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcorporate");
+      let res = await axios.get(
+        "https://dd-merge-backend-2.onrender.com/api/admin/getcorporate"
+      );
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -3467,7 +3471,9 @@ const Banner = ({
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getstories");
+        let res = await axios.get(
+          "https://dd-merge-backend-2.onrender.com/api/admin/getstories"
+        );
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -3636,14 +3642,17 @@ const Banner = ({
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(`https://dd-merge-backend-2.onrender.com/api/user/addressadd`, {
-        Name: user?.Fname,
-        Number: user?.Mobile,
-        userId: user?._id,
-        ApartmentName: data?.Apartmentname,
-        addresstype: addresstype,
-        addressid: data?._id,
-      });
+      let res = await axios.post(
+        `https://dd-merge-backend-2.onrender.com/api/user/addressadd`,
+        {
+          Name: user?.Fname,
+          Number: user?.Mobile,
+          userId: user?._id,
+          ApartmentName: data?.Apartmentname,
+          addresstype: addresstype,
+          addressid: data?._id,
+        }
+      );
     } catch (error) {
       // console.log(error);
     }
