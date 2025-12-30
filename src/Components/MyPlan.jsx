@@ -1681,43 +1681,73 @@ const MyPlan = () => {
                             </div>
                           )}
                           {isUnpaidEditable && (
-                            <button
+                            // <button
+                            //   className="pay-btn"
+                            //   onClick={() => handlePayPlan(plan, "")}
+                            // >
+                            //   Pay
+                            //   {/* {plan.orderType === "PreOrder" ? (
+                            //     <div className="price-pill">
+                            //       ₹{plan.slotTotalAmount?.toFixed(0)}
+                            //     </div>
+                            //   ) : (
+                            //     <div className="price-pill">
+                            //       <span className="actuall-amount">
+                            //         ₹{plan.slotHubTotalAmount?.toFixed(0)}
+                            //       </span>
+                            //       <span className="pre-order-amount">
+                            //         ₹{plan.slotTotalAmount?.toFixed(0)}
+                            //       </span>
+                            //     </div>
+                            //   )} */}
+                            //   <div className="price-pill">
+                            //     {plan.slotHubTotalAmount === payableAmount ? (
+                            //       <span>
+                            //         ₹{plan.slotTotalAmount?.toFixed(0)}
+                            //       </span>
+                            //     ) : (
+                            //       <div className="d-flex gap-2 align-items-center">
+                            //         <span className="actuall-amount d-flex align-items-center">
+                            //           ₹{plan.slotHubTotalAmount?.toFixed(0)}
+                            //         </span>
+                            //         <span className="pre-order-amount">
+                            //           ₹{payableAmount}
+                            //         </span>
+                            //       </div>
+                            //     )}
+                            //   </div>
+                            // </button>
+                         
+                           <button
                               className="pay-btn"
                               onClick={() => handlePayPlan(plan, "")}
                             >
-                              Pay
-                              {/* {plan.orderType === "PreOrder" ? (
-                                <div className="price-pill">
-                                  ₹{plan.slotTotalAmount?.toFixed(0)}
-                                </div>
-                              ) : (
-                                <div className="price-pill">
-                                  <span className="actuall-amount">
-                                    ₹{plan.slotHubTotalAmount?.toFixed(0)}
-                                  </span>
-                                  <span className="pre-order-amount">
-                                    ₹{plan.slotTotalAmount?.toFixed(0)}
-                                  </span>
-                                </div>
-                              )} */}
-                              <div className="price-pill">
-                                {plan.slotHubTotalAmount === payableAmount ? (
-                                  <span>
-                                    ₹{plan.slotTotalAmount?.toFixed(0)}
-                                  </span>
-                                ) : (
-                                  <div className="d-flex gap-2 align-items-center">
-                                    <span className="actuall-amount d-flex align-items-center">
+                              <div className="pay-btn-left">
+                                <div className="confirm-text">Confirm</div>
+                                <div className="and-pay-text">& Pay</div>
+                              </div>
+                              <div className="pay-btn-right">
+                                {plan.slotHubTotalAmount !== payableAmount ? (
+                                  <div className="price-container">
+                                    <span className="original-price">
                                       ₹{plan.slotHubTotalAmount?.toFixed(0)}
                                     </span>
-                                    <span className="pre-order-amount">
+                                    <div className="final-price-box">
                                       ₹{payableAmount}
-                                    </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="price-container">
+                                    <div className="final-price-box">
+                                      ₹{payableAmount}
+                                    </div>
                                   </div>
                                 )}
                               </div>
                             </button>
-                          )}
+                         )}
+
+                        
                         </div>
 
                         {/* {isPaidEditable && (

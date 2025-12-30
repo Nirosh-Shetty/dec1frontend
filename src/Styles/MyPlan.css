@@ -80,8 +80,8 @@
   background-color: var(--cuminBrown);
   color: var(--app-foreground);
   border: 1.5px solid var(--steel-dark);
-   box-shadow: 0 0 1px 4px rgba(0, 0, 0, 0.25);
-box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
+  box-shadow: 0 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25);
 }
 
 /* --- Order Card (List View) --- */
@@ -107,7 +107,7 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   position: relative;
   padding: 16px;
   width: 100%;
-  max-width: 90%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -120,7 +120,7 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   font-size: 14px;
   font-weight: 600;
   line-height: 15px;
-  color: var(--primary-text)
+  color: var(--primary-text);
 }
 
 .plan-full-address {
@@ -153,9 +153,9 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.8px;
-  line-height:25px;
+  line-height: 25px;
   margin: 0;
-  color: var(--cuminBrown)
+  color: var(--cuminBrown);
 }
 
 .status-badge-confirmed {
@@ -174,7 +174,7 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
 .status-badge-skipped {
   color: var(--turmeric-golden);
   font-size: 14px;
-    font-weight: 600;
+  font-weight: 600;
   line-height: 15px;
   letter-spacing: -0.7px;
   /* font-weight: 500; */
@@ -189,7 +189,7 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   color: var(--turmeric-golden);
   font-size: 14px;
   /* font-weight: 500; */
-    font-weight: 600;
+  font-weight: 600;
   line-height: 15px;
   letter-spacing: -0.7px;
   padding: 2px 4px;
@@ -203,7 +203,7 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   color: var(--primary-text);
   font-size: 14px;
   /* font-weight: 500; */
-    font-weight: 600;
+  font-weight: 600;
   line-height: 15px;
   letter-spacing: -0.7px;
   padding: 2px 4px;
@@ -212,12 +212,12 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   align-items: center;
   gap: 4px;
 }
-.delivery-time-textv .fw-semibold{
+.delivery-time-textv .fw-semibold {
   font-weight: 600;
   line-height: 15px;
   letter-spacing: -0.7px;
 }
-.delivery-time-textv .fw-medium{
+.delivery-time-textv .fw-medium {
   font-weight: 600;
   line-height: 15px;
   letter-spacing: -0.7px;
@@ -246,7 +246,7 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
   flex-direction: column;
   align-items: center;
   line-height: 1;
-  background-color: #F8F6F0;
+  background-color: #f8f6f0;
 }
 
 .date-column2 {
@@ -326,8 +326,12 @@ box-shadow: inset 0 2px 16px 0px rgba(0, 0, 0, 0.25)
 }
 
 @keyframes rotation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Optional: Dim button when loading */
@@ -386,7 +390,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
+  /* justify-content: space-evenly; */
 }
 
 .card-actions {
@@ -441,17 +445,85 @@ button:disabled {
 
 .pay-btn {
   background-color: var(--success-green);
-  border: 1px solid var(--app-foreground);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px 44px;
-  border-radius: 10px;
+  border: 2px solid #fafafa;
+  border-radius: 14px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 56px;
+  width: 100%;
+  max-width: 400px;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pay-btn:hover {
+  background-color: #5a7a1f;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.pay-btn-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 8px;
-  color: var(--app-foreground);
-  height: 43px;
-  width: 174px;
+  gap: 2px;
+}
+
+.confirm-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+
+.and-pay-text {
+  font-size: 10px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: -0.1px;
+  line-height: 1.1;
+}
+
+.pay-btn-right {
+  display: flex;
+  align-items: center;
+}
+
+.price-container {
+  background: white;
+  border-radius: 12px;
+  padding: 3px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  flex-direction: row;
+}
+
+.original-price {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  text-decoration: line-through;
+}
+
+.final-price-box {
+  background: #ffc107;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  min-width: fit-content;
+  border: 2px solid #f5deb3;
 }
 
 .price-pill {
@@ -479,18 +551,241 @@ button:disabled {
   font-size: 12px;
 }
 
-.hub-amount-text{
+.hub-amount-text {
   font-size: 10px;
   font-family: 600;
 }
 
-@media (max-width: 480px) {
+/* Desktop/Larger screen styles - same height and width for buttons */
+@media (min-width: 481px) {
+  .pay-btn,
+  .track-order-btn {
+    width: 280px;
+    height: 56px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: 12px;
+    font-family: "Inter", sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
   .pay-btn {
-    padding: 8px 20px;
-    width: 100%;         /* full width on mobile */
-    height: 45px;
-    font-size: 14px;
+    background-color: var(--success-green);
+    border: 2px solid #fafafa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+  }
+
+  .pay-btn:hover {
+    background-color: #5a7a1f;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .track-order-btn {
+    background-color: var(--warm-beige);
+    border: 2px solid var(--app-foreground);
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(245, 155, 83, 0.1);
+    color: var(--primary-text);
+  }
+
+  .track-order-btn:hover {
+    background-color: #e6d4a3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(245, 155, 83, 0.2);
+  }
+
+  .pay-btn-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .confirm-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+  }
+
+  .and-pay-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+    letter-spacing: -0.1px;
+    line-height: 1.1;
+  }
+
+  .pay-btn-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .price-container {
+    background: white;
+    border-radius: 12px;
+    padding: 0px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 40px;
+    flex-direction: row;
+  }
+
+  .original-price {
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    text-decoration: line-through;
+  }
+
+  .final-price-box {
+    background: #ffc107;
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+    min-width: fit-content;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-actions {
+    display: flex;
+    flex-direction: row;
     gap: 6px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 8px;
+  }
+
+  .make-payment-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    position: relative;
+    flex: 1;
+    max-width: 65%;
+  }
+
+  .view-plan-btn-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-shrink: 0;
+    max-width: 30%;
+    margin-left: 8px;
+    height: 48px;
+  }
+
+  .pay-btn {
+    padding: 10px 12px;
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .track-order-btn {
+    background-color: var(--warm-beige);
+    border: 2px solid var(--app-foreground);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 2px 6px rgba(245, 155, 83, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 65%;
+    height: 48px;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .confirm-text {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .and-pay-text {
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .price-container {
+    padding: 4px 6px;
+    gap: 6px;
+    border-radius: 6px;
+    min-height: 28px;
+    flex-direction: row;
+  }
+
+  .original-price {
+    font-size: 11px;
+  }
+
+  .final-price-box {
+    font-size: 13px;
+    padding: 3px 5px;
+    border-radius: 4px;
+  }
+
+  .view-plan-btn {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--neu-STB);
+    color: var(--neu-STB);
+    padding: 0 2px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 3px;
+    font-weight: 600;
+    width: 85%;
+    height: 28px;
+    white-space: nowrap;
+  }
+
+  .reminder-banner {
+    color: var(--primary-text);
+    background: var(--cream-walls);
+    border: 2px solid var(--warm-beige);
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 10px;
+    letter-spacing: -0.2px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 10;
+  }
+
+  .d-flex.gap-1 {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0;
+    justify-content: center;
   }
 
   .price-pill {
@@ -501,6 +796,59 @@ button:disabled {
 
   .pre-order-amount {
     padding: 2px 6px;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 360px) {
+  .pay-btn {
+    padding: 8px 10px;
+    height: 44px;
+  }
+
+  .track-order-btn {
+    padding: 8px 10px;
+    height: 44px;
+  }
+
+  .view-plan-btn {
+    height: 44px;
+    font-size: 11px;
+  }
+
+  .confirm-text {
+    font-size: 12px;
+  }
+
+  .and-pay-text {
+    font-size: 10px;
+  }
+
+  .final-price-box {
+    font-size: 12px;
+    padding: 2px 4px;
+  }
+
+  .original-price {
+    font-size: 10px;
+  }
+
+  .reminder-banner {
+    font-size: 8px;
+    padding: 2px 4px;
+    top: -10px;
+  }
+
+  .card-actions {
+    gap: 8px;
+  }
+
+  .make-payment-container {
+    max-width: 62%;
+  }
+
+  .view-plan-btn-container {
+    max-width: 33%;
   }
 }
 
@@ -636,7 +984,7 @@ button:disabled {
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 16px;
-  border: 0.4px solid var(--copper-accents, #B87333);
+  border: 0.4px solid var(--copper-accents, #b87333);
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -678,7 +1026,7 @@ button:disabled {
   justify-content: flex-start;
   gap: 6px;
   width: 50%;
-  font-family:"Inter"
+  font-family: "Inter";
 }
 
 .plan-current-price {
@@ -704,7 +1052,6 @@ button:disabled {
   text-decoration: line-through;
 }
 
-
 .plan-current-currency {
   font-size: 14px;
 }
@@ -716,7 +1063,7 @@ button:disabled {
 
 .plan-portion-label {
   color: var(--primary-text);
-  font-family: 'SF Pro Display';
+  font-family: "SF Pro Display";
   font-size: 10px;
   font-style: normal;
   font-weight: 400;
@@ -737,7 +1084,7 @@ button:disabled {
   align-items: center;
   justify-content: flex-end;
   /* gap: 12px; */
-  width: 50%
+  width: 50%;
 }
 
 .header-right {
@@ -822,7 +1169,7 @@ button:disabled {
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  background-color:var(--primary)
+  background-color: var(--primary);
 }
 
 .plan-add-more-btn {
@@ -834,7 +1181,7 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap:4px;
+  gap: 4px;
   font-weight: 600;
   border-radius: 10px;
 }
@@ -1004,7 +1351,7 @@ button:disabled {
   justify-content: center;
   gap: 8px;
   color: var(--app-foreground);
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(107, 142, 35, 0.3);
 }
@@ -1155,5 +1502,3 @@ body.nav-hidden .fixed-bottom-bar {
     font-size: 12px;
   }
 }
-
-
