@@ -22,7 +22,7 @@ const AdminPlanDashboard = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [selectedSession, setSelectedSession] = useState("Lunch");
   const [selectedHub, setSelectedHub] = useState("All Hubs");
-
+  const [hubs, setHubs] = useState([]);
   const getStatusBadge = (status) => {
     switch (status) {
       case "Confirmed":
@@ -75,7 +75,18 @@ const AdminPlanDashboard = () => {
       setLoading(false);
     }
   };
+  const getHubs = async () => {
+    try {
+      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      setHubs(res.data);
+    } catch (error) {
+      console.error("Failed to fetch hubs:", error);
+    }
+  };
 
+  useEffect(() => {
+    getHubs();
+  }, []);
   // --- 2. TRIGGER FETCH ON FILTER CHANGE OR TAB SWITCH ---
   useEffect(() => {
     fetchDashboardData();
@@ -189,9 +200,12 @@ const AdminPlanDashboard = () => {
                 value={selectedHub}
                 onChange={(e) => setSelectedHub(e.target.value)}
               >
-                <option>All Hubs</option>
-                <option>Manyata Tech Park</option>
-                <option>Hebbal</option>
+                <option value="">All Hubs</option>
+                {hubs?.map((hub) => (
+                  <option key={hub._id} value={hub._id}>
+                    {hub?.hubName}
+                  </option>
+                ))}
               </Form.Select>
             </div>
             <div className="col-md-3 text-end">
@@ -216,7 +230,7 @@ const AdminPlanDashboard = () => {
               <thead className="bg-light text-uppercase small text-muted">
                 <tr>
                   <th className="py-3 ps-4">Item Name</th>
-                  <th>Hub</th>
+                  <th>Hub Name</th>
                   <th className="text-center">Total Rsrvd</th>
                   <th className="text-center">Confirmed</th>
                   <th className="text-center">Pending</th>
@@ -239,7 +253,7 @@ const AdminPlanDashboard = () => {
                       <td className="ps-4 fw-bold text-dark">
                         {item.foodName}
                       </td>
-                      <td className="text-muted small">{item.hub?.hubName}</td>
+                      <td className="text-muted small">{item.hubName}</td>
                       <td className="text-center fw-bold bg-light">
                         {item.totalPreOrder}
                       </td>

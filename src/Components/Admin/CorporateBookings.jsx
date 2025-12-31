@@ -62,6 +62,8 @@ const CorporateBookings = () => {
   // --- NEW Filter State Management ---
   const [filters, setFilters] = useState({
     dateFilterType: "today",
+    startDate: null,
+    endDate: null,
     hubId: "",
     session: "All",
     status: "",
@@ -97,16 +99,6 @@ const CorporateBookings = () => {
   const [reason, setreason] = useState("");
   const [excelLoading, setExeclLoading] = useState(false);
 
-  // --- REMOVED Old/Unused States ---
-  // const [AllTimesSlote, setAllTimesSlote] = useState([]); (Removed)
-  // const [locations, setLocations] = useState([]); (Removed)
-  // const [selectedLocations, setSelectedLocations] = useState([]); (Removed)
-  // const [allLocation, setAllLocation] = useState([]); (Removed)
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false); (Removed)
-  // const dropdownRef = useRef(null); (Removed)
-
-  // --- API Functions ---
-
   // MODIFIED: Fetches corporate orders based on new filters
   const getApartmentOrder = async (page = 1) => {
     setLoading(true);
@@ -117,6 +109,8 @@ const CorporateBookings = () => {
         orderType: "corporate",
         search: filters.search,
         dateFilterType: filters.dateFilterType,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
         hubId: filters.hubId,
         session: filters.session,
         status: filters.status,
@@ -353,144 +347,138 @@ const CorporateBookings = () => {
   // REMOVED: debouncedSearch useEffect
 
   return (
-    <div>
-      {/* === NEW: Date Filter Toggles === */}
-      <Card className="mb-3">
-        <Card.Body className="d-flex justify-content-center">
-          <ButtonGroup
-            style={{
-              border: "2px solid #007bff",
-              borderRadius: "23px",
-              padding: "5px",
-            }}
-          >
-            <Button
-              variant={
-                filters.dateFilterType === "today"
-                  ? "primary"
-                  : "outline-primary"
-              }
-              onClick={() => handleDateFilterChange("today")}
-              style={{
-                borderTopLeftRadius: "18px",
-                borderBottomLeftRadius: "18px",
-              }}
-            >
-              Today's Orders
-            </Button>
-            <Button
-              variant={
-                filters.dateFilterType === "future"
-                  ? "primary"
-                  : "outline-primary"
-              }
-              onClick={() => handleDateFilterChange("future")}
-            >
-              Future Orders (from Today)
-            </Button>
-            <Button
-              variant={
-                filters.dateFilterType === "all" ? "primary" : "outline-primary"
-              }
-              onClick={() => handleDateFilterChange("all")}
-              style={{
-                borderTopRightRadius: "18px",
-                borderBottomRightRadius: "18px",
-              }}
-            >
-              All Orders
-            </Button>
-          </ButtonGroup>
+    <div style={{ height: "80vh", overflow: "scroll" }}>
+      <Card className="mb-3 shadow-sm">
+        <Card.Body className="p-3">
+          {/* Row 1: Date & Time Filters */}
+          <Row className="g-3 align-items-end mb-3">
+            {/* Date Filter Type (Dropdown) */}
+            <Col md={3}>
+              <Form.Label className="fw-bold small">Time Period</Form.Label>
+              <Form.Select
+                name="dateFilterType"
+                value={filters.dateFilterType}
+                onChange={handleFilterChange}
+                className="shadow-sm"
+              >
+                <option value="today">Today</option>
+                <option value="future">Future (Upcoming)</option>
+                <option value="custom">Custom Date Range</option>
+                <option value="all">All Time</option>
+              </Form.Select>
+            </Col>
+
+            {/* Custom Date Inputs (Only visible if 'custom' is selected) */}
+            {filters.dateFilterType === "custom" && (
+              <>
+                <Col md={3}>
+                  <Form.Label className="fw-bold small">Start Date(Delivery Date)</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="startDate"
+                    value={filters.startDate}
+                    onChange={handleFilterChange}
+                    className="shadow-sm"
+                  />
+                </Col>
+                <Col md={3}>
+                  <Form.Label className="fw-bold small">
+                    End Date (Optional)
+                  </Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="endDate"
+                    value={filters.endDate}
+                    onChange={handleFilterChange}
+                    className="shadow-sm"
+                    min={filters.startDate} // Prevent end date before start date
+                  />
+                </Col>
+              </>
+            )}
+
+            {/* Session Filter */}
+            <Col md={2}>
+              <Form.Label className="fw-bold small">Session</Form.Label>
+              <Form.Select
+                name="session"
+                value={filters.session}
+                onChange={handleFilterChange}
+                className="shadow-sm"
+              >
+                <option value="All">All Sessions</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+              </Form.Select>
+            </Col>
+          </Row>
+
+          {/* Row 2: Hub, Status, Search */}
+          <Row className="g-3 align-items-end">
+            <Col md={3}>
+              <Form.Label className="fw-bold small">Hub</Form.Label>
+              <Form.Select
+                name="hubId"
+                value={filters.hubId}
+                onChange={handleFilterChange}
+                className="shadow-sm"
+              >
+                <option value="">All Hubs</option>
+                {hubs?.map((hub) => (
+                  <option key={hub._id} value={hub._id}>
+                    {hub?.hubName}
+                  </option>
+                ))}
+              </Form.Select>
+            </Col>
+
+            <Col md={3}>
+              <Form.Label className="fw-bold small">Status</Form.Label>
+              <Form.Select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="shadow-sm"
+              >
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Cooking">Cooking</option>
+                <option value="Packing">Packing</option>
+                <option value="On the way">On the way</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+              </Form.Select>
+            </Col>
+
+            <Col md={4}>
+              <Form.Label className="fw-bold small">Search</Form.Label>
+              <InputGroup className="shadow-sm">
+                <InputGroup.Text>
+                  <BsSearch />
+                </InputGroup.Text>
+                <Form.Control
+                  type="text"
+                  placeholder="Order ID / Name"
+                  name="search"
+                  value={filters.search}
+                  onChange={handleFilterChange}
+                />
+              </InputGroup>
+            </Col>
+
+            <Col md={2}>
+              <Button
+                variant="outline-danger"
+                onClick={clearFilters}
+                className="w-100 fw-bold"
+              >
+                Reset
+              </Button>
+            </Col>
+          </Row>
         </Card.Body>
       </Card>
-
-      {/* === MODIFIED: Filters Row 1 === */}
-      <Row className="d-flex gap-3 align-items-center mb-2 mx-1">
-        {/* Hub Filter */}
-        <Col md>
-          <Form.Label>Hub</Form.Label>
-          <Form.Select
-            className="packer-slot-select shadow-sm"
-            name="hubId"
-            value={filters.hubId}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Hubs</option>
-            {hubs?.map((hub) => (
-              <option key={hub._id} value={hub._id}>
-                {hub?.hubName}
-              </option>
-            ))}
-          </Form.Select>
-        </Col>
-
-        {/* NEW: Session Filter */}
-        <Col md>
-          <Form.Label>Session</Form.Label>
-          <Form.Select
-            className="packer-slot-select shadow-sm"
-            name="session"
-            value={filters.session}
-            onChange={handleFilterChange}
-          >
-            <option value="All">All Sessions</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-          </Form.Select>
-        </Col>
-
-        {/* Status Filter (Kept) */}
-        <Col md>
-          <Form.Label>Status</Form.Label>
-          <Form.Select
-            className="form-select packer-slot-select shadow-sm"
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Cooking">Cooking</option>
-            <option value="Packing">Packing</option>
-            <option value="On the way">On the way</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-          </Form.Select>
-        </Col>
-
-        {/* REMOVED: Location Filter Dropdown */}
-        {/* REMOVED: Old Slot Filter */}
-        {/* REMOVED: Bulk Update Button (relied on removed filters) */}
-      </Row>
-
-      {/* === MODIFIED: Filters Row 2 === */}
-      <Row className="d-flex gap-3 mb-2 mx-1 align-items-end">
-        {/* Search */}
-        <Col md={3}>
-          <Form.Label>Search</Form.Label>
-          <InputGroup>
-            <InputGroup.Text id="basic-addon1">
-              <BsSearch />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search by Order ID or Name..."
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-            />
-          </InputGroup>
-        </Col>
-
-        {/* REMOVED: Date From/To */}
-
-        {/* Clear Filters */}
-        <Col md={2}>
-          <Button variant="danger" onClick={clearFilters} className="w-100">
-            Clear All
-          </Button>
-        </Col>
-      </Row>
 
       {/* Main Content */}
       <div className="customerhead p-2">
