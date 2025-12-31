@@ -321,6 +321,16 @@
     gap: 10px;
   }
 
+  .add-more-submit-btn.danger-btn {
+  background-color: #dc3545; /* Red color */
+  border-color: #dc3545;
+  color: white;
+}
+
+.add-more-submit-btn.danger-btn:hover {
+  background-color: #c82333;
+}
+
   /* Smaller image for mobile list */
   .add-more-item-image {
     width: 70px;

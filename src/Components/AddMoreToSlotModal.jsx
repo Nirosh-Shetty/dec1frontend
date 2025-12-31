@@ -58,7 +58,7 @@ const AddMoreToSlotModal = ({
       [itemId]: qty,
     }));
   };
-
+  const totalSelectedQty = Object.values(quantities).reduce((a, b) => a + b, 0);
   const handleAddMore = async () => {
     try {
       setUpdating(true);
@@ -240,13 +240,22 @@ const AddMoreToSlotModal = ({
             className="add-more-submit-btn"
             onClick={handleAddMore}
             disabled={updating || loading}
+            // Add red color style if removing plan
+            style={
+              totalSelectedQty === 0
+                ? { backgroundColor: "#dc3545", borderColor: "#dc3545" }
+                : {}
+            }
           >
             {updating ? (
               <>
-                <span className="button-loader"></span> Updating...
+                <span className="button-loader"></span>
+                {totalSelectedQty === 0 ? " Removing..." : " Updating..."}
               </>
+            ) : totalSelectedQty === 0 ? (
+              "Remove Plan"
             ) : (
-              "Add More"
+              "Update Plan"
             )}
           </button>
         </div>

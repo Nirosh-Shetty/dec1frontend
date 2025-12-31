@@ -3,8 +3,8 @@ import { useState, useMemo, useEffect, useContext } from "react";
 import { WalletContext } from "../WalletContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Button, Modal } from "react-bootstrap";
-import name from "./../assets/successGroup.png";
+import { Modal } from "react-bootstrap";
+// import name from "./../assets/successGroup.png";
 import myplanlocation from "./../assets/myplanlocation.png";
 import myplancalender from "./../assets/myplancalender.png";
 import IsNonVeg from "./../assets/isVeg=no.svg";
@@ -22,7 +22,7 @@ import "../Styles/MyPlan.css";
 import { toast } from "react-toastify";
 import pending from "./../assets/pending.png";
 import success from "./../assets/success-green.png";
-import discount from "./../assets/discount.png";
+// import discount from "./../assets/discount.png";
 import myplancancel from "./../assets/myplancancel.png";
 import "./../Styles/Normal.css";
 import orderhistoryicon from "./../assets/orderhistory.png";
@@ -106,6 +106,12 @@ const ViewPlanModal = ({
       );
 
       if (res.data.success) {
+        if (!res.data.data || res.data.message === "Plan removed as it is empty") {
+            toast.info("Plan removed because it became empty.");
+            onClose(); // Close the modal
+            if (onPlanUpdated) onPlanUpdated(); // Refresh parent list
+            return;
+        }
         const updatedPlan = res.data.data;
         setLocalPlan(updatedPlan);
         // also inform parent to refresh main list if needed
@@ -202,7 +208,7 @@ const ViewPlanModal = ({
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showAddMoreModal, setShowAddMoreModal] = useState(false);
   // Wallet selection state (use WalletContext for live data)
-  const { wallet, walletSeting } = useContext(WalletContext);
+  const { wallet } = useContext(WalletContext);
   const walletBalance = wallet?.balance || 0;
   const [useWallet, setUseWallet] = useState(false);
   // Compute max wallet deduction (same as Checkout)
@@ -946,6 +952,14 @@ const ViewPlanModal = ({
         planId={localPlan._id}
         userId={userId}
         onItemsUpdated={(updatedPlan) => {
+          if (!updatedPlan) {
+             // Plan was deleted (empty)
+             toast.info("Plan removed because it became empty.");
+             setShowAddMoreModal(false); 
+             onClose(); // Close the parent ViewPlanModal immediately
+             if (onPlanUpdated) onPlanUpdated(); // Refresh the main list
+             return; 
+          }
           // Update localPlan immediately with fresh data from backend
           if (updatedPlan) {
             setLocalPlan(updatedPlan);
@@ -968,6 +982,7 @@ const MyPlan = () => {
   const [trackModalVisible, setTrackModalVisible] = useState(false);
   const [currentTrackedOrder, setCurrentTrackedOrder] = useState(null);
   const [showQuickAnswers, setShowQuickAnswers] = useState(false);
+  const { fetchWalletData } = useContext(WalletContext);
   // TODO: wire this to your auth/user context
   // parse stored user once so we can access properties safely
   let user = null;
@@ -1299,7 +1314,7 @@ const MyPlan = () => {
         },
       };
 
-      console.log(configObj, "configgggggggg");
+      // console.log(configObj, "configgggggggg");
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
@@ -1320,6 +1335,14 @@ const MyPlan = () => {
       };
 
       const res = await axios(configObj);
+      //TODO: uncomment wallet fetch
+      // if(res.status === 200 || res.data.success) {
+        // setTimeout(async () => {
+          console.log("comming")
+              await fetchWalletData(); 
+          console.log("came")
+          // }, 500);
+      // }
       const redirectInfo = res.data?.url;
 
       // Show success toast
