@@ -460,12 +460,12 @@ const LocationModal2 = ({
 
         if (!customerId) return;
 
-        // If onAddressSelected callback is provided (e.g., from MyPlan), call it instead of reloading
+        // If onAddressSelected callback is provided (e.g., from MyPlan), call it instead of updating global location
         if (onAddressSelected) {
           onAddressSelected(address);
           setActionLoading(null);
-          return;
-        }
+          return; 
+        }  
 
         // Update UI immediately
         setPrimaryAddressId(address._id);
@@ -473,15 +473,13 @@ const LocationModal2 = ({
         // Set manual location flag to prevent auto-detection
         localStorage.setItem("locationManuallySelected", "true");
         localStorage.removeItem("cart");
+
         // Update cache
         const cachedAddresses = localStorage.getItem(`addresses_${customerId}`);
         if (cachedAddresses) {
           const cached = JSON.parse(cachedAddresses);
           cached.primaryAddress = address._id;
-          localStorage.setItem(
-            `addresses_${customerId}`,
-            JSON.stringify(cached)
-          );
+          localStorage.setItem(`addresses_${customerId}`, JSON.stringify(cached));
         }
 
         // Close modal first
@@ -499,11 +497,7 @@ const LocationModal2 = ({
         if (response.ok) {
           // Trigger refresh everywhere
           window.dispatchEvent(new Event("addressUpdated"));
-
-          // Reload after a short delay
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
+          window.dispatchEvent(new Event("locationUpdated"));
         }
       } catch (error) {
         console.error("Error setting primary address:", error);
@@ -987,12 +981,6 @@ const LocationModal2 = ({
                 const isSelected =
                   (selectedLocationId && selectedLocationId === address._id) ||
                   (!selectedLocationId && isPrimaryAddress(address._id));
-                console.log(
-                  selectedLocationId,
-                  address._id,
-                  isSelected,
-                  address
-                );
                 return (
                   <div
                     key={address._id}

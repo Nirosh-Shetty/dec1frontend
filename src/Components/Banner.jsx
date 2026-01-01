@@ -775,6 +775,36 @@ const Banner = ({
   // Get primary address from state
   const [primaryAddress, setPrimaryAddress] = useState(null);
 
+  const refreshLocationFromStorage = useCallback(() => {
+    const savedPrimaryAddress = localStorage.getItem("primaryAddress");
+    if (savedPrimaryAddress && savedPrimaryAddress !== "null") {
+      try {
+        const parsedPrimaryAddress = JSON.parse(savedPrimaryAddress);
+        setPrimaryAddress(parsedPrimaryAddress);
+        setPrimaryAddressId(parsedPrimaryAddress?._id || null);
+      } catch (e) {
+        console.error("Error parsing primary address from storage:", e);
+        setPrimaryAddress(null);
+        setPrimaryAddressId(null);
+      }
+    } else {
+      setPrimaryAddress(null);
+      setPrimaryAddressId(null);
+    }
+
+    const savedCurrentLocation = localStorage.getItem("currentLocation");
+    if (savedCurrentLocation && savedCurrentLocation !== "null") {
+      try {
+        setCurrentLocation(JSON.parse(savedCurrentLocation));
+      } catch (e) {
+        console.error("Error parsing current location from storage:", e);
+        setCurrentLocation(null);
+      }
+    } else {
+      setCurrentLocation(null);
+    }
+  }, []);
+
   // Replace the problematic autoDetectLocation useEffect with this:
   useEffect(() => {
     let isMounted = true;
@@ -1362,6 +1392,24 @@ const Banner = ({
       fetchAddresses();
     }
   }, [user?._id, fetchAddresses]);
+
+  useEffect(() => {
+    const handleLocationUpdated = () => {
+      refreshLocationFromStorage();
+
+      if (user?._id) {
+        fetchAddresses();
+      }
+    };
+
+    window.addEventListener("locationUpdated", handleLocationUpdated);
+    window.addEventListener("addressUpdated", handleLocationUpdated);
+
+    return () => {
+      window.removeEventListener("locationUpdated", handleLocationUpdated);
+      window.removeEventListener("addressUpdated", handleLocationUpdated);
+    };
+  }, [fetchAddresses, refreshLocationFromStorage, user?._id]);
 
   // Get display name for address
   const getDisplayName = (address) => {

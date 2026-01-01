@@ -116,10 +116,26 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const handleLocationUpdated = () => {
       console.log("Location updated event received");
       refreshAddress();
+
+      // Cart is location-specific; clear in-memory cart as well
+      localStorage.removeItem("cart");
+      setCarts([]);
+      setCart([]);
+    };
+
+    const handleAddressUpdated = () => {
+      console.log("Address updated event received");
+      refreshAddress();
+
+      // Cart is location-specific; clear in-memory cart as well
+      localStorage.removeItem("cart");
+      setCarts([]);
+      setCart([]);
     };
 
     // Listen for custom event from Banner
     window.addEventListener("locationUpdated", handleLocationUpdated);
+    window.addEventListener("addressUpdated", handleAddressUpdated);
 
     // Also listen for localStorage changes
     const handleStorageChange = (e) => {
@@ -132,6 +148,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     return () => {
       window.removeEventListener("locationUpdated", handleLocationUpdated);
+      window.removeEventListener("addressUpdated", handleAddressUpdated);
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
@@ -1022,7 +1039,22 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     console.log("🚀 proceedToPlan called");
     console.log("🚀 user:", user);
     console.log("🚀 Carts.length:", Carts.length);
-    console.log("🚀 address:", address);
+    console.log("🚀 address (state):", address);
+
+    let latestAddress = null;
+    try {
+      const primaryAddress = localStorage.getItem("primaryAddress");
+      const currentLocation = localStorage.getItem("currentLocation");
+      if (primaryAddress && primaryAddress !== "null") {
+        latestAddress = JSON.parse(primaryAddress);
+      } else if (currentLocation && currentLocation !== "null") {
+        latestAddress = JSON.parse(currentLocation);
+      }
+    } catch {
+      latestAddress = null;
+    }
+
+    console.log("🚀 address (latest from storage):", latestAddress);
 
     if (!user) {
       console.log("❌ proceedToPlan - No user");
@@ -1046,7 +1078,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       return;
     }
 
-    if (!address) {
+    if (!latestAddress) {
       console.log("❌ proceedToPlan - No address");
       Swal2.fire({
         toast: true,
@@ -1067,19 +1099,19 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setloader(true);
     try {
       const addressDetails = {
-        addressId: address._id || "",
-        addressline: `${address.fullAddress}`,
-        addressType: address.addressType || "",
-        coordinates: address.location?.coordinates || [0, 0],
-        hubId: address.hubId || "",
-        hubName: address.hubName || "",
-        studentInformation: address.studentInformation,
-        schoolName: address.schoolName || "",
-        houseName: address.houseName || "",
-        apartmentName: address.apartmentName || "",
-        companyName: address.companyName || "",
-        customerType: address.customerType || "",
-        companyId: address.companyId || "",
+        addressId: latestAddress._id || "",
+        addressline: `${latestAddress.fullAddress}`,
+        addressType: latestAddress.addressType || "",
+        coordinates: latestAddress.location?.coordinates || [0, 0],
+        hubId: latestAddress.hubId || "",
+        hubName: latestAddress.hubName || "",
+        studentInformation: latestAddress.studentInformation,
+        schoolName: latestAddress.schoolName || "",
+        houseName: latestAddress.houseName || "",
+        apartmentName: latestAddress.apartmentName || "",
+        companyName: latestAddress.companyName || "",
+        customerType: latestAddress.customerType || "",
+        companyId: latestAddress.companyId || "",
       };
 
       console.log("🚀 proceedToPlan - Making API call with:", {
