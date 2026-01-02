@@ -812,9 +812,27 @@ const ViewPlanModal = ({
             Billing Details
           </span>
           <div className="billing-details-list">
-            <div className="billing-details-row">
+            {/* <div className="billing-details-row">
               <span>Total Order value</span>
               <span> ₹{localPlan?.slotTotalAmount}</span>
+            </div> */}
+            <div className="billing-details-row">
+              <span>Item Total (Excl. Tax)</span>
+              <span> ₹{localPlan?.amountBeforeTax?.toFixed(2)}</span>
+            </div>
+
+            {/* 2. Show Tax Amount */}
+            <div className="billing-details-row">
+              <span>
+                 Tax ({localPlan?.taxPercentage || 5}%)
+              </span>
+              <span> ₹{localPlan?.taxAmount?.toFixed(2)}</span>
+            </div>
+
+            {/* 3. Show Total Order Value (Inclusive) */}
+            <div className="billing-details-row" style={{borderTop: "1px dashed #ddd", paddingTop: "5px"}}>
+              <span style={{fontWeight: 600}}>Total Order Value</span>
+              <span style={{fontWeight: 600}}> ₹{localPlan?.slotTotalAmount}</span>
             </div>
             {localPlan?.slotHubTotalAmount < localPlan?.slotTotalAmount && (
               <div className="billing-details-row">
@@ -1006,7 +1024,20 @@ const MyPlan = () => {
       const res = await axios.get(
         `https://dd-merge-backend-2.onrender.com/api/user/plan/get-plan/${userId}`
       );
-      if (res.data.success) setPlans(res.data.data || []);
+     if (res.data.success) {
+        const newPlans = res.data.data || [];
+        setPlans(newPlans);
+
+        if (selectedPlan && isModalOpen) {
+          const updatedSelectedPlan = newPlans.find(p => p._id === selectedPlan._id);
+          if (updatedSelectedPlan) {
+            setSelectedPlan(updatedSelectedPlan);
+          } else {
+            setIsModalOpen(false);
+            setSelectedPlan(null);
+          }
+        }
+      }
     } catch (err) {
       console.error("fetch plans error", err);
     }
