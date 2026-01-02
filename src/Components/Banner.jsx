@@ -696,7 +696,7 @@ const Banner = ({
         Swal2.fire({
           // title: "🎉 Request Submitted Successfully!",
           html: `
-            <div style="text-align: center; padding: ${isSmall ? "8px" : "12px"};">
+            <div style="text-align: center; zIndex:9999999 padding: ${isSmall ? "8px" : "12px"};">
               <div style="font-size: ${isSmall ? "16px" : "18px"}; color: #6B8E23; margin-bottom: ${isSmall ? "12px" : "15px"}; font-weight: 600;">
                 ✅ Your service request has been successfully submitted!
               </div>
@@ -774,36 +774,6 @@ const Banner = ({
 
   // Get primary address from state
   const [primaryAddress, setPrimaryAddress] = useState(null);
-
-  const refreshLocationFromStorage = useCallback(() => {
-    const savedPrimaryAddress = localStorage.getItem("primaryAddress");
-    if (savedPrimaryAddress && savedPrimaryAddress !== "null") {
-      try {
-        const parsedPrimaryAddress = JSON.parse(savedPrimaryAddress);
-        setPrimaryAddress(parsedPrimaryAddress);
-        setPrimaryAddressId(parsedPrimaryAddress?._id || null);
-      } catch (e) {
-        console.error("Error parsing primary address from storage:", e);
-        setPrimaryAddress(null);
-        setPrimaryAddressId(null);
-      }
-    } else {
-      setPrimaryAddress(null);
-      setPrimaryAddressId(null);
-    }
-
-    const savedCurrentLocation = localStorage.getItem("currentLocation");
-    if (savedCurrentLocation && savedCurrentLocation !== "null") {
-      try {
-        setCurrentLocation(JSON.parse(savedCurrentLocation));
-      } catch (e) {
-        console.error("Error parsing current location from storage:", e);
-        setCurrentLocation(null);
-      }
-    } else {
-      setCurrentLocation(null);
-    }
-  }, []);
 
   // Replace the problematic autoDetectLocation useEffect with this:
   useEffect(() => {
@@ -945,7 +915,6 @@ const Banner = ({
   // Handle location from LocationModal2
   const handleLocationFromModal = useCallback(
     (locationData) => {
-      console.log("Location data received from modal:", locationData)
       if (locationData) {
         // First, save the location data
         const locationToSave = {
@@ -1393,24 +1362,6 @@ const Banner = ({
     }
   }, [user?._id, fetchAddresses]);
 
-  useEffect(() => {
-    const handleLocationUpdated = () => {
-      refreshLocationFromStorage();
-
-      if (user?._id) {
-        fetchAddresses();
-      }
-    };
-
-    window.addEventListener("locationUpdated", handleLocationUpdated);
-    window.addEventListener("addressUpdated", handleLocationUpdated);
-
-    return () => {
-      window.removeEventListener("locationUpdated", handleLocationUpdated);
-      window.removeEventListener("addressUpdated", handleLocationUpdated);
-    };
-  }, [fetchAddresses, refreshLocationFromStorage, user?._id]);
-
   // Get display name for address
   const getDisplayName = (address) => {
     if (!address) return "";
@@ -1668,7 +1619,7 @@ const Banner = ({
                 </div>
               </div>
 
-              <div className="d-flex gap-1 justify-content-center align-items-center referbtn">
+              <div className="d-flex gap-1 justify-content-end align-items-center referbtn">
                 {/* <button
                   className="refer-earn-btn"
                   onClick={() => navigate("/refer")}
@@ -2265,7 +2216,7 @@ const Banner = ({
             fetchAddresses();
           }
         }}
-        onAddressAdded={handleLocationFromModal} // Pass the handler
+        onLocationSelect={handleLocationFromModal} // Pass the handler
         currentLocation={currentLocation}
         onLocationDetect={handleDetectLocation}
         isLocationEnabled={isLocationEnabled}

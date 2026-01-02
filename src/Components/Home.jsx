@@ -84,29 +84,77 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   const [address, setAddress] = useState(null);
 
+  // Initial address loading with better error handling
   useEffect(() => {
-    const primaryAddress = localStorage.getItem("primaryAddress");
-    const currentLocation = localStorage.getItem("currentLocation");
+    const loadInitialAddress = () => {
+      try {
+        const primaryAddress = localStorage.getItem("primaryAddress");
+        const currentLocation = localStorage.getItem("currentLocation");
 
-    if (primaryAddress && primaryAddress !== "null") {
-      setAddress(JSON.parse(primaryAddress));
-    } else if (currentLocation && currentLocation !== "null") {
-      setAddress(JSON.parse(currentLocation));
-    }
+        console.log("Initial load - primaryAddress:", primaryAddress);
+        console.log("Initial load - currentLocation:", currentLocation);
+
+        if (primaryAddress && primaryAddress !== "null") {
+          const parsedPrimary = JSON.parse(primaryAddress);
+          console.log(
+            "Initial load - setting address from primaryAddress:",
+            parsedPrimary
+          );
+          setAddress(parsedPrimary);
+        } else if (currentLocation && currentLocation !== "null") {
+          const parsedCurrent = JSON.parse(currentLocation);
+          console.log(
+            "Initial load - setting address from currentLocation:",
+            parsedCurrent
+          );
+          setAddress(parsedCurrent);
+        } else {
+          console.log("Initial load - no address found");
+          setAddress(null);
+        }
+      } catch (error) {
+        console.error("Error loading initial address:", error);
+        setAddress(null);
+      }
+    };
+
+    loadInitialAddress();
   }, []);
 
   // console.log(address, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
   // Add a function to refresh address from localStorage
   const refreshAddress = useCallback(() => {
-    const primaryAddress = localStorage.getItem("primaryAddress");
-    const currentLocation = localStorage.getItem("currentLocation");
+    try {
+      const primaryAddress = localStorage.getItem("primaryAddress");
+      const currentLocation = localStorage.getItem("currentLocation");
 
-    if (primaryAddress && primaryAddress !== "null") {
-      setAddress(JSON.parse(primaryAddress));
-    } else if (currentLocation && currentLocation !== "null") {
-      setAddress(JSON.parse(currentLocation));
-    } else {
+      console.log("Refreshing address - primaryAddress:", primaryAddress);
+      console.log("Refreshing address - currentLocation:", currentLocation);
+
+      // Clear manual location flag if no addresses are found
+      if (
+        (!primaryAddress || primaryAddress === "null") &&
+        (!currentLocation || currentLocation === "null")
+      ) {
+        localStorage.removeItem("locationManuallySelected");
+        console.log("Cleared manual location flag - no addresses found");
+      }
+
+      if (primaryAddress && primaryAddress !== "null") {
+        const parsedPrimary = JSON.parse(primaryAddress);
+        console.log("Setting address from primaryAddress:", parsedPrimary);
+        setAddress(parsedPrimary);
+      } else if (currentLocation && currentLocation !== "null") {
+        const parsedCurrent = JSON.parse(currentLocation);
+        console.log("Setting address from currentLocation:", parsedCurrent);
+        setAddress(parsedCurrent);
+      } else {
+        console.log("No address found, setting to null");
+        setAddress(null);
+      }
+    } catch (error) {
+      console.error("Error refreshing address:", error);
       setAddress(null);
     }
   }, []);
@@ -116,49 +164,60 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const handleLocationUpdated = () => {
       console.log("Location updated event received");
       refreshAddress();
-
-      // Cart is location-specific; clear in-memory cart as well
-      localStorage.removeItem("cart");
-      setCarts([]);
-      setCart([]);
     };
 
     const handleAddressUpdated = () => {
       console.log("Address updated event received");
       refreshAddress();
-
-      // Cart is location-specific; clear in-memory cart as well
-      localStorage.removeItem("cart");
-      setCarts([]);
-      setCart([]);
     };
 
-    // Listen for custom event from Banner
+    const handleAddressAdded = () => {
+      console.log("Address added event received");
+      refreshAddress();
+    };
+
+    const handleFocus = () => {
+      console.log("Window focus event - refreshing address");
+      refreshAddress();
+    };
+
+    // Listen for all location/address related events
     window.addEventListener("locationUpdated", handleLocationUpdated);
     window.addEventListener("addressUpdated", handleAddressUpdated);
+    window.addEventListener("addressAdded", handleAddressAdded);
+    window.addEventListener("focus", handleFocus);
 
     // Also listen for localStorage changes
     const handleStorageChange = (e) => {
       if (e.key === "currentLocation" || e.key === "primaryAddress") {
+        console.log("localStorage change detected for:", e.key);
         refreshAddress();
       }
     };
 
     window.addEventListener("storage", handleStorageChange);
 
+    // Add periodic check to ensure address stays in sync
+    const intervalId = setInterval(() => {
+      refreshAddress();
+    }, 2000); // Check every 2 seconds
+
     return () => {
       window.removeEventListener("locationUpdated", handleLocationUpdated);
       window.removeEventListener("addressUpdated", handleAddressUpdated);
+      window.removeEventListener("addressAdded", handleAddressAdded);
+      window.removeEventListener("focus", handleFocus);
       window.removeEventListener("storage", handleStorageChange);
+      clearInterval(intervalId);
     };
-  }, []);
+  }, [refreshAddress]);
 
   // Removed: useEffect that depends on user - moved to after user declaration
 
   // --- DATE & SESSION STATE ---
- const getNormalizedToday = () => {
-      const now = new Date();
-      return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const getNormalizedToday = () => {
+    const now = new Date();
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   };
 
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -269,33 +328,31 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     fetchAllMenuData();
   }, [address?.hubId]); // This will re-run whenever hubId changes
 
-  const handleLocationDetected = useCallback(
-    (newLocation) => {
-      console.log("Location detected from Banner:", newLocation);
+  const handleLocationDetected = useCallback((newLocation) => {
+    console.log("Location detected from Banner:", newLocation);
 
-      // Check if location was manually selected - don't override manual selection
-      const manualLocationFlag = localStorage.getItem(
-        "locationManuallySelected"
+    // Check if location was manually selected - don't override manual selection
+    const manualLocationFlag = localStorage.getItem("locationManuallySelected");
+    console.log("Manual location flag:", manualLocationFlag);
+
+    if (manualLocationFlag === "true") {
+      console.log(
+        "Location was manually selected, ignoring auto-detected location"
       );
-      if (manualLocationFlag === "true") {
-        console.log(
-          "Location was manually selected, ignoring auto-detected location"
-        );
-        return;
-      }
+      return;
+    }
 
-      setAddress(newLocation);
+    console.log("Setting new location from Banner:", newLocation);
+    setAddress(newLocation);
 
-      // Save to localStorage for persistence
-      if (newLocation) {
-        localStorage.setItem("currentLocation", JSON.stringify(newLocation));
-      }
+    // Save to localStorage for persistence
+    if (newLocation) {
+      localStorage.setItem("currentLocation", JSON.stringify(newLocation));
+    }
 
-      // Dispatch event for other components
-      window.dispatchEvent(new Event("locationUpdated"));
-    },
-    [setAddress]
-  );
+    // Dispatch event for other components
+    window.dispatchEvent(new Event("locationUpdated"));
+  }, []);
 
   // --- 2. CORE FILTERING LOGIC (The "Magic" Part) ---
 
@@ -462,6 +519,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
     return false;
   };
+
   console.log(address, "address");
   // Helper: always use preorder price if available and before cutoff
   const getEffectivePrice = (item, matchedLocation, session) => {
@@ -1039,22 +1097,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     console.log("🚀 proceedToPlan called");
     console.log("🚀 user:", user);
     console.log("🚀 Carts.length:", Carts.length);
-    console.log("🚀 address (state):", address);
-
-    let latestAddress = null;
-    try {
-      const primaryAddress = localStorage.getItem("primaryAddress");
-      const currentLocation = localStorage.getItem("currentLocation");
-      if (primaryAddress && primaryAddress !== "null") {
-        latestAddress = JSON.parse(primaryAddress);
-      } else if (currentLocation && currentLocation !== "null") {
-        latestAddress = JSON.parse(currentLocation);
-      }
-    } catch {
-      latestAddress = null;
-    }
-
-    console.log("🚀 address (latest from storage):", latestAddress);
+    console.log("🚀 address:", address);
 
     if (!user) {
       console.log("❌ proceedToPlan - No user");
@@ -1078,7 +1121,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       return;
     }
 
-    if (!latestAddress) {
+    if (!address) {
       console.log("❌ proceedToPlan - No address");
       Swal2.fire({
         toast: true,
@@ -1099,19 +1142,19 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setloader(true);
     try {
       const addressDetails = {
-        addressId: latestAddress._id || "",
-        addressline: `${latestAddress.fullAddress}`,
-        addressType: latestAddress.addressType || "",
-        coordinates: latestAddress.location?.coordinates || [0, 0],
-        hubId: latestAddress.hubId || "",
-        hubName: latestAddress.hubName || "",
-        studentInformation: latestAddress.studentInformation,
-        schoolName: latestAddress.schoolName || "",
-        houseName: latestAddress.houseName || "",
-        apartmentName: latestAddress.apartmentName || "",
-        companyName: latestAddress.companyName || "",
-        customerType: latestAddress.customerType || "",
-        companyId: latestAddress.companyId || "",
+        addressId: address._id || "",
+        addressline: `${address.fullAddress}`,
+        addressType: address.addressType || "",
+        coordinates: address.location?.coordinates || [0, 0],
+        hubId: address.hubId || "",
+        hubName: address.hubName || "",
+        studentInformation: address.studentInformation,
+        schoolName: address.schoolName || "",
+        houseName: address.houseName || "",
+        apartmentName: address.apartmentName || "",
+        companyName: address.companyName || "",
+        customerType: address.customerType || "",
+        companyId: address.companyId || "",
       };
 
       console.log("🚀 proceedToPlan - Making API call with:", {
