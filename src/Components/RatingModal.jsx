@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import axios from "axios";
 import { FaStar } from "react-icons/fa";
 
@@ -141,151 +141,171 @@ const RatingModal = () => {
       : "Was the delivery on time? Was the packing good?";
 
   return (
-    <Modal
-      show={rateMode}
-      onHide={handleClose}
-      backdrop="static"
-      centered
-      contentClassName="border-0"
-      style={{
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1001,
-      }}
-    >
-      <Modal.Body
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: "16px",
-          padding: "1.5rem",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
-          position: "fixed",
-          bottom: 0,
-          margin: "10px",
-          left: 0,
-          right: 0,
-        }}
-      >
-        <button className="custom-close-btn" onClick={handleClose}>
-          ×
-        </button>
-        {rateorder && (
-          <>
-            <h6
-              style={{
-                textAlign: "center",
-                fontWeight: 400,
-                color: "#333",
-                fontSize: "0.9rem",
-                marginBottom: "1rem",
-              }}
-            >
-              Order delivered on:{" "}
-              <span style={{ fontWeight: 500 }}>
-                {formatDateTime(rateorder.updatedAt)}
-              </span>
-            </h6>
-
-            <Form>
-              <Form.Group className="text-center mb-3">
-                <Form.Label
+    <>
+      {rateMode && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 999999,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+          }}
+          onClick={handleClose}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "16px 16px 0 0",
+              padding: "1.5rem",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+              width: "100%",
+              maxWidth: "620px",
+              position: "relative",
+              animation: "slideUp 0.3s ease-out",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <style>
+              {`
+                @keyframes slideUp {
+                  from {
+                    transform: translateY(100%);
+                  }
+                  to {
+                    transform: translateY(0);
+                  }
+                }
+              `}
+            </style>
+            <button className="custom-close-btn" onClick={handleClose}>
+              ×
+            </button>
+            {rateorder && (
+              <>
+                <h6
                   style={{
-                    display: "block",
-                    fontSize: "1.1rem",
-                    fontWeight: "600",
-                    color: "#444",
-                    marginBottom: "8px",
-                  }}
-                >
-                  {titleText}
-                </Form.Label>
-                <div className="d-flex justify-content-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FaStar
-                      key={star}
-                      size={46}
-                      color={star <= rating ? "#E6B800" : "#ccc"}
-                      style={{ cursor: "pointer", transition: "color 0.2s" }}
-                      onClick={() => handleRating(star)}
-                    />
-                  ))}
-                </div>
-              </Form.Group>
-
-              <Form.Group>
-                <Form.Label
-                  style={{
+                    textAlign: "center",
                     fontWeight: 400,
-                    fontSize: "0.9rem",
                     color: "#333",
-                  }}
-                >
-                  {subText}
-                </Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  placeholder={placeholderText}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  style={{
                     fontSize: "0.9rem",
-                    border: "1px solid #A9A9A9",
-                    borderRadius: "8px",
-                    resize: "none",
-                    boxShadow: "none",
-                  }}
-                />
-              </Form.Group>
-
-              <div className="mt-4 d-flex justify-content-between gap-3">
-                {/* Skip Button */}
-                <button
-                  className="btn w-50"
-                  style={{
-                    backgroundColor: "#f8f9fa",
-                    color: "#6c757d",
-                    fontWeight: 500,
-                    borderRadius: "10px",
-                    border: "1px solid #dee2e6",
-                    padding: "10px 0",
-                    fontSize: "1rem",
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    submitRating("skipped");
+                    marginBottom: "1rem",
                   }}
                 >
-                  Skip
-                </button>
+                  Order delivered on:{" "}
+                  <span style={{ fontWeight: 500 }}>
+                    {formatDateTime(rateorder.updatedAt)}
+                  </span>
+                </h6>
 
-                {/* Submit Button */}
-                <button
-                  className="btn w-50"
-                  style={{
-                    backgroundColor: "#E6B800",
-                    color: "black",
-                    fontWeight: 600,
-                    borderRadius: "10px",
-                    border: "none",
-                    padding: "10px 0",
-                    fontSize: "1rem",
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    submitRating("rated");
-                  }}
-                >
-                  Submit
-                </button>
-              </div>
-            </Form>
-          </>
-        )}
-      </Modal.Body>
-    </Modal>
+                <Form>
+                  <Form.Group className="text-center mb-3">
+                    <Form.Label
+                      style={{
+                        display: "block",
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        color: "#444",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {titleText}
+                    </Form.Label>
+                    <div className="d-flex justify-content-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FaStar
+                          key={star}
+                          size={46}
+                          color={star <= rating ? "#E6B800" : "#ccc"}
+                          style={{
+                            cursor: "pointer",
+                            transition: "color 0.2s",
+                          }}
+                          onClick={() => handleRating(star)}
+                        />
+                      ))}
+                    </div>
+                  </Form.Group>
+
+                  <Form.Group>
+                    <Form.Label
+                      style={{
+                        fontWeight: 400,
+                        fontSize: "0.9rem",
+                        color: "#333",
+                      }}
+                    >
+                      {subText}
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      placeholder={placeholderText}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      style={{
+                        fontSize: "0.9rem",
+                        border: "1px solid #A9A9A9",
+                        borderRadius: "8px",
+                        resize: "none",
+                        boxShadow: "none",
+                      }}
+                    />
+                  </Form.Group>
+
+                  <div className="mt-4 d-flex justify-content-between gap-3 flex-row">
+                    {/* Skip Button */}
+                    <button
+                      className="btn w-50"
+                      style={{
+                        backgroundColor: "#f8f9fa",
+                        color: "#6c757d",
+                        fontWeight: 500,
+                        borderRadius: "10px",
+                        border: "1px solid #dee2e6",
+                        padding: "10px 0",
+                        fontSize: "1rem",
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        submitRating("skipped");
+                      }}
+                    >
+                      Skip
+                    </button>
+
+                    {/* Submit Button */}
+                    <button
+                      className="btn w-50"
+                      style={{
+                        backgroundColor: "#E6B800",
+                        color: "black",
+                        fontWeight: 600,
+                        borderRadius: "10px",
+                        border: "none",
+                        padding: "10px 0",
+                        fontSize: "1rem",
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        submitRating("rated");
+                      }}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </Form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
