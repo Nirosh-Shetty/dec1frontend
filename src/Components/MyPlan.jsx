@@ -54,6 +54,7 @@ const ViewPlanModal = ({
   handleTrackOrder,
   address,
 }) => {
+  console.log("plans are", plan);
   const user = JSON.parse(localStorage.getItem("user"));
 
   const navigate = useNavigate();
@@ -106,11 +107,14 @@ const ViewPlanModal = ({
       );
 
       if (res.data.success) {
-        if (!res.data.data || res.data.message === "Plan removed as it is empty") {
-            toast.info("Plan removed because it became empty.");
-            onClose(); // Close the modal
-            if (onPlanUpdated) onPlanUpdated(); // Refresh parent list
-            return;
+        if (
+          !res.data.data ||
+          res.data.message === "Plan removed as it is empty"
+        ) {
+          toast.info("Plan removed because it became empty.");
+          onClose(); // Close the modal
+          if (onPlanUpdated) onPlanUpdated(); // Refresh parent list
+          return;
         }
         const updatedPlan = res.data.data;
         setLocalPlan(updatedPlan);
@@ -240,7 +244,7 @@ const ViewPlanModal = ({
     localPlan.status === "Pending Payment" && now < cutoffTime;
   const isPaidEditable = localPlan.status === "Confirmed" && now < cutoffTime;
   const isPaidLocked = localPlan.status === "Confirmed" && now >= cutoffTime;
-
+  const isConfirmed = localPlan.status === "Confirmed";
   const getTimeRemainingToCutoff = () => {
     const diff = cutoffTime - now;
     if (diff <= 0) return { days: 0, hours: 0, mins: 0, isExpired: true };
@@ -823,16 +827,20 @@ const ViewPlanModal = ({
 
             {/* 2. Show Tax Amount */}
             <div className="billing-details-row">
-              <span>
-                 Tax ({localPlan?.taxPercentage || 5}%)
-              </span>
+              <span>Tax ({localPlan?.taxPercentage || 5}%)</span>
               <span> ₹{localPlan?.taxAmount?.toFixed(2)}</span>
             </div>
 
             {/* 3. Show Total Order Value (Inclusive) */}
-            <div className="billing-details-row" style={{borderTop: "1px dashed #ddd", paddingTop: "5px"}}>
-              <span style={{fontWeight: 600}}>Total Order Value</span>
-              <span style={{fontWeight: 600}}> ₹{localPlan?.slotTotalAmount}</span>
+            <div
+              className="billing-details-row"
+              style={{ borderTop: "1px dashed #ddd", paddingTop: "5px" }}
+            >
+              <span style={{ fontWeight: 600 }}>Total Order Value</span>
+              <span style={{ fontWeight: 600 }}>
+                {" "}
+                ₹{localPlan?.slotTotalAmount}
+              </span>
             </div>
             {localPlan?.slotHubTotalAmount < localPlan?.slotTotalAmount && (
               <div className="billing-details-row">
@@ -936,7 +944,7 @@ const ViewPlanModal = ({
               />
             </button>
           )}
-          {isPaidEditable && (
+          {isConfirmed && (
             <button
               className="track-order-btn"
               onClick={() => handleTrackOrder(plan)}
@@ -971,12 +979,12 @@ const ViewPlanModal = ({
         userId={userId}
         onItemsUpdated={(updatedPlan) => {
           if (!updatedPlan) {
-             // Plan was deleted (empty)
-             toast.info("Plan removed because it became empty.");
-             setShowAddMoreModal(false); 
-             onClose(); // Close the parent ViewPlanModal immediately
-             if (onPlanUpdated) onPlanUpdated(); // Refresh the main list
-             return; 
+            // Plan was deleted (empty)
+            toast.info("Plan removed because it became empty.");
+            setShowAddMoreModal(false);
+            onClose(); // Close the parent ViewPlanModal immediately
+            if (onPlanUpdated) onPlanUpdated(); // Refresh the main list
+            return;
           }
           // Update localPlan immediately with fresh data from backend
           if (updatedPlan) {
@@ -1024,12 +1032,16 @@ const MyPlan = () => {
       const res = await axios.get(
         `https://dd-merge-backend-2.onrender.com/api/user/plan/get-plan/${userId}`
       );
-     if (res.data.success) {
+      if (res.data.success) {
         const newPlans = res.data.data || [];
         setPlans(newPlans);
 
+        console.log("plans are", newPlans);
+
         if (selectedPlan && isModalOpen) {
-          const updatedSelectedPlan = newPlans.find(p => p._id === selectedPlan._id);
+          const updatedSelectedPlan = newPlans.find(
+            (p) => p._id === selectedPlan._id
+          );
           if (updatedSelectedPlan) {
             setSelectedPlan(updatedSelectedPlan);
           } else {
@@ -1368,11 +1380,11 @@ const MyPlan = () => {
       const res = await axios(configObj);
       //TODO: uncomment wallet fetch
       // if(res.status === 200 || res.data.success) {
-        // setTimeout(async () => {
-          console.log("comming")
-              await fetchWalletData(); 
-          console.log("came")
-          // }, 500);
+      // setTimeout(async () => {
+      // console.log("comming")
+      await fetchWalletData();
+      // console.log("came")
+      // }, 500);
       // }
       const redirectInfo = res.data?.url;
 
@@ -1566,9 +1578,8 @@ const MyPlan = () => {
                 const isBeforeDeadline = now < deadline;
                 const payableAmount = Math.max(
                   0,
-                  plan.payableAmount -
-                    (plan.discountWallet || 0) 
-                    // -(plan.preorderDiscount || 0)
+                  plan.payableAmount - (plan.discountWallet || 0)
+                  // -(plan.preorderDiscount || 0)
                 ).toFixed(0);
                 const isUnpaidEditable =
                   plan.status === "Pending Payment" && isBeforeDeadline;
@@ -1578,9 +1589,7 @@ const MyPlan = () => {
                 const isPaidLocked =
                   plan.status === "Confirmed" && !isBeforeDeadline;
 
-                {
-                  /* const isConfirmed = plan.status === "Confirmed"; */
-                }
+                const isConfirmed = plan.status === "Confirmed";
 
                 return (
                   <>
@@ -1770,8 +1779,8 @@ const MyPlan = () => {
                             //     )}
                             //   </div>
                             // </button>
-                         
-                           <button
+
+                            <button
                               className="pay-btn"
                               onClick={() => handlePayPlan(plan, "")}
                             >
@@ -1790,7 +1799,10 @@ const MyPlan = () => {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="price-container" style={{color:"black"}}>
+                                  <div
+                                    className="price-container"
+                                    style={{ color: "black" }}
+                                  >
                                     <div className="final-price-box1">
                                       ₹{payableAmount}
                                     </div>
@@ -1798,9 +1810,7 @@ const MyPlan = () => {
                                 )}
                               </div>
                             </button>
-                         )}
-
-                        
+                          )}
                         </div>
 
                         {/* {isPaidEditable && (
@@ -1821,7 +1831,7 @@ const MyPlan = () => {
                           </button>
                         )} */}
                         {/* {isPaidLocked && ( */}
-                        {isPaidEditable && (
+                        {isConfirmed && (
                           // {true && (
                           <button
                             className="track-order-btn"
