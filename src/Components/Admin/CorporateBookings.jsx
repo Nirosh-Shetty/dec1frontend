@@ -875,11 +875,14 @@ const CorporateBookings = () => {
                   <b>Bill Details</b>
                   <div className="col-md-10 mb-2">
                     <div>
-                      <div>Sub Total</div>
-                      <div>Tax (5%)</div>
+                      <div>Item Total (Excl. Tax)</div>
+                      <div>Tax ({data?.taxPercentage || 5}%)</div>
                       {data?.Cutlery ? <div>Cutlery</div> : null}
                       {data?.delivarytype ? <div>Delivery charges</div> : null}
                       {data?.coupon ? <div>Coupon Discount</div> : null}
+                      {data?.preorderDiscount ? (
+                        <div>Preorder Discount</div>
+                      ) : null}
                       {data?.discountWallet ? <div>Apply Wallet</div> : null}
                       <div>
                         <b>Bill total</b>
@@ -891,27 +894,29 @@ const CorporateBookings = () => {
                       <div>
                         <div>
                           ₹{" "}
-                          {data?.allProduct
-                            ?.reduce((acc, item) => {
-                              return (
-                                Number(acc) +
-                                Number(item?.quantity) *
-                                  Number(item?.foodItemId?.foodprice)
-                              );
-                            }, 0)
-                            .toFixed(2)}
+                          {data?.amountBeforeTax
+                            ? data.amountBeforeTax.toFixed(2)
+                            : (
+                                (data?.allTotal || 0) - (data?.tax || 0)
+                              ).toFixed(2)}
                         </div>
-                        <div>₹ {data?.tax?.toFixed(2)}</div>
+
+                        <div>₹ {data?.tax ? data.tax.toFixed(2) : "0.00"}</div>
+
                         {data?.Cutlery ? <div>₹ {data?.Cutlery}</div> : null}
                         {data?.delivarytype ? (
                           <div>₹ {data?.delivarytype}</div>
                         ) : null}
                         {data?.coupon ? <div>- ₹ {data?.coupon}</div> : null}
+                        {data?.preorderDiscount ? (
+                          <div>- ₹ {data?.preorderDiscount}</div>
+                        ) : null}
                         {data?.discountWallet ? (
                           <div>- ₹ {data?.discountWallet}</div>
                         ) : null}
+
                         <div>
-                          <b>₹ {data?.allTotal.toFixed(2)}</b>
+                          <b>₹ {data?.allTotal?.toFixed(2)}</b>
                         </div>
                       </div>
                     </div>

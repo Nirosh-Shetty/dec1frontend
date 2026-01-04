@@ -275,7 +275,7 @@
   border: 2px solid #f5deb3;
   background: #fff8dc;
   position: relative;
-  color: #2c2c2c;
+  color: var(--primary-text);
 
   /* Mobile touch optimization */
   -webkit-tap-highlight-color: transparent;
@@ -289,6 +289,11 @@
   touch-action: manipulation;
 }
 
+.add-to-cart-btn.disabled-btn{
+  background-color:var(--steel-light);
+  border-color:var(--steel-dark);
+}
+
 .add-to-cart-btn:visited {
   color: #2c2c2c;
   border: 1px solid #e8e8e8 !important;
@@ -299,6 +304,14 @@
   border: 1px solid #f5de43 !important;
   transform: scale(1.05);
   transition: all 0.3s ease;
+}
+
+.add-to-cart-btn.disabled-btn:hover {
+  cursor: not-allowed;
+  transform: none;
+  border: 2px solid var(--steel-dark) !important;
+  transform: scale(1);
+  color: var(--primary-text) !important;
 }
 
 /* Mobile touch states */

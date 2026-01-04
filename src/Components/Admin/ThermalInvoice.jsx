@@ -197,27 +197,53 @@ function ThermalInvoice() {
           </div>
 
           {/* Totals */}
-          <div>
+         <div>
             <table style={{ width: "100%", fontSize: "11px" }}>
               <tbody>
+                {/* 1. Item Total (Before Tax) */}
                 <tr>
-                  <td style={{ textAlign: "left", padding: "2px 0" }}>Subtotal:</td>
+                  <td style={{ textAlign: "left", padding: "2px 0" }}>Item Total (Excl. Tax):</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>
-                    ₹ {item?.subTotal ? Number(item.subTotal).toFixed(2) : "0.00"}
+                    ₹{" "}
+                    {item?.amountBeforeTax
+                      ? Number(item.amountBeforeTax).toFixed(2)
+                      : // Fallback for old orders: (Inclusive SubTotal - Tax)
+                        (
+                          (item?.subTotal || 0) - (item?.tax || 0)
+                        ).toFixed(2)}
                   </td>
                 </tr>
+
+                {/* 2. Tax Amount */}
                 <tr>
-                  <td style={{ textAlign: "left", padding: "2px 0" }}>Delivery:</td>
-                  <td style={{ textAlign: "right", padding: "2px 0" }}>
-                    {item?.deliveryCharge <= 0 ? "Free" : `₹ ${Number(item.deliveryCharge).toFixed(2)}`}
+                  <td style={{ textAlign: "left", padding: "2px 0" }}>
+                    Tax ({item?.taxPercentage || 5}%):
                   </td>
-                </tr>
-                <tr>
-                  <td style={{ textAlign: "left", padding: "2px 0" }}>Tax (5%):</td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>
                     ₹ {item?.tax ? Number(item.tax).toFixed(2) : "0.00"}
                   </td>
                 </tr>
+
+                {/* 3. Subtotal (Inclusive - Optional, or just keep as total order value) */}
+                {/* If you want to show the inclusive subtotal sum explicitly before delivery/discounts: */}
+                <tr>
+                   <td style={{ textAlign: "left", padding: "2px 0", borderTop: "1px dotted #ccc" }}>Order Value (Inc. Tax):</td>
+                   <td style={{ textAlign: "right", padding: "2px 0", borderTop: "1px dotted #ccc" }}>
+                     ₹ {item?.subTotal ? Number(item.subTotal).toFixed(2) : "0.00"}
+                   </td>
+                </tr>
+
+                {/* Delivery */}
+                <tr>
+                  <td style={{ textAlign: "left", padding: "2px 0" }}>Delivery:</td>
+                  <td style={{ textAlign: "right", padding: "2px 0" }}>
+                    {item?.deliveryCharge <= 0
+                      ? "Free"
+                      : `₹ ${Number(item.deliveryCharge).toFixed(2)}`}
+                  </td>
+                </tr>
+
+                {/* Cutlery */}
                 {item?.Cutlery > 0 && (
                   <tr>
                     <td style={{ textAlign: "left", padding: "2px 0" }}>Cutlery:</td>
@@ -226,6 +252,8 @@ function ThermalInvoice() {
                     </td>
                   </tr>
                 )}
+
+                {/* Discounts */}
                 {item?.coupon > 0 && (
                   <tr>
                     <td style={{ textAlign: "left", padding: "2px 0" }}>Discount:</td>
@@ -236,14 +264,25 @@ function ThermalInvoice() {
                 )}
                 {item?.discountWallet > 0 && (
                   <tr>
-                    <td style={{ textAlign: "left", padding: "2px 0" }}>Apply Wallet:</td>
+                    <td style={{ textAlign: "left", padding: "2px 0" }}>Wallet Used:</td>
                     <td style={{ textAlign: "right", padding: "2px 0" }}>
                       -₹ {Number(item.discountWallet).toFixed(2)}
                     </td>
                   </tr>
                 )}
+                {
+                  item?.preorderDiscount > 0 &&
+                  <tr>
+                    <td style={{ textAlign: "left", padding: "2px 0" }}>Preorder Discount:</td> 
+                    <td style={{ textAlign: "right", padding: "2px 0" }}>
+                      -₹ {Number(item.preorderDiscount).toFixed(2)}
+                    </td>
+                  </tr>
+                }
+
+                {/* Final Total */}
                 <tr style={{ borderTop: "1px dashed #000", fontWeight: "bold" }}>
-                  <td style={{ textAlign: "left", padding: "6px 0 2px" }}>TOTAL:</td>
+                  <td style={{ textAlign: "left", padding: "6px 0 2px" }}>TOTAL PAID:</td>
                   <td style={{ textAlign: "right", padding: "6px 0 2px" }}>
                     ₹ {item?.allTotal ? Number(item.allTotal).toFixed(2) : "0.00"}
                   </td>

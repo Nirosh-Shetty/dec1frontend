@@ -1157,7 +1157,7 @@ const MyPlan = () => {
   async function handleTrackOrder(plan) {
     if (!plan.orderId) return;
     setLoadingTrackId(plan._id);
-
+    closeModal();
     try {
       const res = await axios.get(
         `https://dd-merge-backend-2.onrender.com/api/admin/getOrderByOrderId/${plan.orderId}`
