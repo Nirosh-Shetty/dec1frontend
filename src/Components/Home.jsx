@@ -265,7 +265,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   //     setloader(true);
   //     try {
   //       const res = await axios.get(
-  //         "http://localhost:7013/api/user/get-hub-menu",
+  //         "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
   //         {
   //           params: {
   //             hubId: address.hubId,
@@ -303,322 +303,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         console.log("Fetching menu for hub:", address.hubId);
 
         const res = await axios.get(
-          "http://localhost:7013/api/user/get-hub-menu",
-          {
-            params: {
-              hubId: address.hubId,
-            },
-          }
-        );
-
-        if (res.status === 200) {
-          console.log("Menu data received:", res.data.menu.length, "items");
-          setAllHubMenuData(res.data.menu);
-        } else {
-          setAllHubMenuData([]);
-        }
-      } catch (error) {
-        console.error("Error fetching menu:", error);
-        setAllHubMenuData([]);
-      } finally {
-        setloader(false);
-      }
-    };
-
-    fetchAllMenuData();
-  }, [address?.hubId]); // This will re-run whenever hubId changes
-
-  const handleLocationDetected = useCallback((newLocation) => {
-    console.log("Location detected from Banner:", newLocation);
-
-    // Check if location was manually selected - don't override manual selection
-    const manualLocationFlag = localStorage.getItem("locationManuallySelected");
-    console.log("Manual location flag:", manualLocationFlag);
-
-    if (manualLocationFlag === "true") {
-      console.log(
-        "Location was manually selected, ignoring auto-detected location"
-      );
-      return;
-    }
-
-    console.log("Setting new location from Banner:", newLocation);
-    setAddress(newLocation);
-
-    // Save to localStorage for persistence
-    if (newLocation) {
-      localStorage.setItem("currentLocation", JSON.stringify(newLocation));
-    }
-
-    // Dispatch event for other components
-    window.dispatchEvent(new Event("locationUpdated"));
-  }, []);
-
-  // --- 2. CORE FILTERING LOGIC (The "Magic" Part) ---
-
-  // A. Get items for the selected Date & Session
-  const currentSlotItems = useMemo(() => {
-    if (!allHubMenuData.length) return [];
-    const selectedDateISO = selectedDate.toISOString();
-
-    return allHubMenuData.filter(
-      (item) =>
-        item.deliveryDate === selectedDateISO &&
-        item.session === selectedSession
-    );
-  }, [allHubMenuData, selectedDate, selectedSession]);
-
-  // B. Filter those items by "Veg Only" toggle
-  const vegFilteredItems = useMemo(() => {
-    if (isVegOnly) {
-      return currentSlotItems.filter((item) => item.foodcategory === "Veg");
-    }
-    return currentSlotItems;
-  }, [currentSlotItems, isVegOnly]);
-
-  // C. Derive Categories dynamically from the VALID items (Step B)
-  // This ensures we ONLY show categories that actually have items to show.
-  const dynamicTabs = useMemo(() => {
-    // Extract unique categories
-    const categories = new Set(
-      vegFilteredItems.map((item) => item.menuCategory)
-    );
-    // Remove undefined/null and sort
-    const uniqueCats = [...categories].filter(Boolean).sort();
-    return ["All", ...uniqueCats];
-  }, [vegFilteredItems]);
-
-  // D. Final List: Filter by the Selected Tab
-  const finalDisplayItems = useMemo(() => {
-    if (selectedCategory === "All") return vegFilteredItems;
-    return vegFilteredItems.filter(
-      (item) => item.menuCategory === selectedCategory
-    );
-  }, [vegFilteredItems, selectedCategory]);
-
-  // --- TABS COMPONENT (Modified to use parent state) ---
-  const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
-    return (
-      <div className="tabs-container2">
-        <div className="tabs-scroll-container">
-          <div className="tabs-scroll">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                className={`tab-button ${activeTab === tab ? "active" : ""}`}
-                onClick={() => onTabClick(tab)}
-              >
-                <span className="tab-button-text">{tab}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        <style jsx>{`
-          .tabs-container2 {
-            background-color: ${Colors.creamWalls};
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-            position: relative;
-            border-bottom: 2px solid #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
-              0 2px 6px rgba(0, 0, 0, 0.05);
-          }
-          .tabs-scroll-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-          }
-          .tabs-scroll-container::-webkit-scrollbar {
-            display: none;
-          }
-          .tabs-scroll {
-            display: inline-flex;
-            min-width: 100%;
-            gap: 10px;
-            padding: 0 4px;
-          }
-          .tab-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            padding: 8px 24px;
-            border-radius: 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-height: 25px;
-          }
-          .tab-button:hover {
-            background-color: ${Colors.warmbeige}40;
-            transform: translateY(-1px);
-          }
-          .tab-button.active {
-            background-color: ${Colors.greenCardamom};
-            padding: 4px 8px;
-            box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
-            width: auto;
-            height: auto;
-            border-radius: 20px;
-          }
-          .tab-button.active:hover {
-            background-color: ${Colors.greenCardamom}E6;
-            transform: translateY(-1px) scale(1.02);
-          }
-          .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 18px;
-            letter-spacing: -0.7px;
-            color: ${Colors.primaryText};
-            transition: all 0.3s ease;
-          }
-          .tab-button.active .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 16px;
-            font-weight: 900;
-            line-height: 21px;
-            letter-spacing: -0.8px;
-            color: ${Colors.appForeground};
-          }
-        `}</style>
-      </div>
-    );
-  };
-
-  const isSameDay = (d1, d2) => {
-    const a = new Date(d1);
-    const b = new Date(d2);
-    a.setHours(0, 0, 0, 0);
-    b.setHours(0, 0, 0, 0);
-    return a.getTime() === b.getTime();
-  };
-  const isFutureDate = (deliveryDate) => {
-    const today = new Date();
-    return !isSameDay(deliveryDate, today) && new Date(deliveryDate) > today;
-  };
-
-  // Helper: enforce cutoff for Lunch (8am) and Dinner (4pm)
-  const isBeforeCutoff = (deliveryDate, session) => {
-    if (!deliveryDate || !session) return false;
-    const now = new Date();
-    const delivery = new Date(deliveryDate);
-    delivery.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (delivery.getTime() > today.getTime()) return true; // future date
-    if (delivery.getTime() < today.getTime()) return false; // past
-    if (session.toLowerCase() === "lunch") {
-      return now.getHours() < 8;
-    }
-    if (session.toLowerCase() === "dinner") {
-      return now.getHours() < 16;
-    }
-    return false;
-  };
-
-  console.log(address, "address");
-  // Helper: always use preorder price if available and before cutoff
-  const getEffectivePrice = (item, matchedLocation, session) => {
-    const hubPrice =
-      (matchedLocation &&
-        (matchedLocation.hubPrice || matchedLocation.basePrice)) ||
-      item?.hubPrice ||
-      item?.basePrice ||
-      0;
-    const preOrderPrice =
-      (matchedLocation &&
-        (matchedLocation.preOrderPrice || matchedLocation.preorderPrice)) ||
-      item?.preOrderPrice ||
-      item?.preorderPrice ||
-      0;
-    const beforeCutoff = isBeforeCutoff(
-      item?.deliveryDate || item?.deliveryDateISO,
-      session
-    );
-    if (beforeCutoff && preOrderPrice > 0) return { price: preOrderPrice };
-    return { price: hubPrice };
-  };
-
-  const [cartCount, setCartCount] = useState(0);
-  const [isCartVisible, setIsCartVisible] = useState(false);
-
-  const handleShow = () => {
-    setCartCount(cartCount + 1);
-    setIsCartVisible(true);
-  };
-
-  const [foodData, setFoodData] = useState({});
-  const [open, setOpen] = useState(false);
-
-  const showDrawer = (food) => {
-    setFoodData(food);
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  // Add body class when drawer is open to control z-index of other elements
-  useEffect(() => {
-    if (open) {
-      document.body.classList.add("drawer-open");
-    } else {
-      document.body.classList.remove("drawer-open");
-    }
-
-    // Cleanup on unmount
-    return () => {
-      document.body.classList.remove("drawer-open");
-    };
-  }, [open]);
-  const [show4, setShow4] = useState(false);
-  const handleClose4 = () => setShow4(false);
-  const [show3, setShow3] = useState(false);
-  const handleClose3 = () => setShow3(false);
-  const [show2, setShow2] = useState(false);
-  const handleClose2 = () => setShow2(false);
-  const handleShow2 = () => setShow2(true);
-
-  // const user = JSON.parse(localStorage.getItem("user"));
-
-  // Refresh address when user logs in/out
-  useEffect(() => {
-    console.log("User state changed, refreshing address");
-    refreshAddress();
-  }, [user]);
-
-  const addCart1 = async (item, checkOf, matchedLocation) => {
-    // Enforce cutoff for adding to cart
-    if (!isBeforeCutoff(selectedDate, selectedSession)) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Cutoff time passed. Cannot add to cart.`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-      });
-      return;
-    }
-    if (!matchedLocation || matchedLocation?.Remainingstock === 0) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Product is out of stock`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        custom    const res = await axios.get(
           "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
           {
             params: {
@@ -1028,13 +712,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     const addonedCarts = async () => {
       try {
-        await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
-          userId: user?._id,
-          items: storedCart,
-          lastUpdated: Date.now,
-          username: user?.Fname,
-          mobile: user?.Mobile,
-        });
+        await axios.post(
+          "https://dd-merge-backend-2.onrender.com/api/cart/addCart",
+          {
+            userId: user?._id,
+            items: storedCart,
+            lastUpdated: Date.now,
+            username: user?.Fname,
+            mobile: user?.Mobile,
+          }
+        );
       } catch (error) {
         console.log(error);
       }
@@ -2243,15 +1930,28 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                   </span>
                                   <FaPlus className="add-to-cart-btn-icon" />
                                 </button>
-                              ) : (<button
-                                  className="add-to-cart-btn"
+                              ) : (
+                                <button
+                                  className={`add-to-cart-btn 
+                                    ${
+                                      (user && !address) ||
+                                      isBeforeCutoff(
+                                        item.deliveryDate,
+                                        item.deliverySession
+                                      )
+                                        ? "disabled-btn"
+                                        : ""
+                                    }`}
                                   onClick={() =>
                                     addCart1(item, checkOf, matchedLocation)
                                   }
-                                  disabled={user && !address}
-                                  style={{
-                                    opacity: user && !address ? 0.5 : 1,
-                                  }}
+                                  disabled={
+                                    (user && !address) ||
+                                    isBeforeCutoff(
+                                      item.deliveryDate,
+                                      item.deliverySession
+                                    )
+                                  }
                                 >
                                   <div className="pick-btn-text">
                                     <span className="pick-btn-text1">PICK</span>
@@ -2659,20 +2359,21 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           </div>
                         </div>
                       ) : stockCount > 0 && gifUrl !== "Closed.gif" ? (
-                        <button
-                          className="add-to-plate-btn"
-                          onClick={() => {
-                            addCart1(foodData, checkOffer, matchedLocation);
-                          }}
-                          disabled={user && !address}
-                          style={{
-                            opacity: user && !address ? 0.5 : 1,
-                            pointerEvents: user && !address ? "none" : "auto",
-                          }}
-                        >
-                          <span>Add to plate</span>
-                          <div className="plate-icon">🍽️</div>
-                        </button>
+                        // <button
+                        //   className="add-to-plate-btn"
+                        //   onClick={() => {
+                        //     addCart1(foodData, checkOffer, matchedLocation);
+                        //   }}
+                        //   disabled={user && !address}
+                        //   style={{
+                        //     opacity: user && !address ? 0.5 : 1,
+                        //     pointerEvents: user && !address ? "none" : "auto",
+                        //   }}
+                        // >
+                        //   <span>Add to plate</span>
+                        //   <div className="plate-icon">🍽️</div>
+                        // </button>
+                        ""
                       ) : (
                         <button
                           className={
