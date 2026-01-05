@@ -2243,15 +2243,15 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                   </span>
                                   <FaPlus className="add-to-cart-btn-icon" />
                                 </button>
-                              ) : (
-                                <button
-                                  className={`add-to-cart-btn ${
-                                   ( user && !address ) || !isBeforeCutoff(item.deliveryDate, item.deliverySession) ? "disabled-btn" : ""
-                                  }`}
+                              ) : (<button
+                                  className="add-to-cart-btn"
                                   onClick={() =>
                                     addCart1(item, checkOf, matchedLocation)
                                   }
-                                  disabled={(user && !address) || !isBeforeCutoff(item.deliveryDate, item.deliverySession)}
+                                  disabled={user && !address}
+                                  style={{
+                                    opacity: user && !address ? 0.5 : 1,
+                                  }}
                                 >
                                   <div className="pick-btn-text">
                                     <span className="pick-btn-text1">PICK</span>
