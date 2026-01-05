@@ -501,7 +501,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     return !isSameDay(deliveryDate, today) && new Date(deliveryDate) > today;
   };
 
-  // Helper: enforce cutoff for Lunch (8am) and Dinner (4pm)
+  // Helper: enforce cutoff for Lunch (10am) and Dinner (4pm)
   const isBeforeCutoff = (deliveryDate, session) => {
     if (!deliveryDate || !session) return false;
     const now = new Date();
@@ -512,7 +512,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     if (delivery.getTime() > today.getTime()) return true; // future date
     if (delivery.getTime() < today.getTime()) return false; // past
     if (session.toLowerCase() === "lunch") {
-      return now.getHours() < 8;
+      return now.getHours() < 10;
     }
     if (session.toLowerCase() === "dinner") {
       return now.getHours() < 16;

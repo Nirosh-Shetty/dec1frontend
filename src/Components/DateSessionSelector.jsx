@@ -78,7 +78,7 @@ const DateSessionSelector = ({
     if (key !== todayUtcKey) return false;
     const hr = now().getHours();
     const min = now().getMinutes();
-    if (session === "Lunch" && (hr > 8 || (hr === 8 && min >= 0))) return true; // block Lunch after 8:00am
+    if (session === "Lunch" && (hr > 10 || (hr === 8 && min >= 0))) return true; // block Lunch after 10:00am
     if (session === "Dinner" && (hr > 16 || (hr === 16 && min >= 0))) return true; // block Dinner after 4:00pm
     return false;
   };
@@ -334,7 +334,7 @@ const DateSessionSelector = ({
                 currentSession === "Lunch" ? "active" : ""
               }`}
             >
-              Order before 8:00 AM
+              Order before 10:00 AM
             </div>
           </button>
         </div>

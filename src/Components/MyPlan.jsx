@@ -67,11 +67,11 @@ const ViewPlanModal = ({
     // setDeliveryNotes(plan.deliveryNotes || "");
   }, [plan]);
 
-  // Only allow editing if before cutoff (8am Lunch, 4pm Dinner)
+  // Only allow editing if before cutoff (10am Lunch, 4pm Dinner)
   function getCutoffTime(deliveryDate, session) {
     const cutoff = new Date(deliveryDate);
     if (session === "Lunch") {
-      cutoff.setHours(8, 0, 0, 0);
+      cutoff.setHours(10, 0, 0, 0);
     } else {
       cutoff.setHours(16, 0, 0, 0);
     }
@@ -1131,7 +1131,7 @@ const MyPlan = () => {
 
     // Only use cutoff time for all plans (preorder only)
     let targetTime = new Date(deliveryDate.getTime());
-    if (plan.session === "Lunch") targetTime.setHours(8, 0, 0, 0);
+    if (plan.session === "Lunch") targetTime.setHours(10, 0, 0, 0);
     else targetTime.setHours(16, 0, 0, 0);
 
     const diffMs = targetTime.getTime() - now.getTime();
@@ -1728,12 +1728,12 @@ const MyPlan = () => {
                               /> */}
                               <div className="reminder-banner">
                                 {`Confirm before ${
-                                  plan.session === "Lunch" ? "8AM" : "4PM"
+                                  plan.session === "Lunch" ? "10AM" : "4PM"
                                 }`}
                               </div>
                               {/* <div className="reminder-banner">
                                 {`Before ${
-                                  plan.session === "Lunch" ? "8AM" : "4PM"
+                                  plan.session === "Lunch" ? "10AM" : "4PM"
                                 }, pay ₹ ${(
                                   plan.slotHubTotalAmount -
                                   plan.slotTotalAmount
@@ -2309,7 +2309,7 @@ const MyPlan = () => {
                 marginBottom: "8px",
               }}
             >
-              You must confirm and pay before the cutoff time: 8am for Lunch,
+              You must confirm and pay before the cutoff time: 10am for Lunch,
               4pm for Dinner. After the cutoff, you cannot edit or pay for the
               plan.
             </p>
