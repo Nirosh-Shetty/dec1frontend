@@ -10,6 +10,8 @@ import {
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import "../../Styles/AdminOrderAssignment.css";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import ZoneOrdersModal from "./ZoneOrdersModal";
+import { useZoneOrders } from "../../hooks/useZoneOrders";
 
 // Define libraries outside component to prevent re-renders
 const LIBRARIES = ["drawing"];
@@ -40,6 +42,18 @@ const AdminOrderAssignment = () => {
   const [isRidersLoading, setIsRidersLoading] = useState(false);
   const [zoneDetails, setZoneDetails] = useState(null);
   const [mapHeight, setMapHeight] = useState("75vh");
+  
+  // Session-based filtering states
+  const [selectedMapSession, setSelectedMapSession] = useState("all");
+
+  // Zone Orders Modal Hook
+  const {
+    showZoneOrdersModal,
+    zoneOrders,
+    loadingZoneOrders,
+    handleShowZoneOrders,
+    closeModal,
+  } = useZoneOrders(filteredOrders);
 
   // Replace LoadScript with useJsApiLoader hook - UPDATED
   const { isLoaded, loadError } = useJsApiLoader({
@@ -295,6 +309,7 @@ const AdminOrderAssignment = () => {
             )
           : []
       );
+      
       setShowZoneForm(true);
       setShowZoneDetails(false);
 
@@ -376,6 +391,117 @@ const AdminOrderAssignment = () => {
     console.log("Clicked zone:", zone.name);
     setSelectedZone(zone);
   }, []);
+
+  // Helper function to check if a point is inside a polygon (Ray casting algorithm)
+  const isPointInPolygon = useCallback((point, polygon) => {
+    if (!polygon || polygon.length < 3) return false;
+
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].lng,
+        yi = polygon[i].lat;
+      const xj = polygon[j].lng,
+        yj = polygon[j].lat;
+
+      const intersect =
+        yi > point.lng !== yj > point.lng &&
+        point.lat < ((xj - xi) * (point.lng - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }, []);
+
+  // Function to check if an order is within any created zone
+  const isOrderInAnyZone = useCallback((order) => {
+    if (!order.coordinates?.coordinates || zones.length === 0) return false;
+    
+    const orderPoint = {
+      lat: order.coordinates.coordinates[1],
+      lng: order.coordinates.coordinates[0]
+    };
+
+    return zones.some(zone => {
+      if (!zone.paths || zone.paths.length < 3) return false;
+      return isPointInPolygon(orderPoint, zone.paths);
+    });
+  }, [zones, isPointInPolygon]);
+
+  // Calculate orders within zones
+  const getOrdersInZones = useCallback(() => {
+    const ordersInZones = filteredOrders.filter(order => isOrderInAnyZone(order));
+    
+    // Debug logging (remove in production)
+    console.log('Zone calculation debug:', {
+      totalFilteredOrders: filteredOrders.length,
+      totalZones: zones.length,
+      ordersInZones: ordersInZones.length,
+      ordersWithCoordinates: filteredOrders.filter(order => order.coordinates).length
+    });
+    
+    return ordersInZones;
+  }, [filteredOrders, isOrderInAnyZone]);
+  const updateClustererMarkers = useCallback(
+    (ordersArray) => {
+      if (!clustererRef.current || !mapRef.current) return;
+
+      clustererRef.current.clearMarkers();
+
+      const markers = ordersArray.map((order, index) => {
+        const marker = new window.google.maps.Marker({
+          position: {
+            lat: order.displayLat,
+            lng: order.displayLng,
+          },
+          icon: createPinShapedMarker(
+            index + 1,
+            order.addressType,
+            order.isGrouped,
+            order.groupCount
+          ),
+          title: `Order ${index + 1}: ${order.username} - ${order.addressType}${
+            order.isGrouped ? ` (${order.groupCount} orders here)` : ""
+          }`,
+          zIndex:
+            selectedOrder?._id === order._id
+              ? 1000
+              : order.isGrouped
+              ? 200
+              : 100,
+        });
+
+        marker.addListener("click", () => {
+          handleMarkerClick(order, index + 1);
+        });
+
+        return marker;
+      });
+
+      clustererRef.current.addMarkers(markers);
+    },
+    [selectedOrder]
+  );
+
+  // Session-based filtering functions
+  const filterOrdersBySession = useCallback((session) => {
+    setSelectedMapSession(session);
+    let sessionFilteredOrders = orders;
+    
+    if (session !== "all") {
+      sessionFilteredOrders = orders.filter(order => order.session === session);
+    }
+    
+    // Apply hub filter on top of session filter
+    if (selectedHub !== "all") {
+      sessionFilteredOrders = sessionFilteredOrders.filter(order => order.hubName === selectedHub);
+    }
+    
+    setFilteredOrders(sessionFilteredOrders);
+    
+    // Update map markers
+    if (clustererRef.current && mapRef.current) {
+      updateClustererMarkers(sessionFilteredOrders);
+    }
+  }, [orders, selectedHub, updateClustererMarkers]);
 
   // Calculate dynamic offset based on zoom level
   const calculateOffsetRadius = (currentZoom) => {
@@ -663,74 +789,34 @@ const AdminOrderAssignment = () => {
     }
   };
 
-  const updateClustererMarkers = useCallback(
-    (ordersArray) => {
-      if (!clustererRef.current || !mapRef.current) return;
-
-      clustererRef.current.clearMarkers();
-
-      const markers = ordersArray.map((order, index) => {
-        const marker = new window.google.maps.Marker({
-          position: {
-            lat: order.displayLat,
-            lng: order.displayLng,
-          },
-          icon: createPinShapedMarker(
-            index + 1,
-            order.addressType,
-            order.isGrouped,
-            order.groupCount
-          ),
-          title: `Order ${index + 1}: ${order.username} - ${order.addressType}${
-            order.isGrouped ? ` (${order.groupCount} orders here)` : ""
-          }`,
-          zIndex:
-            selectedOrder?._id === order._id
-              ? 1000
-              : order.isGrouped
-              ? 200
-              : 100,
-        });
-
-        marker.addListener("click", () => {
-          handleMarkerClick(order, index + 1);
-        });
-
-        return marker;
-      });
-
-      clustererRef.current.addMarkers(markers);
-    },
-    [selectedOrder]
-  );
-
   const filterOrdersByHub = useCallback(
     (hubName) => {
       setSelectedHub(hubName);
-      if (hubName === "all") {
-        setFilteredOrders(orders);
-        if (orders.length > 0) {
-          const firstOrder = orders[0];
-          setMapCenter({
-            lat: firstOrder.displayLat,
-            lng: firstOrder.displayLng,
-          });
-        }
-      } else {
-        const hubOrders = orders.filter((order) => order.hubName === hubName);
-        setFilteredOrders(hubOrders);
+      let hubOrders = orders;
+      
+      if (hubName !== "all") {
+        hubOrders = orders.filter((order) => order.hubName === hubName);
+      }
+      
+      // Apply session filter on top of hub filter
+      if (selectedMapSession !== "all") {
+        hubOrders = hubOrders.filter(order => order.session === selectedMapSession);
+      }
+      
+      setFilteredOrders(hubOrders);
 
-        if (hubOrders.length > 0) {
-          const firstHubOrder = hubOrders[0];
-          setMapCenter({
-            lat: firstHubOrder.displayLat,
-            lng: firstHubOrder.displayLng,
-          });
+      if (hubOrders.length > 0) {
+        const firstOrder = hubOrders[0];
+        setMapCenter({
+          lat: firstOrder.displayLat,
+          lng: firstOrder.displayLng,
+        });
+        if (hubName !== "all") {
           setZoom(14);
         }
       }
     },
-    [orders]
+    [orders, selectedMapSession]
   );
 
   useEffect(() => {
@@ -748,22 +834,29 @@ const AdminOrderAssignment = () => {
         zoom
       );
       setOrders(processedOrders);
+      
+      // Apply both hub and session filters
+      let filteredData = processedOrders;
+      
       if (selectedHub !== "all") {
-        const hubOrders = processedOrders.filter(
+        filteredData = filteredData.filter(
           (order) => order.hubName === selectedHub
         );
-        setFilteredOrders(hubOrders);
-      } else {
-        setFilteredOrders(processedOrders);
       }
-
-      if (clustererRef.current && mapRef.current) {
-        updateClustererMarkers(
-          selectedHub === "all" ? processedOrders : filteredOrders
+      
+      if (selectedMapSession !== "all") {
+        filteredData = filteredData.filter(
+          (order) => order.session === selectedMapSession
         );
       }
+      
+      setFilteredOrders(filteredData);
+
+      if (clustererRef.current && mapRef.current) {
+        updateClustererMarkers(filteredData);
+      }
     }
-  }, [zoom]);
+  }, [zoom, selectedHub, selectedMapSession]);
 
   const handleMarkerClick = useCallback((order, orderNumber) => {
     setSelectedOrder({ ...order, orderNumber });
@@ -828,6 +921,29 @@ const AdminOrderAssignment = () => {
             </p>
           </div>
           <div className="header-actions">
+            {/* Session Selector */}
+            <div className="session-selector">
+              <label htmlFor="session-filter" style={{ fontSize: "14px", fontWeight: "600", marginRight: "8px" }}>
+                Session:
+              </label>
+              <select
+                id="session-filter"
+                value={selectedMapSession}
+                onChange={(e) => filterOrdersBySession(e.target.value)}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "14px",
+                  marginRight: "12px",
+                  minWidth: "120px"
+                }}
+              >
+                <option value="all">All Sessions</option>
+                <option value="Lunch">🍽️ Lunch</option>
+                <option value="Dinner">🌙 Dinner</option>
+              </select>
+            </div>
             <button className="btn btn-outline" onClick={fetchTodaysOrders}>
               🔄 Refresh Orders
             </button>
@@ -842,26 +958,24 @@ const AdminOrderAssignment = () => {
           <div className="snapshot-row header-snapshot-row">
             <div className="snapshot-card snapshot-card--primary">
               <span>
-                {selectedHub === "all"
+                {selectedMapSession !== "all" 
+                  ? `${selectedMapSession} orders`
+                  : selectedHub === "all"
                   ? "Total orders"
                   : `Orders in ${selectedHub}`}
               </span>
               <strong>{filteredOrders.length}</strong>
             </div>
             <div className="snapshot-card">
-              <span>Mapped orders</span>
+              <span>Orders in zones</span>
               <strong>
-                {filteredOrders.filter((order) => order.coordinates).length}
+                {getOrdersInZones().length}
               </strong>
             </div>
-            <div
-              className={`snapshot-card${
-                hasGroupedMarkers ? " snapshot-card--warning" : ""
-              }`}
-            >
-              <span>Grouped locations</span>
+            <div className="snapshot-card">
+              <span>Current session</span>
               <strong>
-                {hasGroupedMarkers ? Object.keys(locationGroups).length : 0}
+                {selectedMapSession === "all" ? "All" : selectedMapSession}
               </strong>
             </div>
             <div className="snapshot-card">
@@ -933,8 +1047,8 @@ const AdminOrderAssignment = () => {
                 >
                   {isDrawingMode ? "Cancel Drawing" : "Create New Zone"}
                 </button>
-                <button className="btn btn-primary" onClick={fetchTodaysOrders}>
-                  Reload data
+                <button className="btn btn-outline" onClick={fetchTodaysOrders}>
+                  🔄 Reload
                 </button>
               </div>
 
@@ -1349,7 +1463,7 @@ const AdminOrderAssignment = () => {
                         }
                       }}
                     >
-                      <div className="d-flex gap-2">
+                      <div className="zone-info">
                         <span
                           className="zone-color-chip"
                           style={{
@@ -1383,6 +1497,16 @@ const AdminOrderAssignment = () => {
                         </div>
                       </div>
                       <div className="zone-actions">
+                        <button
+                          className="btn btn-outline btn-small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShowZoneOrders(zone);
+                          }}
+                          title="View orders in this zone"
+                        >
+                          📦
+                        </button>
                         <button
                           className="btn btn-outline btn-small"
                           onClick={(e) => {
@@ -1831,6 +1955,23 @@ const AdminOrderAssignment = () => {
           </div>
         </div>
       </div>
+
+      <ZoneOrdersModal
+        showModal={showZoneOrdersModal}
+        onClose={closeModal}
+        loading={loadingZoneOrders}
+        orders={zoneOrders}
+        addressTypeConfig={addressTypeConfig}
+        onOrderClick={(order, index) => {
+          setSelectedOrder({ ...order, orderNumber: index + 1 });
+          setMapCenter({
+            lat: order.displayLat,
+            lng: order.displayLng,
+          });
+          setZoom(16);
+          closeModal();
+        }}
+      />
     </div>
   );
 };

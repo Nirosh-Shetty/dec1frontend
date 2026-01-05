@@ -177,7 +177,7 @@
 /* --- Quantity Control --- */
 .add-more-quantity-control {
   display: flex;
-  flex-direction: column; /* Stack vert on desktop if needed, or row */
+  flex-direction: row; /* Stack vert on desktop if needed, or row */
   align-items: center;
   justify-content: center;
   margin-left: 8px;

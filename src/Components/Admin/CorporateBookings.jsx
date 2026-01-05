@@ -897,7 +897,7 @@ const CorporateBookings = () => {
                           {data?.amountBeforeTax
                             ? data.amountBeforeTax.toFixed(2)
                             : (
-                                (data?.allTotal || 0) - (data?.tax || 0)
+                                (data?.subTotal || 0) - (data?.tax || 0)
                               ).toFixed(2)}
                         </div>
 

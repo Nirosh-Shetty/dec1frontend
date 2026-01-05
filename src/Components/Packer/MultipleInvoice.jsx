@@ -47,6 +47,8 @@ function MultipleInvoice() {
     }
   }, []);
 
+  console.log(items,"..........................ssssssssss")
+
   // Alternative manual print function for the button
   const handleManualPrint = () => {
     printReceipts();
@@ -160,7 +162,7 @@ function MultipleInvoice() {
                 marginBottom: "10px",
                 marginLeft: "auto", // Center horizontally
                 marginRight: "auto",
-                fontWeight: 600
+                fontWeight: 600,
               }}
             >
               {/* Header */}
@@ -244,10 +246,8 @@ function MultipleInvoice() {
                     </tr>
                     <tr>
                       <td style={{ padding: "2px 0" }}>Address:</td>
-                      <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        {item?.delivarylocation && item?.addressline
-                          ? `${item.delivarylocation}, ${item.addressline}`
-                          : "-"}
+                      <td style={{ textAlign: "right", padding: "2px 0", fontSize: "16px" }}>
+                        {item?.delivarylocation}
                       </td>
                     </tr>
                   </tbody>
@@ -265,7 +265,7 @@ function MultipleInvoice() {
                     borderCollapse: "separate",
                     borderSpacing: "0",
                     fontSize: "11px",
-                    fontWeight: 600
+                    fontWeight: 600,
                   }}
                 >
                   <thead>
@@ -348,7 +348,9 @@ function MultipleInvoice() {
                         >
                           ₹{" "}
                           {items?.totalPrice
-                            ? Number(items?.totalPrice/items?.quantity).toFixed(2)
+                            ? Number(
+                                items?.totalPrice / items?.quantity
+                              ).toFixed(2)
                             : "0.00"}
                         </td>
                         <td
@@ -383,7 +385,7 @@ function MultipleInvoice() {
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
                         ₹{" "}
                         {item?.subTotal
-                          ? Number(item.subTotal).toFixed(2)
+                          ? ((Number(item.subTotal) * 100) / 105).toFixed(2)
                           : "0.00"}
                       </td>
                     </tr>
@@ -392,9 +394,10 @@ function MultipleInvoice() {
                         Delivery:
                       </td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        {item?.delivarytype <= 0
+                        {/* {item?.delivarytype <= 0
                           ? "Free"
-                          : `₹ ${Number(item.delivarytype).toFixed(2)}`}
+                          : `₹ ${Number(item.delivarytype).toFixed(2)}`} */}{" "}
+                        0
                       </td>
                     </tr>
                     <tr>
@@ -444,11 +447,14 @@ function MultipleInvoice() {
                       <td style={{ textAlign: "left", padding: "6px 0 2px" }}>
                         TOTAL:
                       </td>
-                      <td style={{ textAlign: "right", padding: "6px 0 2px" }}>
-                        ₹{" "}
-                        {item?.allTotal
-                          ? Number(item.allTotal).toFixed(2)
-                          : "0.00"}
+                      <td style={{ textAlign: "right", padding: "2px 0" }}>
+                        ₹
+                        {(
+                          (item?.tax ? Number(item.tax) : 0) +
+                          (item?.subTotal
+                            ? (Number(item.subTotal) * 100) / 105
+                            : 0)
+                        ).toFixed(2)}
                       </td>
                     </tr>
                   </tbody>
