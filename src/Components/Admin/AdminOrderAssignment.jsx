@@ -51,6 +51,7 @@ const AdminOrderAssignment = () => {
     showZoneOrdersModal,
     zoneOrders,
     loadingZoneOrders,
+    currentZone,
     handleShowZoneOrders,
     closeModal,
   } = useZoneOrders(filteredOrders);
@@ -404,8 +405,8 @@ const AdminOrderAssignment = () => {
         yj = polygon[j].lat;
 
       const intersect =
-        yi > point.lng !== yj > point.lng &&
-        point.lat < ((xj - xi) * (point.lng - yi)) / (yj - yi) + xi;
+        yi > point.lat !== yj > point.lat &&
+        point.lng < ((xj - xi) * (point.lat - yi)) / (yj - yi) + xi;
       if (intersect) inside = !inside;
     }
     return inside;
@@ -420,11 +421,34 @@ const AdminOrderAssignment = () => {
       lng: order.coordinates.coordinates[0]
     };
 
+    // Debug: Log first order and zone for inspection
+    if (order === filteredOrders[0] && zones.length > 0) {
+      console.log('Debug first order:', {
+        orderId: order._id,
+        orderCoordinates: order.coordinates,
+        orderPoint,
+        firstZone: zones[0],
+        firstZonePaths: zones[0]?.paths
+      });
+    }
+
     return zones.some(zone => {
       if (!zone.paths || zone.paths.length < 3) return false;
-      return isPointInPolygon(orderPoint, zone.paths);
+      const result = isPointInPolygon(orderPoint, zone.paths);
+      
+      // Debug: Log point-in-polygon results for first few checks
+      if (order === filteredOrders[0]) {
+        console.log('Point-in-polygon check:', {
+          orderPoint,
+          zoneName: zone.name,
+          zonePaths: zone.paths,
+          result
+        });
+      }
+      
+      return result;
     });
-  }, [zones, isPointInPolygon]);
+  }, [zones, isPointInPolygon, filteredOrders]);
 
   // Calculate orders within zones
   const getOrdersInZones = useCallback(() => {
@@ -435,11 +459,105 @@ const AdminOrderAssignment = () => {
       totalFilteredOrders: filteredOrders.length,
       totalZones: zones.length,
       ordersInZones: ordersInZones.length,
-      ordersWithCoordinates: filteredOrders.filter(order => order.coordinates).length
+      ordersNotInZones: filteredOrders.length - ordersInZones.length,
+      ordersWithCoordinates: filteredOrders.filter(order => order.coordinates).length,
+      ordersWithoutCoordinates: filteredOrders.filter(order => !order.coordinates).length,
+      
+      // Show actual order IDs in zones
+      orderIDsInZones: ordersInZones.map(order => ({
+        id: order._id,
+        orderId: order.orderId || order.orderid,
+        username: order.username,
+        coordinates: order.coordinates?.coordinates,
+        lat: order.coordinates?.coordinates?.[1],
+        lng: order.coordinates?.coordinates?.[0]
+      })),
+      
+      // Show order IDs NOT in zones (with coordinates)
+      orderIDsNotInZones: filteredOrders
+        .filter(order => order.coordinates?.coordinates && !isOrderInAnyZone(order))
+        .map(order => ({
+          id: order._id,
+          orderId: order.orderId || order.orderid,
+          username: order.username,
+          coordinates: order.coordinates?.coordinates,
+          lat: order.coordinates?.coordinates?.[1],
+          lng: order.coordinates?.coordinates?.[0]
+        })),
+      
+      sampleOrder: filteredOrders[0] ? {
+        id: filteredOrders[0]._id,
+        orderId: filteredOrders[0].orderId || filteredOrders[0].orderid,
+        coordinates: filteredOrders[0].coordinates,
+        hasCoordinates: !!filteredOrders[0].coordinates?.coordinates
+      } : null,
+      sampleZone: zones[0] ? {
+        name: zones[0].name,
+        pathsCount: zones[0].paths?.length,
+        firstPath: zones[0].paths?.[0]
+      } : null
     });
     
     return ordersInZones;
   }, [filteredOrders, isOrderInAnyZone]);
+
+  // Calculate orders NOT in any zones (remaining unmapped orders)
+  const getOrdersNotInZones = useCallback(() => {
+    return filteredOrders.filter(order => {
+      // Only count orders that have coordinates but are not in any zone
+      return order.coordinates?.coordinates && !isOrderInAnyZone(order);
+    });
+  }, [filteredOrders, isOrderInAnyZone]);
+
+  // Debug function - expose to window for manual testing
+  React.useEffect(() => {
+    window.testPointInPolygon = (lat, lng) => {
+      const testPoint = { lat, lng };
+      console.log('Testing point:', testPoint);
+      
+      zones.forEach((zone, index) => {
+        if (zone.paths && zone.paths.length >= 3) {
+          const result = isPointInPolygon(testPoint, zone.paths);
+          console.log(`Zone ${index} (${zone.name}):`, result);
+          console.log('Zone paths:', zone.paths);
+        }
+      });
+    };
+    
+    window.debugZoneData = () => {
+      console.log('Current zones:', zones);
+      console.log('Current filtered orders:', filteredOrders);
+      console.log('Orders with coordinates:', filteredOrders.filter(order => order.coordinates));
+    };
+
+    // New function to show order IDs in zones
+    window.showOrdersInZones = () => {
+      const ordersInZones = getOrdersInZones();
+      console.log('=== ORDERS IN ZONES ===');
+      ordersInZones.forEach((order, index) => {
+        console.log(`${index + 1}. Order ID: ${order.orderId || order.orderid || order._id}`);
+        console.log(`   Customer: ${order.username}`);
+        console.log(`   Coordinates: [${order.coordinates?.coordinates?.[1]}, ${order.coordinates?.coordinates?.[0]}]`);
+        console.log(`   Session: ${order.session || 'N/A'}`);
+        console.log('---');
+      });
+      console.log(`Total orders in zones: ${ordersInZones.length}`);
+    };
+
+    // New function to show order IDs NOT in zones
+    window.showOrdersNotInZones = () => {
+      const ordersNotInZones = getOrdersNotInZones();
+      console.log('=== ORDERS NOT IN ZONES ===');
+      ordersNotInZones.forEach((order, index) => {
+        console.log(`${index + 1}. Order ID: ${order.orderId || order.orderid || order._id}`);
+        console.log(`   Customer: ${order.username}`);
+        console.log(`   Coordinates: [${order.coordinates?.coordinates?.[1]}, ${order.coordinates?.coordinates?.[0]}]`);
+        console.log(`   Session: ${order.session || 'N/A'}`);
+        console.log('---');
+      });
+      console.log(`Total orders NOT in zones: ${ordersNotInZones.length}`);
+    };
+  }, [zones, filteredOrders, isPointInPolygon, getOrdersInZones, getOrdersNotInZones]);
   const updateClustererMarkers = useCallback(
     (ordersArray) => {
       if (!clustererRef.current || !mapRef.current) return;
@@ -968,8 +1086,14 @@ const AdminOrderAssignment = () => {
             </div>
             <div className="snapshot-card">
               <span>Orders in zones</span>
-              <strong>
+              <strong style={{ color: "#059669" }}>
                 {getOrdersInZones().length}
+              </strong>
+            </div>
+            <div className="snapshot-card snapshot-card--warning">
+              <span>Not in zones</span>
+              <strong style={{ color: "#dc2626" }}>
+                {getOrdersNotInZones().length}
               </strong>
             </div>
             <div className="snapshot-card">
@@ -1438,7 +1562,7 @@ const AdminOrderAssignment = () => {
                   {zones.map((zone) => (
                     <div
                       key={zone.id || zone._id}
-                      className="zone-item"
+                      className="zone-item1"
                       role="button"
                       tabIndex={0}
                       onClick={() => {
@@ -1962,6 +2086,7 @@ const AdminOrderAssignment = () => {
         loading={loadingZoneOrders}
         orders={zoneOrders}
         addressTypeConfig={addressTypeConfig}
+        currentZone={currentZone}
         onOrderClick={(order, index) => {
           setSelectedOrder({ ...order, orderNumber: index + 1 });
           setMapCenter({
@@ -1970,6 +2095,10 @@ const AdminOrderAssignment = () => {
           });
           setZoom(16);
           closeModal();
+        }}
+        onAssignmentComplete={() => {
+          // Refresh orders after assignment
+          fetchTodaysOrders();
         }}
       />
     </div>

@@ -85,6 +85,7 @@ import AddressManagement from "./Components/AddressManagement";
 import LocationRequest from "./Components/Admin/LocationRequest";
 import LocationConfirmationSimple from "./Components/CurrentLocation";
 import AdminOrderAssignment from "./Components/Admin/AdminOrderAssignment";
+import OrderTracking from "./Components/Admin/OrderTracking";
 import MyPlan from "./Components/MyPlan";
 import AdminPlanDashboard from "./Components/Admin/AdminPlanDashboard";
 import AdminFeedBack from "./Components/Admin/AdminFeedBack";
@@ -515,6 +516,10 @@ function App() {
             element={<LocationConfirmationSimple />}
           />
           <Route path="/order-assignment" element={<AdminOrderAssignment />} />
+          <Route
+            path="/order-tracking"
+            element={<Main children={<OrderTracking />} />}
+          />
 
           {/* Packer Routes */}
           <Route path="/packer-login" element={<PackerLogin />} />

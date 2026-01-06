@@ -1,41 +1,48 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNotification } from "../../hooks/useNotification";
+import NotificationToast from "./NotificationToast";
 
 const SessionAssignmentModal = ({
   showModal,
   onClose,
   orders,
-  availableRiders,
   onAssignmentComplete,
 }) => {
-  const [selectedSession, setSelectedSession] = useState("all");
-  const [sessionOrders, setSessionOrders] = useState([]);
   const [selectedRider, setSelectedRider] = useState("");
-  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+  const [availableRiders, setAvailableRiders] = useState([]);
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
+  
+  const { notifications, showSuccess, showError, showWarning, removeNotification } = useNotification();
 
+  // Fetch available riders
   useEffect(() => {
     if (showModal) {
-      filterOrdersBySession(selectedSession);
+      fetchRiders();
+      // Select all unassigned orders by default
+      const unassignedOrders = orders.filter(order => !order.riderId);
+      setSelectedOrders(unassignedOrders.map(order => order._id));
     }
-  }, [showModal, orders, selectedSession]);
+  }, [showModal, orders]);
 
-  const filterOrdersBySession = (session) => {
-    let filtered = orders;
-    if (session !== "all") {
-      filtered = orders.filter(order => order.session === session);
+  const fetchRiders = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/riders");
+      if (response.data?.riders) {
+        setAvailableRiders(response.data.riders);
+      }
+    } catch (error) {
+      console.error("Error fetching riders:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setSessionOrders(filtered);
-    setSelectedOrderIds([]); // Reset selection when session changes
-  };
-
-  const handleSessionChange = (session) => {
-    setSelectedSession(session);
-    filterOrdersBySession(session);
   };
 
   const handleOrderSelection = (orderId) => {
-    setSelectedOrderIds(prev => {
+    setSelectedOrders(prev => {
       if (prev.includes(orderId)) {
         return prev.filter(id => id !== orderId);
       } else {
@@ -45,71 +52,59 @@ const SessionAssignmentModal = ({
   };
 
   const handleSelectAll = () => {
-    if (selectedOrderIds.length === sessionOrders.length) {
-      setSelectedOrderIds([]);
+    const unassignedOrders = orders.filter(order => !order.riderId);
+    if (selectedOrders.length === unassignedOrders.length) {
+      setSelectedOrders([]);
     } else {
-      setSelectedOrderIds(sessionOrders.map(order => order._id));
+      setSelectedOrders(unassignedOrders.map(order => order._id));
     }
   };
 
-  const handleBulkAssignment = async () => {
-    if (!selectedRider || selectedOrderIds.length === 0) {
-      alert("Please select a rider and at least one order");
+  const handleAssignRider = async () => {
+    if (!selectedRider || selectedOrders.length === 0) {
+      showWarning("Please select a rider and at least one order");
       return;
     }
 
-    setIsAssigning(true);
     try {
-      const response = await axios.put(
-        "https://dd-merge-backend-2.onrender.com/api/admin/bulk-assign-rider",
-        {
-          riderId: selectedRider,
-          orderIds: selectedOrderIds
-        }
-      );
-      
-      if (response.status === 200) {
-        alert(`Successfully assigned rider to ${selectedOrderIds.length} orders`);
+      setIsAssigning(true);
+      const response = await axios.put("https://dd-merge-backend-2.onrender.com/api/admin/bulk-assign-rider", {
+        riderId: selectedRider,
+        orderIds: selectedOrders
+      });
+
+      if (response.data.success !== false) {
+        showSuccess(`Successfully assigned ${response.data.assignedCount} orders to rider`);
         onAssignmentComplete();
         onClose();
+      } else {
+        showError(response.data.message || "Failed to assign rider");
       }
     } catch (error) {
       console.error("Error assigning rider:", error);
-      alert("Failed to assign rider. Please try again.");
+      showError("Failed to assign rider. Please try again.");
     } finally {
       setIsAssigning(false);
     }
   };
 
-  const getSessionStats = () => {
-    const lunchOrders = orders.filter(order => order.session === "Lunch");
-    const dinnerOrders = orders.filter(order => order.session === "Dinner");
-    const unassignedOrders = sessionOrders.filter(order => !order.riderId);
-    
-    return {
-      lunch: lunchOrders.length,
-      dinner: dinnerOrders.length,
-      unassigned: unassignedOrders.length,
-      total: sessionOrders.length
-    };
-  };
-
   if (!showModal) return null;
 
-  const stats = getSessionStats();
+  const unassignedOrders = orders.filter(order => !order.riderId);
+  const assignedOrders = orders.filter(order => order.riderId);
 
   return (
     <div className="zone-modal-overlay" onClick={onClose}>
       <div
         className="zone-modal-content"
-        style={{ maxWidth: "800px" }}
         onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: "800px", maxHeight: "90vh" }}
       >
         <div className="zone-modal-header">
           <div>
-            <h2 style={{ margin: 0 }}>Session-Based Rider Assignment</h2>
+            <h2 style={{ margin: 0 }}>Assign Rider to Orders</h2>
             <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#64748b", fontWeight: "normal" }}>
-              Assign riders to orders by session (Lunch/Dinner)
+              Select orders and assign them to a rider
             </p>
           </div>
           <button className="btn btn-ghost btn-small" onClick={onClose}>
@@ -117,35 +112,13 @@ const SessionAssignmentModal = ({
           </button>
         </div>
 
-        <div className="zone-modal-body">
-          {/* Session Filter */}
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
-              Filter by Session:
-            </label>
-            <select
-              value={selectedSession}
-              onChange={(e) => handleSessionChange(e.target.value)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                minWidth: "200px"
-              }}
-            >
-              <option value="all">All Sessions ({orders.length} orders)</option>
-              <option value="Lunch">Lunch ({stats.lunch} orders)</option>
-              <option value="Dinner">Dinner ({stats.dinner} orders)</option>
-            </select>
-          </div>
-
-          {/* Stats Cards */}
+        <div className="zone-modal-body" style={{ maxHeight: "70vh", overflowY: "auto" }}>
+          {/* Summary Stats */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "12px",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "10px",
               marginBottom: "20px",
             }}
           >
@@ -158,8 +131,8 @@ const SessionAssignmentModal = ({
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "18px", fontWeight: "bold", color: "#0284c7" }}>
-                {stats.total}
+              <div style={{ fontSize: "20px", fontWeight: "bold", color: "#0284c7" }}>
+                {orders.length}
               </div>
               <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
                 Total Orders
@@ -174,8 +147,8 @@ const SessionAssignmentModal = ({
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "18px", fontWeight: "bold", color: "#ea580c" }}>
-                {stats.unassigned}
+              <div style={{ fontSize: "20px", fontWeight: "bold", color: "#ea580c" }}>
+                {unassignedOrders.length}
               </div>
               <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
                 Unassigned
@@ -190,27 +163,11 @@ const SessionAssignmentModal = ({
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "18px", fontWeight: "bold", color: "#059669" }}>
-                {selectedOrderIds.length}
+              <div style={{ fontSize: "20px", fontWeight: "bold", color: "#059669" }}>
+                {assignedOrders.length}
               </div>
               <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-                Selected
-              </div>
-            </div>
-            <div
-              style={{
-                padding: "12px",
-                backgroundColor: "#fef3c7",
-                borderRadius: "8px",
-                border: "1px solid #fde68a",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: "18px", fontWeight: "bold", color: "#d97706" }}>
-                {selectedSession === "all" ? "All" : selectedSession}
-              </div>
-              <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-                Session
+                Already Assigned
               </div>
             </div>
           </div>
@@ -224,154 +181,165 @@ const SessionAssignmentModal = ({
               value={selectedRider}
               onChange={(e) => setSelectedRider(e.target.value)}
               style={{
-                padding: "8px 12px",
+                width: "100%",
+                padding: "10px",
+                border: "2px solid #e2e8f0",
                 borderRadius: "6px",
-                border: "1px solid #d1d5db",
                 fontSize: "14px",
-                minWidth: "300px"
               }}
+              disabled={isLoading}
             >
-              <option value="">Choose a rider...</option>
+              <option value="">
+                {isLoading ? "Loading riders..." : "Choose a rider"}
+              </option>
               {availableRiders.map((rider) => (
                 <option key={rider._id} value={rider._id}>
-                  {rider.name || "Unnamed Rider"} {rider.phone ? `(${rider.phone})` : ""}
+                  {rider.name} {rider.phone ? `(${rider.phone})` : ""}
                 </option>
               ))}
             </select>
           </div>
 
           {/* Order Selection */}
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <label style={{ fontWeight: "600" }}>
-                Select Orders to Assign:
-              </label>
-              <button
-                onClick={handleSelectAll}
-                style={{
-                  padding: "6px 12px",
-                  backgroundColor: "#f3f4f6",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  cursor: "pointer"
-                }}
-              >
-                {selectedOrderIds.length === sessionOrders.length ? "Deselect All" : "Select All"}
-              </button>
-            </div>
+          {unassignedOrders.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <label style={{ fontWeight: "600" }}>
+                  Select Orders to Assign ({selectedOrders.length} selected):
+                </label>
+                <button
+                  onClick={handleSelectAll}
+                  style={{
+                    padding: "6px 12px",
+                    backgroundColor: "#f1f5f9",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "4px",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {selectedOrders.length === unassignedOrders.length ? "Deselect All" : "Select All"}
+                </button>
+              </div>
 
-            <div
-              style={{
-                maxHeight: "400px",
-                overflowY: "auto",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                padding: "8px"
-              }}
-            >
-              {sessionOrders.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
-                  No orders found for the selected session
-                </div>
-              ) : (
-                sessionOrders.map((order, index) => (
+              <div style={{ maxHeight: "300px", overflowY: "auto", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+                {unassignedOrders.map((order) => (
                   <div
                     key={order._id}
                     style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #f1f5f9",
                       display: "flex",
                       alignItems: "center",
-                      padding: "12px",
-                      marginBottom: "8px",
-                      backgroundColor: selectedOrderIds.includes(order._id) ? "#ecfdf5" : "#fff",
-                      border: `1px solid ${selectedOrderIds.includes(order._id) ? "#a7f3d0" : "#e5e7eb"}`,
-                      borderRadius: "6px",
-                      cursor: "pointer"
+                      gap: "12px",
+                      backgroundColor: selectedOrders.includes(order._id) ? "#f0f9ff" : "white",
                     }}
-                    onClick={() => handleOrderSelection(order._id)}
                   >
                     <input
                       type="checkbox"
-                      checked={selectedOrderIds.includes(order._id)}
+                      checked={selectedOrders.includes(order._id)}
                       onChange={() => handleOrderSelection(order._id)}
-                      style={{ marginRight: "12px" }}
+                      style={{ width: "16px", height: "16px" }}
                     />
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <div>
-                          <div style={{ fontWeight: "600", fontSize: "14px" }}>
-                            Order #{index + 1} - {order.username}
-                          </div>
-                          <div style={{ fontSize: "12px", color: "#64748b", marginTop: "2px" }}>
-                            📞 {order.Mobilenumber} | 🏢 {order.hubName}
-                          </div>
-                          <div style={{ fontSize: "12px", color: "#64748b", marginTop: "2px" }}>
-                            📍 {order.delivarylocation}
-                          </div>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <div
-                            style={{
-                              padding: "4px 8px",
-                              backgroundColor: order.session === "Lunch" ? "#fef3c7" : "#ddd6fe",
-                              color: order.session === "Lunch" ? "#d97706" : "#7c3aed",
-                              borderRadius: "4px",
-                              fontSize: "11px",
-                              fontWeight: "600",
-                              marginBottom: "4px"
-                            }}
-                          >
-                            {order.session || "No Session"}
-                          </div>
-                          <div style={{ fontSize: "12px", fontWeight: "600", color: "#059669" }}>
-                            ₹{order.allTotal}
-                          </div>
-                          {order.riderId && (
-                            <div style={{ fontSize: "10px", color: "#dc2626", marginTop: "2px" }}>
-                              Already assigned
-                            </div>
-                          )}
-                        </div>
+                      <div style={{ fontWeight: "600", fontSize: "14px" }}>
+                        {order.username} - ID: {order.orderid || order.orderId || order._id?.slice(-6)}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#64748b" }}>
+                        📞 {order.Mobilenumber} | 💰 ₹{order.allTotal} | 🕐 {order.slot}
                       </div>
                     </div>
                   </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Already Assigned Orders */}
+          {assignedOrders.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", marginBottom: "12px", fontWeight: "600" }}>
+                Already Assigned Orders ({assignedOrders.length}):
+              </label>
+              <div style={{ maxHeight: "200px", overflowY: "auto", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+                {assignedOrders.map((order) => (
+                  <div
+                    key={order._id}
+                    style={{
+                      padding: "12px",
+                      borderBottom: "1px solid #f1f5f9",
+                      backgroundColor: "#f8fafc",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <div style={{ fontWeight: "600", fontSize: "14px" }}>
+                          {order.username} - ID: {order.orderid || order.orderId || order._id?.slice(-6)}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#64748b" }}>
+                          📞 {order.Mobilenumber} | 💰 ₹{order.allTotal}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: "12px", color: "#059669", fontWeight: "600" }}>
+                          🏍️ {order.riderId?.name || "Unknown Rider"}
+                        </div>
+                        {order.riderId?.phone && (
+                          <div style={{ fontSize: "11px", color: "#64748b" }}>
+                            📞 {order.riderId.phone}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", paddingTop: "20px", borderTop: "1px solid #e2e8f0" }}>
             <button
               onClick={onClose}
               style={{
                 padding: "10px 20px",
-                backgroundColor: "#f3f4f6",
-                border: "1px solid #d1d5db",
+                backgroundColor: "#f8fafc",
+                border: "1px solid #cbd5e1",
                 borderRadius: "6px",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               Cancel
             </button>
             <button
-              onClick={handleBulkAssignment}
-              disabled={!selectedRider || selectedOrderIds.length === 0 || isAssigning}
+              onClick={handleAssignRider}
+              disabled={!selectedRider || selectedOrders.length === 0 || isAssigning}
               style={{
                 padding: "10px 20px",
-                backgroundColor: selectedRider && selectedOrderIds.length > 0 ? "#059669" : "#d1d5db",
+                backgroundColor: selectedRider && selectedOrders.length > 0 ? "#059669" : "#cbd5e1",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
-                cursor: selectedRider && selectedOrderIds.length > 0 ? "pointer" : "not-allowed",
-                opacity: isAssigning ? 0.7 : 1
+                cursor: selectedRider && selectedOrders.length > 0 ? "pointer" : "not-allowed",
+                fontWeight: "600",
               }}
             >
-              {isAssigning ? "Assigning..." : `Assign to ${selectedOrderIds.length} Orders`}
+              {isAssigning ? "Assigning..." : `Assign Rider to ${selectedOrders.length} Orders`}
             </button>
           </div>
         </div>
       </div>
+      
+      {/* Notification Toasts */}
+      {notifications.map((notification) => (
+        <NotificationToast
+          key={notification.id}
+          message={notification.message}
+          type={notification.type}
+          duration={notification.duration}
+          onClose={() => removeNotification(notification.id)}
+        />
+      ))}
     </div>
   );
 };

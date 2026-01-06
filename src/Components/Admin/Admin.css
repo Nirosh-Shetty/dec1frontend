@@ -51,7 +51,10 @@
 .right-admin {
   padding-left: 8px;
   width: 80%;
-  overflow-y: hidden;
+  margin-left: 20%;
+  overflow-y: auto;
+  height: 100vh;
+  position: relative;
 }
 
 .dark label {
@@ -148,6 +151,7 @@ label{
 
 .admin-all {
   display: flex;
+  position: relative;
 }
 
 /* 
@@ -262,12 +266,12 @@ label {
 .left-side {
   background-color: #fcfcfc;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  /* min-height: 650px; */
-
-  position: sticky;
-  overflow: hidden;
-  overflow-y: scroll;
-  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  width: 20%;
   z-index: 99999;
 }
 
@@ -632,6 +636,11 @@ table thead tr th {
 }
 .admin-sidebar-display {
   width: 20%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 99999;
 }
 
 .lined-input {
@@ -738,16 +747,25 @@ table thead tr th {
     width: 50%;
   }
   .left-side {
-    overflow: unset;
-    overflow-y: unset;
-    width: 0px;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    height: 100vh;
+    overflow-y: auto;
+    transition: left 0.3s ease;
+    z-index: 99999;
+  }
+  
+  .left-side.show {
+    left: 0;
   }
 
   .bg-body-tertiary {
     height: 5rem;
   }
   .si09 {
-    position: absolute;
+    position: relative;
     top: 0px;
     left: 0;
   }
@@ -793,10 +811,19 @@ table thead tr th {
     font-size: 13px;
   }
   .admin-sidebar-display {
-    width: 20%;
-    /* background-color: black; */
+    width: 80%;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    height: 100vh;
     z-index: 99999;
+    transition: left 0.3s ease;
   }
+  
+  .admin-sidebar-display.show {
+    left: 0;
+  }
+  
   .sidebar-close-icon {
     display: block;
   }
@@ -805,7 +832,8 @@ table thead tr th {
     padding: 0px 15px;
   }
   .right-admin {
-    width: 80%;
+    width: 100%;
+    margin-left: 0;
   }
   .header-c {
     font-size: 18px;

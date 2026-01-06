@@ -40,6 +40,7 @@ export const useZoneOrders = (filteredOrders) => {
   const [showZoneOrdersModal, setShowZoneOrdersModal] = useState(false);
   const [zoneOrders, setZoneOrders] = useState([]);
   const [loadingZoneOrders, setLoadingZoneOrders] = useState(false);
+  const [currentZone, setCurrentZone] = useState(null);
 
   // Function to get orders within a zone
   const getOrdersInZone = useCallback(
@@ -70,6 +71,7 @@ export const useZoneOrders = (filteredOrders) => {
     async (zone) => {
       setLoadingZoneOrders(true);
       setShowZoneOrdersModal(true);
+      setCurrentZone(zone);
 
       try {
         const ordersInZone = getOrdersInZone(zone);
@@ -86,12 +88,14 @@ export const useZoneOrders = (filteredOrders) => {
 
   const closeModal = useCallback(() => {
     setShowZoneOrdersModal(false);
+    setCurrentZone(null);
   }, []);
 
   return {
     showZoneOrdersModal,
     zoneOrders,
     loadingZoneOrders,
+    currentZone,
     handleShowZoneOrders,
     closeModal,
   };

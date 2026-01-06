@@ -256,6 +256,14 @@ const Side = () => {
                   <span className="ms-2">Delivery Assignment </span>
                 </li>
               </Link>
+              <Link to="/order-tracking" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <GoPackageDependents style={{ fontSize: "20px" }} />
+                  </span>
+                  <span className="ms-2">📊 Order Tracking </span>
+                </li>
+              </Link>
               <Link
                 to="/packer-dashboard?user=Admin"
                 onClick={() => {
