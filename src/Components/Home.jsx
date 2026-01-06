@@ -712,13 +712,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     const addonedCarts = async () => {
       try {
-        await axios.post("https://dd-merge-backend-2.onrender.com/api/cart/addCart", {
-          userId: user?._id,
-          items: storedCart,
-          lastUpdated: Date.now,
-          username: user?.Fname,
-          mobile: user?.Mobile,
-        });
+        await axios.post(
+          "https://dd-merge-backend-2.onrender.com/api/cart/addCart",
+          {
+            userId: user?._id,
+            items: storedCart,
+            lastUpdated: Date.now,
+            username: user?.Fname,
+            mobile: user?.Mobile,
+          }
+        );
       } catch (error) {
         console.log(error);
       }
@@ -1929,13 +1932,26 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 </button>
                               ) : (
                                 <button
-                                  className={`add-to-cart-btn ${
-                                   ( user && !address ) || !isBeforeCutoff(item.deliveryDate, item.deliverySession) ? "disabled-btn" : ""
-                                  }`}
+                                  className={`add-to-cart-btn 
+                                    ${
+                                      (user && !address) ||
+                                      isBeforeCutoff(
+                                        item.deliveryDate,
+                                        item.deliverySession
+                                      )
+                                        ? "disabled-btn"
+                                        : ""
+                                    }`}
                                   onClick={() =>
                                     addCart1(item, checkOf, matchedLocation)
                                   }
-                                  disabled={(user && !address) || !isBeforeCutoff(item.deliveryDate, item.deliverySession)}
+                                  disabled={
+                                    (user && !address) ||
+                                    isBeforeCutoff(
+                                      item.deliveryDate,
+                                      item.deliverySession
+                                    )
+                                  }
                                 >
                                   <div className="pick-btn-text">
                                     <span className="pick-btn-text1">PICK</span>
@@ -2343,20 +2359,21 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           </div>
                         </div>
                       ) : stockCount > 0 && gifUrl !== "Closed.gif" ? (
-                        <button
-                          className="add-to-plate-btn"
-                          onClick={() => {
-                            addCart1(foodData, checkOffer, matchedLocation);
-                          }}
-                          disabled={user && !address}
-                          style={{
-                            opacity: user && !address ? 0.5 : 1,
-                            pointerEvents: user && !address ? "none" : "auto",
-                          }}
-                        >
-                          <span>Add to plate</span>
-                          <div className="plate-icon">🍽️</div>
-                        </button>
+                        // <button
+                        //   className="add-to-plate-btn"
+                        //   onClick={() => {
+                        //     addCart1(foodData, checkOffer, matchedLocation);
+                        //   }}
+                        //   disabled={user && !address}
+                        //   style={{
+                        //     opacity: user && !address ? 0.5 : 1,
+                        //     pointerEvents: user && !address ? "none" : "auto",
+                        //   }}
+                        // >
+                        //   <span>Add to plate</span>
+                        //   <div className="plate-icon">🍽️</div>
+                        // </button>
+                        ""
                       ) : (
                         <button
                           className={
