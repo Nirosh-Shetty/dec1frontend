@@ -67,6 +67,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     } else {
       localStorage.removeItem("user");
     }
+    window.dispatchEvent(new Event("userUpdated"));
   };
 
   const navigate = useNavigate();

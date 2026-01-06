@@ -1188,6 +1188,7 @@ const Banner = ({
       if (res.status === 200) {
         localStorage.setItem("user", JSON.stringify(res.data.details));
         sessionStorage.setItem("user", JSON.stringify(res.data.details));
+        window.dispatchEvent(new Event("userUpdated"));
         Swal2.fire({
           toast: true,
           position: "bottom",

@@ -73,6 +73,7 @@ const Profile = () => {
       if (res.status === 200) {
         alert("Profile Details Successfully Updated");
         localStorage.setItem("user", JSON.stringify(res.data.userdata));
+        window.dispatchEvent(new Event("userUpdated"));
         setFname("");
         setEmail("");
         setAddress("");
@@ -104,6 +105,7 @@ const Profile = () => {
       if (res.status === 200) {
         alert("Successfully Updated");
         localStorage.setItem("user", JSON.stringify(res.data.success));
+        window.dispatchEvent(new Event("userUpdated"));
         handleClose5();
         window.location.reload();
       }

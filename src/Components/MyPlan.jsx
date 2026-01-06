@@ -930,7 +930,7 @@ const ViewPlanModal = ({
             </>
           )}
 
-          {isPaidEditable && (
+          {/* {isPaidEditable && (
             <button
               className="skip-btn"
               onClick={handleSkipOrCancel}
@@ -943,7 +943,7 @@ const ViewPlanModal = ({
                 style={{ marginLeft: 6, width: 16 }}
               />
             </button>
-          )}
+          )} */}
           {isConfirmed && (
             <button
               className="track-order-btn"

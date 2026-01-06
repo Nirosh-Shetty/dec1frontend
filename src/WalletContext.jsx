@@ -12,12 +12,30 @@ export const WalletProvider = ({ children }) => {
   useEffect(() => {
     fetchWalletData();
     AdminWallet();
+
+    const handleUserUpdated = () => {
+      fetchWalletData();
+    };
+
+    window.addEventListener("userUpdated", handleUserUpdated);
+    window.addEventListener("storage", handleUserUpdated);
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdated);
+      window.removeEventListener("storage", handleUserUpdated);
+    };
   }, []);
 
   const fetchWalletData = async () => {
     try {
+      setLoading(true);
       const userId = JSON.parse(localStorage.getItem("user")); // Assuming user is logged in
-      if (!userId) return;
+      if (!userId?._id) {
+        setWallet(null);
+        setTransactions([]);
+        setLoading(false);
+        return;
+      }
 
       const walletRes = await axios.get(
         `https://dd-merge-backend-2.onrender.com/api/wallet/user/${userId?._id}`

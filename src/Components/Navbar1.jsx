@@ -104,6 +104,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       let res = await axios(config);
       if (res.status === 200) {
         localStorage.setItem("user", JSON.stringify(res.data.details));
+        window.dispatchEvent(new Event("userUpdated"));
         setFname(" ");
         setAddress(" ");
         setFlatno(" ");
@@ -138,6 +139,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
     }, 5000);
     localStorage.removeItem("user");
     localStorage.removeItem("cart");
+    window.dispatchEvent(new Event("userUpdated"));
   };
   const loginAdmin = async () => {
     try {
@@ -180,6 +182,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       if (res.status === 200) {
         setadmindata(res.data.success);
         localStorage.setItem("user", JSON.stringify(res.data.details));
+        window.dispatchEvent(new Event("userUpdated"));
         alert("OTP verified successfully");
         navigate("/checkout");
         handleClose2();

@@ -62,6 +62,7 @@ export default function Validate() {
           const userData = res.data.details;
           localStorage.setItem("user", JSON.stringify(userData));
           localStorage.setItem("addresstype", "corporate");
+          window.dispatchEvent(new Event("userUpdated"));
 
           if (capturedReferralCode) {
             localStorage.removeItem("referralCode");
