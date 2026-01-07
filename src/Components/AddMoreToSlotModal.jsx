@@ -29,7 +29,7 @@ const AddMoreToSlotModal = ({
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/user/plan/menu-items-for-slot/${planId}`
+        `https://api.dailydish.in/api/user/plan/menu-items-for-slot/${planId}`
       );
 
       if (response.data.success) {
@@ -70,7 +70,7 @@ const AddMoreToSlotModal = ({
       }));
 
       const response = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/batch-update-items",
+        "https://api.dailydish.in/api/user/plan/batch-update-items",
         {
           planId,
           userId,

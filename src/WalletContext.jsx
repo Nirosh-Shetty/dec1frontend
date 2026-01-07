@@ -38,17 +38,17 @@ export const WalletProvider = ({ children }) => {
       }
 
       const walletRes = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/wallet/user/${userId?._id}`
+        `https://api.dailydish.in/api/wallet/user/${userId?._id}`
       );
       setWallet(walletRes.data.data?.wallet);
 
       const transactionsRes = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/wallet/transactions/${userId?._id}`
+        `https://api.dailydish.in/api/wallet/transactions/${userId?._id}`
       );
       setTransactions(transactionsRes.data.data);
 
       const walseting = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/wallet/getsettings"
+        "https://api.dailydish.in/api/wallet/getsettings"
       );
       setWalletSeting(walseting.data.success);
       setLoading(false);
@@ -61,7 +61,7 @@ export const WalletProvider = ({ children }) => {
   const [AllWallet, setAllWallet] = useState([]);
   const AdminWallet = async () => {
     try {
-      const response = await axios.get("https://dd-merge-backend-2.onrender.com/api/wallet/all");
+      const response = await axios.get("https://api.dailydish.in/api/wallet/all");
       setAllWallet(response.data.success);
     } catch (error) {
       console.error("Error fetching wallets:", error);
@@ -73,7 +73,7 @@ export const WalletProvider = ({ children }) => {
   //   try {
   //     const userId = JSON.parse(localStorage.getItem("user")) // Assuming user is logged in
   //       if (!userId) return;
-  //     let res=await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getorderNotRatedByUserID/"+userId?._id);
+  //     let res=await axios.get("https://api.dailydish.in/api/admin/getorderNotRatedByUserID/"+userId?._id);
   //     if(res.status==200){
   //       setrateorder(res.data.order)
   //       setRateMode(true)
@@ -89,7 +89,7 @@ export const WalletProvider = ({ children }) => {
 
   // const makeRateOrder=async(id, rate, comement,userId )=>{
   // try {
-  //   let res=await axios.put('https://dd-merge-backend-2.onrender.com/api/admin/makeRateOfOrder',{
+  //   let res=await axios.put('https://api.dailydish.in/api/admin/makeRateOfOrder',{
   //     id, rate, comement
   //   });
   //   if(res.status==200){
@@ -106,7 +106,7 @@ export const WalletProvider = ({ children }) => {
 
   // const makeRateOrder=async(id, rate, comement,userId )=>{
   // try {
-  //   let res=await axios.put('https://dd-merge-backend-2.onrender.com/api/admin/makeRateOfOrder',{
+  //   let res=await axios.put('https://api.dailydish.in/api/admin/makeRateOfOrder',{
   //     id, rate, comement
   //   });
   //   if(res.status==200){

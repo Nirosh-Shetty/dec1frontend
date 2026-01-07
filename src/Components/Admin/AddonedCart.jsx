@@ -30,7 +30,7 @@ const AbandonedCart = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/cart/getAllcartaddon"
+        "https://api.dailydish.in/api/cart/getAllcartaddon"
       );
       setCarts(response.data.success || []);
     } catch (error) {

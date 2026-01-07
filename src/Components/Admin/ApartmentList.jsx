@@ -65,7 +65,7 @@ const ApartmentList = () => {
       const config = {
         url: "/admin/addapartment",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://api.dailydish.in/api",
         header: { "content-type": "application/json" },
         data: {
           Apartmentname: Apartmentname,
@@ -100,7 +100,7 @@ const ApartmentList = () => {
   const [AddApartment, setAddApartment] = useState([]);
   const getAddApartment = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getapartment");
+      let res = await axios.get("https://api.dailydish.in/api/admin/getapartment");
       if (res.status === 200) {
         setAddApartment(res.data.corporatedata.reverse());
         setNoChangeData(res.data.corporatedata);
@@ -119,7 +119,7 @@ const ApartmentList = () => {
       const config = {
         url: "admin/deleteapartment/" + Data,
         method: "delete",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -155,7 +155,7 @@ const ApartmentList = () => {
       const config = {
         url: "admin/updateapartment",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         headers: { "Content-Type": "application/json" },
         data: {
           Apartmentname,

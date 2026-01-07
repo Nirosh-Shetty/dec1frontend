@@ -95,7 +95,7 @@ const ViewPlanModal = ({
 
     try {
       const res = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/update-product",
+        "https://api.dailydish.in/api/user/plan/update-product",
         {
           planId: localPlan._id,
           foodItemId:
@@ -145,7 +145,7 @@ const ViewPlanModal = ({
         throw new Error("Customer ID not found. Please login again.");
       }
       const response = await axios.patch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${addressId}/primary`
+        `https://api.dailydish.in/api/User/customers/${userId}/addresses/${addressId}/primary`
       );
       alert("Setting primary address...");
 
@@ -257,7 +257,7 @@ const ViewPlanModal = ({
   const { days, hours, mins, isExpired } = getTimeRemainingToCutoff();
   const handleAddressChange = async () => {
     try {
-      // await axios.patch(`https://dd-merge-backend-2.onrender.com/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
+      // await axios.patch(`https://api.dailydish.in/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
       setShowLocationModal(true);
     } catch (error) {
       Swal2.fire("Error", "Unable to Change Address", "error");
@@ -269,7 +269,7 @@ const ViewPlanModal = ({
       setLoading(true);
       // Call backend to update plan address
       const response = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/update-address",
+        "https://api.dailydish.in/api/user/plan/update-address",
         {
           planId: localPlan._id,
           userId,
@@ -297,7 +297,7 @@ const ViewPlanModal = ({
     try {
       setLoading(true);
       await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel",
+        "https://api.dailydish.in/api/user/plan/skip-cancel",
         {
           planId: plan._id,
           userId,
@@ -1030,7 +1030,7 @@ const MyPlan = () => {
     if (!userId) return;
     try {
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/user/plan/get-plan/${userId}`
+        `https://api.dailydish.in/api/user/plan/get-plan/${userId}`
       );
       if (res.data.success) {
         const newPlans = res.data.data || [];
@@ -1160,7 +1160,7 @@ const MyPlan = () => {
     closeModal();
     try {
       const res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getOrderByOrderId/${plan.orderId}`
+        `https://api.dailydish.in/api/admin/getOrderByOrderId/${plan.orderId}`
       );
       if (res.data.success) {
         const order = res.data.data;
@@ -1248,7 +1248,7 @@ const MyPlan = () => {
   //     };
   //     const configObj = {
   //       method: "post",
-  //       baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+  //       baseURL: "https://api.dailydish.in/api/",
   //       url: "/user/plan/create-from-plan",
   //       headers: { "content-type": "application/json" },
   //       data: {
@@ -1276,7 +1276,7 @@ const MyPlan = () => {
   //     const config1 = {
   //       url: "/user/addpaymentphonepay",
   //       method: "post",
-  //       baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+  //       baseURL: "https://api.dailydish.in/api/",
   //       headers: { "content-type": "application/json" },
   //       data: {
   //         userId,
@@ -1331,7 +1331,7 @@ const MyPlan = () => {
       };
       const configObj = {
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         url: "/user/plan/create-from-plan",
         headers: { "content-type": "application/json" },
         data: {
@@ -1361,7 +1361,7 @@ const MyPlan = () => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId,
@@ -1818,7 +1818,7 @@ const MyPlan = () => {
                             className="btn-base btn-primary"
                             onClick={async () => {
                               await axios.post(
-                                "https://dd-merge-backend-2.onrender.com/api/user/plan/skip-cancel",
+                                "https://api.dailydish.in/api/user/plan/skip-cancel",
                                 {
                                   planId: plan._id,
                                   userId,

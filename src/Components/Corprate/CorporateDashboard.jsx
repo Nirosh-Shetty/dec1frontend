@@ -157,7 +157,7 @@ function CorporateDashboard() {
   const getOrders = async () => {
     try {
       let res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/admin/getAllOrdersByCompanyId/${corporate?._id}`
+        `https://api.dailydish.in/api/admin/getAllOrdersByCompanyId/${corporate?._id}`
       );
       if (res.status === 200) {
         const corporateOrders = res.data.orders;
@@ -171,7 +171,7 @@ function CorporateDashboard() {
   const getAllEmployees = async () => {
     try {
       let res = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/User/getUserByCompany/${corporate?._id}`
+        `https://api.dailydish.in/api/User/getUserByCompany/${corporate?._id}`
       );
       if (res.status === 200) {
         setEmployees(res.data.success);

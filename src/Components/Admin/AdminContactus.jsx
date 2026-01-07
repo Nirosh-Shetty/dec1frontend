@@ -51,7 +51,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/contactus",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "application/Json" },
         data: {
           CAddress: CAddress,
@@ -77,7 +77,7 @@ const AdminContactus = () => {
   const [Addcontactus, setAddcontactus] = useState([]);
   const getAddcontactus = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getcontactus");
+      let res = await axios.get("https://api.dailydish.in/api/admin/getcontactus");
       if (res.status === 200) {
         setAddcontactus(res.data.getcontactus);
       }
@@ -93,7 +93,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/Deletecontactus/" + Data,
         method: "delete",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -130,7 +130,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/editcontactus",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -171,7 +171,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/social",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -192,7 +192,7 @@ const AdminContactus = () => {
   const [Addsocial, setAddsocial] = useState([]);
   const getAddsocial = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getsocial");
+      let res = await axios.get("https://api.dailydish.in/api/admin/getsocial");
       if (res.status === 200) {
         setAddsocial(res.data.getsocial);
       }
@@ -208,7 +208,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/Deletesocial/" + Datas,
         method: "delete",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -242,7 +242,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/editsocial",
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };

@@ -200,7 +200,7 @@ const LocationModal2 = ({
         fetchAbortControllerRef.current = new AbortController();
 
         const response = await fetch(
-          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+          `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -249,7 +249,7 @@ const LocationModal2 = ({
   const fetchAddressesInBackground = async (customerId) => {
     try {
       const response = await fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+        `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -489,7 +489,7 @@ const LocationModal2 = ({
 
         // API call
         const response = await fetch(
-          `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+          `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -534,7 +534,7 @@ const LocationModal2 = ({
       }
 
       const response = await fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressToDelete._id}`,
+        `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${addressToDelete._id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -1495,7 +1495,7 @@ export default LocationModal2;
 //         fetchAbortControllerRef.current = new AbortController();
 
 //         const response = await fetch(
-//           `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+//           `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
 //           {
 //             method: "GET",
 //             headers: { "Content-Type": "application/json" },
@@ -1544,7 +1544,7 @@ export default LocationModal2;
 //   const fetchAddressesInBackground = async (customerId) => {
 //     try {
 //       const response = await fetch(
-//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses`,
+//         `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: { "Content-Type": "application/json" },
@@ -1738,7 +1738,7 @@ export default LocationModal2;
 
 //       // API call
 //       await fetch(
-//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/primary-address/remove`,
+//         `https://api.dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
 //         {
 //           method: "PATCH",
 //           headers: { "Content-Type": "application/json" },
@@ -1834,7 +1834,7 @@ export default LocationModal2;
 
 //         // API call
 //         const response = await fetch(
-//           `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+//           `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
 //           {
 //             method: "PATCH",
 //             headers: { "Content-Type": "application/json" },
@@ -1879,7 +1879,7 @@ export default LocationModal2;
 //       }
 
 //       const response = await fetch(
-//         `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressToDelete._id}`,
+//         `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${addressToDelete._id}`,
 //         {
 //           method: "DELETE",
 //           headers: { "Content-Type": "application/json" },

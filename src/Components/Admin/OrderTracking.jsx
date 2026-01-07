@@ -94,7 +94,7 @@ const OrderTracking = () => {
   // Fetch riders for filter dropdown
   const fetchRiders = async () => {
     try {
-      const response = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/riders");
+      const response = await axios.get("https://api.dailydish.in/api/admin/riders");
       console.log("Riders API response:", response.data);
       if (response.data && response.data.riders) {
         setRiders(response.data.riders);
@@ -124,7 +124,7 @@ const OrderTracking = () => {
       
       console.log("Fetching orders with params:", Object.fromEntries(params));
       
-      const response = await axios.get(`https://dd-merge-backend-2.onrender.com/api/admin/all-orders?${params}`);
+      const response = await axios.get(`https://api.dailydish.in/api/admin/all-orders?${params}`);
       if (response.data && response.data.orders) {
         setOrders(response.data.orders);
         setFilteredOrders(response.data.orders);
@@ -162,7 +162,7 @@ const OrderTracking = () => {
         export: "true"
       });
       
-      const response = await axios.get(`https://dd-merge-backend-2.onrender.com/api/admin/export-orders?${params}`, {
+      const response = await axios.get(`https://api.dailydish.in/api/admin/export-orders?${params}`, {
         responseType: 'blob'
       });
       
@@ -208,7 +208,7 @@ const OrderTracking = () => {
   // Update order status
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      const response = await axios.put(`https://dd-merge-backend-2.onrender.com/api/admin/update-order-status/${orderId}`, {
+      const response = await axios.put(`https://api.dailydish.in/api/admin/update-order-status/${orderId}`, {
         status: newStatus
       });
       

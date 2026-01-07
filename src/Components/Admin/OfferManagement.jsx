@@ -64,7 +64,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 //   const [viewingOffer, setViewingOffer] = useState(null);
 //   const getOffers = async () => {
 //     try {
-//       const res = await axios.get('https://dd-merge-backend-2.onrender.com/api/admin/offers');
+//       const res = await axios.get('https://api.dailydish.in/api/admin/offers');
 //       if (res.status === 200) {
 //         setOffers(res.data.data);
 //       }
@@ -77,7 +77,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 //     const getFoodItems = async () => {
 //       setLoader(true);
 //       try {
-//         const res = await axios.get('https://dd-merge-backend-2.onrender.com/api/admin/getFoodItemsUnBlocks');
+//         const res = await axios.get('https://api.dailydish.in/api/admin/getFoodItemsUnBlocks');
 //         if (res.status === 200) {
 //           setFoodItemData(res.data.data);
 //           setLoader(false);
@@ -140,7 +140,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 //     try {
 //       let response;
 //       if (editingOffer) {
-//         response = await axios.put(`https://dd-merge-backend-2.onrender.com/api/admin/offers/${editingOffer._id}`, {
+//         response = await axios.put(`https://api.dailydish.in/api/admin/offers/${editingOffer._id}`, {
 //           products: formattedProducts,
 //           startDate,
 //           endDate,
@@ -148,7 +148,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 //         getOffers()
 //         setEditingOffer(null);
 //       } else {
-//         response = await axios.post('https://dd-merge-backend-2.onrender.com/api/admin/offers', {
+//         response = await axios.post('https://api.dailydish.in/api/admin/offers', {
 //           products: formattedProducts,
 //           startDate,
 //           endDate,
@@ -205,7 +205,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 //     if (result.isConfirmed) {
 //       try {
-//         await axios.delete(`https://dd-merge-backend-2.onrender.com/api/admin/offers/${offerId}`);
+//         await axios.delete(`https://api.dailydish.in/api/admin/offers/${offerId}`);
 //         getOffers();
 //         Swal.fire({
 //           title: 'Deleted!',
@@ -537,7 +537,7 @@ const OfferForm = () => {
 
   const getOffers = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/offers");
+      const res = await axios.get("https://api.dailydish.in/api/admin/offers");
       if (res.status === 200) {
         setOffers(res.data.data);
       }
@@ -548,7 +548,7 @@ const OfferForm = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      const res = await axios.get("https://api.dailydish.in/api/Hub/hubs");
       if (res.status === 200) {
         setHubsData(res.data);
       }
@@ -569,7 +569,7 @@ const OfferForm = () => {
       setLoader(true);
       try {
         const res = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/admin/getFoodItemsUnBlocks"
+          "https://api.dailydish.in/api/admin/getFoodItemsUnBlocks"
         );
         if (res.status === 200) {
           setFoodItemData(res.data.data);
@@ -685,7 +685,7 @@ const OfferForm = () => {
       let response;
       if (editingOffer) {
         response = await axios.put(
-          `https://dd-merge-backend-2.onrender.com/api/admin/offers/${editingOffer._id}`,
+          `https://api.dailydish.in/api/admin/offers/${editingOffer._id}`,
           {
             products: formattedProducts,
             startDate,
@@ -698,7 +698,7 @@ const OfferForm = () => {
         getOffers();
         setEditingOffer(null);
       } else {
-        response = await axios.post("https://dd-merge-backend-2.onrender.com/api/admin/offers", {
+        response = await axios.post("https://api.dailydish.in/api/admin/offers", {
           products: formattedProducts,
           startDate,
           endDate,
@@ -770,7 +770,7 @@ const OfferForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`https://dd-merge-backend-2.onrender.com/api/admin/offers/${offerId}`);
+        await axios.delete(`https://api.dailydish.in/api/admin/offers/${offerId}`);
         getOffers();
         Swal.fire({
           title: "Deleted!",
@@ -1177,7 +1177,7 @@ const BannerForm = () => {
   const [viewingBanner, setViewingBanner] = useState(null);
   const getBanners = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/banners");
+      const res = await axios.get("https://api.dailydish.in/api/admin/banners");
       if (res.status === 200) {
         setExistingBanners(res.data.getbanner);
       }
@@ -1189,7 +1189,7 @@ const BannerForm = () => {
     const getBannerImages = async () => {
       try {
         const res = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/admin/banners/images"
+          "https://api.dailydish.in/api/admin/banners/images"
         );
         if (res.status === 200) {
           setBannerImages(res.data.images);
@@ -1252,7 +1252,7 @@ const BannerForm = () => {
         const formData = formDataArray[0];
         responses = [
           await axios.put(
-            `https://dd-merge-backend-2.onrender.com/api/admin/editbanner/${editingBanner._id}`,
+            `https://api.dailydish.in/api/admin/editbanner/${editingBanner._id}`,
             formData,
             {
               headers: { "Content-Type": "multipart/form-data" },
@@ -1264,7 +1264,7 @@ const BannerForm = () => {
       } else {
         responses = await Promise.all(
           formDataArray.map((formData) =>
-            axios.post("https://dd-merge-backend-2.onrender.com/api/admin/banners", formData, {
+            axios.post("https://api.dailydish.in/api/admin/banners", formData, {
               headers: { "Content-Type": "multipart/form-data" },
             })
           )
@@ -1336,7 +1336,7 @@ const BannerForm = () => {
     if (result.isConfirmed) {
       try {
         await axios.delete(
-          `https://dd-merge-backend-2.onrender.com/api/admin/Deletebanner/${bannerId}`
+          `https://api.dailydish.in/api/admin/Deletebanner/${bannerId}`
         );
         setExistingBanners(existingBanners.filter((b) => b._id !== bannerId));
         Swal.fire({
@@ -1602,7 +1602,7 @@ const Reports = () => {
     const fetchReports = async () => {
       try {
         const response = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/admin/reports"
+          "https://api.dailydish.in/api/admin/reports"
         );
         if (response.status === 200) {
           setReports(response.data.data);
@@ -1622,7 +1622,7 @@ const Reports = () => {
 
   const handleExport = async () => {
     try {
-      window.location.href = "https://dd-merge-backend-2.onrender.com/api/admin/reports/export";
+      window.location.href = "https://api.dailydish.in/api/admin/reports/export";
       Swal.fire({
         title: "Success",
         text: "Exporting data as CSV...",

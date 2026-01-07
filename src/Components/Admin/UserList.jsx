@@ -93,7 +93,7 @@ const UserList = () => {
       });
 
       const response = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/User/registeruser?${params}`
+        `https://api.dailydish.in/api/User/registeruser?${params}`
       );
       if (response.status === 200) {
         setAdduser(response.data.success);
@@ -119,7 +119,7 @@ const UserList = () => {
       const config = {
         url: `/User/deleteUser/${deleteID}`,
         method: "delete",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://api.dailydish.in/api",
         headers: { "Content-Type": "application/json" },
       };
       const res = await axios(config);
@@ -138,7 +138,7 @@ const UserList = () => {
   const [ApartmentOrder, setApartmentOrder] = useState([]);
   const getApartmentOrder = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getallorders");
+      let res = await axios.get("https://api.dailydish.in/api/admin/getallorders");
       if (res.status === 200) {
         setApartmentOrder(res.data.order.reverse());
       }
@@ -157,7 +157,7 @@ const UserList = () => {
       const config = {
         url: `/User/blockuser/${user?._id}`,
         method: "put",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://api.dailydish.in/api",
         headers: { "Content-Type": "application/json" },
       };
       const res = await axios(config);
@@ -196,8 +196,8 @@ const UserList = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://dd-merge-backend-2.onrender.com/api/wallet/add-free-cash"
-          : "https://dd-merge-backend-2.onrender.com/api/wallet/deduct-cash",
+          ? "https://api.dailydish.in/api/wallet/add-free-cash"
+          : "https://api.dailydish.in/api/wallet/deduct-cash",
         {
           userId: userw,
           amount: Number(amount),
@@ -272,7 +272,7 @@ const UserList = () => {
         });
 
         const response = await axios.get(
-          `https://dd-merge-backend-2.onrender.com/api/User/export-all?${params}`
+          `https://api.dailydish.in/api/User/export-all?${params}`
         );
         const chunkData = response.data.success;
         const pagination = response.data.pagination;
@@ -501,7 +501,7 @@ const UserList = () => {
                 <td>
                   {item?.profileImage ? (
                     <img
-                      src={`https://dd-merge-backend-2.onrender.com/Customer/${item?.profileImage}`}
+                      src={`https://api.dailydish.in/Customer/${item?.profileImage}`}
                       alt="Profile"
                       style={{
                         width: "50px",

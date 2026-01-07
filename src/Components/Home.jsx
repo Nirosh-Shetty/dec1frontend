@@ -266,7 +266,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   //     setloader(true);
   //     try {
   //       const res = await axios.get(
-  //         "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
+  //         "https://api.dailydish.in/api/user/get-hub-menu",
   //         {
   //           params: {
   //             hubId: address.hubId,
@@ -304,7 +304,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         console.log("Fetching menu for hub:", address.hubId);
 
         const res = await axios.get(
-          "https://dd-merge-backend-2.onrender.com/api/user/get-hub-menu",
+          "https://api.dailydish.in/api/user/get-hub-menu",
           {
             params: {
               hubId: address.hubId,
@@ -714,7 +714,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const addonedCarts = async () => {
       try {
         await axios.post(
-          "https://dd-merge-backend-2.onrender.com/api/cart/addCart",
+          "https://api.dailydish.in/api/cart/addCart",
           {
             userId: user?._id,
             items: storedCart,
@@ -1170,7 +1170,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       });
 
       const res = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/user/plan/add-to-plan",
+        "https://api.dailydish.in/api/user/plan/add-to-plan",
         {
           userId: user._id,
           mobile: user.Mobile,
@@ -1230,7 +1230,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
       if (user?._id && location) {
         const response = await axios.put(
-          "https://dd-merge-backend-2.onrender.com/api/admin/getuseroffer",
+          "https://api.dailydish.in/api/admin/getuseroffer",
           {
             id: user._id,
             location,
@@ -1356,7 +1356,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://api.dailydish.in/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -1443,7 +1443,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api/",
+        baseURL: "https://api.dailydish.in/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,

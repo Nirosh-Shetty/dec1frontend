@@ -130,7 +130,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "https://dd-merge-backend-2.onrender.com/api",
+//         baseURL: "https://api.dailydish.in/api",
 
 //         headers: { "content-type": "application/json" },
 //         data: {
@@ -707,7 +707,7 @@ export default function LeafWithLogo() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://api.dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,

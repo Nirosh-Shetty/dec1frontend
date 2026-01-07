@@ -75,7 +75,7 @@ const EmployeeOrders = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getAllOrdersByCompanyId/" +
+        "https://api.dailydish.in/api/admin/getAllOrdersByCompanyId/" +
           corparate?._id
       );
       if (res.status === 200) {

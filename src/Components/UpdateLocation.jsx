@@ -381,7 +381,7 @@ const UpdateLocation = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "https://dd-merge-backend-2.onrender.com/api/Hub/validate-location",
+        "https://api.dailydish.in/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -1155,7 +1155,7 @@ const UpdateLocation = () => {
       console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/service-requests",
+        "https://api.dailydish.in/api/service-requests",
         requestData,
         {
           headers: {
@@ -1362,8 +1362,8 @@ const UpdateLocation = () => {
       }
 
       const endpoint = location.state?.editingAddress?._id
-        ? `https://dd-merge-backend-2.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-        : "https://dd-merge-backend-2.onrender.com/api/User/addresses";
+        ? `https://api.dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+        : "https://api.dailydish.in/api/User/addresses";
       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
       const response = await fetch(endpoint, {
@@ -1425,7 +1425,7 @@ const UpdateLocation = () => {
   const setAddressAsPrimary = async (customerId, addressId) => {
     try {
       const response = await fetch(
-        `https://dd-merge-backend-2.onrender.com/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

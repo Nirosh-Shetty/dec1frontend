@@ -50,7 +50,7 @@ export default function Validate() {
         const config = {
           url: "/User/mobileotpverification",
           method: "post",
-          baseURL: "https://dd-merge-backend-2.onrender.com/api",
+          baseURL: "https://api.dailydish.in/api",
           headers: { "content-type": "application/json" },
           data: payload,
         };
@@ -73,7 +73,7 @@ export default function Validate() {
           if (userData?.primaryAddress) {
             try {
               const response = await fetch(
-                `https://dd-merge-backend-2.onrender.com/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
+                `https://api.dailydish.in/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
@@ -581,7 +581,7 @@ export default function Validate() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-merge-backend-2.onrender.com/api",
+        baseURL: "https://api.dailydish.in/api",
 
         headers: { "content-type": "application/json" },
         data: {

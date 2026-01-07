@@ -41,7 +41,7 @@ const RestaurantClosure = () => {
   const fetchClosureDetails = async () => {
     try {
       const response = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getClosureDetails"
+        "https://api.dailydish.in/api/admin/getClosureDetails"
       );
       if (response.status === 200 && response.data.data) {
         setClosureDetails(response.data.data);
@@ -122,7 +122,7 @@ const RestaurantClosure = () => {
 
       // Send data to API
       const response = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/admin/setClosure",
+        "https://api.dailydish.in/api/admin/setClosure",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -150,7 +150,7 @@ const RestaurantClosure = () => {
     try {
       setIsLoading(true);
       const response = await axios.delete(
-        "https://dd-merge-backend-2.onrender.com/api/admin/clearClosure"
+        "https://api.dailydish.in/api/admin/clearClosure"
       );
       if (response.status === 200) {
         setSuccess("Closure cleared successfully");

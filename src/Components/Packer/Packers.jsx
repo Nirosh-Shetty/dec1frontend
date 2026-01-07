@@ -24,10 +24,10 @@ import {
 import { Link } from "react-router-dom";
 
 // Constants
-const API_BASE_URL = "https://dd-merge-backend-2.onrender.com/api/packer";
-const ADMIN_ORDERS_URL = "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders2";
+const API_BASE_URL = "https://api.dailydish.in/api/packer";
+const ADMIN_ORDERS_URL = "https://api.dailydish.in/api/admin/getPackerOrders2";
 const PACKING_GROUPED_URL = `${API_BASE_URL}/packing/today/grouped`;
-const HUBS_API_URL = "https://dd-merge-backend-2.onrender.com/api/Hub/hubs";
+const HUBS_API_URL = "https://api.dailydish.in/api/Hub/hubs";
 const SWR_KEY = "packer:combined";
 const LOCAL_CACHE_KEY = "packer:combined:cache:v1";
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes

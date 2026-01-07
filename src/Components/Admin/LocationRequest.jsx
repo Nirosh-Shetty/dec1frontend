@@ -26,7 +26,7 @@
 //       params.append('page', filters.page);
 //       params.append('limit', filters.limit);
 
-//       const response = await axios.get(`https://dd-merge-backend-2.onrender.com/api/service-requests?${params}`);
+//       const response = await axios.get(`https://api.dailydish.in/api/service-requests?${params}`);
 
 //       console.log(response,"/////b//////////")
 
@@ -48,7 +48,7 @@
 //   const fetchStats = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get('https://dd-merge-backend-2.onrender.com/api/service-requests/stats', {
+//       const response = await axios.get('https://api.dailydish.in/api/service-requests/stats', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -68,7 +68,7 @@
 //       const token = localStorage.getItem('token');
 
 //       const response = await axios.put(
-//         `https://dd-merge-backend-2.onrender.com/api/service-requests/${requestId}`,
+//         `https://api.dailydish.in/api/service-requests/${requestId}`,
 //         {
 //           status: updateStatus,
 //           notes: updateNotes
@@ -535,7 +535,7 @@
 //       params.append("limit", filters.limit);
 
 //       const response = await axios.get(
-//         `https://dd-merge-backend-2.onrender.com/api/service-requests?${params}`,
+//         `https://api.dailydish.in/api/service-requests?${params}`,
 //         {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
@@ -566,7 +566,7 @@
 //     try {
 //       const token = localStorage.getItem("token");
 //       const response = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/service-requests/stats",
+//         "https://api.dailydish.in/api/service-requests/stats",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
@@ -588,7 +588,7 @@
 //       const token = localStorage.getItem("token");
 
 //       const response = await axios.put(
-//         `https://dd-merge-backend-2.onrender.com/api/service-requests/${requestId}`,
+//         `https://api.dailydish.in/api/service-requests/${requestId}`,
 //         {
 //           status: updateStatus,
 //           notes: updateNotes,
@@ -1364,7 +1364,7 @@ const LocationRequest = () => {
       params.append("limit", filters.limit);
 
       const response = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/service-requests?${params}`,
+        `https://api.dailydish.in/api/service-requests?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1400,7 +1400,7 @@ const LocationRequest = () => {
       if (filters.status) params.append("status", filters.status);
 
       const response = await axios.get(
-        `https://dd-merge-backend-2.onrender.com/api/service-requests/map-locations?${params}`,
+        `https://api.dailydish.in/api/service-requests/map-locations?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1431,7 +1431,7 @@ const LocationRequest = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/service-requests/stats",
+        "https://api.dailydish.in/api/service-requests/stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1453,7 +1453,7 @@ const LocationRequest = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        `https://dd-merge-backend-2.onrender.com/api/service-requests/${requestId}`,
+        `https://api.dailydish.in/api/service-requests/${requestId}`,
         {
           status: updateStatus,
           notes: updateNotes,

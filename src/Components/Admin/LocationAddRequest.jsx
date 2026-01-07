@@ -19,7 +19,7 @@ const LocationAddRequest = () => {
   const getEnquiry = async () => {
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/User/getEnquiryenquiry"
+        "https://api.dailydish.in/api/User/getEnquiryenquiry"
       );
       if (res.status === 200) {
         setEnquiry(res.data.getdata.reverse());
@@ -35,7 +35,7 @@ const LocationAddRequest = () => {
   let DeleteEnquiry = async () => {
     try {
       let res = await axios.delete(
-        `https://dd-merge-backend-2.onrender.com/api/User/DeleteEnquiryList/${contactListId}`
+        `https://api.dailydish.in/api/User/DeleteEnquiryList/${contactListId}`
       );
       if (res.status === 200) {
         alert(` Successfully Deleted..!`);

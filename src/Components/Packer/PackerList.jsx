@@ -117,7 +117,7 @@ const PackerList = () => {
   // Fetch hubs
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs", {
+      const res = await axios.get("https://api.dailydish.in/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setHubs(res.data);
@@ -135,7 +135,7 @@ const PackerList = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/packer/getAllPacker",
+        "https://api.dailydish.in/api/packer/getAllPacker",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -178,7 +178,7 @@ const PackerList = () => {
         mobileNumber: cleanPhoneNumber(newPacker.mobileNumber),
       };
       const res = await axios.post(
-        "https://dd-merge-backend-2.onrender.com/api/packer/createpacker",
+        "https://api.dailydish.in/api/packer/createpacker",
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -226,7 +226,7 @@ const PackerList = () => {
         packerId: selectedPacker.packerId,
       };
       const res = await axios.put(
-        `https://dd-merge-backend-2.onrender.com/api/packer/updatePacker`,
+        `https://api.dailydish.in/api/packer/updatePacker`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -251,7 +251,7 @@ const PackerList = () => {
     setDeletePackerLoading(true);
     try {
       const res = await axios.delete(
-        `https://dd-merge-backend-2.onrender.com/api/packer/deletPacker/${selectedPacker.packerId}`,
+        `https://api.dailydish.in/api/packer/deletPacker/${selectedPacker.packerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

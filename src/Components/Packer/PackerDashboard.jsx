@@ -21,7 +21,7 @@
 // import moment from "moment";
 // import { BsSearch } from "react-icons/bs";
 
-// const socket = io("https://dd-merge-backend-2.onrender.com/", {
+// const socket = io("https://api.dailydish.in/", {
 //   reconnection: true, // Enable reconnection
 //   reconnectionAttempts: 5, // Retry up to 5 times
 //   reconnectionDelay: 1000, // Start with 1-second delay
@@ -75,7 +75,7 @@
 //     setLoading(true);
 //     try {
 //       const orderResponse = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
+//         "https://api.dailydish.in/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -185,7 +185,7 @@
 //         }
 //       }
 //       const orderResponse = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
+//         "https://api.dailydish.in/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -219,7 +219,7 @@
 
 //       // Fetch drivers
 //       setLocations([...new Set(allorder.map((ele) => ele?.delivarylocation))]);
-//       // const driverResponse = await axios.get('https://dd-merge-backend-2.onrender.com/api/admin/getDrivers');
+//       // const driverResponse = await axios.get('https://api.dailydish.in/api/admin/getDrivers');
 //       // setDrivers(driverResponse.data);
 //       setLoading(false);
 //     } catch (error) {
@@ -243,7 +243,7 @@
 
 //   const getBegs = async () => {
 //     try {
-//       let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
+//       let res = await axios.get("https://api.dailydish.in/api/admin/getbags");
 //       if (res.status == 200) {
 //         setAllBags(res.data.bags);
 //       }
@@ -255,7 +255,7 @@
 //   const getAllReason = async () => {
 //     try {
 //       let res = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/getdelayreasons"
+//         "https://api.dailydish.in/api/admin/getdelayreasons"
 //       );
 //       if (res.status == 200) {
 //         setAllReason(
@@ -699,7 +699,7 @@
 //     setLoading(true);
 //     try {
 //       const response = await axios.put(
-//         `https://dd-merge-backend-2.onrender.com/api/admin/updatePackerOrder`,
+//         `https://api.dailydish.in/api/admin/updatePackerOrder`,
 //         updatedData,
 //         {
 //           headers: {
@@ -2223,7 +2223,7 @@
 // import moment from "moment";
 // import { BsSearch } from "react-icons/bs";
 
-// const socket = io("https://dd-merge-backend-2.onrender.com/", {
+// const socket = io("https://api.dailydish.in/", {
 //   reconnection: true, // Enable reconnection
 //   reconnectionAttempts: 5, // Retry up to 5 times
 //   reconnectionDelay: 1000, // Start with 1-second delay
@@ -2284,7 +2284,7 @@
 
 //   const getHubs = async () => {
 //     try {
-//       const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+//       const res = await axios.get("https://api.dailydish.in/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Error fetching hubs:", error);
@@ -2415,7 +2415,7 @@
 //     setLoading(true);
 //     try {
 //       const orderResponse = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
+//         "https://api.dailydish.in/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -2515,7 +2515,7 @@
 //         }
 //       }
 //       const orderResponse = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
+//         "https://api.dailydish.in/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -2567,7 +2567,7 @@
 
 //   const getBegs = async () => {
 //     try {
-//       let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
+//       let res = await axios.get("https://api.dailydish.in/api/admin/getbags");
 //       if (res.status == 200) {
 //         setAllBags(res.data.bags);
 //       }
@@ -2579,7 +2579,7 @@
 //   const getAllReason = async () => {
 //     try {
 //       let res = await axios.get(
-//         "https://dd-merge-backend-2.onrender.com/api/admin/getdelayreasons"
+//         "https://api.dailydish.in/api/admin/getdelayreasons"
 //       );
 //       if (res.status == 200) {
 //         setAllReason(
@@ -2660,7 +2660,7 @@
 //   }, []);
 
 //   useEffect(() => {
-//     fetch("https://dd-merge-backend-2.onrender.com/api/packer/packing")
+//     fetch("https://api.dailydish.in/api/packer/packing")
 //       .then((res) => res.json())
 //       .then((data) => setPackingStats(data.data));
 
@@ -3132,7 +3132,7 @@
 //     setLoading(true);
 //     try {
 //       const response = await axios.put(
-//         `https://dd-merge-backend-2.onrender.com/api/admin/updatePackerOrder`,
+//         `https://api.dailydish.in/api/admin/updatePackerOrder`,
 //         updatedData,
 //         {
 //           headers: {
@@ -4325,7 +4325,7 @@ import io from "socket.io-client";
 import moment from "moment";
 import { BsSearch } from "react-icons/bs";
 
-const socket = io("https://dd-merge-backend-2.onrender.com/", {
+const socket = io("https://api.dailydish.in/", {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
@@ -4517,7 +4517,7 @@ const DashboardPage = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-merge-backend-2.onrender.com/api/Hub/hubs");
+      const res = await axios.get("https://api.dailydish.in/api/Hub/hubs");
       const allHubs = res.data;
 
       // Filter hubs based on packer's assigned hubs
@@ -4543,7 +4543,7 @@ const DashboardPage = () => {
     setLoading(true);
     try {
       const orderResponse = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
+        "https://api.dailydish.in/api/admin/getPackerOrders",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -4643,7 +4643,7 @@ const DashboardPage = () => {
         }
       }
       const orderResponse = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getPackerOrders",
+        "https://api.dailydish.in/api/admin/getPackerOrders",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -4694,7 +4694,7 @@ const DashboardPage = () => {
 
   const getBegs = async () => {
     try {
-      let res = await axios.get("https://dd-merge-backend-2.onrender.com/api/admin/getbags");
+      let res = await axios.get("https://api.dailydish.in/api/admin/getbags");
       if (res.status == 200) {
         setAllBags(res.data.bags);
       }
@@ -4706,7 +4706,7 @@ const DashboardPage = () => {
   const getAllReason = async () => {
     try {
       let res = await axios.get(
-        "https://dd-merge-backend-2.onrender.com/api/admin/getdelayreasons"
+        "https://api.dailydish.in/api/admin/getdelayreasons"
       );
       if (res.status == 200) {
         setAllReason(
@@ -5284,7 +5284,7 @@ const DashboardPage = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `https://dd-merge-backend-2.onrender.com/api/admin/updatePackerOrder`,
+        `https://api.dailydish.in/api/admin/updatePackerOrder`,
         updatedData,
         {
           headers: {
