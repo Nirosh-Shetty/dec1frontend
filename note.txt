@@ -5,4 +5,5 @@ process.env.REACT_APP_GOOGLE_MAPS_API_KEY
 import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
 https://dd-merge-backend-2.onrender.com
+https://api.dailydish.in
 http://localhost:7013
