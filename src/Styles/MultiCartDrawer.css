@@ -553,3 +553,73 @@
 .checkout-top {
   width: 100%;
 }
+
+/* Custom toast styles for MyPlans success message */
+/* Custom toast styles for MyPlans success message */
+.myplans-custom-toast {
+  background-color: #fff8dc !important;
+  border: 1px solid #6b8e23 !important;
+  border-bottom: 3px solid #6b8e23 !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  max-width: 350px !important;
+  margin: 0 auto !important;
+  position: fixed !important;
+  bottom: 90px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 10000 !important;
+}
+
+.myplans-toast-html {
+  margin: 0 !important;
+  padding: 16px 20px !important;
+}
+
+.myplans-toast-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.myplans-toast-check {
+  width: 24px !important;
+  height: 24px !important;
+  flex-shrink: 0 !important;
+}
+
+.myplans-toast-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  width: 360px;
+}
+
+.myplans-toast-title {
+  color: #000 !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+.myplans-toast-subtitle {
+  color: #000 !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* Override SweetAlert2 default styles for this specific toast */
+.swal2-popup.myplans-custom-toast {
+  display: block !important;
+  text-align: left !important;
+}
+
+.swal2-popup.myplans-custom-toast .swal2-timer-progress-bar {
+  background-color: #6b8e23 !important;
+}

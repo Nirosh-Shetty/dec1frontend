@@ -20,7 +20,7 @@ function CorporateLogin() {
       const config = {
         url: "/admin/Loginwithotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: { mobile: mobileNumber },
       };
@@ -52,7 +52,7 @@ function CorporateLogin() {
       const config = {
         url: "/admin/verifyOtpCorprate",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: { mobile: mobileNumber, otp: otp },
       };

@@ -126,7 +126,7 @@ const Banner = ({
   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
 
   // Default hub ID for non-serviceable areas
-  const DEFAULT_HUB_ID = "6943daf278eca12b0b53b36b";
+  const DEFAULT_HUB_ID = "69522e8c195d0cafeda7f611";
 
   // Function to get location using browser's geolocation API
   const getCurrentLocation = useCallback(() => {
@@ -287,7 +287,7 @@ const Banner = ({
       setIsCheckingServiceability(true);
 
       const response = await fetch(
-        "https://api.dailydish.in/api/Hub/validate-location",
+        "http://localhost:7013/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -448,7 +448,7 @@ const Banner = ({
   //     console.log("Submitting service request:", requestData);
 
   //     const response = await fetch(
-  //       "https://api.dailydish.in/api/service-requests",
+  //       "http://localhost:7013/api/service-requests",
   //       {
   //         method: "POST",
   //         headers: {
@@ -630,7 +630,7 @@ const Banner = ({
       // console.log("Submitting service request:", requestData);
 
       const response = await fetch(
-        "https://api.dailydish.in/api/service-requests",
+        "http://localhost:7013/api/service-requests",
         {
           method: "POST",
           headers: {
@@ -696,7 +696,7 @@ const Banner = ({
           Swal2.fire({
             // title: "🎉 Request Submitted Successfully!",
             html: `
-            <div style="text-align: center; zIndex:9999999 padding: ${
+            <div style="text-align: center; zIndex:999999 padding: ${
               isSmall ? "8px" : "12px"
             };">
               <div style="font-size: ${
@@ -729,7 +729,6 @@ const Banner = ({
                   isSmall ? "280px" : "320px"
                 };">
                   <p style="margin: 4px 0;">• Our team will review your location</p>
-                  <p style="margin: 4px 0;">• We'll contact you within 24 hours</p>
                   <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
                 </div>
               </div>
@@ -739,7 +738,7 @@ const Banner = ({
             confirmButtonText: "Got it!",
             confirmButtonColor: "#6B8E23",
             width: isSmall ? "90%" : "500px",
-            padding: isSmall ? "1rem" : "1.5rem",
+            padding: isSmall ? "0rem" : "1.5rem",
             backdrop: true,
             allowOutsideClick: true,
             allowEscapeKey: true,
@@ -995,7 +994,7 @@ const Banner = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1079,7 +1078,7 @@ const Banner = ({
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getapartment");
+      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -1095,7 +1094,7 @@ const Banner = ({
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -1113,7 +1112,7 @@ const Banner = ({
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("https://api.dailydish.in/api/admin/getstories");
+        let res = await axios.get("http://localhost:7013/api/admin/getstories");
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -1197,7 +1196,7 @@ const Banner = ({
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1244,7 +1243,7 @@ const Banner = ({
   const getSelectedAddress = async () => {
     try {
       let res = await axios.get(
-        `https://api.dailydish.in/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
+        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
       );
       if (res.status === 200) {
         setSelectedAddress(res.data.getdata);
@@ -1283,7 +1282,7 @@ const Banner = ({
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(`https://api.dailydish.in/api/user/addressadd`, {
+      let res = await axios.post(`http://localhost:7013/api/user/addressadd`, {
         Name: user?.Fname,
         Number: user?.Mobile,
         userId: user?._id,
@@ -1337,7 +1336,7 @@ const Banner = ({
         }
 
         const response = await fetch(
-          `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
+          `http://localhost:7013/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: getAuthHeaders(),

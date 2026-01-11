@@ -30,7 +30,7 @@ function Gst() {
       const config = {
         url: "admin/addgst",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "Content-Type": "application/Json" },
         data: {
           Cgst: cgst,
@@ -56,7 +56,7 @@ function Gst() {
   const [nochangedata, setNoChangeData] = useState([]);
   const getGst = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getgst");
+      let res = await axios.get("https://dailydish.in/api/admin/getgst");
       if (res.status === 200) {
         setGstList(res.data.gst.reverse());
         setNoChangeData(res.data.gst.reverse());
@@ -71,7 +71,7 @@ function Gst() {
   let deleteGst = async (id) => {
     try {
       let res = await axios.delete(
-        `https://api.dailydish.in/api/admin/deletegst/${delData?._id}`
+        `https://dailydish.in/api/admin/deletegst/${delData?._id}`
       );
       if (res.status === 200) {
         alert(`GST Deleted Successfully`);

@@ -12,7 +12,7 @@ import "../Styles/ReferScreen.css";
 // Add this line after your imports
 // Import animation data
 import referralAnimation from "../assets/referral.json";
-axios.defaults.baseURL = "https://api.dailydish.in/api";
+axios.defaults.baseURL = "https://dailydish.in/api";
 
 export default function ReferScreen() {
   // const [copied, setCopied] = useState(false);
@@ -164,10 +164,10 @@ export default function ReferScreen() {
     const referralLink = `${cleanDomain}/${userReferralCode}`;
 
     const message = encodeURIComponent(
-      `Hey, I just came across DailyDish and gave it a try - ordered a meal there. 🍽️\n\n` +
-        `This app actually delivers proper home-style meals at very reasonable prices, and I could even choose my delivery slot.\n\n` +
-        `Thought you'd like it. 😊\n\n` +
-        `Just sign up using my link. Worth trying:` +
+      `Stop stressing about what to eat every day 😊 \n` +
+        `I use DailyDish to pre-plan simple home-style meals.  
+It saves me time and hassle.\n\n` +
+        `Get ₹25 off your first meal:\n` +
         ` ${referralLink} 📱`
     );
 

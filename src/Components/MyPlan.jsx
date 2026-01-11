@@ -29,6 +29,7 @@ import orderhistoryicon from "./../assets/orderhistory.png";
 import LocationModal2 from "./LocationModal2";
 import AddMoreToSlotModal from "./AddMoreToSlotModal";
 import "../Styles/AddMoreToSlotModal.css";
+import checkCircle from "../assets/check_circle.png";
 
 const formatDate = (isoString) => {
   const d = new Date(isoString);
@@ -62,6 +63,7 @@ const ViewPlanModal = ({
   // console.log("Viewing plan:", plan);
 
   const [deliveryNotes, setDeliveryNotes] = useState(plan.deliveryNotes || "");
+  const [isProcessing, setIsProcessing] = useState(false);
   useEffect(() => {
     setLocalPlan(plan);
     // setDeliveryNotes(plan.deliveryNotes || "");
@@ -95,7 +97,7 @@ const ViewPlanModal = ({
 
     try {
       const res = await axios.post(
-        "https://api.dailydish.in/api/user/plan/update-product",
+        "https://dailydish.in/api/user/plan/update-product",
         {
           planId: localPlan._id,
           foodItemId:
@@ -145,7 +147,7 @@ const ViewPlanModal = ({
         throw new Error("Customer ID not found. Please login again.");
       }
       const response = await axios.patch(
-        `https://api.dailydish.in/api/User/customers/${userId}/addresses/${addressId}/primary`
+        `https://dailydish.in/api/User/customers/${userId}/addresses/${addressId}/primary`
       );
       alert("Setting primary address...");
 
@@ -257,7 +259,7 @@ const ViewPlanModal = ({
   const { days, hours, mins, isExpired } = getTimeRemainingToCutoff();
   const handleAddressChange = async () => {
     try {
-      // await axios.patch(`https://api.dailydish.in/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
+      // await axios.patch(`https://dailydish.in/api/User/customers/${userId}/addresses/${localPlan.addressId}/primary`)
       setShowLocationModal(true);
     } catch (error) {
       Swal2.fire("Error", "Unable to Change Address", "error");
@@ -269,7 +271,7 @@ const ViewPlanModal = ({
       setLoading(true);
       // Call backend to update plan address
       const response = await axios.post(
-        "https://api.dailydish.in/api/user/plan/update-address",
+        "https://dailydish.in/api/user/plan/update-address",
         {
           planId: localPlan._id,
           userId,
@@ -296,10 +298,43 @@ const ViewPlanModal = ({
   const handleSkipOrCancel = async () => {
     try {
       setLoading(true);
-      await axios.post("https://api.dailydish.in/api/user/plan/skip-cancel", {
+      await axios.post("https://dailydish.in/api/user/plan/skip-cancel", {
         planId: plan._id,
         userId,
       });
+
+      // Show success toast with same styling as "move to my plan" toast
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+        html: `
+          <div class="myplans-toast-content">
+            <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+            <div class="myplans-toast-text">
+              <div class="myplans-toast-title">Plan skipped.</div>
+              <div class="myplans-toast-subtitle">Removing from your upcoming list</div>
+            </div>
+          </div>
+        `,
+        customClass: {
+          popup: "myplans-custom-toast",
+          htmlContainer: "myplans-toast-html",
+        },
+        didOpen: () => {
+          // Position above bottom nav
+          const toast = document.querySelector(".myplans-custom-toast");
+          if (toast) {
+            toast.style.bottom = "90px"; // Position above bottom nav
+            toast.style.left = "50%";
+            toast.style.transform = "translateX(-50%)";
+            toast.style.position = "fixed";
+          }
+        },
+      });
+
       onPlanUpdated && onPlanUpdated();
       onClose();
     } catch (err) {
@@ -365,13 +400,13 @@ const ViewPlanModal = ({
         onClick={(e) => {
           e.stopPropagation();
         }}
-        // style={
-        //   localPlan.status === "Pending Payment" && isBeforeDeadline
-        //     ? {
-        //         borderTopRightRadius: 0,
-        //       }
-        //     : {}
-        // }
+      // style={
+      //   localPlan.status === "Pending Payment" && isBeforeDeadline
+      //     ? {
+      //         borderTopRightRadius: 0,
+      //       }
+      //     : {}
+      // }
       >
         {/* Header */}
         <div className="modal-header-section">
@@ -383,8 +418,8 @@ const ViewPlanModal = ({
                 {localPlan?.addressType === "School"
                   ? "12:00 to 12:15 PM"
                   : localPlan?.session === "Lunch"
-                  ? "12:00 to 01:00 PM"
-                  : "07:00 to 08:00 PM"}
+                    ? "12:00 to 01:00 PM"
+                    : "07:30 to 08:30 PM"}
               </div>
             </div>
 
@@ -469,9 +504,8 @@ const ViewPlanModal = ({
                       {/* qty +/- disabled for now; can be wired to updatePlanProduct API */}
                       <div className="quantity-control">
                         <div
-                          className={`${
-                            !isEditable && "disabled"
-                          } quantity-control`}
+                          className={`${!isEditable && "disabled"
+                            } quantity-control`}
                         >
                           <button
                             className="quantity-btn"
@@ -479,7 +513,7 @@ const ViewPlanModal = ({
                             onClick={() =>
                               changeQuantity(
                                 product.foodItemId?.toString?.() ||
-                                  product.foodItemId,
+                                product.foodItemId,
                                 -1
                               )
                             }
@@ -497,7 +531,7 @@ const ViewPlanModal = ({
                             onClick={() =>
                               changeQuantity(
                                 product.foodItemId?.toString?.() ||
-                                  product.foodItemId,
+                                product.foodItemId,
                                 1
                               )
                             }
@@ -510,17 +544,17 @@ const ViewPlanModal = ({
                         {/* Always show preorder price, as only preorder is allowed */}
                         {product.hubTotalPrice?.toFixed(0) <
                           product.totalPrice?.toFixed(0) && (
-                          <div className="plan-actual-price">
-                            <div className="plan-current-currency">
-                              <div className="current-currency-text">₹</div>
-                            </div>
-                            <div className="plan-hub-amount">
-                              <div className="hub-amount-text">
-                                {product.hubTotalPrice?.toFixed(0)}
+                            <div className="plan-actual-price">
+                              <div className="plan-current-currency">
+                                <div className="current-currency-text">₹</div>
+                              </div>
+                              <div className="plan-hub-amount">
+                                <div className="hub-amount-text">
+                                  {product.hubTotalPrice?.toFixed(0)}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         <div className="plan-current-price">
                           <div className="plan-current-currency">
@@ -573,6 +607,7 @@ const ViewPlanModal = ({
                 paddingBottom: 8,
                 paddingLeft: 8,
                 fontSize: 20,
+                letterSpacing: "-1px",
               }}
             >
               Delivery Details
@@ -605,25 +640,25 @@ const ViewPlanModal = ({
                       localPlan?.addressType === "Home"
                         ? localPlan?.homeName || "Home"
                         : localPlan?.addressType === "PG"
-                        ? localPlan?.apartmentName || "PG"
-                        : localPlan?.addressType === "School"
-                        ? localPlan?.schoolName || "School"
-                        : localPlan?.addressType === "Work" ||
-                          localPlan?.addressType === "corporate"
-                        ? localPlan?.companyName
-                        : localPlan?.addressType || "Delivery Location"
+                          ? localPlan?.apartmentName || "PG"
+                          : localPlan?.addressType === "School"
+                            ? localPlan?.schoolName || "School"
+                            : localPlan?.addressType === "Work" ||
+                              localPlan?.addressType === "corporate"
+                              ? localPlan?.companyName
+                              : localPlan?.addressType || "Delivery Location"
                     }
                   >
                     {localPlan?.addressType === "Home"
                       ? localPlan?.homeName || "Home"
                       : localPlan?.addressType === "PG"
-                      ? localPlan?.apartmentName || "PG"
-                      : localPlan?.addressType === "School"
-                      ? localPlan?.schoolName || "School"
-                      : localPlan?.addressType === "Work" ||
-                        localPlan?.addressType === "corporate"
-                      ? localPlan?.companyName
-                      : localPlan?.addressType || "Delivery Location"}
+                        ? localPlan?.apartmentName || "PG"
+                        : localPlan?.addressType === "School"
+                          ? localPlan?.schoolName || "School"
+                          : localPlan?.addressType === "Work" ||
+                            localPlan?.addressType === "corporate"
+                            ? localPlan?.companyName
+                            : localPlan?.addressType || "Delivery Location"}
                   </p>
 
                   {/* 2. Full Address */}
@@ -648,18 +683,18 @@ const ViewPlanModal = ({
                   {/* 4. Student Details (Only shows if School or student data exists) */}
                   {(localPlan?.addressType === "School" ||
                     localPlan?.studentName) && (
-                    <div className="caption-section" data-text-role="Caption">
-                      <div className="user-detailss mt-1">
-                        {localPlan?.studentName}
-                        {localPlan?.studentClass
-                          ? ` | Class - ${localPlan.studentClass}`
-                          : ""}
-                        {localPlan?.studentSection
-                          ? ` | Section - ${localPlan.studentSection}`
-                          : ""}
+                      <div className="caption-section" data-text-role="Caption">
+                        <div className="user-detailss mt-1">
+                          {localPlan?.studentName}
+                          {localPlan?.studentClass
+                            ? ` | Class - ${localPlan.studentClass}`
+                            : ""}
+                          {localPlan?.studentSection
+                            ? ` | Section - ${localPlan.studentSection}`
+                            : ""}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
 
                 {/* Change Button */}
@@ -715,7 +750,7 @@ const ViewPlanModal = ({
                   <input
                     type="text"
                     className="delivery-notes-input"
-                    placeholder="Enter any notes for delivery"
+                    placeholder="Add Delivery Notes"
                     // Mapped to your existing state logic from the old code
                     value={deliveryNotes}
                     onChange={(e) => setDeliveryNotes(e.target.value)}
@@ -747,6 +782,7 @@ const ViewPlanModal = ({
             paddingBottom: 8,
             paddingLeft: 8,
             fontSize: 20,
+            letterSpacing: "-1px",
           }}
         >
           Apply & Save
@@ -762,12 +798,12 @@ const ViewPlanModal = ({
                 name="Apply Wallet"
                 onChange={(e) => setUseWallet(e.target.checked)}
                 disabled={walletBalance <= 0}
-                // style={{
-                //   border: discountWallet
-                //     ? "1px solid #6B8E23 !important"
-                //     : "1px solid #6B6B6B !important",
-                //   backgroundColor: discountWallet ? "#6B8E23" : "white",
-                // }}
+              // style={{
+              //   border: discountWallet
+              //     ? "1px solid #6B8E23 !important"
+              //     : "1px solid #6B6B6B !important",
+              //   backgroundColor: discountWallet ? "#6B8E23" : "white",
+              // }}
               />
               {/* Wallet Credit Text */}
               <div className="wallet-text">
@@ -809,6 +845,7 @@ const ViewPlanModal = ({
               paddingBottom: 8,
               paddingLeft: 8,
               fontSize: 20,
+              letterSpacing: "-1px",
             }}
           >
             Billing Details
@@ -899,8 +936,9 @@ const ViewPlanModal = ({
                 />
               </button>
               <button
-                className="confirm-pay-btn"
+                className={`pay-btn ${isProcessing ? "processing" : ""}`}
                 onClick={async () => {
+                  setIsProcessing(true);
                   setLoading(true);
                   try {
                     await handlePayPlan(
@@ -910,20 +948,40 @@ const ViewPlanModal = ({
                     );
                   } catch (e) {
                     setLoading(false);
+                    setIsProcessing(false);
                   }
                 }}
-                disabled={loading}
+                disabled={loading || isProcessing}
               >
-                {loading ? (
-                  <>
-                    <span className="button-loader"></span> Processing...
-                  </>
-                ) : (
-                  <>
-                    Confirm & Pay
-                    <span className="pay-amount-badge">{payableAmount}</span>
-                  </>
-                )}
+                <div className="pay-btn-left">
+                  <div className="confirm-text">
+                    {loading || isProcessing ? (
+                      <>
+                        <span className="button-loader"></span>
+                        Processing
+                      </>
+                    ) : (
+                      "Confirm"
+                    )}
+                  </div>
+                  <div className="and-pay-text">
+                    {loading || isProcessing ? "" : "& Pay"}
+                  </div>
+                </div>
+                <div className="pay-btn-right">
+                  {localPlan.slotHubTotalAmount > payableAmount ? (
+                    <div className="price-container">
+                      <span className="original-price">
+                        ₹{localPlan.slotHubTotalAmount?.toFixed(0)}
+                      </span>
+                      <div className="final-price-box">₹{payableAmount}</div>
+                    </div>
+                  ) : (
+                    <div className="price-container" style={{ color: "black" }}>
+                      <div className="final-price-box1">₹{payableAmount}</div>
+                    </div>
+                  )}
+                </div>
               </button>
             </>
           )}
@@ -1006,6 +1064,8 @@ const MyPlan = () => {
   const [trackModalVisible, setTrackModalVisible] = useState(false);
   const [currentTrackedOrder, setCurrentTrackedOrder] = useState(null);
   const [showQuickAnswers, setShowQuickAnswers] = useState(false);
+  const [processingPlanId, setProcessingPlanId] = useState(null);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const { fetchWalletData } = useContext(WalletContext);
   const [sessionDetails, setSessionDetails] = useState(null);
   // TODO: wire this to your auth/user context
@@ -1018,7 +1078,7 @@ const MyPlan = () => {
   }
   const address = JSON.parse(
     localStorage.getItem("primaryAddress") ??
-      localStorage.getItem("currentLocation")
+    localStorage.getItem("currentLocation")
   );
 
   // console.log(address);
@@ -1026,10 +1086,14 @@ const MyPlan = () => {
   // console.log('UW3MR',JSON.stringify(userId))
 
   const fetchPlans = async () => {
-    if (!userId) return;
+    if (!userId) {
+      setIsLoadingPlans(false);
+      return;
+    }
     try {
+      setIsLoadingPlans(true);
       const res = await axios.get(
-        `https://api.dailydish.in/api/user/plan/get-plan/${userId}`
+        `https://dailydish.in/api/user/plan/get-plan/${userId}`
       );
       if (res.data.success) {
         const newPlans = res.data.data || [];
@@ -1051,12 +1115,19 @@ const MyPlan = () => {
       }
     } catch (err) {
       console.error("fetch plans error", err);
+    } finally {
+      setIsLoadingPlans(false);
     }
   };
 
   useEffect(() => {
     fetchPlans();
   }, [userId]);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // categorize plans
   const categorizedOrders = useMemo(() => {
@@ -1159,7 +1230,7 @@ const MyPlan = () => {
     closeModal();
     try {
       const res = await axios.get(
-        `https://api.dailydish.in/api/admin/getOrderByOrderId/${plan.orderId}`
+        `https://dailydish.in/api/admin/getOrderByOrderId/${plan.orderId}`
       );
       if (res.data.success) {
         const order = res.data.data;
@@ -1249,7 +1320,7 @@ const MyPlan = () => {
       };
       const configObj = {
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         url: "/user/plan/create-from-plan",
         headers: { "content-type": "application/json" },
         data: {
@@ -1279,7 +1350,7 @@ const MyPlan = () => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId,
@@ -1294,31 +1365,49 @@ const MyPlan = () => {
           cart_id: null,
         },
       };
-      console.log(amount, "amount");
+
       const res = await axios(amount > 0 ? config1 : configObj);
       if (res.status === 200 || res.data?.success) {
         await fetchWalletData();
         const redirectInfo = res.data?.url;
 
         if (amount === 0) {
-          console.log("hi");
+
           // toast.success("Plan Confirmed successfully! 🎉", {
           //   position: "bottom-center",
           //   autoClose: 3000,
           // });
-          Swal2.fire({
-            toast: true,
-            position: "bottom",
-            icon: "success",
-            title: "Plan Confirmed successfully! 🎉",
-            showConfirmButton: false,
-            didOpen: (toast) => {
-              const container = Swal2.getContainer();
-              if (container) {
-                container.style.zIndex = "99999";
-              }
-            },
-          });
+            Swal2.fire({
+                toast: true,
+                position: "bottom",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                html: `
+                  <div class="myplans-toast-content">
+                    <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+                    <div class="myplans-toast-text">
+                      <div class="myplans-toast-title">Success!</div>
+                      <div class="myplans-toast-subtitle">Plan Confirmed successfully! 🎉</div>
+                    </div>
+                  </div>
+                `,
+                customClass: {
+                  popup: "myplans-custom-toast",
+                  htmlContainer: "myplans-toast-html",
+                },
+                didOpen: () => {
+                  // Position above bottom nav
+                  const toast = document.querySelector(".myplans-custom-toast");
+                  if (toast) {
+                    toast.style.bottom = "90px"; // Position above bottom nav
+                    toast.style.left = "50%";
+                    toast.style.transform = "translateX(-50%)";
+                    toast.style.position = "fixed";
+                  }
+                },
+              });
+        
         }
         // else {
         //    toast.success("Order created! Redirecting...", {
@@ -1332,6 +1421,9 @@ const MyPlan = () => {
             fetchPlans();
           }
 
+          // Reset processing state
+          setProcessingPlanId(null);
+
           if (amount > 0) {
             if (redirectInfo?.url) {
               window.location.href = redirectInfo.url;
@@ -1344,6 +1436,8 @@ const MyPlan = () => {
       }
     } catch (err) {
       // setLoading(false);
+      // Reset processing state on error
+      setProcessingPlanId(null);
       console.error("pay plan error", err);
       if (err.response?.data?.error === "OUT_OF_STOCK") {
         Swal2.fire({
@@ -1386,7 +1480,7 @@ const MyPlan = () => {
   //      ========================= */
   //     const createPlanConfig = {
   //       method: "post",
-  //       baseURL: "https://api.dailydish.in/api/",
+  //       baseURL: "https://dailydish.in/api/",
   //       url: "/user/plan/create-from-plan",
   //       headers: { "Content-Type": "application/json" },
   //       data: {
@@ -1425,7 +1519,7 @@ const MyPlan = () => {
   //      ========================= */
   //     const phonepeConfig = {
   //       method: "post",
-  //       baseURL: "https://api.dailydish.in/api/",
+  //       baseURL: "https://dailydish.in/api/",
   //       url: "/user/addpaymentphonepay",
   //       headers: { "Content-Type": "application/json" },
   //       data: {
@@ -1602,9 +1696,8 @@ const MyPlan = () => {
                   key={tab}
                   onClick={() => hasPlan && setSelectedTab(tab)}
                   // Add 'grayed-out' class if there is NO plan
-                  className={`tab-btn ${isActive ? "active" : ""} ${
-                    !hasPlan ? "grayed-out" : ""
-                  }`}
+                  className={`tab-btn ${isActive ? "active" : ""} ${!hasPlan ? "grayed-out" : ""
+                    }`}
                 >
                   <h1 className={`tab-label ${isActive ? "active" : ""}`}>
                     {label}
@@ -1616,7 +1709,14 @@ const MyPlan = () => {
 
           {/* Cards */}
           <div className="plans-list">
-            {currentTabOrders.length === 0 ? (
+            {isLoadingPlans ? (
+              <div className="loading-plans">
+                <div className="plans-loader-container">
+                  <span className="plans-loader"></span>
+                  <div className="loading-text">Loading your plans...</div>
+                </div>
+              </div>
+            ) : currentTabOrders.length === 0 ? (
               <div className="no-plans-text">No plans for this day yet</div>
             ) : (
               currentTabOrders.map((plan) => {
@@ -1641,7 +1741,11 @@ const MyPlan = () => {
 
                 return (
                   <>
-                    <div key={plan._id} className="plan-card">
+                    <div
+                      key={plan._id}
+                      className={`plan-card ${plan.status === "Confirmed" ? "confirmed" : ""
+                        }`}
+                    >
                       {/* reminder for unpaid before cutoff */}
 
                       <div className="plan-header">
@@ -1654,7 +1758,7 @@ const MyPlan = () => {
                             <span className=" fw-medium">
                               {plan.session === "Lunch"
                                 ? "12:00 to 01:00PM"
-                                : "07:00 to 08:00PM"}
+                                : "07:30 to 08:30PM"}
                             </span>
                           </div>
                         </div>
@@ -1727,12 +1831,12 @@ const MyPlan = () => {
                             {plan?.addressType === "Home"
                               ? plan?.homeName || "Home"
                               : plan?.addressType === "PG"
-                              ? plan?.apartmentName || "PG"
-                              : plan?.addressType === "School"
-                              ? plan?.schoolName || "School"
-                              : plan?.addressType === "Work"
-                              ? plan?.companyName || "Company"
-                              : "Unknown"}
+                                ? plan?.apartmentName || "PG"
+                                : plan?.addressType === "School"
+                                  ? plan?.schoolName || "School"
+                                  : plan?.addressType === "Work"
+                                    ? plan?.companyName || "Company"
+                                    : "Unknown"}
                           </h1>
                           <p className="addressLine2 text-truncate">
                             {plan.delivarylocation}
@@ -1775,9 +1879,8 @@ const MyPlan = () => {
                                 style={{ width: "15px", height: "15px" }}
                               /> */}
                               <div className="reminder-banner">
-                                {`Confirm before ${
-                                  plan.session === "Lunch" ? "10AM" : "4PM"
-                                }`}
+                                {`Confirm before ${plan.session === "Lunch" ? "10AM" : "4PM"
+                                  }`}
                               </div>
                               {/* <div className="reminder-banner">
                                 {`Before ${
@@ -1829,17 +1932,33 @@ const MyPlan = () => {
                             // </button>
 
                             <button
-                              className="pay-btn"
+                              className={`pay-btn ${processingPlanId === plan._id
+                                  ? "processing"
+                                  : ""
+                                }`}
                               // onClick={() => handlePayPlan(plan, "")}
                               onClick={() => {
                                 console.log("PAY BUTTON CLICKED");
                                 console.log("PLAN FROM UI 👉", plan);
+                                setProcessingPlanId(plan._id);
                                 handlePayPlan(plan, "");
                               }}
+                              disabled={processingPlanId === plan._id}
                             >
                               <div className="pay-btn-left">
-                                <div className="confirm-text">Confirm</div>
-                                <div className="and-pay-text">& Pay</div>
+                                <div className="confirm-text">
+                                  {processingPlanId === plan._id ? (
+                                    <>
+                                      <span className="button-loader"></span>
+                                      Processing
+                                    </>
+                                  ) : (
+                                    "Confirm"
+                                  )}
+                                </div>
+                                <div className="and-pay-text">
+                                  {processingPlanId === plan._id ? "" : "& Pay"}
+                                </div>
                               </div>
                               <div className="pay-btn-right">
                                 {plan.slotHubTotalAmount > payableAmount ? (
@@ -1871,7 +1990,7 @@ const MyPlan = () => {
                             className="btn-base btn-primary"
                             onClick={async () => {
                               await axios.post(
-                                "https://api.dailydish.in/api/user/plan/skip-cancel",
+                                "https://dailydish.in/api/user/plan/skip-cancel",
                                 {
                                   planId: plan._id,
                                   userId,
@@ -2173,8 +2292,8 @@ const MyPlan = () => {
                       {sessionDetails === "Lunch"
                         ? "12:00 - 1:00 PM"
                         : sessionDetails === "Dinner"
-                        ? "7:00 - 8:00 PM"
-                        : ""}
+                          ? "7:30 - 8:30 PM"
+                          : ""}
                     </span>
                   </div>
                 </>
@@ -2211,11 +2330,14 @@ const MyPlan = () => {
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              We show your Lunch and Dinner plans for Today, Tomorrow, and the
-              days ahead so you can confirm them whenever you're ready.
+              We organize your meals into <strong>Today, Tomorrow</strong>, and{" "}
+              <strong>Upcoming</strong> lists. You can plan ahead for the whole
+              week, but nothing is ordered until you tap "
+              <strong>Confirm & Pay</strong>" for each specific day.
             </p>
 
             <h5
@@ -2227,17 +2349,19 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              2. Why do cutoff times matter?
+              2. Why confirm early?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              They tell you how long a plan stays at its lower pre-order price.
-              Cutoff times always apply to that plan's date, so there's no
-              confusion across days.
+              Confirming early guarantees your meal. We start cooking based on
+              confirmed orders to ensure freshness and zero waste. Once the
+              cutoff time passes, we stop taking orders for that meal—no
+              exceptions.
             </p>
 
             <h5
@@ -2249,17 +2373,20 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              3. What is "View Plan"?
+              3. What are the cutoff times?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              View Plan shows all details for that meal — items, bill,
-              discounts, and your wallet use. You can change items here and pay
-              any balance if needed.
+              <strong>Lunch:</strong> Confirm by <strong>10:00 AM</strong>{" "}
+              (Delivered <strong>12:15–1:00 PM</strong>)<br />
+              <strong>Dinner:</strong> Confirm by <strong>4:00 PM</strong>{" "}
+              (Delivered <strong>7:30–8:30 PM</strong>)<br />
+              After these times, ordering for that meal is closed.
             </p>
 
             <h5
@@ -2271,18 +2398,19 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              4. Why confirm early?
+              4. What does "View Plan" show?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              Early confirmations help us plan fresh batches and keep prices
-              low. Post that, plans are subject to availabilities. Lunch has a 6
-              AM cutoff for pre-order pricing (about 7 hours before delivery).
-              Dinner has a 3 PM same-day cutoff.
+              "View Plan" is your checkout screen. It shows exactly what's in
+              your meal, the total bill, any discounts, and your delivery
+              address. This is also where you apply your Wallet Credits before
+              paying.
             </p>
 
             <h5
@@ -2294,16 +2422,23 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              5. What do "Pending" and "Confirmed" mean?
+              5. What do the statuses mean?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              Pending = Not paid yet. You can skip or ignore it anytime.
-              Confirmed = Paid and reserved for that day.
+              <strong>Pending:</strong> You planned this meal but haven't paid.
+              It is not ordered yet.
+              <br />
+              <strong>Confirmed:</strong> You've paid. Your meal is locked in
+              and will be delivered.
+              <br />
+              <strong>Skipped:</strong> You removed this plan or missed the
+              cutoff.
             </p>
 
             <h5
@@ -2315,16 +2450,25 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              6. Can I cancel a confirmed plan?
+              6. Can I cancel after confirming?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              Yes, up to 2 hours before the delivery window. We refund the full
-              amount to your wallet for future orders.
+              Once you confirm, we start preparing your order almost
+              immediately.
+              <br />
+              <br />
+              <strong>Before Cutoff:</strong> You can't self-cancel in the app
+              (yet), but please contact Customer Support. We handle these
+              requests case-by-case.
+              <br />
+              <strong>After Cutoff:</strong> Cancellations are generally not
+              possible as food preparation has begun.
             </p>
 
             <h5
@@ -2336,17 +2480,22 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              7. What happens after I confirm?
+              7. What happens if I "Skip" a plan?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              Your order is scheduled. We start processing it about an hour
-              before delivery and update you automatically. Once processing
-              begins, it can't be cancelled.
+              Skipping tells us you definitely don't want that meal, which helps
+              us forecast our kitchen stock better.
+              <br />
+              <br />
+              <strong>Note:</strong> If you don't confirm a "Pending" plan by
+              the cutoff time, it gets skipped automatically. You won't be
+              charged.
             </p>
 
             <h5
@@ -2363,12 +2512,19 @@ const MyPlan = () => {
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              You must confirm and pay before the cutoff time: 10am for Lunch,
-              4pm for Dinner. After the cutoff, you cannot edit or pay for the
-              plan.
+              Discounts apply automatically where eligible.
+              <br />
+              <br />
+              <strong>New Users:</strong> Get <strong>₹50 off</strong> on your
+              first <strong>3</strong> confirmed orders.
+              <br />
+              <br />
+              You'll see the discount breakdown inside "View Plan" before you
+              pay.
             </p>
 
             <h5
@@ -2380,15 +2536,18 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              9. Where does my refund go?
+              9. What if I forget to confirm?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
-              All payments are safe. Refunds (when allowed) go to your wallet.
+              Nothing bad happens! Your plan stays "Pending" until the cutoff
+              passes, then it simply disappears. You are never charged unless
+              you explicitly hit "Confirm & Pay".
             </p>
 
             <h5
@@ -2400,36 +2559,39 @@ const MyPlan = () => {
                 marginTop: "16px",
               }}
             >
-              10. Where can I see past orders?
+              10. Where is my refund?
             </h5>
             <p
               style={{
                 fontStyle: "italic",
-                marginBottom: "8px",
+                fontSize: "12px",
+                marginBottom: "16px",
+              }}
+            >
+              If a refund is approved by support for any reason, the money is
+              refunded instantly to your <strong>DailyDish Wallet</strong>. You
+              can use it for your next meal.
+            </p>
+
+            <h5
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginBottom: "4px",
+                marginTop: "16px",
+              }}
+            >
+              11. Where can I see past orders?
+            </h5>
+            <p
+              style={{
+                fontStyle: "italic",
+                fontSize: "12px",
+                marginBottom: "16px",
               }}
             >
               Delivered meals move to My Orders / Order History automatically.
-            </p>
-
-            <h5
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: "bold",
-                fontSize: "12px",
-                marginBottom: "4px",
-                marginTop: "16px",
-              }}
-            >
-              11. What if I forget to confirm?
-            </h5>
-            <p
-              style={{
-                fontStyle: "italic",
-                marginBottom: "8px",
-              }}
-            >
-              Nothing happens. Your plan stays Pending — you won't be charged
-              unless you confirm.
             </p>
           </div>
         </Modal.Body>

@@ -138,8 +138,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         (!primaryAddress || primaryAddress === "null") &&
         (!currentLocation || currentLocation === "null")
       ) {
-        localStorage.removeItem("locationManuallySelected");
-        console.log("Cleared manual location flag - no addresses found");
+        console.log("No addresses found");
       }
 
       if (primaryAddress && primaryAddress !== "null") {
@@ -254,6 +253,46 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
   }, [user, address]);
 
+  // Add location detection for users coming from splash screen
+  useEffect(() => {
+    const checkLocationPermission = async () => {
+      // Only run this check if user has no address data at all
+      const currentLocation = localStorage.getItem("currentLocation");
+      const primaryAddress = localStorage.getItem("primaryAddress");
+
+      // If user has any address data, don't redirect
+      if (currentLocation || primaryAddress || address) {
+        return;
+      }
+
+      // Check if browser supports geolocation
+      if (navigator.geolocation && navigator.permissions) {
+        try {
+          const permission = await navigator.permissions.query({
+            name: "geolocation",
+          });
+
+          if (permission.state === "denied" || permission.state === "prompt") {
+            // Permission denied or will prompt, redirect to modal
+            navigate("/location-permission");
+            return;
+          }
+
+          // If permission is granted but we still don't have location, let user stay on home
+          // They can use the location selection in the banner
+        } catch (error) {
+          // Permissions API not supported, let user stay on home
+          console.error("Permissions API error:", error);
+        }
+      }
+      // If geolocation not supported, let user stay on home
+    };
+
+    // Run the check after component mounts, but only once
+    const timer = setTimeout(checkLocationPermission, 500);
+    return () => clearTimeout(timer);
+  }, []); // Remove dependencies to prevent re-running
+
   // --- 1. FETCH DATA (Only when Hub Changes) ---
   // useEffect(() => {
   //   if (!address || !address.hubId) {
@@ -266,7 +305,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   //     setloader(true);
   //     try {
   //       const res = await axios.get(
-  //         "https://api.dailydish.in/api/user/get-hub-menu",
+  //         "https://dailydish.in/api/user/get-hub-menu",
   //         {
   //           params: {
   //             hubId: address.hubId,
@@ -304,7 +343,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         // console.log("Fetching menu for hub:", address.hubId);
 
         const res = await axios.get(
-          "https://api.dailydish.in/api/user/get-hub-menu",
+          "https://dailydish.in/api/user/get-hub-menu",
           {
             params: {
               hubId: address.hubId,
@@ -332,16 +371,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const handleLocationDetected = useCallback((newLocation) => {
     // console.log("Location detected from Banner:", newLocation);
 
-    // Check if location was manually selected - don't override manual selection
-    const manualLocationFlag = localStorage.getItem("locationManuallySelected");
+    // Don't override manual selection - removed check for locationManuallySelected
     // console.log("Manual location flag:", manualLocationFlag);
-
-    if (manualLocationFlag === "true") {
-      console.log(
-        "Location was manually selected, ignoring auto-detected location"
-      );
-      return;
-    }
 
     // console.log("Setting new location from Banner:", newLocation);
     setAddress(newLocation);
@@ -396,9 +427,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       (item) => item.menuCategory === selectedCategory
     );
   }, [vegFilteredItems, selectedCategory]);
-
-  // --- TABS COMPONENT (Modified to use parent state) ---
- 
 
   const isSameDay = (d1, d2) => {
     const a = new Date(d1);
@@ -623,7 +651,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     const addonedCarts = async () => {
       try {
-        await axios.post("https://api.dailydish.in/api/cart/addCart", {
+        await axios.post("https://dailydish.in/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
           lastUpdated: Date.now,
@@ -1077,7 +1105,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       // });
 
       const res = await axios.post(
-        "https://api.dailydish.in/api/user/plan/add-to-plan",
+        "https://dailydish.in/api/user/plan/add-to-plan",
         {
           userId: user._id,
           mobile: user.Mobile,
@@ -1137,7 +1165,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
       if (user?._id && location) {
         const response = await axios.put(
-          "https://api.dailydish.in/api/admin/getuseroffer",
+          "https://dailydish.in/api/admin/getuseroffer",
           {
             id: user._id,
             location,
@@ -1263,7 +1291,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -1350,7 +1378,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1765,6 +1793,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                   flexShrink: 0,
                                   display: "flex",
                                   gap: "2px",
+                                  marginLeft: "7px",
                                 }}
                               >
                                 <span className="fw-normal">₹</span>
@@ -1838,6 +1867,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           {address && (
                             <div>
                               <div className="guaranteed-label">
+                                <img
+                                  src={availabity}
+                                  alt=""
+                                  style={{ width: "11px", height: "11px" }}
+                                />{" "}
                                 Guaranteed Availability{" "}
                               </div>
                               {checkOf && <BiSolidOffer color="green" />}
@@ -1992,11 +2026,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                 )}
               </div>
             </div>
-            <div className="col-md-12">
+            {/* <div className="col-md-12">
               <p className="copyright-text">
                 © CULINARY CRAVINGS CONVENIENCE PVT LTD all rights reserved.
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -2473,96 +2507,96 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   );
 };
 
- const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
-    return (
-      <div className="tabs-container2">
-        <div className="tabs-scroll-container">
-          <div className="tabs-scroll">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                className={`tab-button ${activeTab === tab ? "active" : ""}`}
-                onClick={() => onTabClick(tab)}
-              >
-                <span className="tab-button-text">{tab}</span>
-              </button>
-            ))}
-          </div>
+const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
+  return (
+    <div className="tabs-container2">
+      <div className="tabs-scroll-container">
+        <div className="tabs-scroll">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              className={`tab-button ${activeTab === tab ? "active" : ""}`}
+              onClick={() => onTabClick(tab)}
+            >
+              <span className="tab-button-text">{tab}</span>
+            </button>
+          ))}
         </div>
-        <style jsx>{`
-          .tabs-container2 {
-            background-color: ${Colors.creamWalls};
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-            position: relative;
-            border-bottom: 2px solid #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
-              0 2px 6px rgba(0, 0, 0, 0.05);
-          }
-          .tabs-scroll-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-          }
-          .tabs-scroll-container::-webkit-scrollbar {
-            display: none;
-          }
-          .tabs-scroll {
-            display: inline-flex;
-            min-width: 100%;
-            gap: 10px;
-            padding: 0 4px;
-          }
-          .tab-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            padding: 8px 24px;
-            border-radius: 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-height: 25px;
-          }
-          .tab-button:hover {
-            background-color: ${Colors.warmbeige}40;
-            transform: translateY(-1px);
-          }
-          .tab-button.active {
-            background-color: ${Colors.greenCardamom};
-            padding: 4px 8px;
-            box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
-            width: auto;
-            height: auto;
-            border-radius: 20px;
-          }
-          .tab-button.active:hover {
-            background-color: ${Colors.greenCardamom}E6;
-            transform: translateY(-1px) scale(1.02);
-          }
-          .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 18px;
-            letter-spacing: -0.7px;
-            color: ${Colors.primaryText};
-            transition: all 0.3s ease;
-          }
-          .tab-button.active .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 16px;
-            font-weight: 900;
-            line-height: 21px;
-            letter-spacing: -0.8px;
-            color: ${Colors.appForeground};
-          }
-        `}</style>
       </div>
-    );
-  };
+      <style jsx>{`
+        .tabs-container2 {
+          background-color: ${Colors.creamWalls};
+          border-bottom-left-radius: 16px;
+          border-bottom-right-radius: 16px;
+          position: relative;
+          border-bottom: 2px solid #fff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
+            0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        .tabs-scroll-container {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .tabs-scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+        .tabs-scroll {
+          display: inline-flex;
+          min-width: 100%;
+          gap: 10px;
+          padding: 0 4px;
+        }
+        .tab-button {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          padding: 8px 24px;
+          border-radius: 20px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          white-space: nowrap;
+          flex-shrink: 0;
+          min-height: 25px;
+        }
+        .tab-button:hover {
+          background-color: ${Colors.warmbeige}40;
+          transform: translateY(-1px);
+        }
+        .tab-button.active {
+          background-color: ${Colors.greenCardamom};
+          padding: 4px 8px;
+          box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
+          width: auto;
+          height: auto;
+          border-radius: 20px;
+        }
+        .tab-button.active:hover {
+          background-color: ${Colors.greenCardamom}E6;
+          transform: translateY(-1px) scale(1.02);
+        }
+        .tab-button-text {
+          font-family: "Inter", sans-serif;
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.7px;
+          color: ${Colors.primaryText};
+          transition: all 0.3s ease;
+        }
+        .tab-button.active .tab-button-text {
+          font-family: "Inter", sans-serif;
+          font-size: 16px;
+          font-weight: 900;
+          line-height: 21px;
+          letter-spacing: -0.8px;
+          color: ${Colors.appForeground};
+        }
+      `}</style>
+    </div>
+  );
+};
 
 export default Home;

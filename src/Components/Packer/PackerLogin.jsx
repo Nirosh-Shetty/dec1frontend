@@ -18,7 +18,7 @@ const LoginPage = () => {
     try {
       if (whatsappNumber.length === 10) {
         let res = await axios.post(
-          "https://api.dailydish.in/api/packer/sendPackerOtp",
+          "https://dailydish.in/api/packer/sendPackerOtp",
           {
             mobileNumber: whatsappNumber,
           }
@@ -65,7 +65,7 @@ const LoginPage = () => {
     try {
       if (otp.length === 6) {
         let res = await axios.post(
-          "https://api.dailydish.in/api/packer/verificationPacker",
+          "https://dailydish.in/api/packer/verificationPacker",
           {
             mobileNumber: whatsappNumber,
             otp: otp,

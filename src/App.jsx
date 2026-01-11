@@ -92,6 +92,7 @@ import AdminFeedBack from "./Components/Admin/AdminFeedBack";
 import OnboardScreen from "./Components/OnboardScreen";
 import UpdateLocation from "./Components/UpdateLocation";
 import SplashScreen from "./Components/SplashScreen";
+import LocationDetection from "./Components/LocationDetection";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -165,10 +166,12 @@ function App() {
         <Routes>
           {/* <Route path="/" element={<LandingPage />} /> */}
           <Route path="/login" element={<LeafWithLogo />} />
-             <Route path="/splash" element={<SplashScreen />} />
-          
+          <Route path="/splash" element={<SplashScreen />} />
+
           {/* Redirect from root to splash, then splash redirects to home */}
           <Route path="/" element={<Navigate to="/splash" replace />} />
+          <Route path="/location-permission" element={<LocationDetection />} />
+
           <Route path="/:referralCode" element={<LeafWithLogo />} />
           <Route path="/otp-varification" element={<Validate />} />
           <Route
@@ -186,6 +189,7 @@ function App() {
                   Carts={Carts}
                   setCarts={setCarts}
                 />
+                <Footer />
               </>
             }
           />
@@ -376,7 +380,7 @@ function App() {
             path="/home_banner"
             element={<Main children={<HomeBanner />} />}
           />
-           
+
           <Route
             path="/apartmentlist"
             element={<Main children={<ApartmentList />} />}

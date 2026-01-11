@@ -173,7 +173,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,

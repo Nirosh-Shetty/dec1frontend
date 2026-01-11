@@ -20,10 +20,10 @@ import { Link } from "react-router-dom";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 // API URL for HubMenu (Daily Menu)
-const API_URL = "https://api.dailydish.in/api/admin/hub-menu";
+const API_URL = "https://dailydish.in/api/admin/hub-menu";
 // API URL for Admin actions (Products, Hubs)
-const ADMIN_API_URL = "https://api.dailydish.in/api/admin";
-const HUB_API_URL = "https://api.dailydish.in/api/Hub";
+const ADMIN_API_URL = "https://dailydish.in/api/admin";
+const HUB_API_URL = "https://dailydish.in/api/Hub";
 
 const HubWiseProductManagement = () => {
   // --- STATE ---

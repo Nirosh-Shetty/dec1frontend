@@ -40,7 +40,7 @@ const Checkout = () => {
 
   const [expandedSections, setExpandedSections] = useState({});
 
-  console.log(data, "checkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+  // console.log(data, "checkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
   // --- NEW: State for individual date and session filters ---
   const [activeDateKey, setActiveDateKey] = useState(null); // e.g., "2025-11-09T00:00:00.000Z"
   const [activeSession, setActiveSession] = useState(null); // e.g., "Lunch"
@@ -87,7 +87,7 @@ const Checkout = () => {
 
     try {
       const res = await axios.post(
-        "https://api.dailydish.in/api/User/addStudentInformation",
+        "https://dailydish.in/api/User/addStudentInformation",
         {
           customerId: user._id,
           ...newInfo,
@@ -152,7 +152,7 @@ const Checkout = () => {
 
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getapartment");
+      let res = await axios.get("https://dailydish.in/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
         // console.log("apartmentdata", res.data);
@@ -165,7 +165,7 @@ const Checkout = () => {
   const [corporatedata, setcorporatedata] = useState([]);
   const getCorporatedata = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
         // console.log("corporatedata", res.data);
@@ -442,7 +442,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/applyCoupon",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "application/json" },
         data: {
           mobileNumber: user?.Mobile,
@@ -493,7 +493,7 @@ const Checkout = () => {
   useEffect(() => {
     const addonedCarts = async () => {
       try {
-        let res = await axios.post("https://api.dailydish.in/api/cart/addCart", {
+        let res = await axios.post("https://dailydish.in/api/cart/addCart", {
           userId: user?._id,
           items: Carts,
           lastUpdated: Date.now(),
@@ -516,7 +516,7 @@ const Checkout = () => {
   const validateSlotAndCart = async () => {
     try {
       const cartResponse = await axios.get(
-        "https://api.dailydish.in/api/admin/getFoodItemsUnBlocks",
+        "https://dailydish.in/api/admin/getFoodItemsUnBlocks",
         {
           cartItems: cartdata,
           slot: slotdata,
@@ -581,7 +581,7 @@ const Checkout = () => {
     location
   ) => {
     try {
-      await axios.post("https://api.dailydish.in/api/admin/createreports", {
+      await axios.post("https://dailydish.in/api/admin/createreports", {
         customerName,
         phone,
         totalOrders,
@@ -866,7 +866,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/addfoodorder",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "application/json" },
         data: {
           orderGroups: orderGroups,
@@ -900,7 +900,7 @@ const Checkout = () => {
       const offerconfig = {
         url: "/admin/createreports",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "application/json" },
         data: {
           customerName: address?.name,
@@ -916,7 +916,7 @@ const Checkout = () => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId: user?._id,
@@ -991,7 +991,7 @@ const Checkout = () => {
     setApartmentname(id);
     try {
       let res = await axios.get(
-        `https://api.dailydish.in/api/user/getSelectedAddressByUserIDAddressID/${user?._id}/${id}`
+        `https://dailydish.in/api/user/getSelectedAddressByUserIDAddressID/${user?._id}/${id}`
       );
       if (res.status === 200) {
         let am = res.data.getdata;
@@ -1009,7 +1009,7 @@ const Checkout = () => {
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      await axios.post(`https://api.dailydish.in/api/user/addressadd`, {
+      await axios.post(`https://dailydish.in/api/user/addressadd`, {
         Name: name,
         Number: mobilenumber,
         userId: user?._id,
@@ -1152,7 +1152,7 @@ const Checkout = () => {
   const getfooditems = async (shouldValidate = false) => {
     try {
       let res = await axios.get(
-        "https://api.dailydish.in/api/admin/getFoodItemsUnBlocks"
+        "https://dailydish.in/api/admin/getFoodItemsUnBlocks"
       );
       if (res.status === 200) {
         const foodItemData = res.data.data;
@@ -1209,7 +1209,7 @@ const Checkout = () => {
   const [gstlist, setGstList] = useState([]);
   const getGst = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getgst");
+      let res = await axios.get("https://dailydish.in/api/admin/getgst");
       if (res.status === 200) {
         setGstList(res.data.gst);
       }

@@ -91,7 +91,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/registercustomer",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -146,7 +146,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -171,7 +171,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -482,7 +482,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
                       <>
                         {user?.profileImage ? (
                           <img
-                            src={`https://api.dailydish.in/Customer/${user?.profileImage}`}
+                            src={`https://dailydish.in/Customer/${user?.profileImage}`}
                             alt=""
                             style={{ width: "50px", borderRadius: "50%" }}
                           />

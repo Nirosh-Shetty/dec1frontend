@@ -94,7 +94,7 @@ const ZoneOrdersModal = ({
       showInfo("Processing auto-assignment...", 2000);
 
       const response = await axios.post(
-        "https://api.dailydish.in/api/admin/auto-assign-zone-riders",
+        "https://dailydish.in/api/admin/auto-assign-zone-riders",
         {
           zoneId: currentZone.id || currentZone._id,
           session: "all",

@@ -68,7 +68,7 @@ const SalesReport = () => {
   //   setLoading(true);
   //   try {
   //     const res = await axios.get(
-  //       "https://api.dailydish.in/api/admin/getFoodItems"
+  //       "https://dailydish.in/api/admin/getFoodItems"
   //     );
   //     if (res.status === 200) {
   //       setProducts(res.data.data);
@@ -110,7 +110,7 @@ const SalesReport = () => {
       params.append("sortOrder", sortOrder);
 
       const res = await axios.get(
-        `https://api.dailydish.in/api/admin/getSalesReport?${params.toString()}`
+        `https://dailydish.in/api/admin/getSalesReport?${params.toString()}`
       );
       if (res.status === 200) {
         setFilteredData(res.data.data);
@@ -125,7 +125,7 @@ const SalesReport = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://api.dailydish.in/api/Hub/hubs", {
+      const res = await axios.get("https://dailydish.in/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${"token"}` },
       });
       setHubs(res.data);

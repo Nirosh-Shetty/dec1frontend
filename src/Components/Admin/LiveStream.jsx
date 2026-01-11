@@ -49,7 +49,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/Livestream",
         method: "post",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -72,7 +72,9 @@ const Livestreams = () => {
   const [AddLivestream, setAddLivestream] = useState([]);
   const getAddLivestream = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getLivestream");
+      let res = await axios.get(
+        "https://dailydish.in/api/admin/getLivestream"
+      );
       if (res.status === 200) {
         // Sort by date (updatedAt or other date field) or ObjectId (_id)
         const sortedVideos = res.data.getLivestream.sort(
@@ -92,7 +94,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/DeleteLivestream/" + Datav,
         method: "delete",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -128,7 +130,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/editLivestream",
         method: "put",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };

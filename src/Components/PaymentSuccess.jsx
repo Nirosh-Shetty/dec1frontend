@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaTimesCircle } from "react-icons/fa";
+import Lottie from "lottie-react";
 import "../Styles/payment.css";
 import axios from "axios";
-import Swal2 from "sweetalert2"; // Using Swal2 for consistency with your MyPlan code
+import Swal2 from "sweetalert2";
+import success from "../../src/assets/Success2.json";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -14,9 +16,14 @@ const PaymentSuccess = () => {
   const userId = searchParams.get("userID");
   const code = searchParams.get("code"); // PhonePe sends this (e.g., PAYMENT_ERROR)
 
-  // State for payment status
-  const [paymentStatus, setPaymentStatus] = useState("LOADING"); // LOADING, COMPLETED, FAILED
-  const [paymentDetails, setPaymentDetails] = useState(null);
+  // State for payment status - Set to COMPLETED for UI testing
+  const [paymentStatus, setPaymentStatus] = useState(""); // Changed to show success UI
+  const [paymentDetails, setPaymentDetails] = useState({
+    session: "Lunch",
+    deliveryDate: "2024-01-15T00:00:00.000Z",
+    username: "John Doe",
+    amount: 299,
+  }); // Added static data for UI testing
 
   const handleSuccessRedirect = () => {
     navigate("/orders"); // Changed to just /orders as per your request
@@ -28,14 +35,11 @@ const PaymentSuccess = () => {
 
   const checkPaymentStatus = async () => {
     try {
-      // 1. Check for immediate failure code from URL (User clicked Back/Cancel)
-      if (code === "PAYMENT_ERROR" || code === "PAYMENT_DECLINED") {
-        throw new Error("Payment was declined or cancelled by user.");
-      }
+  
 
       // 2. Verify with Backend
       // Using your existing endpoint structure
-      const url = `https://api.dailydish.in/api/User/checkPayment/${transactionId}/${userId}`;
+      const url = `https://dailydish.in/api/User/checkPayment/${transactionId}/${userId}`;
 
       const response = await axios.get(url);
 
@@ -52,25 +56,22 @@ const PaymentSuccess = () => {
           // Optional: Clear cart if this was a cart order.
           // For MyPlan, we don't strictly need to, but it's safe to leave if you use this page for Cart too.
           localStorage.removeItem("cart");
-
-          Swal2.fire({
-            icon: "success",
-            title: "Payment Successful!",
-            text: "Your order has been confirmed.",
-            timer: 2000,
-            showConfirmButton: false,
-          }).then(() => {
-            navigate("/orders");
-          });
+          setTimeout(()=>{
+                navigate("/my-plan");
+          },5000)
         } else {
           throw new Error("Payment status is not COMPLETED");
         }
       } else {
+
         throw new Error("Invalid response from server");
       }
     } catch (error) {
       console.error("Error checking payment status:", error);
       setPaymentStatus("FAILED");
+       setTimeout(()=>{
+                navigate("/my-plan");
+          },5000)
 
       // Allow user to see the error screen before auto-redirecting (optional)
       // or simply stay on the failed screen
@@ -78,7 +79,7 @@ const PaymentSuccess = () => {
   };
 
   useEffect(() => {
-    // alert('hi')
+    // Commented out for UI testing - always show success
     if (transactionId) {
       checkPaymentStatus();
     } else if (code === "PAYMENT_ERROR") {
@@ -87,82 +88,80 @@ const PaymentSuccess = () => {
       // No params? Probably manual navigation, go home
       navigate("/");
     }
+
     // eslint-disable-next-line
   }, [transactionId, userId, code]);
 
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return "15/01/2024";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB"); // DD/MM/YYYY format
+  };
+
   return (
     <div
-      className="payment-success-container"
-      style={{ textAlign: "center", padding: "50px" }}
+      className={`payment-success-page ${
+        paymentStatus === "COMPLETED"
+          ? "success"
+          : paymentStatus === "FAILED"
+          ? "failure"
+          : ""
+      }`}
     >
       {paymentStatus === "COMPLETED" ? (
-        <>
-          <FaCheckCircle
-            className="payment-success-icon"
-            style={{ color: "#6b8e23", fontSize: "50px", marginBottom: "20px" }}
-          />
-          <h1 className="payment-success-title">Payment Successful!</h1>
-          <p className="payment-success-message">
-            Thank you for your payment
-            {paymentDetails?.username ? `, ${paymentDetails.username}` : ""}.
-          </p>
-          {paymentDetails?.amount && (
-            <p className="payment-success-message">
-              Amount: <strong>₹{paymentDetails.amount}</strong>
+        <div className="success-content">
+          {/* Lottie Animation */}
+          <div className="success-animation">
+            <Lottie
+              animationData={success}
+              loop={false}
+              style={{ width: 360, height: 360 }}
+            />
+          </div>
+
+          {/* Success Message */}
+          <div className="success-text">
+            <h1 className="success-title">
+              Great choice! This is how stress-free eating starts
+            </h1>
+            <p className="success-subtitle">
+              Your{" "}
+              <span className="highlight-text">
+                {paymentDetails?.session || "Lunch"}
+              </span>{" "}
+              for{" "}
+              <span className="highlight-text">
+                {formatDate(paymentDetails?.deliveryDate)}
+              </span>{" "}
+              is confirmed and scheduled!
             </p>
-          )}
-          <button
+          </div>
+
+          {/* Action Button */}
+          {/* <button
             onClick={handleSuccessRedirect}
-            className="payment-success-button"
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#6b8e23",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
+            className="success-action-button"
           >
-            Go To My Orders
-          </button>
-        </>
+            Go To My Plan
+          </button> */}
+        </div>
       ) : paymentStatus === "FAILED" ? (
-        <>
-          <FaTimesCircle
-            className="payment-failed-icon"
-            style={{ color: "#dc3545", fontSize: "50px", marginBottom: "20px" }}
-          />
+        <div className="failure-content">
+          <FaTimesCircle className="payment-failed-icon" />
           <h1 className="payment-failed-title">Payment Failed</h1>
           <p className="payment-failed-message">
             We could not process your payment or it was cancelled.
           </p>
           <button
             onClick={handleFailureRedirect}
-            className="payment-success-button"
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
+            className="failure-action-button"
           >
             Retry in My Plan
           </button>
-        </>
+        </div>
       ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "15px",
-          }}
-        >
-          {/* You can use your Spinner here if you have one imported */}
+        <div className="loading-content">
           <div className="spinner-border text-success" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>

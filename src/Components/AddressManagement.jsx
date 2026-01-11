@@ -76,7 +76,7 @@ const AddressManagement = () => {
   const fetchAddressesInBackground = useCallback(async (customerId) => {
     try {
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -146,7 +146,7 @@ const AddressManagement = () => {
       fetchAbortControllerRef.current = new AbortController();
 
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -244,7 +244,7 @@ const AddressManagement = () => {
       }
 
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${addressId}`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses/${addressId}`,
         {
           method: "DELETE",
           headers: getAuthHeaders(),
@@ -334,7 +334,7 @@ const AddressManagement = () => {
 
       // API call in background
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: getAuthHeaders(),
@@ -394,7 +394,7 @@ const AddressManagement = () => {
 
       // API call in background
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
+        `https://dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: getAuthHeaders(),

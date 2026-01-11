@@ -58,13 +58,13 @@ const AdminPlanDashboard = () => {
 
       if (activeView === "sales") {
         const res = await axios.get(
-          "https://api.dailydish.in/api/admin/plan/sales-tracker",
+          "https://dailydish.in/api/admin/plan/sales-tracker",
           { params }
         );
         if (res.data.success) setSalesData(res.data.data);
       } else {
         const res = await axios.get(
-          "https://api.dailydish.in/api/admin/plan/orders-tracker",
+          "https://dailydish.in/api/admin/plan/orders-tracker",
           { params }
         );
         if (res.data.success) setOrdersData(res.data.data);
@@ -77,7 +77,7 @@ const AdminPlanDashboard = () => {
   };
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://api.dailydish.in/api/Hub/hubs");
+      const res = await axios.get("https://dailydish.in/api/Hub/hubs");
       setHubs(res.data);
     } catch (error) {
       console.error("Failed to fetch hubs:", error);
@@ -110,7 +110,7 @@ const AdminPlanDashboard = () => {
     try {
       const dateStr = startDate.toISOString().split("T")[0];
       const res = await axios.post(
-        "https://api.dailydish.in/api/admin/plan/send-reminders",
+        "https://dailydish.in/api/admin/plan/send-reminders",
         {
           date: dateStr,
           session: selectedSession,

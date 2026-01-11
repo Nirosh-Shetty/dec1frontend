@@ -7,9 +7,9 @@ import { Box } from "@mui/material";
 import axios from "axios";
 
 // 2. Define ALL your API URLs
-const SAVE_API_URL = "https://api.dailydish.in/api/admin/hub-menu"; // This is for SAVING (from our plan)
-const HUBS_API = "https://api.dailydish.in/api/Hub/hubs"; // This is your live API
-const PRODUCTS_API = "https://api.dailydish.in/api/admin/getFoodItems"; // This is your live API
+const SAVE_API_URL = "https://dailydish.in/api/admin/hub-menu"; // This is for SAVING (from our plan)
+const HUBS_API = "https://dailydish.in/api/Hub/hubs"; // This is your live API
+const PRODUCTS_API = "https://dailydish.in/api/admin/getFoodItems"; // This is your live API
 
 const MenuUpload = () => {
   const navigate = useNavigate();

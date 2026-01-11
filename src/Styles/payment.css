@@ -1,4 +1,234 @@
-/* Container to center the content */
+/* Payment Success Page - Conditional Background Design */
+.payment-success-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+/* Success Background - Green */
+.payment-success-page.success {
+  background: linear-gradient(135deg, #6b8e23 0%, #5a7a1f 100%);
+}
+
+/* Failure Background - Dark Gray */
+.payment-success-page.failure {
+  background: #b22222;
+}
+
+/* Success Content Container */
+.success-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Lottie Animation Container */
+.success-animation {
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Success Text Section */
+.success-text {
+  margin-bottom: 60px;
+}
+
+.success-title {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.success-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+  text-align: center;
+}
+
+.highlight-text {
+  font-weight: 700;
+  color: white;
+  font-size: 20px;
+}
+
+/* Action Button */
+.success-action-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.success-action-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Failure Content */
+.failure-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  background: white;
+  padding: 40px 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.payment-failed-icon {
+  color:  #b22222;
+;
+  font-size: 60px;
+  margin-bottom: 20px;
+  animation: shake 0.8s ease-in-out;
+}
+
+.payment-failed-title {
+  color: black;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.payment-failed-message {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 30px;
+  line-height: 1.4;
+}
+
+.failure-action-button {
+  background: #b22222;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.failure-action-button:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading Content */
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  color: white;
+  font-size: 16px;
+}
+
+.loading-content .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3em;
+  border-color: white;
+  border-right-color: transparent;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .success-title {
+    font-size: 28px;
+  }
+
+  .success-subtitle {
+    font-size: 16px;
+  }
+
+  .highlight-text {
+    font-size: 18px;
+  }
+
+  .success-action-button,
+  .failure-action-button {
+    font-size: 14px;
+    padding: 12px 24px;
+  }
+
+  .success-animation {
+    margin-bottom: -90px;
+  }
+
+  .success-text {
+    margin-bottom: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-success-page {
+    padding: 15px;
+  }
+
+  .success-title {
+    font-size: 28px;
+  }
+
+  .success-subtitle {
+    font-size: 15px;
+  }
+
+  .highlight-text {
+    font-size: 17px;
+  }
+
+  .success-content {
+    max-width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+/* Legacy styles for backward compatibility */
 .payment-success-container {
   display: flex;
   flex-direction: column;
@@ -11,30 +241,19 @@
   box-sizing: border-box;
 }
 
-/* Success icon styling with animation */
 .payment-success-icon {
   color: #28a745;
   font-size: 60px;
   margin-bottom: 20px;
-  animation: bounce 1s ease-in-out infinite; /* Add bounce animation */
+  animation: bounce 1s ease-in-out infinite;
 }
 
-/* Failed icon styling with animation */
-.payment-failed-icon {
-  color: red;
-  font-size: 60px;
-  margin-bottom: 20px;
-  animation: shake 0.8s ease-in-out infinite; /* Add shake animation */
-}
-
-/* Title styling */
 .payment-success-title {
   font-size: 2rem;
   color: #333;
   margin-bottom: 10px;
 }
 
-/* Message styling */
 .payment-success-message {
   font-size: 1.2rem;
   color: #555;
@@ -42,18 +261,9 @@
   line-height: 1.5;
 }
 
-/* Details section styling */
-.payment-success-details {
-  text-align: left;
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: 400px;
-}
-
-/* Button styling */
 .payment-success-button {
   padding: 10px 20px;
-  background-color: #6B8E23;
+  background-color: #6b8e23;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -66,44 +276,12 @@
   background-color: green;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .payment-success-title {
-      font-size: 1.8rem;
-  }
-
-  .payment-success-message {
-      font-size: 1rem;
-  }
-
-  .payment-success-button {
-      font-size: 0.9rem;
-      padding: 8px 16px;
-  }
-}
-
-/* Bounce Animation for Success Icon */
 @keyframes bounce {
-  0%, 100% {
-      transform: translateY(0);
+  0%,
+  100% {
+    transform: translateY(0);
   }
   50% {
-      transform: translateY(-10px);
-  }
-}
-
-/* Shake Animation for Failed Icon */
-@keyframes shake {
-  0%, 100% {
-      transform: translateX(0);
-  }
-  25% {
-      transform: translateX(-5px);
-  }
-  50% {
-      transform: translateX(5px);
-  }
-  75% {
-      transform: translateX(-5px);
+    transform: translateY(-10px);
   }
 }

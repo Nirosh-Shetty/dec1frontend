@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import Swal2 from "sweetalert2";
 import locationpng from "./../assets/deliverylocation.svg";
 import homeimg from "./../assets/ion_home-outline.png";
 import homeimg2 from "./../assets/ion_home-outline-white.svg";
@@ -381,7 +382,7 @@ const UpdateLocation = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "https://api.dailydish.in/api/Hub/validate-location",
+        "https://dailydish.in/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -772,11 +773,34 @@ const UpdateLocation = () => {
 
               if (error.code === error.PERMISSION_DENIED) {
                 setLocationPermissionDenied(true);
-                alert(
-                  "Location access denied. Please enable location permissions in your browser settings."
-                );
+                Swal2.fire({
+                  toast: true,
+                  position: "bottom",
+                  icon: "error",
+                  title:
+                    "Location access denied. Please enable location permissions in your browser settings.",
+                  showConfirmButton: false,
+                  timer: 4000,
+                  timerProgressBar: true,
+                  customClass: {
+                    popup: "me-small-toast",
+                    title: "me-small-toast-title",
+                  },
+                });
               } else {
-                alert("Unable to get your location. Please try again.");
+                Swal2.fire({
+                  toast: true,
+                  position: "bottom",
+                  icon: "error",
+                  title: "Unable to get your location. Please try again.",
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  customClass: {
+                    popup: "me-small-toast",
+                    title: "me-small-toast-title",
+                  },
+                });
               }
 
               locationButton.innerHTML = `
@@ -792,7 +816,19 @@ const UpdateLocation = () => {
             }
           );
         } else {
-          alert("Geolocation is not supported by your browser");
+          Swal2.fire({
+            toast: true,
+            position: "bottom",
+            icon: "error",
+            title: "Geolocation is not supported by your browser",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+              popup: "me-small-toast",
+              title: "me-small-toast-title",
+            },
+          });
         }
       });
 
@@ -1155,7 +1191,7 @@ const UpdateLocation = () => {
       console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
-        "https://api.dailydish.in/api/service-requests",
+        "https://dailydish.in/api/service-requests",
         requestData,
         {
           headers: {
@@ -1168,13 +1204,78 @@ const UpdateLocation = () => {
       console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrr");
 
       if (response.data.success) {
-        alert(
-          "Thank you! Your request has been submitted successfully. We'll notify you when we start operations in your area."
-        );
+        // Check if screen is small (mobile)
+        const isSmall = window.innerWidth <= 768;
 
+        // Store the success data
+        const successData = {
+          name: name.trim(),
+          phone: phone.trim(),
+          address: address || "Address not available",
+        };
+
+        // Close the service request popup
         setShowServiceablePopup(false);
+
+        // Clear form fields
         setServiceRequestName("");
         setServiceRequestPhone("");
+
+        // Wait for modal to fully close before showing success
+        setTimeout(() => {
+          Swal2.fire({
+            html: `
+            <div style="text-align: center; padding: ${
+              isSmall ? "8px" : "12px"
+            };">
+              <div style="font-size: ${
+                isSmall ? "16px" : "18px"
+              }; color: #6B8E23; margin-bottom: ${
+              isSmall ? "12px" : "15px"
+            }; font-weight: 600;">
+                ✅ Your service request has been successfully submitted!
+              </div>
+              <div style="font-size: ${
+                isSmall ? "13px" : "14px"
+              }; color: #666; line-height: 1.5; margin-bottom: ${
+              isSmall ? "12px" : "15px"
+            };">
+                <div style="text-align: left; margin: 0 auto; max-width: ${
+                  isSmall ? "280px" : "320px"
+                }; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                  <p style="margin: 6px 0;"><strong>Name:</strong> ${
+                    successData.name
+                  }</p>
+                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${
+                    successData.phone
+                  }</p>
+                  <p style="margin: 6px 0;"><strong>Address:</strong> ${
+                    successData.address
+                  }</p>
+                </div>
+                <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
+                <div style="text-align: left; margin: 0 auto; max-width: ${
+                  isSmall ? "280px" : "320px"
+                };">
+                  <p style="margin: 4px 0;">• Our team will review your location</p>
+                  <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
+                </div>
+              </div>
+            </div>
+          `,
+            icon: "success",
+            confirmButtonText: "Got it!",
+            confirmButtonColor: "#6B8E23",
+            width: isSmall ? "90%" : "500px",
+            padding: isSmall ? "1rem" : "1.5rem",
+            backdrop: true,
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            focusConfirm: true,
+            showConfirmButton: true,
+            zIndex: 9999999, // High z-index to appear above all other modals
+          });
+        }, 500);
 
         navigate("/location");
       } else {
@@ -1362,8 +1463,8 @@ const UpdateLocation = () => {
       }
 
       const endpoint = location.state?.editingAddress?._id
-        ? `https://api.dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-        : "https://api.dailydish.in/api/User/addresses";
+        ? `https://dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+        : "https://dailydish.in/api/User/addresses";
       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
       const response = await fetch(endpoint, {
@@ -1425,7 +1526,7 @@ const UpdateLocation = () => {
   const setAddressAsPrimary = async (customerId, addressId) => {
     try {
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -1617,7 +1718,10 @@ const UpdateLocation = () => {
               margin: "0 auto 20px auto",
             }}
           >
-            <div className="d-flex gap-2 align-items-start">
+            <div
+              className=" gap-2 align-items-start"
+              style={{ display: "flex", gap: 2 }}
+            >
               <img
                 src={spilt}
                 alt=""
@@ -1641,7 +1745,10 @@ const UpdateLocation = () => {
               />
             </div>
 
-            <div className="d-flex gap-2 align-items-start">
+            <div
+              className=" gap-2 align-items-start"
+              style={{ display: "flex", gap: 2 }}
+            >
               <img
                 src={secure}
                 alt=""
@@ -2345,7 +2452,7 @@ const UpdateLocation = () => {
         style={{
           flex: "1",
           backgroundColor: "white",
-          overflowY: "auto",
+          // overflowY: "auto",
           padding: window.innerWidth <= 480 ? "16px" : "24px",
           boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
         }}

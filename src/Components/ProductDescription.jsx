@@ -60,7 +60,9 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
   const [Addproducts, setAddproducts] = useState([]);
   const getAddproducts = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/admin/product");
+      let res = await axios.get(
+        "https://dailydish.in/api/admin/admin/product"
+      );
       if (res.status === 200) {
         setAddproducts(res.data.products);
       }
@@ -107,7 +109,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
         const config = {
           url: "/addcart/Addtocart",
           method: "post",
-          baseURL: "https://api.dailydish.in/api",
+          baseURL: "https://dailydish.in/api",
           data: {
             productId: item._id,
             customerId: user._id,
@@ -144,7 +146,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
       const config = {
         url: "/addcart/deletecart",
         method: "put",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: {
           productId: item?.productId?._id, // Update this to match the actual productId
@@ -168,7 +170,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
       const config = {
         url: "/priceIncAnddec",
         method: "put",
-        baseURL: "https://api.dailydish.in/api/addcart",
+        baseURL: "https://dailydish.in/api/addcart",
         headers: { "conten-type": "application/json" },
         data: {
           cartId: items?._id,
@@ -192,7 +194,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
         const config = {
           url: "/priceIncAnddec",
           method: "put",
-          baseURL: "https://api.dailydish.in/api/addcart",
+          baseURL: "https://dailydish.in/api/addcart",
           headers: { "conten-type": "application/json" },
           data: {
             cartId: items?._id,
@@ -216,7 +218,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
 
   const getCatrDeatils = () => {
     axios
-      .get("https://api.dailydish.in/api/addcart/getcart/" + user?._id)
+      .get("https://dailydish.in/api/addcart/getcart/" + user?._id)
       .then(function (response) {
         setCarts(response.data.success);
         setCartstatus(response.data.success);

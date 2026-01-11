@@ -50,24 +50,7 @@ const CoinBalance = ({
   return (
     <div className="ban-container">
       <div className="mobile-banner" style={{ position: "relative" }}>
-        {user && 
-        
-        // (
-        //   <div
-        //     style={{
-        //       position: "absolute",
-        //       top: 0,
-        //       left: 0,
-        //       right: 0,
-        //       bottom: 0,
-        //       backgroundColor: "#f9f8f6",
-        //       zIndex: 10,
-        //       pointerEvents: "none",
-        //       opacity: 0.8,
-        //     }}
-        //   ></div>
-        // )
-
+        {/* {user && 
          <div className="coin-balance-card mb-3">
           <p className="coin-balance-text">
             🎉 <b>₹{wallet?.balance}</b> is waiting in your wallet, but only for{" "}
@@ -78,9 +61,7 @@ const CoinBalance = ({
             onClick={() => setShow(false)}
             className="coin-balance-text-icon"
           />
-        </div>
-        
-        }
+        </div> } */}
 
         {/* <div className="coin-card mt-3">
         <div className="coin-header">

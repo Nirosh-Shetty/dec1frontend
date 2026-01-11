@@ -117,7 +117,7 @@ const LocationConfirmationSimple = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "https://api.dailydish.in/api/Hub/validate-location",
+        "https://dailydish.in/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -727,7 +727,7 @@ const LocationConfirmationSimple = () => {
         let hubData = null;
         try {
           const response = await fetch(
-            "https://api.dailydish.in/api/Hub/validate-location",
+            "https://dailydish.in/api/Hub/validate-location",
             {
               method: "POST",
               headers: {
@@ -838,7 +838,7 @@ const LocationConfirmationSimple = () => {
       // console.log("Submitting service request:", requestData);
 
       const response = await fetch(
-        "https://api.dailydish.in/api/service-requests",
+        "https://dailydish.in/api/service-requests",
         {
           method: "POST",
           headers: {
@@ -906,7 +906,7 @@ const LocationConfirmationSimple = () => {
         setTimeout(() => {
           Swal2.fire({
             html: `
-            <div style="text-align: center; padding: ${
+            <div style="text-align: center;zIndex:"9999999"; padding: ${
               isSmall ? "8px" : "12px"
             };">
               <div style="font-size: ${
@@ -939,7 +939,6 @@ const LocationConfirmationSimple = () => {
                   isSmall ? "280px" : "320px"
                 };">
                   <p style="margin: 4px 0;">• Our team will review your location</p>
-                  <p style="margin: 4px 0;">• We'll contact you within 24 hours</p>
                   <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
                 </div>
               </div>

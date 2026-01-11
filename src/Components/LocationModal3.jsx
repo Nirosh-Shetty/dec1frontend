@@ -102,7 +102,7 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: {
@@ -215,7 +215,7 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `https://api.dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+        `https://dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
         {
           method: "PATCH",
           headers: {

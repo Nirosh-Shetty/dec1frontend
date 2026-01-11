@@ -160,7 +160,7 @@ const CorporateList = () => {
       const config = {
         url: "/admin/addcorporate",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -206,7 +206,7 @@ const CorporateList = () => {
   const getAddCorporate = async () => {
     try {
       setLoading(true);
-      let res = await axios.get("https://api.dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
         setNoChangeData(res.data.corporatedata);
@@ -225,7 +225,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/deletecorporate/" + Data,
         method: "delete",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -306,7 +306,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/updatecorporatelist",
         method: "put",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: {
           "Content-Type": "multipart/form-data",
         },

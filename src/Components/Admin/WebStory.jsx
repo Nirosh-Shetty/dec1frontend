@@ -40,7 +40,7 @@ const WebStory = () => {
   const getAddWebstory = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("https://api.dailydish.in/api/admin/getstories");
+      let res = await axios.get("https://dailydish.in/api/admin/getstories");
       if (res.status === 200) {
         setAddWebstory(res.data.getbanner.reverse());
       }
@@ -82,7 +82,7 @@ const WebStory = () => {
       const config = {
         url: "/admin/Addstories",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -109,7 +109,7 @@ const WebStory = () => {
       const config = {
         url: "admin/Deletestories/" + Data,
         method: "delete",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -140,7 +140,7 @@ const WebStory = () => {
       const config = {
         url: "admin/editstories",
         method: "put",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };

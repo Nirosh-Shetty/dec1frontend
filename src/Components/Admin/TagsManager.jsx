@@ -13,7 +13,7 @@ const TagsManager = () => {
 
   const load = async () => {
     try {
-      const res = await axios.get("https://api.dailydish.in/api/admin/food-tags");
+      const res = await axios.get("https://dailydish.in/api/admin/food-tags");
       setTags(res.data.data || []);
     } catch (e) {
       console.error(e);
@@ -27,7 +27,7 @@ const TagsManager = () => {
   const createTag = async () => {
     try {
       if (!name) return alert("Tag name required");
-      await axios.post("https://api.dailydish.in/api/admin/food-tags", {
+      await axios.post("https://dailydish.in/api/admin/food-tags", {
         tagName: name,
         description: desc,
         tagColor: color,
@@ -53,7 +53,7 @@ const TagsManager = () => {
   const saveEdit = async () => {
     try {
       await axios.put(
-        `https://api.dailydish.in/api/admin/food-tags/${editing._id}`,
+        `https://dailydish.in/api/admin/food-tags/${editing._id}`,
         { tagName: name, description: desc, tagColor: color }
       );
       setEditShow(false);
@@ -70,7 +70,7 @@ const TagsManager = () => {
   const deleteTag = async (id) => {
     // if (!confirm('Delete this tag?')) return;
     try {
-      await axios.delete(`https://api.dailydish.in/api/admin/food-tags/${id}`);
+      await axios.delete(`https://dailydish.in/api/admin/food-tags/${id}`);
       load();
     } catch (e) {
       alert("Error deleting");

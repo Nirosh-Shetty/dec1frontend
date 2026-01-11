@@ -19,7 +19,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding-bottom: 100px; /* Space for fixed bottom navbar and cart button */
+  /* padding-bottom: 100px;  */
 }
 .copyright-text {
   color: #6b6b6b;
@@ -867,7 +867,7 @@ input[type="number"] {
 
 /* When nav is visible, push cart button up above the navbar */
 body.nav-visible .cartbtn {
-  bottom: 90px; /* 70px navbar height + 20px spacing */
+  bottom: 60px; /* 70px navbar height + 20px spacing */
 }
 
 /* When nav is hidden, cart button stays at normal position */
@@ -2025,6 +2025,8 @@ body.drawer-open .ant-drawer.description-product {
   justify-items: center;
   font-family: Inter;
   font-weight: 500;
+  letter-spacing: -0.5px;
+  gap:1px
 }
 .remaining-stock-label {
   font-size: 10px;

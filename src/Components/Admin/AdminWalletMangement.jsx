@@ -49,7 +49,7 @@ const AdminWalletManagement = () => {
       });
 
       const response = await axios.get(
-        `https://api.dailydish.in/api/wallet/all?${params}`
+        `https://dailydish.in/api/wallet/all?${params}`
       );
       setAllWallet(response.data.success);
       setPagination(response.data.pagination);
@@ -117,7 +117,7 @@ const AdminWalletManagement = () => {
         });
 
         const response = await axios.get(
-          `https://api.dailydish.in/api/wallet/export-all?${params}`
+          `https://dailydish.in/api/wallet/export-all?${params}`
         );
         const chunkData = response.data.success;
         const pagination = response.data.pagination;
@@ -164,8 +164,8 @@ const AdminWalletManagement = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://api.dailydish.in/api/wallet/add-free-cash"
-          : "https://api.dailydish.in/api/wallet/deduct-cash",
+          ? "https://dailydish.in/api/wallet/add-free-cash"
+          : "https://dailydish.in/api/wallet/deduct-cash",
         {
           userId: selectedWallet?.userId?._id,
           amount: amount,

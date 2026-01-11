@@ -31,7 +31,7 @@ const DeliveryCharge = () => {
       const config = {
         url: "/admin/delivarycharge",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         header: { "content-type": "multipart/form-data" },
         data: {
           MinimumAmount: MinimumAmount,
@@ -54,7 +54,7 @@ const DeliveryCharge = () => {
   const getAddDelivarychrg = async () => {
     try {
       let res = await axios.get(
-        "https://api.dailydish.in/api/admin/getdelivarycharge"
+        "https://dailydish.in/api/admin/getdelivarycharge"
       );
       if (res.status === 200) {
         setAddDelivarychrg(res.data.getdelivarycharge);
@@ -71,7 +71,7 @@ const DeliveryCharge = () => {
       const config = {
         url: "admin/Deletedelivarycharge/" + Data,
         method: "delete",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -104,7 +104,7 @@ const DeliveryCharge = () => {
       const config = {
         url: "admin/editdelivarycharge",
         method: "put",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: {
           MinimumAmount: MinimumAmount,

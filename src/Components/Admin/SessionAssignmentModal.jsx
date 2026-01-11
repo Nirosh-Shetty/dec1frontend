@@ -36,7 +36,9 @@ const SessionAssignmentModal = ({
   const fetchRiders = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("https://api.dailydish.in/api/admin/riders");
+      const response = await axios.get(
+        "https://dailydish.in/api/admin/riders"
+      );
       if (response.data?.riders) {
         setAvailableRiders(response.data.riders);
       }
@@ -75,7 +77,7 @@ const SessionAssignmentModal = ({
     try {
       setIsAssigning(true);
       const response = await axios.put(
-        "https://api.dailydish.in/api/admin/bulk-assign-rider",
+        "https://dailydish.in/api/admin/bulk-assign-rider",
         {
           riderId: selectedRider,
           orderIds: selectedOrders,

@@ -96,7 +96,7 @@ const CorporateBookingsOld = () => {
       };
 
       const res = await axios.get(
-        "https://api.dailydish.in/api/admin/getallordersfilterold",
+        "https://dailydish.in/api/admin/getallordersfilterold",
         { params }
       );
 
@@ -130,7 +130,7 @@ const CorporateBookingsOld = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://api.dailydish.in/api/Hub/hubs", {
+      const res = await axios.get("https://dailydish.in/api/Hub/hubs", {
         // headers: { Authorization: `Bearer ${token}` },
       });
       setHubs(res.data);
@@ -213,7 +213,7 @@ const CorporateBookingsOld = () => {
     try {
       setLoading(true);
       let res = await axios.delete(
-        `https://api.dailydish.in/api/admin/deletefoodorder/${data}`
+        `https://dailydish.in/api/admin/deletefoodorder/${data}`
       );
       if (res) {
         Swal.fire({
@@ -289,7 +289,7 @@ const CorporateBookingsOld = () => {
       const config = {
         url: "/admin/updateMultipleOrderStatus",
         method: "put",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "Content-Type": "application/json" },
         data: {
           status: selectStatus,
@@ -350,7 +350,7 @@ const CorporateBookingsOld = () => {
       setExeclLoading(true);
 
       const res = await axios.get(
-        "https://api.dailydish.in/api/admin/exportExcelOrder",
+        "https://dailydish.in/api/admin/exportExcelOrder",
         {
           params,
           responseType: "blob", // Critical: Handle as binary data
@@ -432,7 +432,7 @@ const CorporateBookingsOld = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "Content-Type": "application/json" },
         data: {
           newStatus: statusdata,

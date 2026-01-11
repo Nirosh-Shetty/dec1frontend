@@ -48,7 +48,7 @@ const Category = () => {
       const config = {
         url: "/admin/category",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -70,7 +70,7 @@ const Category = () => {
   const [AddCategory, setAddCategory] = useState([]);
   const getAddCategory = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getcategory");
+      let res = await axios.get("https://dailydish.in/api/admin/getcategory");
       if (res.status === 200) {
         setAddCategory(res.data.getcategory);
         setNoChangeData(res.data.getcategory);
@@ -87,7 +87,7 @@ const Category = () => {
       const config = {
         url: "admin/Deletecategory/" + Data,
         method: "delete",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -123,7 +123,7 @@ const Category = () => {
       const config = {
         url: "admin/editcategory",
         method: "put",
-        baseURL: "https://api.dailydish.in/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -252,7 +252,7 @@ const Category = () => {
 
                   {/* <td>
                         <Image
-                          src={`https://api.dailydish.in/Category/${items?.SubcatImage}`}
+                          src={`https://dailydish.in/Category/${items?.SubcatImage}`}
                           alt="pic"
                           style={{ width: "75px", height: "75px" }}
                         />

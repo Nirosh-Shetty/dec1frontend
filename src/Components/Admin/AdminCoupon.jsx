@@ -24,7 +24,7 @@ const AdminCoupon = () => {
   const getfooditems = async () => {
     try {
       let res = await axios.get(
-        "https://api.dailydish.in/api/admin/getFoodItemsUnBlocks"
+        "https://dailydish.in/api/admin/getFoodItemsUnBlocks"
       );
       if (res.status === 200) {
         setfooditemdata(res.data.data);
@@ -43,7 +43,7 @@ const AdminCoupon = () => {
   const getCoupon = async () => {
     try {
       axios
-        .get("https://api.dailydish.in/api/admin/coupons")
+        .get("https://dailydish.in/api/admin/coupons")
         .then((response) => {
           setCoupons(response.data);
         })

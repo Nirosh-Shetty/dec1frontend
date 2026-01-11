@@ -29,7 +29,7 @@
 @supports (padding: max(0px)) {
   .bottom-nav-container {
     padding-bottom: max(0px, env(safe-area-inset-bottom));
-    height: calc(70px + max(0px, env(safe-area-inset-bottom)));
+    height: calc(54px + max(0px, env(safe-area-inset-bottom)));
   }
 }
 

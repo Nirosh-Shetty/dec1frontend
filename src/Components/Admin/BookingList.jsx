@@ -47,7 +47,7 @@ const BookingList = () => {
     try {
       setLoading(true);
       let res = await axios.get(
-        "https://api.dailydish.in/api/admin/getAllAppartmentOrder"
+        "https://dailydish.in/api/admin/getAllAppartmentOrder"
       );
       if (res.status === 200) {
         const allorder = res.data.orders || [];
@@ -81,7 +81,7 @@ const BookingList = () => {
   const [Addproducts, setAddproducts] = useState([]);
   const getAddproducts = async () => {
     try {
-      let res = await axios.get("https://api.dailydish.in/api/admin/getFoodItems");
+      let res = await axios.get("https://dailydish.in/api/admin/getFoodItems");
       if (res.status === 200) {
         setAddproducts(res.data.data);
         setNoChangeData(res.data.data);
@@ -96,7 +96,7 @@ const BookingList = () => {
     try {
       setLoading(true);
       let res = await axios.delete(
-        `https://api.dailydish.in/api/admin/deletefoodorder/${data}`
+        `https://dailydish.in/api/admin/deletefoodorder/${data}`
       );
       if (res) {
         alert(`Bookings Data Deleted Successfully`);
@@ -241,7 +241,7 @@ const BookingList = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "Content-Type": "application/json" },
         data: {
           newStatus: statusdata,
@@ -364,7 +364,7 @@ const BookingList = () => {
       const config = {
         url: "/admin/updateMultipleOrderStatus",
         method: "put",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "Content-Type": "application/json" },
         data: {
           status: selectStatus,

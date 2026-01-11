@@ -29,7 +29,7 @@ const RatingModal = () => {
       if (!userId) return;
 
       const res = await axios.get(
-        `https://api.dailydish.in/api/admin/getorderNotRatedByUserID/${userId?._id}`
+        `https://dailydish.in/api/admin/getorderNotRatedByUserID/${userId?._id}`
       );
 
       if (res.status === 200 && res.data.order) {
@@ -64,7 +64,7 @@ const RatingModal = () => {
       };
 
       const res = await axios.put(
-        "https://api.dailydish.in/api/admin/submitOrderRating",
+        "https://dailydish.in/api/admin/submitOrderRating",
         payload
       );
 

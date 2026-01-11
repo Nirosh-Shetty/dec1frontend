@@ -84,7 +84,7 @@ const ValidateModal = ({
         const config = {
           url: "/User/mobileotpverification",
           method: "post",
-          baseURL: "https://api.dailydish.in/api",
+          baseURL: "https://dailydish.in/api",
           headers: { "content-type": "application/json" },
           data: payload,
         };
@@ -106,7 +106,7 @@ const ValidateModal = ({
           if (userData?.primaryAddress) {
             try {
               const response = await fetch(
-                `https://api.dailydish.in/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
+                `https://dailydish.in/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
@@ -694,7 +694,7 @@ const ValidateModal = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
 
         headers: { "content-type": "application/json" },
         data: {

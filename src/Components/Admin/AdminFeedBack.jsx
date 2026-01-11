@@ -40,7 +40,7 @@ const AdminFeedBack = () => {
       setLoading(true);
       // Ensure this matches your route in backend
       const response = await axios.get(
-        "https://api.dailydish.in/api/admin/feedback-orders"
+        "https://dailydish.in/api/admin/feedback-orders"
       );
 
       if (response.data.success) {

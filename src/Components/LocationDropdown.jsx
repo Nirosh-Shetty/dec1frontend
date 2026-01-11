@@ -196,7 +196,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
     try {
       // Check serviceability
       const serviceabilityResponse = await fetch(
-        "https://api.dailydish.in/api/Hub/validate-location",
+        "https://dailydish.in/api/Hub/validate-location",
         {
           method: "POST",
           headers: {

@@ -130,7 +130,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "https://api.dailydish.in/api",
+//         baseURL: "https://dailydish.in/api",
 
 //         headers: { "content-type": "application/json" },
 //         data: {
@@ -575,6 +575,33 @@ export default function LeafWithLogo() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Fix mobile viewport height issues with address bar
+  useEffect(() => {
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    // Set initial viewport height
+    setViewportHeight();
+
+    // Update on resize and orientation change
+    window.addEventListener("resize", setViewportHeight);
+    window.addEventListener("orientationchange", setViewportHeight);
+
+    // Prevent scrolling on this page
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      // Cleanup: restore scrolling when leaving this component
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      window.removeEventListener("resize", setViewportHeight);
+      window.removeEventListener("orientationchange", setViewportHeight);
+    };
+  }, []);
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -707,7 +734,7 @@ export default function LeafWithLogo() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://api.dailydish.in/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,
@@ -786,7 +813,10 @@ export default function LeafWithLogo() {
   };
 
   return (
-    <div className="login-page-wrapper" style={{ height: "100vh" }}>
+    <div
+      className="login-page-wrapper"
+      style={{ height: "calc(var(--vh, 1vh) * 100)", overflow: "hidden" }}
+    >
       <div className="login-container">
         <motion.div
           className="header-wrapper"
@@ -798,16 +828,19 @@ export default function LeafWithLogo() {
             <div
               className="logo-container"
               style={{
-                width: leafWidth,
-                height: leafHeight,
+                width: "100%",
+                height: "100%",
                 position: "relative",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
               <div
                 style={{
-                  position: "absolute",
-                  width: LOGO_W,
-                  height: LOGO_H,
+                  position: "relative",
+                  width: "clamp(200px, 60vw, 300px)", // Responsive width
+                  height: "clamp(120px, 15vh, 180px)", // Responsive height
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
@@ -817,29 +850,14 @@ export default function LeafWithLogo() {
               >
                 <img
                   src={"/Assets/logo-container.png"}
-                  width={LOGO_W}
-                  height={LOGO_H}
                   alt="Logo"
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
+                    width: "100%",
+                    height: "100%",
                     objectFit: "contain",
                   }}
                 />
-                {/* <h3
-                  style={{
-                    margin: 0,
-                    textAlign: "center",
-                    color: "#fafafa",
-                    fontSize: "16px",
-                    fontFamily: "'Inter', sans-serif",
-                  }}
-                >
-                  Plan Food, Not Appetite
-                </h3> */}
               </div>
-
-              {/* First yellow container */}
             </div>
           </div>
 
@@ -847,7 +865,7 @@ export default function LeafWithLogo() {
           <div
             className="yellow-container"
             style={{
-              height: "41px",
+              height: "clamp(35px, 5vh, 45px)", // Responsive height
               background: "#E6B800",
               border: "2px solid #F5DEB3",
               borderRadius: "0px 0px 32px 32px",
@@ -866,10 +884,10 @@ export default function LeafWithLogo() {
                 animate={{
                   x: "0%",
                   transition: {
-                    delay: 0, // 150ms delay as per Figma
+                    delay: 0,
                     x: {
-                      duration: 0.7, // 1600ms duration as per Figma
-                      ease: customBezier, // Custom bezier curve
+                      duration: 0.7,
+                      ease: customBezier,
                     },
                   },
                 }}
@@ -884,7 +902,7 @@ export default function LeafWithLogo() {
                   position: "absolute",
                   whiteSpace: "nowrap",
                   fontFamily: "'Inter', sans-serif",
-                  fontSize: "16px",
+                  fontSize: "clamp(14px, 3.5vw, 16px)", // Responsive font size
                   fontWeight: "500",
                   color: "#333",
                   textAlign: "center",
@@ -894,13 +912,16 @@ export default function LeafWithLogo() {
                 <motion.img
                   src={success}
                   alt=""
-                  style={{ width: "20px", display: "inline-block" }}
+                  style={{
+                    width: "clamp(16px, 4vw, 20px)", // Responsive icon size
+                    display: "inline-block",
+                  }}
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{
                     scale: 1,
                     rotate: 0,
                     transition: {
-                      delay: 0.15, // Same 150ms delay
+                      delay: 0.15,
                       duration: 0.9,
                       ease: customBezier,
                     },
@@ -989,8 +1010,10 @@ export default function LeafWithLogo() {
             style={{
               width: "100%",
               maxWidth: "420px",
+              maxHeight: "25vh", // Responsive max height
               display: "block",
               margin: "0 auto",
+              objectFit: "contain",
             }}
           />
 
@@ -998,13 +1021,15 @@ export default function LeafWithLogo() {
             className="terms-and-conditions-text"
             style={{
               position: "absolute",
-              top: "160px",
+              top: "clamp(80px, 15vh, 160px)", // Responsive positioning
               left: "50%",
               transform: "translateX(-50%)",
-              width: "100%",
+              width: "90%", // Slightly narrower for better mobile fit
               color: "#6b6b6b",
               fontWeight: "500",
-              fontSize: "12px",
+              fontSize: "clamp(9px, 2.5vw, 12px)", // Responsive font size
+              lineHeight: "1.2",
+              padding: "0 8px", // Add padding for very small screens
             }}
           >
             By continuing, you agree to our{" "}

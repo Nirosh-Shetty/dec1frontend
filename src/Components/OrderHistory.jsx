@@ -32,7 +32,7 @@ function OrderHistory() {
   const getorders = async (id) => {
     try {
       let res = await axios.get(
-        `https://api.dailydish.in/api/admin/getallordersbyUserId/${id}`
+        `https://dailydish.in/api/admin/getallordersbyUserId/${id}`
       );
       if (res.status === 200 && res.data.order) {
         const formattedOrders = res.data.order
@@ -487,7 +487,7 @@ function OrderHistory() {
     const comment = isFoodRating ? foodReview : deliveryReview;
 
     try {
-      await axios.put(`https://api.dailydish.in/api/admin/submitOrderRating`, {
+      await axios.put(`https://dailydish.in/api/admin/submitOrderRating`, {
         orderId: currentOrderId,
         ratingType,
         rating,

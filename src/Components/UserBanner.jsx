@@ -14,7 +14,7 @@
 //     const fetchBanners = async () => {
 //       try {
 //         const res = await axios.get(
-//           "https://api.dailydish.in/api/admin/banners"
+//           "https://dailydish.in/api/admin/banners"
 //         );
 //         // console.log(res.getbanner, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 //         if (res.status === 200) {
@@ -305,7 +305,7 @@
 //   useEffect(() => {
 //     const fetchBanners = async () => {
 //       try {
-//         const res = await axios.get("https://api.dailydish.in/api/admin/banners");
+//         const res = await axios.get("https://dailydish.in/api/admin/banners");
 //         console.log(res.getbanner, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 //         if (res.status === 200) {
 //           const bannerData = res.data.getbanner || res.data.getbanner || [];
@@ -595,7 +595,7 @@
 //   useEffect(() => {
 //     const fetchBanners = async () => {
 //       try {
-//         const res = await axios.get("https://api.dailydish.in/api/admin/banners");
+//         const res = await axios.get("https://dailydish.in/api/admin/banners");
 //         if (res.status === 200) {
 //           const bannerData = res.data.getbanner || [];
 //           setBanners(
@@ -818,7 +818,7 @@ const UserBanner = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await axios.get("https://api.dailydish.in/api/admin/banners");
+        const res = await axios.get("https://dailydish.in/api/admin/banners");
         if (res.status === 200) {
           const bannerData = res.data.getbanner || [];
           setBanners(

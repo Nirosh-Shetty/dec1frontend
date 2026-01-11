@@ -29,7 +29,7 @@ const CorparateWallet = () => {
   const getCorporateWallet = async () => {
     try {
       const response = await axios.get(
-        `https://api.dailydish.in/api/wallet/getAllWalletCompsny/${corparate._id}`
+        `https://dailydish.in/api/wallet/getAllWalletCompsny/${corparate._id}`
       );
       setAllWallet(response.data);
     } catch (error) {
@@ -119,8 +119,8 @@ const CorparateWallet = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://api.dailydish.in/api/wallet/add-free-cash"
-          : "https://api.dailydish.in/api/wallet/deduct-cash",
+          ? "https://dailydish.in/api/wallet/add-free-cash"
+          : "https://dailydish.in/api/wallet/deduct-cash",
         {
           userId: selectedWallet?.userId?._id,
           amount: amount,
