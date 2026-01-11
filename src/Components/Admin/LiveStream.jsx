@@ -72,9 +72,7 @@ const Livestreams = () => {
   const [AddLivestream, setAddLivestream] = useState([]);
   const getAddLivestream = async () => {
     try {
-      let res = await axios.get(
-        "https://api.dailydish.in/api/admin/getLivestream"
-      );
+      let res = await axios.get("https://api.dailydish.in/api/admin/getLivestream");
       if (res.status === 200) {
         // Sort by date (updatedAt or other date field) or ObjectId (_id)
         const sortedVideos = res.data.getLivestream.sort(

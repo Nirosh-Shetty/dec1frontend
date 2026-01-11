@@ -987,12 +987,12 @@ const LocationModal2 = ({
                 const isSelected =
                   (selectedLocationId && selectedLocationId === address._id) ||
                   (!selectedLocationId && isPrimaryAddress(address._id));
-                console.log(
-                  selectedLocationId,
-                  address._id,
-                  isSelected,
-                  address
-                );
+                // console.log(
+                //   selectedLocationId,
+                //   address._id,
+                //   isSelected,
+                //   address
+                // );
                 return (
                   <div
                     key={address._id}

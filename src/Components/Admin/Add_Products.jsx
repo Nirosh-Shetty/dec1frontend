@@ -140,9 +140,7 @@ const Add_Products = () => {
   // Get categories
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(
-        "https://api.dailydish.in/api/admin/getcategory"
-      );
+      const res = await axios.get("https://api.dailydish.in/api/admin/getcategory");
       setCategoryName(res.data.categories);
     } catch (error) {
       console.error(error);
@@ -789,7 +787,7 @@ const Add_Products = () => {
                   value={menuCategory}
                 >
                   <option value="">Select Category</option>
-                  {menu.map((cat) => (
+                  {menu?.map((cat) => (
                     <option key={cat._id} value={cat.menuCategory}>
                       {cat.menuCategory}
                     </option>
@@ -1029,7 +1027,7 @@ const Add_Products = () => {
                   value={menuCategory}
                 >
                   <option value="">{Data1?.menuCategory}</option>
-                  {menu.map((cat) => (
+                  {menu?.map((cat) => (
                     <option key={cat._id} value={cat.menuCategory}>
                       {cat.menuCategory}
                     </option>

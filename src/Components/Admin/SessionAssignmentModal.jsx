@@ -14,16 +14,22 @@ const SessionAssignmentModal = ({
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
-  
-  const { notifications, showSuccess, showError, showWarning, removeNotification } = useNotification();
+
+  const {
+    notifications,
+    showSuccess,
+    showError,
+    showWarning,
+    removeNotification,
+  } = useNotification();
 
   // Fetch available riders
   useEffect(() => {
     if (showModal) {
       fetchRiders();
       // Select all unassigned orders by default
-      const unassignedOrders = orders.filter(order => !order.riderId);
-      setSelectedOrders(unassignedOrders.map(order => order._id));
+      const unassignedOrders = orders.filter((order) => !order.riderId);
+      setSelectedOrders(unassignedOrders.map((order) => order._id));
     }
   }, [showModal, orders]);
 
@@ -42,9 +48,9 @@ const SessionAssignmentModal = ({
   };
 
   const handleOrderSelection = (orderId) => {
-    setSelectedOrders(prev => {
+    setSelectedOrders((prev) => {
       if (prev.includes(orderId)) {
-        return prev.filter(id => id !== orderId);
+        return prev.filter((id) => id !== orderId);
       } else {
         return [...prev, orderId];
       }
@@ -52,11 +58,11 @@ const SessionAssignmentModal = ({
   };
 
   const handleSelectAll = () => {
-    const unassignedOrders = orders.filter(order => !order.riderId);
+    const unassignedOrders = orders.filter((order) => !order.riderId);
     if (selectedOrders.length === unassignedOrders.length) {
       setSelectedOrders([]);
     } else {
-      setSelectedOrders(unassignedOrders.map(order => order._id));
+      setSelectedOrders(unassignedOrders.map((order) => order._id));
     }
   };
 
@@ -68,13 +74,18 @@ const SessionAssignmentModal = ({
 
     try {
       setIsAssigning(true);
-      const response = await axios.put("https://api.dailydish.in/api/admin/bulk-assign-rider", {
-        riderId: selectedRider,
-        orderIds: selectedOrders
-      });
+      const response = await axios.put(
+        "https://api.dailydish.in/api/admin/bulk-assign-rider",
+        {
+          riderId: selectedRider,
+          orderIds: selectedOrders,
+        }
+      );
 
       if (response.data.success !== false) {
-        showSuccess(`Successfully assigned ${response.data.assignedCount} orders to rider`);
+        showSuccess(
+          `Successfully assigned ${response.data.assignedCount} orders to rider`
+        );
         onAssignmentComplete();
         onClose();
       } else {
@@ -90,8 +101,8 @@ const SessionAssignmentModal = ({
 
   if (!showModal) return null;
 
-  const unassignedOrders = orders.filter(order => !order.riderId);
-  const assignedOrders = orders.filter(order => order.riderId);
+  const unassignedOrders = orders.filter((order) => !order.riderId);
+  const assignedOrders = orders.filter((order) => order.riderId);
 
   return (
     <div className="zone-modal-overlay" onClick={onClose}>
@@ -103,7 +114,14 @@ const SessionAssignmentModal = ({
         <div className="zone-modal-header">
           <div>
             <h2 style={{ margin: 0 }}>Assign Rider to Orders</h2>
-            <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#64748b", fontWeight: "normal" }}>
+            <p
+              style={{
+                margin: "4px 0 0 0",
+                fontSize: "14px",
+                color: "#64748b",
+                fontWeight: "normal",
+              }}
+            >
               Select orders and assign them to a rider
             </p>
           </div>
@@ -112,7 +130,10 @@ const SessionAssignmentModal = ({
           </button>
         </div>
 
-        <div className="zone-modal-body" style={{ maxHeight: "70vh", overflowY: "auto" }}>
+        <div
+          className="zone-modal-body"
+          style={{ maxHeight: "70vh", overflowY: "auto" }}
+        >
           {/* Summary Stats */}
           <div
             style={{
@@ -131,10 +152,18 @@ const SessionAssignmentModal = ({
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "20px", fontWeight: "bold", color: "#0284c7" }}>
+              <div
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#0284c7",
+                }}
+              >
                 {orders.length}
               </div>
-              <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+              <div
+                style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}
+              >
                 Total Orders
               </div>
             </div>
@@ -147,10 +176,18 @@ const SessionAssignmentModal = ({
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "20px", fontWeight: "bold", color: "#ea580c" }}>
+              <div
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#ea580c",
+                }}
+              >
                 {unassignedOrders.length}
               </div>
-              <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+              <div
+                style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}
+              >
                 Unassigned
               </div>
             </div>
@@ -163,10 +200,18 @@ const SessionAssignmentModal = ({
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "20px", fontWeight: "bold", color: "#059669" }}>
+              <div
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#059669",
+                }}
+              >
                 {assignedOrders.length}
               </div>
-              <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+              <div
+                style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}
+              >
                 Already Assigned
               </div>
             </div>
@@ -174,7 +219,13 @@ const SessionAssignmentModal = ({
 
           {/* Rider Selection */}
           <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "600",
+              }}
+            >
               Select Rider:
             </label>
             <select
@@ -203,7 +254,14 @@ const SessionAssignmentModal = ({
           {/* Order Selection */}
           {unassignedOrders.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "12px",
+                }}
+              >
                 <label style={{ fontWeight: "600" }}>
                   Select Orders to Assign ({selectedOrders.length} selected):
                 </label>
@@ -218,11 +276,20 @@ const SessionAssignmentModal = ({
                     cursor: "pointer",
                   }}
                 >
-                  {selectedOrders.length === unassignedOrders.length ? "Deselect All" : "Select All"}
+                  {selectedOrders.length === unassignedOrders.length
+                    ? "Deselect All"
+                    : "Select All"}
                 </button>
               </div>
 
-              <div style={{ maxHeight: "300px", overflowY: "auto", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+              <div
+                style={{
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "6px",
+                }}
+              >
                 {unassignedOrders.map((order) => (
                   <div
                     key={order._id}
@@ -232,7 +299,9 @@ const SessionAssignmentModal = ({
                       display: "flex",
                       alignItems: "center",
                       gap: "12px",
-                      backgroundColor: selectedOrders.includes(order._id) ? "#f0f9ff" : "white",
+                      backgroundColor: selectedOrders.includes(order._id)
+                        ? "#f0f9ff"
+                        : "white",
                     }}
                   >
                     <input
@@ -243,10 +312,12 @@ const SessionAssignmentModal = ({
                     />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: "600", fontSize: "14px" }}>
-                        {order.username} - ID: {order.orderid || order.orderId || order._id?.slice(-6)}
+                        {order.username} - ID:{" "}
+                        {order.orderid || order.orderId || order._id?.slice(-6)}
                       </div>
                       <div style={{ fontSize: "12px", color: "#64748b" }}>
-                        📞 {order.Mobilenumber} | 💰 ₹{order.allTotal} | 🕐 {order.slot}
+                        📞 {order.Mobilenumber} | 💰 ₹{order.allTotal} | 🕐{" "}
+                        {order.slot}
                       </div>
                     </div>
                   </div>
@@ -258,10 +329,23 @@ const SessionAssignmentModal = ({
           {/* Already Assigned Orders */}
           {assignedOrders.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", marginBottom: "12px", fontWeight: "600" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "12px",
+                  fontWeight: "600",
+                }}
+              >
                 Already Assigned Orders ({assignedOrders.length}):
               </label>
-              <div style={{ maxHeight: "200px", overflowY: "auto", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+              <div
+                style={{
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "6px",
+                }}
+              >
                 {assignedOrders.map((order) => (
                   <div
                     key={order._id}
@@ -271,17 +355,32 @@ const SessionAssignmentModal = ({
                       backgroundColor: "#f8fafc",
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <div>
                         <div style={{ fontWeight: "600", fontSize: "14px" }}>
-                          {order.username} - ID: {order.orderid || order.orderId || order._id?.slice(-6)}
+                          {order.username} - ID:{" "}
+                          {order.orderid ||
+                            order.orderId ||
+                            order._id?.slice(-6)}
                         </div>
                         <div style={{ fontSize: "12px", color: "#64748b" }}>
                           📞 {order.Mobilenumber} | 💰 ₹{order.allTotal}
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: "12px", color: "#059669", fontWeight: "600" }}>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#059669",
+                            fontWeight: "600",
+                          }}
+                        >
                           🏍️ {order.riderId?.name || "Unknown Rider"}
                         </div>
                         {order.riderId?.phone && (
@@ -298,7 +397,15 @@ const SessionAssignmentModal = ({
           )}
 
           {/* Action Buttons */}
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", paddingTop: "20px", borderTop: "1px solid #e2e8f0" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              justifyContent: "flex-end",
+              paddingTop: "20px",
+              borderTop: "1px solid #e2e8f0",
+            }}
+          >
             <button
               onClick={onClose}
               style={{
@@ -313,23 +420,33 @@ const SessionAssignmentModal = ({
             </button>
             <button
               onClick={handleAssignRider}
-              disabled={!selectedRider || selectedOrders.length === 0 || isAssigning}
+              disabled={
+                !selectedRider || selectedOrders.length === 0 || isAssigning
+              }
               style={{
                 padding: "10px 20px",
-                backgroundColor: selectedRider && selectedOrders.length > 0 ? "#059669" : "#cbd5e1",
+                backgroundColor:
+                  selectedRider && selectedOrders.length > 0
+                    ? "#059669"
+                    : "#cbd5e1",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
-                cursor: selectedRider && selectedOrders.length > 0 ? "pointer" : "not-allowed",
+                cursor:
+                  selectedRider && selectedOrders.length > 0
+                    ? "pointer"
+                    : "not-allowed",
                 fontWeight: "600",
               }}
             >
-              {isAssigning ? "Assigning..." : `Assign Rider to ${selectedOrders.length} Orders`}
+              {isAssigning
+                ? "Assigning..."
+                : `Assign Rider to ${selectedOrders.length} Orders`}
             </button>
           </div>
         </div>
       </div>
-      
+
       {/* Notification Toasts */}
       {notifications.map((notification) => (
         <NotificationToast

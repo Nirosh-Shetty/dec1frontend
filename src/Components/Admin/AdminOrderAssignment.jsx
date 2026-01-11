@@ -42,7 +42,7 @@ const AdminOrderAssignment = () => {
   const [isRidersLoading, setIsRidersLoading] = useState(false);
   const [zoneDetails, setZoneDetails] = useState(null);
   const [mapHeight, setMapHeight] = useState("75vh");
-  
+
   // Session-based filtering states
   const [selectedMapSession, setSelectedMapSession] = useState("all");
 
@@ -188,7 +188,7 @@ const AdminOrderAssignment = () => {
         "https://api.dailydish.in/api/admin/saveZone",
         newZone
       );
-      console.log("Zone saved to backend", res.data);
+      // console.log("Zone saved to backend", res.data);
       // Reload zones from backend to get the saved zone with proper ID
       await loadZones();
       return res.data.zone;
@@ -211,7 +211,7 @@ const AdminOrderAssignment = () => {
           lng: latLng.lng(),
         }));
 
-      console.log("Polygon drawn with coordinates:", coordinates);
+      // console.log("Polygon drawn with coordinates:", coordinates);
       setTempPolygonCoords(coordinates);
       polygon.setMap(null);
       setIsDrawingMode(false);
@@ -282,7 +282,7 @@ const AdminOrderAssignment = () => {
         `https://api.dailydish.in/api/admin/updateZone/${zoneId}`,
         zoneData
       );
-      console.log("Zone updated in backend", res.data);
+      // console.log("Zone updated in backend", res.data);
       await loadZones();
       return res.data.zone;
     } catch (error) {
@@ -310,7 +310,7 @@ const AdminOrderAssignment = () => {
             )
           : []
       );
-      
+
       setShowZoneForm(true);
       setShowZoneDetails(false);
 
@@ -366,9 +366,7 @@ const AdminOrderAssignment = () => {
     }
 
     try {
-      await axios.delete(
-        `https://api.dailydish.in/api/admin/deleteZone/${zoneId}`
-      );
+      await axios.delete(`https://api.dailydish.in/api/admin/deleteZone/${zoneId}`);
       // Reload zones from backend after deletion
       await loadZones();
       if (selectedZone?.id === zoneId || selectedZone?._id === zoneId) {
@@ -376,7 +374,7 @@ const AdminOrderAssignment = () => {
       }
     } catch (error) {
       console.error("Error deleting zone:", error);
-      console.log("Backend not available, deleting from localStorage");
+      // console.log("Backend not available, deleting from localStorage");
       const updatedZones = zones.filter(
         (z) => z.id !== zoneId && z._id !== zoneId
       );
@@ -389,7 +387,7 @@ const AdminOrderAssignment = () => {
   };
 
   const handleZoneClick = useCallback((zone, event) => {
-    console.log("Clicked zone:", zone.name);
+    // console.log("Clicked zone:", zone.name);
     setSelectedZone(zone);
   }, []);
 
@@ -413,97 +411,111 @@ const AdminOrderAssignment = () => {
   }, []);
 
   // Function to check if an order is within any created zone
-  const isOrderInAnyZone = useCallback((order) => {
-    if (!order.coordinates?.coordinates || zones.length === 0) return false;
-    
-    const orderPoint = {
-      lat: order.coordinates.coordinates[1],
-      lng: order.coordinates.coordinates[0]
-    };
+  const isOrderInAnyZone = useCallback(
+    (order) => {
+      if (!order.coordinates?.coordinates || zones.length === 0) return false;
 
-    // Debug: Log first order and zone for inspection
-    if (order === filteredOrders[0] && zones.length > 0) {
-      console.log('Debug first order:', {
-        orderId: order._id,
-        orderCoordinates: order.coordinates,
-        orderPoint,
-        firstZone: zones[0],
-        firstZonePaths: zones[0]?.paths
-      });
-    }
+      const orderPoint = {
+        lat: order.coordinates.coordinates[1],
+        lng: order.coordinates.coordinates[0],
+      };
 
-    return zones.some(zone => {
-      if (!zone.paths || zone.paths.length < 3) return false;
-      const result = isPointInPolygon(orderPoint, zone.paths);
-      
-      // Debug: Log point-in-polygon results for first few checks
-      if (order === filteredOrders[0]) {
-        console.log('Point-in-polygon check:', {
+      // Debug: Log first order and zone for inspection
+      if (order === filteredOrders[0] && zones.length > 0) {
+        console.log("Debug first order:", {
+          orderId: order._id,
+          orderCoordinates: order.coordinates,
           orderPoint,
-          zoneName: zone.name,
-          zonePaths: zone.paths,
-          result
+          firstZone: zones[0],
+          firstZonePaths: zones[0]?.paths,
         });
       }
-      
-      return result;
-    });
-  }, [zones, isPointInPolygon, filteredOrders]);
+
+      return zones.some((zone) => {
+        if (!zone.paths || zone.paths.length < 3) return false;
+        const result = isPointInPolygon(orderPoint, zone.paths);
+
+        // Debug: Log point-in-polygon results for first few checks
+        if (order === filteredOrders[0]) {
+          console.log("Point-in-polygon check:", {
+            orderPoint,
+            zoneName: zone.name,
+            zonePaths: zone.paths,
+            result,
+          });
+        }
+
+        return result;
+      });
+    },
+    [zones, isPointInPolygon, filteredOrders]
+  );
 
   // Calculate orders within zones
   const getOrdersInZones = useCallback(() => {
-    const ordersInZones = filteredOrders.filter(order => isOrderInAnyZone(order));
-    
+    const ordersInZones = filteredOrders.filter((order) =>
+      isOrderInAnyZone(order)
+    );
+
     // Debug logging (remove in production)
-    console.log('Zone calculation debug:', {
+    console.log("Zone calculation debug:", {
       totalFilteredOrders: filteredOrders.length,
       totalZones: zones.length,
       ordersInZones: ordersInZones.length,
       ordersNotInZones: filteredOrders.length - ordersInZones.length,
-      ordersWithCoordinates: filteredOrders.filter(order => order.coordinates).length,
-      ordersWithoutCoordinates: filteredOrders.filter(order => !order.coordinates).length,
-      
+      ordersWithCoordinates: filteredOrders.filter((order) => order.coordinates)
+        .length,
+      ordersWithoutCoordinates: filteredOrders.filter(
+        (order) => !order.coordinates
+      ).length,
+
       // Show actual order IDs in zones
-      orderIDsInZones: ordersInZones.map(order => ({
+      orderIDsInZones: ordersInZones.map((order) => ({
         id: order._id,
         orderId: order.orderId || order.orderid,
         username: order.username,
         coordinates: order.coordinates?.coordinates,
         lat: order.coordinates?.coordinates?.[1],
-        lng: order.coordinates?.coordinates?.[0]
+        lng: order.coordinates?.coordinates?.[0],
       })),
-      
+
       // Show order IDs NOT in zones (with coordinates)
       orderIDsNotInZones: filteredOrders
-        .filter(order => order.coordinates?.coordinates && !isOrderInAnyZone(order))
-        .map(order => ({
+        .filter(
+          (order) => order.coordinates?.coordinates && !isOrderInAnyZone(order)
+        )
+        .map((order) => ({
           id: order._id,
           orderId: order.orderId || order.orderid,
           username: order.username,
           coordinates: order.coordinates?.coordinates,
           lat: order.coordinates?.coordinates?.[1],
-          lng: order.coordinates?.coordinates?.[0]
+          lng: order.coordinates?.coordinates?.[0],
         })),
-      
-      sampleOrder: filteredOrders[0] ? {
-        id: filteredOrders[0]._id,
-        orderId: filteredOrders[0].orderId || filteredOrders[0].orderid,
-        coordinates: filteredOrders[0].coordinates,
-        hasCoordinates: !!filteredOrders[0].coordinates?.coordinates
-      } : null,
-      sampleZone: zones[0] ? {
-        name: zones[0].name,
-        pathsCount: zones[0].paths?.length,
-        firstPath: zones[0].paths?.[0]
-      } : null
+
+      sampleOrder: filteredOrders[0]
+        ? {
+            id: filteredOrders[0]._id,
+            orderId: filteredOrders[0].orderId || filteredOrders[0].orderid,
+            coordinates: filteredOrders[0].coordinates,
+            hasCoordinates: !!filteredOrders[0].coordinates?.coordinates,
+          }
+        : null,
+      sampleZone: zones[0]
+        ? {
+            name: zones[0].name,
+            pathsCount: zones[0].paths?.length,
+            firstPath: zones[0].paths?.[0],
+          }
+        : null,
     });
-    
+
     return ordersInZones;
   }, [filteredOrders, isOrderInAnyZone]);
 
   // Calculate orders NOT in any zones (remaining unmapped orders)
   const getOrdersNotInZones = useCallback(() => {
-    return filteredOrders.filter(order => {
+    return filteredOrders.filter((order) => {
       // Only count orders that have coordinates but are not in any zone
       return order.coordinates?.coordinates && !isOrderInAnyZone(order);
     });
@@ -513,33 +525,42 @@ const AdminOrderAssignment = () => {
   React.useEffect(() => {
     window.testPointInPolygon = (lat, lng) => {
       const testPoint = { lat, lng };
-      console.log('Testing point:', testPoint);
-      
+      // console.log('Testing point:', testPoint);
+
       zones.forEach((zone, index) => {
         if (zone.paths && zone.paths.length >= 3) {
           const result = isPointInPolygon(testPoint, zone.paths);
           console.log(`Zone ${index} (${zone.name}):`, result);
-          console.log('Zone paths:', zone.paths);
+          console.log("Zone paths:", zone.paths);
         }
       });
     };
-    
+
     window.debugZoneData = () => {
-      console.log('Current zones:', zones);
-      console.log('Current filtered orders:', filteredOrders);
-      console.log('Orders with coordinates:', filteredOrders.filter(order => order.coordinates));
+      console.log("Current zones:", zones);
+      console.log("Current filtered orders:", filteredOrders);
+      console.log(
+        "Orders with coordinates:",
+        filteredOrders.filter((order) => order.coordinates)
+      );
     };
 
     // New function to show order IDs in zones
     window.showOrdersInZones = () => {
       const ordersInZones = getOrdersInZones();
-      console.log('=== ORDERS IN ZONES ===');
+      console.log("=== ORDERS IN ZONES ===");
       ordersInZones.forEach((order, index) => {
-        console.log(`${index + 1}. Order ID: ${order.orderId || order.orderid || order._id}`);
+        console.log(
+          `${index + 1}. Order ID: ${
+            order.orderId || order.orderid || order._id
+          }`
+        );
         console.log(`   Customer: ${order.username}`);
-        console.log(`   Coordinates: [${order.coordinates?.coordinates?.[1]}, ${order.coordinates?.coordinates?.[0]}]`);
-        console.log(`   Session: ${order.session || 'N/A'}`);
-        console.log('---');
+        console.log(
+          `   Coordinates: [${order.coordinates?.coordinates?.[1]}, ${order.coordinates?.coordinates?.[0]}]`
+        );
+        console.log(`   Session: ${order.session || "N/A"}`);
+        console.log("---");
       });
       console.log(`Total orders in zones: ${ordersInZones.length}`);
     };
@@ -547,17 +568,29 @@ const AdminOrderAssignment = () => {
     // New function to show order IDs NOT in zones
     window.showOrdersNotInZones = () => {
       const ordersNotInZones = getOrdersNotInZones();
-      console.log('=== ORDERS NOT IN ZONES ===');
+      console.log("=== ORDERS NOT IN ZONES ===");
       ordersNotInZones.forEach((order, index) => {
-        console.log(`${index + 1}. Order ID: ${order.orderId || order.orderid || order._id}`);
+        console.log(
+          `${index + 1}. Order ID: ${
+            order.orderId || order.orderid || order._id
+          }`
+        );
         console.log(`   Customer: ${order.username}`);
-        console.log(`   Coordinates: [${order.coordinates?.coordinates?.[1]}, ${order.coordinates?.coordinates?.[0]}]`);
-        console.log(`   Session: ${order.session || 'N/A'}`);
-        console.log('---');
+        console.log(
+          `   Coordinates: [${order.coordinates?.coordinates?.[1]}, ${order.coordinates?.coordinates?.[0]}]`
+        );
+        console.log(`   Session: ${order.session || "N/A"}`);
+        console.log("---");
       });
       console.log(`Total orders NOT in zones: ${ordersNotInZones.length}`);
     };
-  }, [zones, filteredOrders, isPointInPolygon, getOrdersInZones, getOrdersNotInZones]);
+  }, [
+    zones,
+    filteredOrders,
+    isPointInPolygon,
+    getOrdersInZones,
+    getOrdersNotInZones,
+  ]);
   const updateClustererMarkers = useCallback(
     (ordersArray) => {
       if (!clustererRef.current || !mapRef.current) return;
@@ -600,26 +633,33 @@ const AdminOrderAssignment = () => {
   );
 
   // Session-based filtering functions
-  const filterOrdersBySession = useCallback((session) => {
-    setSelectedMapSession(session);
-    let sessionFilteredOrders = orders;
-    
-    if (session !== "all") {
-      sessionFilteredOrders = orders.filter(order => order.session === session);
-    }
-    
-    // Apply hub filter on top of session filter
-    if (selectedHub !== "all") {
-      sessionFilteredOrders = sessionFilteredOrders.filter(order => order.hubName === selectedHub);
-    }
-    
-    setFilteredOrders(sessionFilteredOrders);
-    
-    // Update map markers
-    if (clustererRef.current && mapRef.current) {
-      updateClustererMarkers(sessionFilteredOrders);
-    }
-  }, [orders, selectedHub, updateClustererMarkers]);
+  const filterOrdersBySession = useCallback(
+    (session) => {
+      setSelectedMapSession(session);
+      let sessionFilteredOrders = orders;
+
+      if (session !== "all") {
+        sessionFilteredOrders = orders.filter(
+          (order) => order.session === session
+        );
+      }
+
+      // Apply hub filter on top of session filter
+      if (selectedHub !== "all") {
+        sessionFilteredOrders = sessionFilteredOrders.filter(
+          (order) => order.hubName === selectedHub
+        );
+      }
+
+      setFilteredOrders(sessionFilteredOrders);
+
+      // Update map markers
+      if (clustererRef.current && mapRef.current) {
+        updateClustererMarkers(sessionFilteredOrders);
+      }
+    },
+    [orders, selectedHub, updateClustererMarkers]
+  );
 
   // Calculate dynamic offset based on zoom level
   const calculateOffsetRadius = (currentZoom) => {
@@ -911,16 +951,18 @@ const AdminOrderAssignment = () => {
     (hubName) => {
       setSelectedHub(hubName);
       let hubOrders = orders;
-      
+
       if (hubName !== "all") {
         hubOrders = orders.filter((order) => order.hubName === hubName);
       }
-      
+
       // Apply session filter on top of hub filter
       if (selectedMapSession !== "all") {
-        hubOrders = hubOrders.filter(order => order.session === selectedMapSession);
+        hubOrders = hubOrders.filter(
+          (order) => order.session === selectedMapSession
+        );
       }
-      
+
       setFilteredOrders(hubOrders);
 
       if (hubOrders.length > 0) {
@@ -952,22 +994,22 @@ const AdminOrderAssignment = () => {
         zoom
       );
       setOrders(processedOrders);
-      
+
       // Apply both hub and session filters
       let filteredData = processedOrders;
-      
+
       if (selectedHub !== "all") {
         filteredData = filteredData.filter(
           (order) => order.hubName === selectedHub
         );
       }
-      
+
       if (selectedMapSession !== "all") {
         filteredData = filteredData.filter(
           (order) => order.session === selectedMapSession
         );
       }
-      
+
       setFilteredOrders(filteredData);
 
       if (clustererRef.current && mapRef.current) {
@@ -1041,7 +1083,14 @@ const AdminOrderAssignment = () => {
           <div className="header-actions">
             {/* Session Selector */}
             <div className="session-selector">
-              <label htmlFor="session-filter" style={{ fontSize: "14px", fontWeight: "600", marginRight: "8px" }}>
+              <label
+                htmlFor="session-filter"
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  marginRight: "8px",
+                }}
+              >
                 Session:
               </label>
               <select
@@ -1054,7 +1103,7 @@ const AdminOrderAssignment = () => {
                   border: "1px solid #d1d5db",
                   fontSize: "14px",
                   marginRight: "12px",
-                  minWidth: "120px"
+                  minWidth: "120px",
                 }}
               >
                 <option value="all">All Sessions</option>
@@ -1076,7 +1125,7 @@ const AdminOrderAssignment = () => {
           <div className="snapshot-row header-snapshot-row">
             <div className="snapshot-card snapshot-card--primary">
               <span>
-                {selectedMapSession !== "all" 
+                {selectedMapSession !== "all"
                   ? `${selectedMapSession} orders`
                   : selectedHub === "all"
                   ? "Total orders"

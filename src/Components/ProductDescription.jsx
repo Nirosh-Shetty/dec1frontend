@@ -60,9 +60,7 @@ const ProductDescription = ({ setHeaderUpdate, cartRemoveStatus }) => {
   const [Addproducts, setAddproducts] = useState([]);
   const getAddproducts = async () => {
     try {
-      let res = await axios.get(
-        "https://api.dailydish.in/api/admin/admin/product"
-      );
+      let res = await axios.get("https://api.dailydish.in/api/admin/admin/product");
       if (res.status === 200) {
         setAddproducts(res.data.products);
       }

@@ -54,7 +54,7 @@ const ViewPlanModal = ({
   handleTrackOrder,
   address,
 }) => {
-  console.log("plans are", plan);
+  // console.log("plans are", plan);
   const user = JSON.parse(localStorage.getItem("user"));
 
   const navigate = useNavigate();
@@ -200,7 +200,7 @@ const ViewPlanModal = ({
         console.warn("Failed to update address cache:", cacheErr);
       }
 
-      console.log("Primary address set successfully!", "success");
+      // console.log("Primary address set successfully!", "success");
     } catch (error) {
       console.error("Error setting primary address:", error);
       console.log(error.message || "Failed to set primary address", "danger");
@@ -296,13 +296,10 @@ const ViewPlanModal = ({
   const handleSkipOrCancel = async () => {
     try {
       setLoading(true);
-      await axios.post(
-        "https://api.dailydish.in/api/user/plan/skip-cancel",
-        {
-          planId: plan._id,
-          userId,
-        }
-      );
+      await axios.post("https://api.dailydish.in/api/user/plan/skip-cancel", {
+        planId: plan._id,
+        userId,
+      });
       onPlanUpdated && onPlanUpdated();
       onClose();
     } catch (err) {
@@ -382,11 +379,12 @@ const ViewPlanModal = ({
             <div className="plan-session-info">
               <h3 className="session-title">{localPlan.session}</h3>
               <div className="delivery-time-text">
-                {/* static for now; optionally store slot time in DB later */}
                 Arrives fresh between{" "}
-                {localPlan.session === "Lunch"
-                  ? "12:00 to 01:00PM"
-                  : "07:00 to 08:00PM"}
+                {localPlan?.addressType === "School"
+                  ? "12:00 to 12:15 PM"
+                  : localPlan?.session === "Lunch"
+                  ? "12:00 to 01:00 PM"
+                  : "07:00 to 08:00 PM"}
               </div>
             </div>
 
@@ -1009,6 +1007,7 @@ const MyPlan = () => {
   const [currentTrackedOrder, setCurrentTrackedOrder] = useState(null);
   const [showQuickAnswers, setShowQuickAnswers] = useState(false);
   const { fetchWalletData } = useContext(WalletContext);
+  const [sessionDetails, setSessionDetails] = useState(null);
   // TODO: wire this to your auth/user context
   // parse stored user once so we can access properties safely
   let user = null;
@@ -1036,7 +1035,7 @@ const MyPlan = () => {
         const newPlans = res.data.data || [];
         setPlans(newPlans);
 
-        console.log("plans are", newPlans);
+        // console.log("plans are", newPlans);
 
         if (selectedPlan && isModalOpen) {
           const updatedSelectedPlan = newPlans.find(
@@ -1175,6 +1174,7 @@ const MyPlan = () => {
         const orderid = order.orderid || order._id;
         const deliveryDate = new Date(order.deliveryDate);
         const session = order.session;
+        setSessionDetails(session);
 
         // simple ETA string; you can refine as needed
         const eta =
@@ -1238,92 +1238,10 @@ const MyPlan = () => {
   const mobile = user?.Mobile;
   const username = user?.Fname;
 
-  // async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
-  //   try {
-  //     const amount = plan.slotTotalAmount; // single plan only
-  //     const generateUniqueId = () => {
-  //       const timestamp = Date.now().toString().slice(-4);
-  //       const randomNumber = Math.floor(1000 + Math.random() * 9000);
-  //       return `${address?.prefixcode}${timestamp}${randomNumber}`;
-  //     };
-  //     const configObj = {
-  //       method: "post",
-  //       baseURL: "https://api.dailydish.in/api/",
-  //       url: "/user/plan/create-from-plan",
-  //       headers: { "content-type": "application/json" },
-  //       data: {
-  //         userId,
-  //         planId: plan._id,
-  //         // optional discounts:
-  //         discountWallet,
-  //         coupon: 0,
-  //         // couponId: null,
-  //         // companyId: null,
-  //         // companyName: "Normal User",
-  //         // customerType: "Individual",
-  //         studentName: plan.studentName,
-  //         studentClass: plan.studentClass,
-  //         studentSection: plan.studentSection,
-  //         addressType: plan.addressType,
-  //         coordinates: plan.coordinates,
-  //         hubName: plan?.hubName, // if you have
-  //         username: username,
-  //         mobile: mobile,
-  //         deliveryNotes: deliveryNotes,
-  //         orderid: generateUniqueId(),
-  //       },
-  //     };
-  //     const config1 = {
-  //       url: "/user/addpaymentphonepay",
-  //       method: "post",
-  //       baseURL: "https://api.dailydish.in/api/",
-  //       headers: { "content-type": "application/json" },
-  //       data: {
-  //         userId,
-  //         username,
-  //         Mobile: mobile,
-  //         amount,
-  //         transactionid: null,
-  //         orderid: generateUniqueId(),
-  //         config: JSON.stringify(configObj),
-  //         cartId: null,
-  //         offerconfig: null,
-  //         cart_id: null,
-  //       },
-  //     };
-
-  //     const res = await axios(configObj);
-  //     const redirectInfo = res.data?.url;
-  //     if (redirectInfo?.url) {
-  //       window.location.href = redirectInfo.url;
-  //     } else if (redirectInfo?.redirectUrl) {
-  //       window.location.href = redirectInfo.redirectUrl;
-  //     }
-  //   } catch (err) {
-  //     // setLoading(false);
-  //     console.error("pay plan error", err);
-  //     if (err.response?.data?.error === "OUT_OF_STOCK") {
-  //       Swal2.fire({
-  //         icon: "info",
-  //         title: "Item Unavailable",
-  //         text: err.response.data.message,
-  //         // text: 'Oops, That item just ran out. Please pick something else to continue.',
-  //         confirmButtonText: "See Other Options",
-  //         confirmButtonColor: "#d33",
-  //       }).then(() => {
-  //         if (isModalOpen) closeModal();
-  //         // fetchPlans();
-  //         navigate("/home");
-  //       });
-  //     } else {
-  //       toast.error(err.response?.data?.message || "Failed to start payment");
-  //     }
-  //   }
-  // }
 
   async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
-      const amount = plan.payableAmount; // single plan only
+      const amount = plan.payableAmount - discountWallet;
       const generateUniqueId = () => {
         const timestamp = Date.now().toString().slice(-4);
         const randomNumber = Math.floor(1000 + Math.random() * 9000);
@@ -1349,7 +1267,7 @@ const MyPlan = () => {
           studentSection: plan.studentSection,
           addressType: plan.addressType,
           coordinates: plan.coordinates,
-          hubName: plan?.hubName, // if you have
+          hubName: plan?.hubName,
           username: username,
           mobile: mobile,
           deliveryNotes: deliveryNotes,
@@ -1376,59 +1294,54 @@ const MyPlan = () => {
           cart_id: null,
         },
       };
+      console.log(amount, "amount");
+      const res = await axios(amount > 0 ? config1 : configObj);
+      if (res.status === 200 || res.data?.success) {
+        await fetchWalletData();
+        const redirectInfo = res.data?.url;
 
-      const res = await axios(configObj);
-      //TODO: uncomment wallet fetch
-      // if(res.status === 200 || res.data.success) {
-      // setTimeout(async () => {
-      // console.log("comming")
-      await fetchWalletData();
-      // console.log("came")
-      // }, 500);
-      // }
-      const redirectInfo = res.data?.url;
+        if (amount === 0) {
+          console.log("hi");
+          // toast.success("Plan Confirmed successfully! 🎉", {
+          //   position: "bottom-center",
+          //   autoClose: 3000,
+          // });
+          Swal2.fire({
+            toast: true,
+            position: "bottom",
+            icon: "success",
+            title: "Plan Confirmed successfully! 🎉",
+            showConfirmButton: false,
+            didOpen: (toast) => {
+              const container = Swal2.getContainer();
+              if (container) {
+                container.style.zIndex = "99999";
+              }
+            },
+          });
+        }
+        // else {
+        //    toast.success("Order created! Redirecting...", {
+        //      position: "bottom-center",
+        //      autoClose: 2000
+        //    });
+        // }
 
-      // Show success toast
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "success",
-        title: "Order",
-        text: "Order Successfully Created",
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
-        },
-        didClose: () => {
-          // Refresh data or page after toast closes
+        setTimeout(() => {
           if (typeof fetchPlans === "function") {
-            fetchPlans(); // Refresh plans data
+            fetchPlans();
           }
-          // Optionally refresh other data or state
-        },
-      });
 
-      // Wait for toast to show, then refresh and redirect
-      setTimeout(() => {
-        // Refresh the current page data
-        if (typeof fetchPlans === "function") {
-          fetchPlans(); // Refresh plans data
-        }
-
-        // Clear any form data or reset state if needed
-        // setDeliveryNotes(''); // Example if you have state for delivery notes
-        // setSelectedPlan(null); // Example if you have state for selected plan
-
-        // Navigate to payment gateway
-        if (redirectInfo?.url) {
-          window.location.href = redirectInfo.url;
-        } else if (redirectInfo?.redirectUrl) {
-          window.location.href = redirectInfo.redirectUrl;
-        }
-      }, 1500);
+          if (amount > 0) {
+            if (redirectInfo?.url) {
+              window.location.href = redirectInfo.url;
+            } else if (redirectInfo?.redirectUrl) {
+              window.location.href = redirectInfo.redirectUrl;
+            }
+          }
+          // If amount === 0, the code stops here. The user stays on the page with the success toast.
+        }, 1200);
+      }
     } catch (err) {
       // setLoading(false);
       console.error("pay plan error", err);
@@ -1450,6 +1363,138 @@ const MyPlan = () => {
       }
     }
   }
+
+  // async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
+  //   console.log("Initiating payment for plan:", plan);
+  //   console.log("plan id", plan?._id);
+  //   try {
+  //     const amount = plan?.payableAmount;
+
+  //     console.log("amt initiated", amount);
+
+  //     // 🔑 Generate orderId ONCE
+  //     const generateUniqueId = () => {
+  //       const timestamp = Date.now().toString().slice(-4);
+  //       const randomNumber = Math.floor(1000 + Math.random() * 9000);
+  //       return `${address?.prefixcode}${timestamp}${randomNumber}`;
+  //     };
+
+  //     const orderid = generateUniqueId();
+
+  //     /* =========================
+  //      1️⃣ CREATE PLAN ORDER
+  //      ========================= */
+  //     const createPlanConfig = {
+  //       method: "post",
+  //       baseURL: "https://api.dailydish.in/api/",
+  //       url: "/user/plan/create-from-plan",
+  //       headers: { "Content-Type": "application/json" },
+  //       data: {
+  //         userId,
+  //         planId: plan?._id,
+  //         discountWallet,
+  //         coupon: 0,
+
+  //         studentName: plan.studentName,
+  //         studentClass: plan.studentClass,
+  //         studentSection: plan.studentSection,
+
+  //         addressType: plan.addressType,
+  //         coordinates: plan.coordinates,
+  //         hubName: plan?.hubName,
+
+  //         username,
+  //         mobile,
+  //         deliveryNotes,
+  //         orderid,
+  //       },
+  //     };
+
+  //     console.log("createplanconfig", createPlanConfig);
+
+  //     const createRes = await axios(createPlanConfig);
+
+  //     console.log("createRes", createRes);
+
+  //     if (!createRes.data?.success) {
+  //       throw new Error("Order creation failed");
+  //     }
+
+  //     /* =========================
+  //      2️⃣ INITIATE PHONEPE
+  //      ========================= */
+  //     const phonepeConfig = {
+  //       method: "post",
+  //       baseURL: "https://api.dailydish.in/api/",
+  //       url: "/user/addpaymentphonepay",
+  //       headers: { "Content-Type": "application/json" },
+  //       data: {
+  //         userId,
+  //         username,
+  //         Mobile: mobile,
+  //         amount,
+  //         transactionid: null,
+  //         orderid,
+  //         config: JSON.stringify(createPlanConfig),
+  //         cartId: null,
+  //         offerconfig: null,
+  //       },
+  //     };
+
+  //     console.log("phonepeConfig", phonepeConfig);
+
+  //     const paymentRes = await axios(phonepeConfig);
+
+  //     const redirectInfo = paymentRes.data;
+
+  //     /* =========================
+  //      3️⃣ UI FEEDBACK
+  //      ========================= */
+  //     await fetchWalletData();
+
+  //     Swal2.fire({
+  //       toast: true,
+  //       position: "bottom",
+  //       icon: "success",
+  //       title: "Order Placed",
+  //       text: "Redirecting to PhonePe...",
+  //       showConfirmButton: false,
+  //       timer: 2000,
+  //       timerProgressBar: true,
+  //       customClass: {
+  //         popup: "me-small-toast",
+  //         title: "me-small-toast-title",
+  //       },
+  //     });
+
+  //     /* =========================
+  //      4️⃣ REDIRECT TO PHONEPE
+  //      ========================= */
+  //     setTimeout(() => {
+  //       if (redirectInfo?.url) {
+  //         window.location.href = redirectInfo.url;
+  //       } else if (redirectInfo?.redirectUrl) {
+  //         window.location.href = redirectInfo.redirectUrl;
+  //       } else {
+  //         toast.error("Payment gateway not available");
+  //       }
+  //     }, 1500);
+  //   } catch (err) {
+  //     console.error("PhonePe payment error:", err);
+
+  //     if (err.response?.data?.error === "OUT_OF_STOCK") {
+  //       Swal2.fire({
+  //         icon: "info",
+  //         title: "Item Unavailable",
+  //         text: err.response.data.message,
+  //         confirmButtonText: "See Other Options",
+  //         confirmButtonColor: "#d33",
+  //       }).then(() => navigate("/home"));
+  //     } else {
+  //       toast.error(err.response?.data?.message || "Payment failed");
+  //     }
+  //   }
+  // }
 
   return (
     <div className="my-plan-container mainbg">
@@ -1476,7 +1521,10 @@ const MyPlan = () => {
                 />
               </svg>
             </div>
-            <div className="d-flex gap-1">
+            <div
+              className=""
+              style={{ display: "flex", alignItems: "center", gap: 3 }}
+            >
               <h3 className="tagline">My Plans</h3>
               <img
                 src={pending}
@@ -1578,7 +1626,7 @@ const MyPlan = () => {
                 const isBeforeDeadline = now < deadline;
                 const payableAmount = Math.max(
                   0,
-                  plan.payableAmount - (plan.discountWallet || 0)
+                  plan?.payableAmount - (plan.discountWallet || 0)
                   // -(plan.preorderDiscount || 0)
                 ).toFixed(0);
                 const isUnpaidEditable =
@@ -1782,7 +1830,12 @@ const MyPlan = () => {
 
                             <button
                               className="pay-btn"
-                              onClick={() => handlePayPlan(plan, "")}
+                              // onClick={() => handlePayPlan(plan, "")}
+                              onClick={() => {
+                                console.log("PAY BUTTON CLICKED");
+                                console.log("PLAN FROM UI 👉", plan);
+                                handlePayPlan(plan, "");
+                              }}
                             >
                               <div className="pay-btn-left">
                                 <div className="confirm-text">Confirm</div>
@@ -1902,8 +1955,8 @@ const MyPlan = () => {
             (() => {
               const progressSteps = [
                 "Cooking",
-                "Packing",
-                "Ontheway",
+                "Packed",
+                "On the way",
                 "Delivered",
               ];
               const statusMap = { inprocess: "Cooking" };
@@ -2117,7 +2170,11 @@ const MyPlan = () => {
                   <div className="etaText" style={{ marginTop: 16 }}>
                     Your meal is scheduled for{" "}
                     <span style={{ fontWeight: "bold", color: "black" }}>
-                      {currentTrackedOrder.eta}
+                      {sessionDetails === "Lunch"
+                        ? "12:00 - 1:00 PM"
+                        : sessionDetails === "Dinner"
+                        ? "7:00 - 8:00 PM"
+                        : ""}
                     </span>
                   </div>
                 </>

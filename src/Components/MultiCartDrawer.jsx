@@ -518,8 +518,8 @@ const MultiCartDrawer = ({
   };
 
   const handleSlotDetailClick = (slot) => {
-    console.log("Details clicked for slot:", slot);
-    console.log("Calling onJumpToSlot with:", slot.date, slot.session);
+    // console.log("Details clicked for slot:", slot);
+    // console.log("Calling onJumpToSlot with:", slot.date, slot.session);
     onJumpToSlot(slot.date, slot.session);
     setIsDrawerOpen(false);
   };

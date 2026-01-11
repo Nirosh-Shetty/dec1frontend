@@ -30,9 +30,7 @@ const AdminCategory = () => {
   // ✅ Fetch Packers Categories
   const fetchPackersCategories = async () => {
     try {
-      const res = await axios.get(
-        "https://api.dailydish.in/api/admin/getcategory"
-      );
+      const res = await axios.get("https://api.dailydish.in/api/admin/getcategory");
       setPackersCategories(res.data.categories);
     } catch (error) {
       console.error(error);
@@ -116,9 +114,7 @@ const AdminCategory = () => {
   // ✅ Delete Packers Category
   const handlePackersDelete = async (id) => {
     try {
-      await axios.delete(
-        `https://api.dailydish.in/api/admin/deletecategory/${id}`
-      );
+      await axios.delete(`https://api.dailydish.in/api/admin/deletecategory/${id}`);
       fetchPackersCategories();
     } catch (error) {
       console.error(error);

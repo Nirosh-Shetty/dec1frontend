@@ -19,8 +19,15 @@ const ZoneOrdersModal = ({
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [isAutoAssigning, setIsAutoAssigning] = useState(false);
   const [viewMode, setViewMode] = useState("table"); // "table" or "cards"
-  
-  const { notifications, showSuccess, showError, showWarning, showInfo, removeNotification } = useNotification();
+
+  const {
+    notifications,
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo,
+    removeNotification,
+  } = useNotification();
 
   // Filter orders based on search term
   useEffect(() => {
@@ -49,24 +56,35 @@ const ZoneOrdersModal = ({
   const unassignedCount = filteredOrders.length - assignedCount;
 
   const handleAutoAssign = async () => {
-    if (!currentZone || !currentZone.id && !currentZone._id) {
+    if (!currentZone || (!currentZone.id && !currentZone._id)) {
       showError("Zone information not available");
       return;
     }
 
-    if (!currentZone.assignedRiders || currentZone.assignedRiders.length === 0) {
-      showWarning("No riders are assigned to this zone. Please assign riders to the zone first.");
+    if (
+      !currentZone.assignedRiders ||
+      currentZone.assignedRiders.length === 0
+    ) {
+      showWarning(
+        "No riders are assigned to this zone. Please assign riders to the zone first."
+      );
       return;
     }
 
-    const unassignedOrders = filteredOrders.filter(order => !order.riderId);
+    const unassignedOrders = filteredOrders.filter((order) => !order.riderId);
     if (unassignedOrders.length === 0) {
       showInfo("All orders in this zone are already assigned to riders.");
       return;
     }
 
-    const confirmMessage = `Auto-assign ${unassignedOrders.length} unassigned orders to ${currentZone.assignedRiders.length} zone riders?\n\nZone: ${currentZone.name}\nRiders: ${currentZone.assignedRiders.map(r => r.name).join(', ')}`;
-    
+    const confirmMessage = `Auto-assign ${
+      unassignedOrders.length
+    } unassigned orders to ${
+      currentZone.assignedRiders.length
+    } zone riders?\n\nZone: ${
+      currentZone.name
+    }\nRiders: ${currentZone.assignedRiders.map((r) => r.name).join(", ")}`;
+
     if (!window.confirm(confirmMessage)) {
       return;
     }
@@ -74,16 +92,21 @@ const ZoneOrdersModal = ({
     try {
       setIsAutoAssigning(true);
       showInfo("Processing auto-assignment...", 2000);
-      
-      const response = await axios.post("https://api.dailydish.in/api/admin/auto-assign-zone-riders", {
-        zoneId: currentZone.id || currentZone._id,
-        session: "all"
-      });
+
+      const response = await axios.post(
+        "https://api.dailydish.in/api/admin/auto-assign-zone-riders",
+        {
+          zoneId: currentZone.id || currentZone._id,
+          session: "all",
+        }
+      );
 
       if (response.data.assignedCount > 0) {
-        const successMessage = `Successfully assigned ${response.data.assignedCount} orders to ${response.data.riderAssignments?.length || 0} riders`;
+        const successMessage = `Successfully assigned ${
+          response.data.assignedCount
+        } orders to ${response.data.riderAssignments?.length || 0} riders`;
         showSuccess(successMessage, 4000);
-        
+
         if (onAssignmentComplete) {
           onAssignmentComplete();
         }
@@ -93,7 +116,10 @@ const ZoneOrdersModal = ({
       }
     } catch (error) {
       console.error("Error in auto-assignment:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Auto-assignment failed";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Auto-assignment failed";
       showError(`Auto-assignment failed: ${errorMessage}`, 5000);
     } finally {
       setIsAutoAssigning(false);
@@ -102,43 +128,55 @@ const ZoneOrdersModal = ({
 
   return (
     <div className="zone-modal-overlay" onClick={onClose}>
-      <div
-        className="zone-modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="zone-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="zone-modal-header">
           <div>
             <h2 style={{ margin: 0 }}>Orders in Zone</h2>
-            <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#64748b", fontWeight: "normal" }}>
+            <p
+              style={{
+                margin: "4px 0 0 0",
+                fontSize: "14px",
+                color: "#64748b",
+                fontWeight: "normal",
+              }}
+            >
               Click any order to view on map
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <button 
-              className={`btn btn-small ${viewMode === "table" ? "btn-primary" : "btn-ghost"}`}
+            <button
+              className={`btn btn-small ${
+                viewMode === "table" ? "btn-primary" : "btn-ghost"
+              }`}
               onClick={() => setViewMode("table")}
               style={{ fontSize: "11px", padding: "4px 8px" }}
             >
               📊 Table
             </button>
-            <button 
-              className={`btn btn-small ${viewMode === "cards" ? "btn-primary" : "btn-ghost"}`}
+            <button
+              className={`btn btn-small ${
+                viewMode === "cards" ? "btn-primary" : "btn-ghost"
+              }`}
               onClick={() => setViewMode("cards")}
               style={{ fontSize: "11px", padding: "4px 8px" }}
             >
               🗃️ Cards
             </button>
-            {unassignedCount > 0 && currentZone && (currentZone.assignedRiders?.length > 0) && (
-              <button 
-                className="btn btn-primary btn-small"
-                onClick={handleAutoAssign}
-                disabled={isAutoAssigning}
-                style={{ fontSize: "12px", padding: "6px 12px" }}
-              >
-                {isAutoAssigning ? "⏳ Auto-Assigning..." : "🤖 Auto-Assign Zone Riders"}
-              </button>
-            )}
-            <button 
+            {unassignedCount > 0 &&
+              currentZone &&
+              currentZone.assignedRiders?.length > 0 && (
+                <button
+                  className="btn btn-primary btn-small"
+                  onClick={handleAutoAssign}
+                  disabled={isAutoAssigning}
+                  style={{ fontSize: "12px", padding: "6px 12px" }}
+                >
+                  {isAutoAssigning
+                    ? "⏳ Auto-Assigning..."
+                    : "🤖 Auto-Assign Zone Riders"}
+                </button>
+              )}
+            <button
               className="btn btn-success btn-small"
               onClick={() => setShowAssignmentModal(true)}
               style={{ fontSize: "12px", padding: "6px 12px" }}
@@ -153,14 +191,23 @@ const ZoneOrdersModal = ({
         <div className="zone-modal-body">
           {/* Zone Information */}
           {currentZone && (
-            <div style={{ 
-              marginBottom: "20px", 
-              padding: "12px", 
-              backgroundColor: "#f0f9ff", 
-              borderRadius: "8px", 
-              border: "1px solid #bae6fd" 
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <div
+              style={{
+                marginBottom: "20px",
+                padding: "12px",
+                backgroundColor: "#f0f9ff",
+                borderRadius: "8px",
+                border: "1px solid #bae6fd",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "8px",
+                }}
+              >
                 <h3 style={{ margin: 0, fontSize: "14px", color: "#1e40af" }}>
                   📍 {currentZone.name}
                 </h3>
@@ -168,11 +215,13 @@ const ZoneOrdersModal = ({
                   {currentZone.assignedRiders?.length || 0} riders assigned
                 </span>
               </div>
-              {currentZone.assignedRiders && currentZone.assignedRiders.length > 0 && (
-                <div style={{ fontSize: "12px", color: "#475569" }}>
-                  <strong>Zone Riders:</strong> {currentZone.assignedRiders.map(r => r.name).join(', ')}
-                </div>
-              )}
+              {currentZone.assignedRiders &&
+                currentZone.assignedRiders.length > 0 && (
+                  <div style={{ fontSize: "12px", color: "#475569" }}>
+                    <strong>Zone Riders:</strong>{" "}
+                    {currentZone.assignedRiders.map((r) => r.name).join(", ")}
+                  </div>
+                )}
             </div>
           )}
 
@@ -214,7 +263,9 @@ const ZoneOrdersModal = ({
               </div>
             </div>
             {searchTerm && (
-              <div style={{ marginTop: "8px", fontSize: "12px", color: "#64748b" }}>
+              <div
+                style={{ marginTop: "8px", fontSize: "12px", color: "#64748b" }}
+              >
                 Showing {filteredOrders.length} of {orders.length} orders
               </div>
             )}
@@ -290,10 +341,9 @@ const ZoneOrdersModal = ({
                   maxWidth: "300px",
                 }}
               >
-                {searchTerm 
+                {searchTerm
                   ? `No orders match "${searchTerm}". Try a different search term.`
-                  : "There are no orders in this zone at the moment"
-                }
+                  : "There are no orders in this zone at the moment"}
               </p>
             </div>
           ) : (
@@ -420,14 +470,17 @@ const ZoneOrdersModal = ({
                           style={{
                             cursor: "pointer",
                             transition: "all 0.2s",
-                            backgroundColor: order.riderId ? "#ecfdf5" : "#fff7ed",
+                            backgroundColor: order.riderId
+                              ? "#ecfdf5"
+                              : "#fff7ed",
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = "#f0f9ff";
                             e.currentTarget.style.transform = "translateX(2px)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = order.riderId ? "#ecfdf5" : "#fff7ed";
+                            e.currentTarget.style.backgroundColor =
+                              order.riderId ? "#ecfdf5" : "#fff7ed";
                             e.currentTarget.style.transform = "translateX(0)";
                           }}
                         >
@@ -436,7 +489,9 @@ const ZoneOrdersModal = ({
                               style={{
                                 width: "32px",
                                 height: "32px",
-                                backgroundColor: addressTypeConfig[order.addressType]?.color || "#007bff",
+                                backgroundColor:
+                                  addressTypeConfig[order.addressType]?.color ||
+                                  "#007bff",
                                 borderRadius: "50%",
                                 display: "flex",
                                 alignItems: "center",
@@ -451,7 +506,14 @@ const ZoneOrdersModal = ({
                             </div>
                           </div>
                           <div className="table-cell">
-                            <div style={{ fontWeight: "600", fontSize: "14px", color: "#1e293b", marginBottom: "4px" }}>
+                            <div
+                              style={{
+                                fontWeight: "600",
+                                fontSize: "14px",
+                                color: "#1e293b",
+                                marginBottom: "4px",
+                              }}
+                            >
                               {order.username}
                             </div>
                             <div style={{ fontSize: "12px", color: "#64748b" }}>
@@ -470,14 +532,18 @@ const ZoneOrdersModal = ({
                                 display: "inline-block",
                               }}
                             >
-                              {order.orderid || order.orderId || order._id?.slice(-6)}
+                              {order.orderid ||
+                                order.orderId ||
+                                order._id?.slice(-6)}
                             </span>
                           </div>
                           <div className="table-cell">
                             <span
                               style={{
                                 padding: "5px 10px",
-                                backgroundColor: addressTypeConfig[order.addressType]?.color || "#007bff",
+                                backgroundColor:
+                                  addressTypeConfig[order.addressType]?.color ||
+                                  "#007bff",
                                 color: "white",
                                 borderRadius: "6px",
                                 fontSize: "11px",
@@ -486,7 +552,8 @@ const ZoneOrdersModal = ({
                                 display: "inline-block",
                               }}
                             >
-                              {addressTypeConfig[order.addressType]?.icon} {order.addressType}
+                              {addressTypeConfig[order.addressType]?.icon}{" "}
+                              {order.addressType}
                             </span>
                             {order.hubName && (
                               <div
@@ -507,18 +574,31 @@ const ZoneOrdersModal = ({
                           <div className="table-cell">
                             {order.riderId ? (
                               <div className="table-status-assigned">
-                                <div style={{ fontSize: "12px", marginBottom: "2px", fontWeight: "600" }}>
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    marginBottom: "2px",
+                                    fontWeight: "600",
+                                  }}
+                                >
                                   🏍️ {order.riderId.name || "Unknown"}
                                 </div>
                                 {order.riderId.phone && (
-                                  <div style={{ fontSize: "10px", opacity: 0.8 }}>
+                                  <div
+                                    style={{ fontSize: "10px", opacity: 0.8 }}
+                                  >
                                     📞 {order.riderId.phone}
                                   </div>
                                 )}
                               </div>
                             ) : (
                               <div className="table-status-unassigned">
-                                <div style={{ fontSize: "12px", fontWeight: "600" }}>
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    fontWeight: "600",
+                                  }}
+                                >
                                   ⏳ Unassigned
                                 </div>
                                 <div style={{ fontSize: "10px", opacity: 0.8 }}>
@@ -552,15 +632,21 @@ const ZoneOrdersModal = ({
                             </span>
                           </div>
                           <div className="table-cell">
-                            <span style={{ fontSize: "13px", fontWeight: "600", color: "#1e293b" }}>
+                            <span
+                              style={{
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                color: "#1e293b",
+                              }}
+                            >
                               {order.slot}
                             </span>
                           </div>
                           <div className="table-cell">
-                            <span 
-                              style={{ 
-                                fontSize: "15px", 
-                                fontWeight: "700", 
+                            <span
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "700",
                                 color: "#059669",
                                 padding: "2px 6px",
                                 backgroundColor: "#ecfdf5",
@@ -571,10 +657,10 @@ const ZoneOrdersModal = ({
                             </span>
                           </div>
                           <div className="table-cell">
-                            <span 
-                              style={{ 
-                                fontSize: "14px", 
-                                fontWeight: "600", 
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                fontWeight: "600",
                                 color: "#1e293b",
                                 padding: "3px 8px",
                                 backgroundColor: "#f8fafc",
@@ -588,19 +674,29 @@ const ZoneOrdersModal = ({
                       ))}
                     </div>
                   </div>
-                  
+
                   {/* Address Details - Show on hover/click */}
-                  <div style={{ 
-                    marginTop: "16px", 
-                    padding: "12px", 
-                    backgroundColor: "#fef3c7", 
-                    borderRadius: "6px", 
-                    border: "1px solid #fde68a",
-                    fontSize: "11px",
-                    color: "#78350f"
-                  }}>
-                    <div style={{ fontSize: "9px", color: "#92400e", fontWeight: "600", marginBottom: "4px" }}>
-                      💡 TIP: Click any order row to view its location on the map and see full delivery address
+                  <div
+                    style={{
+                      marginTop: "16px",
+                      padding: "12px",
+                      backgroundColor: "#fef3c7",
+                      borderRadius: "6px",
+                      border: "1px solid #fde68a",
+                      fontSize: "11px",
+                      color: "#78350f",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "9px",
+                        color: "#92400e",
+                        fontWeight: "600",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      💡 TIP: Click any order row to view its location on the
+                      map and see full delivery address
                     </div>
                   </div>
                 </>
@@ -623,7 +719,8 @@ const ZoneOrdersModal = ({
                       }}
                       onClick={() => onOrderClick(order, index)}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 12px rgba(0,0,0,0.08)";
                         e.currentTarget.style.transform = "translateY(-1px)";
                         e.currentTarget.style.borderColor = "#2563eb";
                       }}
@@ -641,7 +738,9 @@ const ZoneOrdersModal = ({
                           left: "12px",
                           width: "28px",
                           height: "28px",
-                          backgroundColor: addressTypeConfig[order.addressType]?.color || "#007bff",
+                          backgroundColor:
+                            addressTypeConfig[order.addressType]?.color ||
+                            "#007bff",
                           borderRadius: "50%",
                           display: "flex",
                           alignItems: "center",
@@ -667,8 +766,21 @@ const ZoneOrdersModal = ({
                         }}
                       >
                         <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                            <h4 style={{ margin: "0", fontSize: "14px", color: "#1e293b" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              marginBottom: "4px",
+                            }}
+                          >
+                            <h4
+                              style={{
+                                margin: "0",
+                                fontSize: "14px",
+                                color: "#1e293b",
+                              }}
+                            >
                               {order.username}
                             </h4>
                             <span
@@ -681,18 +793,36 @@ const ZoneOrdersModal = ({
                                 fontWeight: "600",
                               }}
                             >
-                              ID: {order.orderid || order.orderId || order._id?.slice(-6)}
+                              ID:{" "}
+                              {order.orderid ||
+                                order.orderId ||
+                                order._id?.slice(-6)}
                             </span>
                           </div>
-                          <p style={{ margin: "0", fontSize: "12px", color: "#64748b" }}>
+                          <p
+                            style={{
+                              margin: "0",
+                              fontSize: "12px",
+                              color: "#64748b",
+                            }}
+                          >
                             📞 {order.Mobilenumber}
                           </p>
                         </div>
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "flex-end",
+                            gap: "4px",
+                          }}
+                        >
                           <span
                             style={{
                               padding: "4px 8px",
-                              backgroundColor: addressTypeConfig[order.addressType]?.color || "#007bff",
+                              backgroundColor:
+                                addressTypeConfig[order.addressType]?.color ||
+                                "#007bff",
                               color: "white",
                               borderRadius: "4px",
                               fontSize: "10px",
@@ -700,7 +830,8 @@ const ZoneOrdersModal = ({
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {addressTypeConfig[order.addressType]?.icon} {order.addressType}
+                            {addressTypeConfig[order.addressType]?.icon}{" "}
+                            {order.addressType}
                           </span>
                           {order.hubName && (
                             <span
@@ -717,7 +848,7 @@ const ZoneOrdersModal = ({
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Rider Information */}
                       {order.riderId ? (
                         <div
@@ -729,7 +860,13 @@ const ZoneOrdersModal = ({
                             marginBottom: "8px",
                           }}
                         >
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
                             <div
                               style={{
                                 width: "28px",
@@ -746,14 +883,33 @@ const ZoneOrdersModal = ({
                               🏍️
                             </div>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: "9px", color: "#059669", fontWeight: "600", marginBottom: "1px" }}>
+                              <div
+                                style={{
+                                  fontSize: "9px",
+                                  color: "#059669",
+                                  fontWeight: "600",
+                                  marginBottom: "1px",
+                                }}
+                              >
                                 ASSIGNED RIDER
                               </div>
-                              <div style={{ fontSize: "12px", fontWeight: "600", color: "#064e3b" }}>
+                              <div
+                                style={{
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  color: "#064e3b",
+                                }}
+                              >
                                 {order.riderId.name || "Unknown Rider"}
                               </div>
                               {order.riderId.phone && (
-                                <div style={{ fontSize: "10px", color: "#047857", marginTop: "1px" }}>
+                                <div
+                                  style={{
+                                    fontSize: "10px",
+                                    color: "#047857",
+                                    marginTop: "1px",
+                                  }}
+                                >
                                   📞 {order.riderId.phone}
                                 </div>
                               )}
@@ -770,7 +926,13 @@ const ZoneOrdersModal = ({
                             marginBottom: "8px",
                           }}
                         >
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
                             <div
                               style={{
                                 width: "28px",
@@ -787,20 +949,39 @@ const ZoneOrdersModal = ({
                               ⏳
                             </div>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: "9px", color: "#ea580c", fontWeight: "600", marginBottom: "1px" }}>
+                              <div
+                                style={{
+                                  fontSize: "9px",
+                                  color: "#ea580c",
+                                  fontWeight: "600",
+                                  marginBottom: "1px",
+                                }}
+                              >
                                 UNASSIGNED ORDER
                               </div>
-                              <div style={{ fontSize: "12px", fontWeight: "600", color: "#9a3412" }}>
+                              <div
+                                style={{
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  color: "#9a3412",
+                                }}
+                              >
                                 No rider assigned yet
                               </div>
-                              <div style={{ fontSize: "10px", color: "#c2410c", marginTop: "1px" }}>
+                              <div
+                                style={{
+                                  fontSize: "10px",
+                                  color: "#c2410c",
+                                  marginTop: "1px",
+                                }}
+                              >
                                 Awaiting assignment
                               </div>
                             </div>
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Order Details Grid */}
                       <div
                         style={{
@@ -815,7 +996,13 @@ const ZoneOrdersModal = ({
                         }}
                       >
                         <div>
-                          <div style={{ fontSize: "9px", color: "#64748b", marginBottom: "2px" }}>
+                          <div
+                            style={{
+                              fontSize: "9px",
+                              color: "#64748b",
+                              marginBottom: "2px",
+                            }}
+                          >
                             Status
                           </div>
                           <div
@@ -834,31 +1021,67 @@ const ZoneOrdersModal = ({
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: "9px", color: "#64748b", marginBottom: "2px" }}>
+                          <div
+                            style={{
+                              fontSize: "9px",
+                              color: "#64748b",
+                              marginBottom: "2px",
+                            }}
+                          >
                             Time Slot
                           </div>
-                          <div style={{ fontSize: "11px", fontWeight: "600", color: "#1e293b" }}>
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              color: "#1e293b",
+                            }}
+                          >
                             {order.slot}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: "9px", color: "#64748b", marginBottom: "2px" }}>
+                          <div
+                            style={{
+                              fontSize: "9px",
+                              color: "#64748b",
+                              marginBottom: "2px",
+                            }}
+                          >
                             Amount
                           </div>
-                          <div style={{ fontSize: "11px", fontWeight: "700", color: "#059669" }}>
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: "700",
+                              color: "#059669",
+                            }}
+                          >
                             ₹{order.allTotal}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: "9px", color: "#64748b", marginBottom: "2px" }}>
+                          <div
+                            style={{
+                              fontSize: "9px",
+                              color: "#64748b",
+                              marginBottom: "2px",
+                            }}
+                          >
                             Items
                           </div>
-                          <div style={{ fontSize: "11px", fontWeight: "600", color: "#1e293b" }}>
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              color: "#1e293b",
+                            }}
+                          >
                             {order.allProduct?.length || 0} items
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Address */}
                       <div
                         style={{
@@ -868,10 +1091,23 @@ const ZoneOrdersModal = ({
                           border: "1px solid #fde68a",
                         }}
                       >
-                        <div style={{ fontSize: "9px", color: "#92400e", fontWeight: "600", marginBottom: "2px" }}>
+                        <div
+                          style={{
+                            fontSize: "9px",
+                            color: "#92400e",
+                            fontWeight: "600",
+                            marginBottom: "2px",
+                          }}
+                        >
                           📍 DELIVERY ADDRESS
                         </div>
-                        <div style={{ fontSize: "11px", color: "#78350f", lineHeight: "1.4" }}>
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color: "#78350f",
+                            lineHeight: "1.4",
+                          }}
+                        >
                           {order.delivarylocation}
                         </div>
                       </div>
@@ -881,33 +1117,78 @@ const ZoneOrdersModal = ({
               )}
             </div>
           )}
-          
+
           {/* Summary Footer */}
           {filteredOrders.length > 0 && (
-            <div style={{ 
-              marginTop: "20px", 
-              padding: "16px", 
-              backgroundColor: "#f8fafc", 
-              borderRadius: "8px", 
-              border: "1px solid #e2e8f0",
-              borderTop: "3px solid #2563eb"
-            }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "12px", fontSize: "12px" }}>
+            <div
+              style={{
+                marginTop: "20px",
+                padding: "16px",
+                backgroundColor: "#f8fafc",
+                borderRadius: "8px",
+                border: "1px solid #e2e8f0",
+                borderTop: "3px solid #2563eb",
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                  gap: "12px",
+                  fontSize: "12px",
+                }}
+              >
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontWeight: "bold", color: "#2563eb", fontSize: "16px" }}>{filteredOrders.length}</div>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#2563eb",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {filteredOrders.length}
+                  </div>
                   <div style={{ color: "#64748b" }}>Total Orders</div>
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontWeight: "bold", color: "#059669", fontSize: "16px" }}>{assignedCount}</div>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#059669",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {assignedCount}
+                  </div>
                   <div style={{ color: "#64748b" }}>Assigned</div>
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontWeight: "bold", color: "#ea580c", fontSize: "16px" }}>{unassignedCount}</div>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#ea580c",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {unassignedCount}
+                  </div>
                   <div style={{ color: "#64748b" }}>Unassigned</div>
                 </div>
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ fontWeight: "bold", color: "#7c3aed", fontSize: "16px" }}>
-                    ₹{filteredOrders.reduce((sum, order) => sum + (parseFloat(order.allTotal) || 0), 0).toFixed(0)}
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#7c3aed",
+                      fontSize: "16px",
+                    }}
+                  >
+                    ₹
+                    {filteredOrders
+                      .reduce(
+                        (sum, order) => sum + (parseFloat(order.allTotal) || 0),
+                        0
+                      )
+                      .toFixed(0)}
                   </div>
                   <div style={{ color: "#64748b" }}>Total Value</div>
                 </div>
@@ -930,7 +1211,7 @@ const ZoneOrdersModal = ({
           }
         }}
       />
-      
+
       {/* Notification Toasts */}
       {notifications.map((notification) => (
         <NotificationToast

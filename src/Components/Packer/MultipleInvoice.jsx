@@ -47,7 +47,7 @@ function MultipleInvoice() {
     }
   }, []);
 
-  console.log(items,"..........................ssssssssss")
+  console.log(items, "..........................ssssssssss");
 
   // Alternative manual print function for the button
   const handleManualPrint = () => {
@@ -244,10 +244,17 @@ function MultipleInvoice() {
                         {item?.customerType || "Normal"}
                       </td>
                     </tr>
+                   
                     <tr>
-                      <td style={{ padding: "2px 0" }}>Address:</td>
-                      <td style={{ textAlign: "right", padding: "2px 0", fontSize: "16px" }}>
-                        {item?.delivarylocation}
+                      <td
+                        colSpan={2}
+                        style={{
+                          textAlign: "right",
+                          padding: "2px 0",
+                          fontSize: "14px",
+                        }}
+                      >
+                       {item?.delivarylocation}
                       </td>
                     </tr>
                   </tbody>
@@ -397,7 +404,7 @@ function MultipleInvoice() {
                         {/* {item?.delivarytype <= 0
                           ? "Free"
                           : `₹ ${Number(item.delivarytype).toFixed(2)}`} */}{" "}
-                        0
+                        Free
                       </td>
                     </tr>
                     <tr>

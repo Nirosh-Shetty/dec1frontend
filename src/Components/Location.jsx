@@ -122,7 +122,7 @@ const LocationConfirmation = () => {
         const hasAddresses =
           result.success && result.addresses && result.addresses.length > 0;
         const isNew = !hasAddresses;
-        console.log("User address check:", { hasAddresses, isNew });
+        // console.log("User address check:", { hasAddresses, isNew });
         setIsNewUser(isNew);
       } else {
         console.log("API failed, assuming new user");
@@ -278,7 +278,7 @@ const LocationConfirmation = () => {
 
   // Handle editing existing address - FIXED with proper coordinate handling
   const handleEditingAddress = (editingAddress) => {
-    console.log("Editing address:", editingAddress);
+    // console.log("Editing address:", editingAddress);
 
     let locationCoords = { lat: 40.7128, lng: -74.006 }; // Default fallback
 
@@ -306,7 +306,7 @@ const LocationConfirmation = () => {
       console.warn("No location data found, using default location");
     }
 
-    console.log("Setting location coords:", locationCoords);
+    // console.log("Setting location coords:", locationCoords);
 
     setSelectedLocation(locationCoords);
     setAddress(editingAddress.fullAddress || editingAddress.address || "");
@@ -432,7 +432,7 @@ const LocationConfirmation = () => {
         setIsServiceable(data.serviceable);
         if (data.serviceable) {
           setHub(data.hubs || []);
-          console.log("Location is serviceable. Hubs:", data.hubs);
+          // console.log("Location is serviceable. Hubs:", data.hubs);
         } else {
           console.log("Location is not serviceable");
           setHub([]);
@@ -480,7 +480,7 @@ const LocationConfirmation = () => {
     script.onload = () => {
       setScriptLoaded(true);
       initializeServices();
-      console.log("Google Maps script loaded successfully");
+      // console.log("Google Maps script loaded successfully");
     };
 
     script.onerror = () => {
@@ -508,7 +508,7 @@ const LocationConfirmation = () => {
       // Small delay to ensure DOM is ready
       setTimeout(() => {
         if (mapRef.current) {
-          console.log("Initializing map with location:", selectedLocation);
+          // console.log("Initializing map with location:", selectedLocation);
           initializeMap(selectedLocation);
 
           // Only get address if we don't already have one
@@ -566,7 +566,7 @@ const LocationConfirmation = () => {
           }
         }
 
-        console.log("Setting editing address location:", locationCoords);
+        // console.log("Setting editing address location:", locationCoords);
         setSelectedLocation(locationCoords);
         setAddress(editingAddress.fullAddress || editingAddress.address || "");
       }
@@ -595,7 +595,7 @@ const LocationConfirmation = () => {
           lat: latitude,
           lng: longitude,
         };
-        console.log("Got current location:", location);
+        // console.log("Got current location:", location);
         setCurrentLocation(location);
         setSelectedLocation(location);
         setLocationDenied(false);
@@ -640,7 +640,7 @@ const LocationConfirmation = () => {
     }
 
     try {
-      console.log("Creating new map instance at:", location);
+      // console.log("Creating new map instance at:", location);
 
       const map = new window.google.maps.Map(mapRef.current, {
         zoom: 16,
@@ -728,7 +728,7 @@ const LocationConfirmation = () => {
                 lng: position.coords.longitude,
               };
 
-              console.log("Current location:", currentLocation);
+              // console.log("Current location:", currentLocation);
 
               // Center map on current location
               map.setCenter(currentLocation);
@@ -969,7 +969,7 @@ const LocationConfirmation = () => {
         title: "Delivery location",
       });
 
-      console.log("Fixed pin and message created at center");
+      // console.log("Fixed pin and message created at center");
 
       let mapMoveTimeout;
 
@@ -980,7 +980,7 @@ const LocationConfirmation = () => {
           lng: newCenter.lng(),
         };
 
-        console.log("Map moved to:", newLocation);
+        // console.log("Map moved to:", newLocation);
         markerRef.current.setPosition(newLocation);
         setSelectedLocation(newLocation);
         setIsConfirmed(false);
@@ -1038,7 +1038,7 @@ const LocationConfirmation = () => {
         }
       });
 
-      console.log("Map initialized successfully with fixed pin and message");
+      // console.log("Map initialized successfully with fixed pin and message");
     } catch (error) {
       console.error("Error initializing map:", error);
       setError("Failed to initialize map. Please try again.");
@@ -1246,7 +1246,7 @@ const LocationConfirmation = () => {
         address: address,
       };
 
-      console.log("Submitting service request:", requestData);
+      // console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
         "https://api.dailydish.in/api/service-requests",
@@ -1259,7 +1259,7 @@ const LocationConfirmation = () => {
         }
       );
 
-      console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrr");
+      // console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrr");
 
       if (response.data.success) {
         // Show success message
@@ -1509,7 +1509,7 @@ const LocationConfirmation = () => {
       isDefault: true, // NEW: Mark as primary by default
     };
 
-    console.log("Saving address as primary:", addressData);
+    // console.log("Saving address as primary:", addressData);
 
     try {
       setIsLoading(true);
@@ -1632,7 +1632,7 @@ const LocationConfirmation = () => {
       );
 
       if (response.ok) {
-        console.log(`Address ${addressId} set as primary successfully`);
+        // console.log(`Address ${addressId} set as primary successfully`);
 
         // Update local storage cache
         const cachedAddresses = localStorage.getItem(`addresses_${customerId}`);
@@ -2028,7 +2028,7 @@ const LocationConfirmation = () => {
           // Validate serviceability
           validateServiceability(userLocation);
 
-          console.log("Located user at:", userLocation);
+          // console.log("Located user at:", userLocation);
         },
         (error) => {
           console.error("Error getting current location:", error);

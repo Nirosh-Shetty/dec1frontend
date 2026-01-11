@@ -230,7 +230,7 @@ const OrderHistory = () => {
                               </div>
                             </>
                           ) : Data1?.status === "Packing" ||
-                            Data1?.status === "Ontheway" ||
+                            Data1?.status === "On the way" ||
                             Data1?.status === "Delivered" ? (
                             <>
                               <div className="status-step  completed">
@@ -267,7 +267,7 @@ const OrderHistory = () => {
                                 <div className="line"></div>
                               </div>
                             </>
-                          ) : Data1?.status === "Ontheway" ||
+                          ) : Data1?.status === "On the way" ||
                             Data1?.status === "Delivered" ? (
                             <>
                               <div className="status-step   completed">
@@ -293,7 +293,7 @@ const OrderHistory = () => {
 
                         {/* Step 3: On the way */}
                         <div>
-                          {Data1?.status === "Ontheway" ? (
+                          {Data1?.status === "On the way" ? (
                             <>
                               <div className="status-step completed">
                                 <img
@@ -370,7 +370,7 @@ const OrderHistory = () => {
                           alt=""
                           style={{ width: "40px" }}
                         />
-                      ) : Data1?.status === "Ontheway" ? (
+                      ) : Data1?.status === "On the way" ? (
                         <img
                           src="Assets/delivery.gif"
                           alt=""

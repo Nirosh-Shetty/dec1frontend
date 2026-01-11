@@ -152,7 +152,7 @@ const Banner = ({
           try {
             const { latitude, longitude } = position.coords;
 
-            console.log("Raw coordinates:", { latitude, longitude });
+            // console.log("Raw coordinates:", { latitude, longitude });
 
             // Get more accurate address using multiple methods
             const address = await getAccurateAddress(latitude, longitude);
@@ -171,7 +171,7 @@ const Banner = ({
               },
             };
 
-            console.log("Location data:", locationData);
+            // console.log("Location data:", locationData);
 
             // Save to localStorage
             localStorage.setItem(
@@ -559,98 +559,98 @@ const Banner = ({
   // };
 
   const handleServiceRequest = async () => {
-  // Convert to string and handle null/undefined
-  const name = String(serviceRequestName || "");
-  const phone = String(serviceRequestPhone || "");
+    // Convert to string and handle null/undefined
+    const name = String(serviceRequestName || "");
+    const phone = String(serviceRequestPhone || "");
 
-  if (!name.trim()) {
-    Swal2.fire({
-      toast: true,
-      position: "bottom",
-      icon: "error",
-      title: "Please enter your name",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: {
-        popup: "me-small-toast",
-        title: "me-small-toast-title",
-      },
-    });
-    return;
-  }
-
-  if (!phone.trim()) {
-    Swal2.fire({
-      toast: true,
-      position: "bottom",
-      icon: "error",
-      title: "Please enter your phone number",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: {
-        popup: "me-small-toast",
-        title: "me-small-toast-title",
-      },
-    });
-    return;
-  }
-
-  // Basic phone validation
-  const phoneRegex = /^[0-9]{10}$/;
-  if (!phoneRegex.test(phone.trim())) {
-    Swal2.fire({
-      toast: true,
-      position: "bottom",
-      icon: "error",
-      title: "Please enter a valid 10-digit phone number",
-      showConfirmButton: false,
-      timer: 3000,
-      customClass: {
-        popup: "me-small-toast",
-        title: "me-small-toast-title",
-      },
-    });
-    return;
-  }
-
-  try {
-    setIsSubmittingRequest(true);
-
-    const requestData = {
-      name: name.trim(),
-      phone: phone.trim(),
-      location: {
-        lat: currentLocation?.lat || 0,
-        lng: currentLocation?.lng || 0,
-      },
-      address: currentLocation?.fullAddress || "Address not available",
-      customerId: user?._id || null,
-    };
-
-    console.log("Submitting service request:", requestData);
-
-    const response = await fetch(
-      "https://api.dailydish.in/api/service-requests",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    if (!name.trim()) {
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "error",
+        title: "Please enter your name",
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
         },
-        body: JSON.stringify(requestData),
-      }
-    );
+      });
+      return;
+    }
 
-    const result = await response.json();
+    if (!phone.trim()) {
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "error",
+        title: "Please enter your phone number",
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+      });
+      return;
+    }
 
-    if (response.status === 409) {
-  // Handle duplicate request case
-  setIsSubmittingRequest(false);
-  setShowServiceablePopup(false);
-  
-  setTimeout(() => {
-    Swal2.fire({
-      // title: "⏳ Already Requested",
-      html: `
+    // Basic phone validation
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone.trim())) {
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "error",
+        title: "Please enter a valid 10-digit phone number",
+        showConfirmButton: false,
+        timer: 3000,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+      });
+      return;
+    }
+
+    try {
+      setIsSubmittingRequest(true);
+
+      const requestData = {
+        name: name.trim(),
+        phone: phone.trim(),
+        location: {
+          lat: currentLocation?.lat || 0,
+          lng: currentLocation?.lng || 0,
+        },
+        address: currentLocation?.fullAddress || "Address not available",
+        customerId: user?._id || null,
+      };
+
+      // console.log("Submitting service request:", requestData);
+
+      const response = await fetch(
+        "https://api.dailydish.in/api/service-requests",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.status === 409) {
+        // Handle duplicate request case
+        setIsSubmittingRequest(false);
+        setShowServiceablePopup(false);
+
+        setTimeout(() => {
+          Swal2.fire({
+            // title: "⏳ Already Requested",
+            html: `
         <div style="text-align: center; padding: 16px;">
           <h4 style="color: #856404; margin: 0 0 12px 0;">Request Already Exists</h4>
           <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
@@ -661,53 +661,73 @@ const Banner = ({
           </p>
         </div>
       `,
-      confirmButtonText: "OK",
-      confirmButtonColor: "#856404",
-      width: isSmall ? "300px" : "360px",
-      showCloseButton: true,
-      backdrop: true,
-    });
-  }, 300);
-  
-  return;
-}
+            confirmButtonText: "OK",
+            confirmButtonColor: "#856404",
+            width: isSmall ? "300px" : "360px",
+            showCloseButton: true,
+            backdrop: true,
+          });
+        }, 300);
 
-    if (result.success) {
-      // Store the success data first
-      const successData = {
-        name: name.trim(),
-        phone: phone.trim(),
-        address: currentLocation?.fullAddress || "Address not available",
-      };
-      
-      // Close the service request popup
-      setShowServiceablePopup(false);
-      
-      // Clear form fields
-      setServiceRequestName("");
-      setServiceRequestPhone("");
-      
-      // Reset submitting state
-      setIsSubmittingRequest(false);
-      
-      // Wait for modal to fully close before showing success
-      setTimeout(() => {
-        // Use a simpler Swal2 configuration without custom classes
-        Swal2.fire({
-          // title: "🎉 Request Submitted Successfully!",
-          html: `
-            <div style="text-align: center; zIndex:9999999 padding: ${isSmall ? "8px" : "12px"};">
-              <div style="font-size: ${isSmall ? "16px" : "18px"}; color: #6B8E23; margin-bottom: ${isSmall ? "12px" : "15px"}; font-weight: 600;">
+        return;
+      }
+
+      if (result.success) {
+        // Store the success data first
+        const successData = {
+          name: name.trim(),
+          phone: phone.trim(),
+          address: currentLocation?.fullAddress || "Address not available",
+        };
+
+        // Close the service request popup
+        setShowServiceablePopup(false);
+
+        // Clear form fields
+        setServiceRequestName("");
+        setServiceRequestPhone("");
+
+        // Reset submitting state
+        setIsSubmittingRequest(false);
+
+        // Wait for modal to fully close before showing success
+        setTimeout(() => {
+          // Use a simpler Swal2 configuration without custom classes
+          Swal2.fire({
+            // title: "🎉 Request Submitted Successfully!",
+            html: `
+            <div style="text-align: center; zIndex:9999999 padding: ${
+              isSmall ? "8px" : "12px"
+            };">
+              <div style="font-size: ${
+                isSmall ? "16px" : "18px"
+              }; color: #6B8E23; margin-bottom: ${
+              isSmall ? "12px" : "15px"
+            }; font-weight: 600;">
                 ✅ Your service request has been successfully submitted!
               </div>
-              <div style="font-size: ${isSmall ? "13px" : "14px"}; color: #666; line-height: 1.5; margin-bottom: ${isSmall ? "12px" : "15px"};">
-                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"}; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                  <p style="margin: 6px 0;"><strong>Name:</strong> ${successData.name}</p>
-                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${successData.phone}</p>
-                  <p style="margin: 6px 0;"><strong>Address:</strong> ${successData.address}</p>
+              <div style="font-size: ${
+                isSmall ? "13px" : "14px"
+              }; color: #666; line-height: 1.5; margin-bottom: ${
+              isSmall ? "12px" : "15px"
+            };">
+                <div style="text-align: left; margin: 0 auto; max-width: ${
+                  isSmall ? "280px" : "320px"
+                }; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                  <p style="margin: 6px 0;"><strong>Name:</strong> ${
+                    successData.name
+                  }</p>
+                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${
+                    successData.phone
+                  }</p>
+                  <p style="margin: 6px 0;"><strong>Address:</strong> ${
+                    successData.address
+                  }</p>
                 </div>
                 <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
-                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"};">
+                <div style="text-align: left; margin: 0 auto; max-width: ${
+                  isSmall ? "280px" : "320px"
+                };">
                   <p style="margin: 4px 0;">• Our team will review your location</p>
                   <p style="margin: 4px 0;">• We'll contact you within 24 hours</p>
                   <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
@@ -715,40 +735,40 @@ const Banner = ({
               </div>
             </div>
           `,
-          icon: "success",
-          confirmButtonText: "Got it!",
-          confirmButtonColor: "#6B8E23",
-          width: isSmall ? "90%" : "500px",
-          padding: isSmall ? "1rem" : "1.5rem",
-          backdrop: true,
-          allowOutsideClick: true,
-          allowEscapeKey: true,
-          focusConfirm: true,
-          showConfirmButton: true,
-        });
-      }, 500); // Increased delay to ensure modal is fully closed
-    } else {
-      throw new Error(result.message || "Failed to submit request");
+            icon: "success",
+            confirmButtonText: "Got it!",
+            confirmButtonColor: "#6B8E23",
+            width: isSmall ? "90%" : "500px",
+            padding: isSmall ? "1rem" : "1.5rem",
+            backdrop: true,
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            focusConfirm: true,
+            showConfirmButton: true,
+          });
+        }, 500); // Increased delay to ensure modal is fully closed
+      } else {
+        throw new Error(result.message || "Failed to submit request");
+      }
+    } catch (error) {
+      console.error("Error submitting service request:", error);
+      setIsSubmittingRequest(false);
+
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "error",
+        title: error.message || "Failed to submit request. Please try again.",
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+      });
     }
-  } catch (error) {
-    console.error("Error submitting service request:", error);
-    setIsSubmittingRequest(false);
-    
-    Swal2.fire({
-      toast: true,
-      position: "bottom",
-      icon: "error",
-      title: error.message || "Failed to submit request. Please try again.",
-      showConfirmButton: false,
-      timer: 4000,
-      timerProgressBar: true,
-      customClass: {
-        popup: "me-small-toast",
-        title: "me-small-toast-title",
-      },
-    });
-  }
-};
+  };
 
   // Function to handle Request Location click
   const handleRequestLocationClick = () => {

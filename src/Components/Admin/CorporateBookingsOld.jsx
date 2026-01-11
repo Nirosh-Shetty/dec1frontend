@@ -1118,8 +1118,8 @@ const CorporateBookingsOld = () => {
             >
               <option value="">Select Status</option>
               <option value="Cooking">Cooking</option>
-              <option value="Packing">Packing</option>
-              <option value="Ontheway">On the way</option>
+              <option value="Packed">Packed</option>
+              <option value="On the way">On the way</option>
               <option value="Delivered">Delivered</option>
             </select>
           </div>

@@ -620,8 +620,8 @@ function OrderHistory() {
             (() => {
               const progressSteps = [
                 "Cooking",
-                "Packing",
-                "Ontheway",
+                "Packed",
+                "On the way",
                 "Delivered",
               ];
               const statusMap = { inprocess: "Cooking" };

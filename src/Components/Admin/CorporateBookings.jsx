@@ -372,7 +372,9 @@ const CorporateBookings = () => {
             {filters.dateFilterType === "custom" && (
               <>
                 <Col md={3}>
-                  <Form.Label className="fw-bold small">Start Date(Delivery Date)</Form.Label>
+                  <Form.Label className="fw-bold small">
+                    Start Date(Delivery Date)
+                  </Form.Label>
                   <Form.Control
                     type="date"
                     name="startDate"
@@ -444,7 +446,7 @@ const CorporateBookings = () => {
                 <option value="Pending">Pending</option>
                 <option value="Confirmed">Confirmed</option>
                 <option value="Cooking">Cooking</option>
-                <option value="Packing">Packing</option>
+                <option value="Packed">Packing</option>
                 <option value="On the way">On the way</option>
                 <option value="Delivered">Delivered</option>
                 <option value="Cancelled">Cancelled</option>
@@ -1041,7 +1043,7 @@ const CorporateBookings = () => {
                 Select Status
               </option>
               <option value="Cooking">Cooking</option>
-              <option value="Packing">Packing</option>
+              <option value="Packed">Packing</option>
               <option value="On the way">On the way</option>
               <option value="Delivered">Delivered</option>
             </Form.Select>

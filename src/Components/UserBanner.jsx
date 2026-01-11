@@ -944,7 +944,7 @@ const UserBanner = () => {
             position: relative;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border: 5px solid #cccccc;
             height: 200px;
             touch-action: pan-y pinch-zoom;

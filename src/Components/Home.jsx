@@ -92,22 +92,22 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         const primaryAddress = localStorage.getItem("primaryAddress");
         const currentLocation = localStorage.getItem("currentLocation");
 
-        console.log("Initial load - primaryAddress:", primaryAddress);
-        console.log("Initial load - currentLocation:", currentLocation);
+        // console.log("Initial load - primaryAddress:", primaryAddress);
+        // console.log("Initial load - currentLocation:", currentLocation);
 
         if (primaryAddress && primaryAddress !== "null") {
           const parsedPrimary = JSON.parse(primaryAddress);
-          console.log(
-            "Initial load - setting address from primaryAddress:",
-            parsedPrimary
-          );
+          // console.log(
+          //   "Initial load - setting address from primaryAddress:",
+          //   parsedPrimary
+          // );
           setAddress(parsedPrimary);
         } else if (currentLocation && currentLocation !== "null") {
           const parsedCurrent = JSON.parse(currentLocation);
-          console.log(
-            "Initial load - setting address from currentLocation:",
-            parsedCurrent
-          );
+          // console.log(
+          //   "Initial load - setting address from currentLocation:",
+          //   parsedCurrent
+          // );
           setAddress(parsedCurrent);
         } else {
           console.log("Initial load - no address found");
@@ -130,8 +130,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const primaryAddress = localStorage.getItem("primaryAddress");
       const currentLocation = localStorage.getItem("currentLocation");
 
-      console.log("Refreshing address - primaryAddress:", primaryAddress);
-      console.log("Refreshing address - currentLocation:", currentLocation);
+      // console.log("Refreshing address - primaryAddress:", primaryAddress);
+      // console.log("Refreshing address - currentLocation:", currentLocation);
 
       // Clear manual location flag if no addresses are found
       if (
@@ -144,11 +144,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
       if (primaryAddress && primaryAddress !== "null") {
         const parsedPrimary = JSON.parse(primaryAddress);
-        console.log("Setting address from primaryAddress:", parsedPrimary);
+        // console.log("Setting address from primaryAddress:", parsedPrimary);
         setAddress(parsedPrimary);
       } else if (currentLocation && currentLocation !== "null") {
         const parsedCurrent = JSON.parse(currentLocation);
-        console.log("Setting address from currentLocation:", parsedCurrent);
+        // console.log("Setting address from currentLocation:", parsedCurrent);
         setAddress(parsedCurrent);
       } else {
         console.log("No address found, setting to null");
@@ -191,7 +191,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     // Also listen for localStorage changes
     const handleStorageChange = (e) => {
       if (e.key === "currentLocation" || e.key === "primaryAddress") {
-        console.log("localStorage change detected for:", e.key);
+        // console.log("localStorage change detected for:", e.key);
         refreshAddress();
       }
     };
@@ -235,7 +235,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [showLocationPopup, setShowLocationPopup] = useState(false);
 
   const handleSelectionChange = (date1, session1) => {
-    console.log("Selection changed:", date1, session1);
+    // console.log("Selection changed:", date1, session1);
     setSelectedDate(date1);
     setSelectedSession(session1);
     // Reset category to All when session changes to avoid empty states
@@ -301,7 +301,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const fetchAllMenuData = async () => {
       setloader(true);
       try {
-        console.log("Fetching menu for hub:", address.hubId);
+        // console.log("Fetching menu for hub:", address.hubId);
 
         const res = await axios.get(
           "https://api.dailydish.in/api/user/get-hub-menu",
@@ -313,7 +313,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         );
 
         if (res.status === 200) {
-          console.log("Menu data received:", res.data.menu.length, "items");
+          // console.log("Menu data received:", res.data.menu.length, "items");
           setAllHubMenuData(res.data.menu);
         } else {
           setAllHubMenuData([]);
@@ -330,11 +330,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [address?.hubId]); // This will re-run whenever hubId changes
 
   const handleLocationDetected = useCallback((newLocation) => {
-    console.log("Location detected from Banner:", newLocation);
+    // console.log("Location detected from Banner:", newLocation);
 
     // Check if location was manually selected - don't override manual selection
     const manualLocationFlag = localStorage.getItem("locationManuallySelected");
-    console.log("Manual location flag:", manualLocationFlag);
+    // console.log("Manual location flag:", manualLocationFlag);
 
     if (manualLocationFlag === "true") {
       console.log(
@@ -343,7 +343,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       return;
     }
 
-    console.log("Setting new location from Banner:", newLocation);
+    // console.log("Setting new location from Banner:", newLocation);
     setAddress(newLocation);
 
     // Save to localStorage for persistence
@@ -398,97 +398,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [vegFilteredItems, selectedCategory]);
 
   // --- TABS COMPONENT (Modified to use parent state) ---
-  const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
-    return (
-      <div className="tabs-container2">
-        <div className="tabs-scroll-container">
-          <div className="tabs-scroll">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                className={`tab-button ${activeTab === tab ? "active" : ""}`}
-                onClick={() => onTabClick(tab)}
-              >
-                <span className="tab-button-text">{tab}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        <style jsx>{`
-          .tabs-container2 {
-            background-color: ${Colors.creamWalls};
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-            position: relative;
-            border-bottom: 2px solid #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
-              0 2px 6px rgba(0, 0, 0, 0.05);
-          }
-          .tabs-scroll-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-          }
-          .tabs-scroll-container::-webkit-scrollbar {
-            display: none;
-          }
-          .tabs-scroll {
-            display: inline-flex;
-            min-width: 100%;
-            gap: 10px;
-            padding: 0 4px;
-          }
-          .tab-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            padding: 8px 24px;
-            border-radius: 20px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-height: 25px;
-          }
-          .tab-button:hover {
-            background-color: ${Colors.warmbeige}40;
-            transform: translateY(-1px);
-          }
-          .tab-button.active {
-            background-color: ${Colors.greenCardamom};
-            padding: 4px 8px;
-            box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
-            width: auto;
-            height: auto;
-            border-radius: 20px;
-          }
-          .tab-button.active:hover {
-            background-color: ${Colors.greenCardamom}E6;
-            transform: translateY(-1px) scale(1.02);
-          }
-          .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 18px;
-            letter-spacing: -0.7px;
-            color: ${Colors.primaryText};
-            transition: all 0.3s ease;
-          }
-          .tab-button.active .tab-button-text {
-            font-family: "Inter", sans-serif;
-            font-size: 16px;
-            font-weight: 900;
-            line-height: 21px;
-            letter-spacing: -0.8px;
-            color: ${Colors.appForeground};
-          }
-        `}</style>
-      </div>
-    );
-  };
+ 
 
   const isSameDay = (d1, d2) => {
     const a = new Date(d1);
@@ -521,7 +431,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     return false;
   };
 
-  console.log(address, "address");
+  // console.log(address, "address");
   // Helper: always use preorder price if available and before cutoff
   const getEffectivePrice = (item, matchedLocation, session) => {
     const hubPrice =
@@ -588,7 +498,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   // Refresh address when user logs in/out
   useEffect(() => {
-    console.log("User state changed, refreshing address");
+    // console.log("User state changed, refreshing address");
     refreshAddress();
   }, [user]);
 
@@ -713,16 +623,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     const addonedCarts = async () => {
       try {
-        await axios.post(
-          "https://api.dailydish.in/api/cart/addCart",
-          {
-            userId: user?._id,
-            items: storedCart,
-            lastUpdated: Date.now,
-            username: user?.Fname,
-            mobile: user?.Mobile,
-          }
-        );
+        await axios.post("https://api.dailydish.in/api/cart/addCart", {
+          userId: user?._id,
+          items: storedCart,
+          lastUpdated: Date.now,
+          username: user?.Fname,
+          mobile: user?.Mobile,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -733,7 +640,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [JSON.stringify(Carts), user?._id]);
 
   const updateCartData = (updatedCart) => {
-    console.log("Updating cart data:", updatedCart);
+    // console.log("Updating cart data:", updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     setCart(updatedCart);
     setCarts(updatedCart);
@@ -1098,10 +1005,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [groupedCarts]);
   // console.log(address.location?.coordinates,'sfsdfdsf')
   const proceedToPlan = async () => {
-    console.log("🚀 proceedToPlan called");
-    console.log("🚀 user:", user);
-    console.log("🚀 Carts.length:", Carts.length);
-    console.log("🚀 address:", address);
+    // console.log("🚀 proceedToPlan called");
+    // console.log("🚀 user:", user);
+    // console.log("🚀 Carts.length:", Carts.length);
+    // console.log("🚀 address:", address);
 
     if (!user) {
       console.log("❌ proceedToPlan - No user");
@@ -1142,7 +1049,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       });
       return;
     }
-    console.log("✅ proceedToPlan - All checks passed, proceeding...");
+    // console.log("✅ proceedToPlan - All checks passed, proceeding...");
     setloader(true);
     try {
       const addressDetails = {
@@ -1161,13 +1068,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         companyId: address.companyId || "",
       };
 
-      console.log("🚀 proceedToPlan - Making API call with:", {
-        userId: user._id,
-        mobile: user.Mobile,
-        username: user.Fname,
-        itemsCount: Carts.length,
-        addressDetails: addressDetails,
-      });
+      // console.log("🚀 proceedToPlan - Making API call with:", {
+      //   userId: user._id,
+      //   mobile: user.Mobile,
+      //   username: user.Fname,
+      //   itemsCount: Carts.length,
+      //   addressDetails: addressDetails,
+      // });
 
       const res = await axios.post(
         "https://api.dailydish.in/api/user/plan/add-to-plan",
@@ -1180,12 +1087,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         }
       );
 
-      console.log("🚀 proceedToPlan - API response:", res.status);
+      // console.log("🚀 proceedToPlan - API response:", res.status);
 
       if (res.status === 200) {
-        console.log(
-          "✅ proceedToPlan - Success! Clearing cart and navigating to /my-plan"
-        );
+        // console.log(
+        //   "✅ proceedToPlan - Success! Clearing cart and navigating to /my-plan"
+        // );
         localStorage.removeItem("cart");
         setCarts([]);
         navigate("/my-plan");
@@ -1244,7 +1151,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         }
       }
     } catch (error) {
-      console.log("getAllOffer error:", error);
+      // console.log("getAllOffer error:", error);
       setAllOffer([]);
     }
   };
@@ -1849,13 +1756,15 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                             parseFloat(matchedLocation?.basePrice) !==
                               parseFloat(effectivePrice) ? (
                               <div
-                                className="d-flex gap-1 align-items-center"
+                                className="align-items-start"
                                 style={{
                                   textDecoration: "line-through",
                                   color: "#6b6b6b",
                                   fontSize: "15px",
                                   whiteSpace: "nowrap",
                                   flexShrink: 0,
+                                  display: "flex",
+                                  gap: "2px",
                                 }}
                               >
                                 <span className="fw-normal">₹</span>
@@ -1864,7 +1773,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                             ) : null}
 
                             <div
-                              className="d-flex gap-1 align-items-center"
+                              className="align-items-start"
                               style={{
                                 color: "#2c2c2c",
                                 fontFamily: "Inter",
@@ -1874,11 +1783,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 letterSpacing: "-0.8px",
                                 whiteSpace: "nowrap",
                                 flexShrink: 0,
+                                display: "flex",
+                                gap: "2px",
                               }}
                             >
                               {checkOf ? (
-                                <div className="d-flex align-items-center gap-2">
-                                  <div className="d-flex gap-1 align-items-center">
+                                <div className="d-flex align-items-start gap-2">
+                                  <div
+                                    className="align-items-start"
+                                    style={{ display: "flex", gap: "2px" }}
+                                  >
                                     <span className="fw-bold">₹</span>
                                     <span
                                       style={{
@@ -1893,13 +1807,27 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                       {effectivePrice}
                                     </span>
                                   </div>
-                                  <div className="d-flex gap-1 align-items-center">
+                                  <div
+                                    className="align-items-start"
+                                    style={{
+                                      display: "flex",
+                                      gap: "2px",
+                                      marginLeft: "5px",
+                                    }}
+                                  >
                                     <span className="fw-normal">₹</span>
                                     <span>{checkOf?.price}</span>
                                   </div>
                                 </div>
                               ) : (
-                                <div className="d-flex gap-1 align-items-center">
+                                <div
+                                  className=" align-items-start"
+                                  style={{
+                                    display: "flex",
+                                    gap: "1px",
+                                    marginLeft: "6px",
+                                  }}
+                                >
                                   <span className="fw-bold">₹</span>
                                   <span>{effectivePrice}</span>
                                 </div>
@@ -2544,5 +2472,97 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     </div>
   );
 };
+
+ const TabsComponent = ({ tabs, activeTab, onTabClick }) => {
+    return (
+      <div className="tabs-container2">
+        <div className="tabs-scroll-container">
+          <div className="tabs-scroll">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                className={`tab-button ${activeTab === tab ? "active" : ""}`}
+                onClick={() => onTabClick(tab)}
+              >
+                <span className="tab-button-text">{tab}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <style jsx>{`
+          .tabs-container2 {
+            background-color: ${Colors.creamWalls};
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            position: relative;
+            border-bottom: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
+              0 2px 6px rgba(0, 0, 0, 0.05);
+          }
+          .tabs-scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .tabs-scroll-container::-webkit-scrollbar {
+            display: none;
+          }
+          .tabs-scroll {
+            display: inline-flex;
+            min-width: 100%;
+            gap: 10px;
+            padding: 0 4px;
+          }
+          .tab-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 24px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-height: 25px;
+          }
+          .tab-button:hover {
+            background-color: ${Colors.warmbeige}40;
+            transform: translateY(-1px);
+          }
+          .tab-button.active {
+            background-color: ${Colors.greenCardamom};
+            padding: 4px 8px;
+            box-shadow: 0 2px 8px ${Colors.greenCardamom}80;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+          }
+          .tab-button.active:hover {
+            background-color: ${Colors.greenCardamom}E6;
+            transform: translateY(-1px) scale(1.02);
+          }
+          .tab-button-text {
+            font-family: "Inter", sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 18px;
+            letter-spacing: -0.7px;
+            color: ${Colors.primaryText};
+            transition: all 0.3s ease;
+          }
+          .tab-button.active .tab-button-text {
+            font-family: "Inter", sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 21px;
+            letter-spacing: -0.8px;
+            color: ${Colors.appForeground};
+          }
+        `}</style>
+      </div>
+    );
+  };
 
 export default Home;
