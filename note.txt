@@ -6,4 +6,5 @@ import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
 https://dd-merge-backend-2.onrender.com
 https://api.dailydish.in
+https://dailydish.in
 http://localhost:7013

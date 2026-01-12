@@ -113,7 +113,36 @@ const ViewPlanModal = ({
           !res.data.data ||
           res.data.message === "Plan removed as it is empty"
         ) {
-          toast.info("Plan removed because it became empty.");
+          Swal2.fire({
+            toast: true,
+            position: "bottom",
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            html: `
+          <div class="myplans-toast-content">
+            <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+            <div class="myplans-toast-text">
+              <div class="myplans-toast-title">Plan Removed.</div>
+              <div class="myplans-toast-subtitle">Plan removed as it is empty</div>
+            </div>
+          </div>
+        `,
+            customClass: {
+              popup: "myplans-custom-toast",
+              htmlContainer: "myplans-toast-html",
+            },
+            didOpen: () => {
+              // Position above bottom nav
+              const toast = document.querySelector(".myplans-custom-toast");
+              if (toast) {
+                toast.style.bottom = "90px"; // Position above bottom nav
+                toast.style.left = "50%";
+                toast.style.transform = "translateX(-50%)";
+                toast.style.position = "fixed";
+              }
+            },
+          });
           onClose(); // Close the modal
           if (onPlanUpdated) onPlanUpdated(); // Refresh parent list
           return;
@@ -220,7 +249,7 @@ const ViewPlanModal = ({
   // Compute max wallet deduction (same as Checkout)
   const maxWalletDeduction = Math.max(
     0,
-    Math.min(walletBalance, localPlan.slotTotalAmount || 0)
+    Math.min(walletBalance, localPlan.payableAmount || 0)
   );
   const [walletDeduction, setWalletDeduction] = useState(0);
   // Update wallet deduction when useWallet toggles or wallet/plan changes
@@ -400,13 +429,13 @@ const ViewPlanModal = ({
         onClick={(e) => {
           e.stopPropagation();
         }}
-      // style={
-      //   localPlan.status === "Pending Payment" && isBeforeDeadline
-      //     ? {
-      //         borderTopRightRadius: 0,
-      //       }
-      //     : {}
-      // }
+        // style={
+        //   localPlan.status === "Pending Payment" && isBeforeDeadline
+        //     ? {
+        //         borderTopRightRadius: 0,
+        //       }
+        //     : {}
+        // }
       >
         {/* Header */}
         <div className="modal-header-section">
@@ -418,8 +447,8 @@ const ViewPlanModal = ({
                 {localPlan?.addressType === "School"
                   ? "12:00 to 12:15 PM"
                   : localPlan?.session === "Lunch"
-                    ? "12:00 to 01:00 PM"
-                    : "07:30 to 08:30 PM"}
+                  ? "12:00 to 01:00 PM"
+                  : "07:30 to 08:30 PM"}
               </div>
             </div>
 
@@ -504,8 +533,9 @@ const ViewPlanModal = ({
                       {/* qty +/- disabled for now; can be wired to updatePlanProduct API */}
                       <div className="quantity-control">
                         <div
-                          className={`${!isEditable && "disabled"
-                            } quantity-control`}
+                          className={`${
+                            !isEditable && "disabled"
+                          } quantity-control`}
                         >
                           <button
                             className="quantity-btn"
@@ -513,7 +543,7 @@ const ViewPlanModal = ({
                             onClick={() =>
                               changeQuantity(
                                 product.foodItemId?.toString?.() ||
-                                product.foodItemId,
+                                  product.foodItemId,
                                 -1
                               )
                             }
@@ -531,7 +561,7 @@ const ViewPlanModal = ({
                             onClick={() =>
                               changeQuantity(
                                 product.foodItemId?.toString?.() ||
-                                product.foodItemId,
+                                  product.foodItemId,
                                 1
                               )
                             }
@@ -544,17 +574,17 @@ const ViewPlanModal = ({
                         {/* Always show preorder price, as only preorder is allowed */}
                         {product.hubTotalPrice?.toFixed(0) <
                           product.totalPrice?.toFixed(0) && (
-                            <div className="plan-actual-price">
-                              <div className="plan-current-currency">
-                                <div className="current-currency-text">₹</div>
-                              </div>
-                              <div className="plan-hub-amount">
-                                <div className="hub-amount-text">
-                                  {product.hubTotalPrice?.toFixed(0)}
-                                </div>
+                          <div className="plan-actual-price">
+                            <div className="plan-current-currency">
+                              <div className="current-currency-text">₹</div>
+                            </div>
+                            <div className="plan-hub-amount">
+                              <div className="hub-amount-text">
+                                {product.hubTotalPrice?.toFixed(0)}
                               </div>
                             </div>
-                          )}
+                          </div>
+                        )}
 
                         <div className="plan-current-price">
                           <div className="plan-current-currency">
@@ -640,25 +670,25 @@ const ViewPlanModal = ({
                       localPlan?.addressType === "Home"
                         ? localPlan?.homeName || "Home"
                         : localPlan?.addressType === "PG"
-                          ? localPlan?.apartmentName || "PG"
-                          : localPlan?.addressType === "School"
-                            ? localPlan?.schoolName || "School"
-                            : localPlan?.addressType === "Work" ||
-                              localPlan?.addressType === "corporate"
-                              ? localPlan?.companyName
-                              : localPlan?.addressType || "Delivery Location"
+                        ? localPlan?.apartmentName || "PG"
+                        : localPlan?.addressType === "School"
+                        ? localPlan?.schoolName || "School"
+                        : localPlan?.addressType === "Work" ||
+                          localPlan?.addressType === "corporate"
+                        ? localPlan?.companyName
+                        : localPlan?.addressType || "Delivery Location"
                     }
                   >
                     {localPlan?.addressType === "Home"
                       ? localPlan?.homeName || "Home"
                       : localPlan?.addressType === "PG"
-                        ? localPlan?.apartmentName || "PG"
-                        : localPlan?.addressType === "School"
-                          ? localPlan?.schoolName || "School"
-                          : localPlan?.addressType === "Work" ||
-                            localPlan?.addressType === "corporate"
-                            ? localPlan?.companyName
-                            : localPlan?.addressType || "Delivery Location"}
+                      ? localPlan?.apartmentName || "PG"
+                      : localPlan?.addressType === "School"
+                      ? localPlan?.schoolName || "School"
+                      : localPlan?.addressType === "Work" ||
+                        localPlan?.addressType === "corporate"
+                      ? localPlan?.companyName
+                      : localPlan?.addressType || "Delivery Location"}
                   </p>
 
                   {/* 2. Full Address */}
@@ -683,18 +713,18 @@ const ViewPlanModal = ({
                   {/* 4. Student Details (Only shows if School or student data exists) */}
                   {(localPlan?.addressType === "School" ||
                     localPlan?.studentName) && (
-                      <div className="caption-section" data-text-role="Caption">
-                        <div className="user-detailss mt-1">
-                          {localPlan?.studentName}
-                          {localPlan?.studentClass
-                            ? ` | Class - ${localPlan.studentClass}`
-                            : ""}
-                          {localPlan?.studentSection
-                            ? ` | Section - ${localPlan.studentSection}`
-                            : ""}
-                        </div>
+                    <div className="caption-section" data-text-role="Caption">
+                      <div className="user-detailss mt-1">
+                        {localPlan?.studentName}
+                        {localPlan?.studentClass
+                          ? ` | Class - ${localPlan.studentClass}`
+                          : ""}
+                        {localPlan?.studentSection
+                          ? ` | Section - ${localPlan.studentSection}`
+                          : ""}
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Change Button */}
@@ -798,12 +828,12 @@ const ViewPlanModal = ({
                 name="Apply Wallet"
                 onChange={(e) => setUseWallet(e.target.checked)}
                 disabled={walletBalance <= 0}
-              // style={{
-              //   border: discountWallet
-              //     ? "1px solid #6B8E23 !important"
-              //     : "1px solid #6B6B6B !important",
-              //   backgroundColor: discountWallet ? "#6B8E23" : "white",
-              // }}
+                // style={{
+                //   border: discountWallet
+                //     ? "1px solid #6B8E23 !important"
+                //     : "1px solid #6B6B6B !important",
+                //   backgroundColor: discountWallet ? "#6B8E23" : "white",
+                // }}
               />
               {/* Wallet Credit Text */}
               <div className="wallet-text">
@@ -1036,7 +1066,36 @@ const ViewPlanModal = ({
         onItemsUpdated={(updatedPlan) => {
           if (!updatedPlan) {
             // Plan was deleted (empty)
-            toast.info("Plan removed because it became empty.");
+            Swal2.fire({
+              toast: true,
+              position: "bottom",
+              showConfirmButton: false,
+              timer: 2500,
+              timerProgressBar: true,
+              html: `
+          <div class="myplans-toast-content">
+            <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+            <div class="myplans-toast-text">
+              <div class="myplans-toast-title">Plan Removed.</div>
+              <div class="myplans-toast-subtitle">Plan removed as it is empty</div>
+            </div>
+          </div>
+        `,
+              customClass: {
+                popup: "myplans-custom-toast",
+                htmlContainer: "myplans-toast-html",
+              },
+              didOpen: () => {
+                // Position above bottom nav
+                const toast = document.querySelector(".myplans-custom-toast");
+                if (toast) {
+                  toast.style.bottom = "90px"; // Position above bottom nav
+                  toast.style.left = "50%";
+                  toast.style.transform = "translateX(-50%)";
+                  toast.style.position = "fixed";
+                }
+              },
+            });
             setShowAddMoreModal(false);
             onClose(); // Close the parent ViewPlanModal immediately
             if (onPlanUpdated) onPlanUpdated(); // Refresh the main list
@@ -1078,7 +1137,7 @@ const MyPlan = () => {
   }
   const address = JSON.parse(
     localStorage.getItem("primaryAddress") ??
-    localStorage.getItem("currentLocation")
+      localStorage.getItem("currentLocation")
   );
 
   // console.log(address);
@@ -1309,9 +1368,10 @@ const MyPlan = () => {
   const mobile = user?.Mobile;
   const username = user?.Fname;
 
-
   async function handlePayPlan(plan, deliveryNotes, discountWallet = 0) {
     try {
+      console.log(discountWallet, "ssssssssssssssssssssssssssss");
+
       const amount = plan.payableAmount - discountWallet;
       const generateUniqueId = () => {
         const timestamp = Date.now().toString().slice(-4);
@@ -1372,18 +1432,17 @@ const MyPlan = () => {
         const redirectInfo = res.data?.url;
 
         if (amount === 0) {
-
           // toast.success("Plan Confirmed successfully! 🎉", {
           //   position: "bottom-center",
           //   autoClose: 3000,
           // });
-            Swal2.fire({
-                toast: true,
-                position: "bottom",
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                html: `
+          Swal2.fire({
+            toast: true,
+            position: "bottom",
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            html: `
                   <div class="myplans-toast-content">
                     <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
                     <div class="myplans-toast-text">
@@ -1392,22 +1451,21 @@ const MyPlan = () => {
                     </div>
                   </div>
                 `,
-                customClass: {
-                  popup: "myplans-custom-toast",
-                  htmlContainer: "myplans-toast-html",
-                },
-                didOpen: () => {
-                  // Position above bottom nav
-                  const toast = document.querySelector(".myplans-custom-toast");
-                  if (toast) {
-                    toast.style.bottom = "90px"; // Position above bottom nav
-                    toast.style.left = "50%";
-                    toast.style.transform = "translateX(-50%)";
-                    toast.style.position = "fixed";
-                  }
-                },
-              });
-        
+            customClass: {
+              popup: "myplans-custom-toast",
+              htmlContainer: "myplans-toast-html",
+            },
+            didOpen: () => {
+              // Position above bottom nav
+              const toast = document.querySelector(".myplans-custom-toast");
+              if (toast) {
+                toast.style.bottom = "90px"; // Position above bottom nav
+                toast.style.left = "50%";
+                toast.style.transform = "translateX(-50%)";
+                toast.style.position = "fixed";
+              }
+            },
+          });
         }
         // else {
         //    toast.success("Order created! Redirecting...", {
@@ -1596,7 +1654,7 @@ const MyPlan = () => {
         {/* Header */}
         <div className="mobile-banner-updated">
           <div
-            className="screen-checkout mb-2 checkout-header d-flex align-items-center"
+            className="screen-checkout mb-2 d-flex align-items-center"
             style={{ gap: "24px" }}
           >
             <div>
@@ -1619,7 +1677,7 @@ const MyPlan = () => {
               className=""
               style={{ display: "flex", alignItems: "center", gap: 3 }}
             >
-              <h3 className="tagline">My Plans</h3>
+              <h3 className="plan-header-text">My Plans</h3>
               <img
                 src={pending}
                 alt=""
@@ -1696,8 +1754,9 @@ const MyPlan = () => {
                   key={tab}
                   onClick={() => hasPlan && setSelectedTab(tab)}
                   // Add 'grayed-out' class if there is NO plan
-                  className={`tab-btn ${isActive ? "active" : ""} ${!hasPlan ? "grayed-out" : ""
-                    }`}
+                  className={`tab-btn ${isActive ? "active" : ""} ${
+                    !hasPlan ? "grayed-out" : ""
+                  }`}
                 >
                   <h1 className={`tab-label ${isActive ? "active" : ""}`}>
                     {label}
@@ -1743,8 +1802,9 @@ const MyPlan = () => {
                   <>
                     <div
                       key={plan._id}
-                      className={`plan-card ${plan.status === "Confirmed" ? "confirmed" : ""
-                        }`}
+                      className={`plan-card ${
+                        plan.status === "Confirmed" ? "confirmed" : ""
+                      }`}
                     >
                       {/* reminder for unpaid before cutoff */}
 
@@ -1831,12 +1891,12 @@ const MyPlan = () => {
                             {plan?.addressType === "Home"
                               ? plan?.homeName || "Home"
                               : plan?.addressType === "PG"
-                                ? plan?.apartmentName || "PG"
-                                : plan?.addressType === "School"
-                                  ? plan?.schoolName || "School"
-                                  : plan?.addressType === "Work"
-                                    ? plan?.companyName || "Company"
-                                    : "Unknown"}
+                              ? plan?.apartmentName || "PG"
+                              : plan?.addressType === "School"
+                              ? plan?.schoolName || "School"
+                              : plan?.addressType === "Work"
+                              ? plan?.companyName || "Company"
+                              : "Unknown"}
                           </h1>
                           <p className="addressLine2 text-truncate">
                             {plan.delivarylocation}
@@ -1879,8 +1939,9 @@ const MyPlan = () => {
                                 style={{ width: "15px", height: "15px" }}
                               /> */}
                               <div className="reminder-banner">
-                                {`Confirm before ${plan.session === "Lunch" ? "10AM" : "4PM"
-                                  }`}
+                                {`Confirm before ${
+                                  plan.session === "Lunch" ? "10AM" : "4PM"
+                                }`}
                               </div>
                               {/* <div className="reminder-banner">
                                 {`Before ${
@@ -1932,10 +1993,11 @@ const MyPlan = () => {
                             // </button>
 
                             <button
-                              className={`pay-btn ${processingPlanId === plan._id
+                              className={`pay-btn ${
+                                processingPlanId === plan._id
                                   ? "processing"
                                   : ""
-                                }`}
+                              }`}
                               // onClick={() => handlePayPlan(plan, "")}
                               onClick={() => {
                                 console.log("PAY BUTTON CLICKED");
@@ -2292,8 +2354,8 @@ const MyPlan = () => {
                       {sessionDetails === "Lunch"
                         ? "12:00 - 1:00 PM"
                         : sessionDetails === "Dinner"
-                          ? "7:30 - 8:30 PM"
-                          : ""}
+                        ? "7:30 - 8:30 PM"
+                        : ""}
                     </span>
                   </div>
                 </>

@@ -624,7 +624,10 @@ function OrderHistory() {
                 "On the way",
                 "Delivered",
               ];
-              const statusMap = { inprocess: "Cooking" };
+              const statusMap = { 
+                inprocess: "Cooking",
+                undelivered: "Undelivered"
+              };
               const currentStatus =
                 statusMap[currentTrackedOrder.rawStatus] ||
                 currentTrackedOrder.rawStatus;

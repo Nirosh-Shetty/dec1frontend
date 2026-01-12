@@ -503,8 +503,8 @@ const MultiCartDrawer = ({
 }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const address = JSON.parse(
-    localStorage.getItem("currentLocation") ??
-      localStorage.getItem("primaryAddress")
+    localStorage.getItem("primaryAddress")
+    // localStorage.getItem("currentLocation")
   );
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -627,7 +627,7 @@ const MultiCartDrawer = ({
                     Picked : {groupedCarts.length} meals
                   </div>
                 </div>
-                {user ? (
+                {user && address ? (
                   <div
                     className="d-flex gap-2 viewcartbtn align-items-center"
                     onClick={handleMoveToMyPlans}
@@ -635,6 +635,18 @@ const MultiCartDrawer = ({
                     <div className="my-meal-text">
                       <img src={arrow} alt="Arrow" className="button-arrow" />
                       Move to My Plans
+                    </div>
+                  </div>
+                ) : user && !address ? (
+                  <div
+                    className="d-flex gap-2 viewcartbtn align-items-center"
+                    onClick={() => {
+                      navigate("/location");
+                    }}
+                  >
+                    <div className="my-meal-text">
+                      <img src={arrow} alt="Arrow" className="button-arrow" />
+                      Add location
                     </div>
                   </div>
                 ) : (
@@ -673,11 +685,13 @@ const MultiCartDrawer = ({
                 <div
                   className="checkout-top"
                   onClick={() => {
-                    user ? handleMoveToMyPlans() : handleMyMealClickForGuest();
+
+                    user && address ? handleMoveToMyPlans() :user && !address ? navigate("/location") : handleMyMealClickForGuest();
                   }}
                 >
                   <img src={arrow} alt="arrow" className="header-arrow" />
-                  {user ? "Move to My Plans" : "Login to continue"}
+                  {user && !address ? "Add location" : user && address? "Move to My Plans" : "Login to continue"}
+
                 </div>
               </div>
 

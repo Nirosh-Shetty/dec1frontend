@@ -287,7 +287,7 @@ const Banner = ({
       setIsCheckingServiceability(true);
 
       const response = await fetch(
-        "http://localhost:7013/api/Hub/validate-location",
+        "https://dailydish.in/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -448,7 +448,7 @@ const Banner = ({
   //     console.log("Submitting service request:", requestData);
 
   //     const response = await fetch(
-  //       "http://localhost:7013/api/service-requests",
+  //       "https://dailydish.in/api/service-requests",
   //       {
   //         method: "POST",
   //         headers: {
@@ -630,7 +630,7 @@ const Banner = ({
       // console.log("Submitting service request:", requestData);
 
       const response = await fetch(
-        "http://localhost:7013/api/service-requests",
+        "https://dailydish.in/api/service-requests",
         {
           method: "POST",
           headers: {
@@ -994,7 +994,7 @@ const Banner = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dailydish.in/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1078,7 +1078,7 @@ const Banner = ({
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
+      let res = await axios.get("https://dailydish.in/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -1094,7 +1094,7 @@ const Banner = ({
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
+      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -1112,7 +1112,7 @@ const Banner = ({
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("http://localhost:7013/api/admin/getstories");
+        let res = await axios.get("https://dailydish.in/api/admin/getstories");
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -1196,7 +1196,7 @@ const Banner = ({
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dailydish.in/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1243,7 +1243,7 @@ const Banner = ({
   const getSelectedAddress = async () => {
     try {
       let res = await axios.get(
-        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
+        `https://dailydish.in/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
       );
       if (res.status === 200) {
         setSelectedAddress(res.data.getdata);
@@ -1282,7 +1282,7 @@ const Banner = ({
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(`http://localhost:7013/api/user/addressadd`, {
+      let res = await axios.post(`https://dailydish.in/api/user/addressadd`, {
         Name: user?.Fname,
         Number: user?.Mobile,
         userId: user?._id,
@@ -1336,7 +1336,7 @@ const Banner = ({
         }
 
         const response = await fetch(
-          `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+          `https://dailydish.in/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: getAuthHeaders(),
