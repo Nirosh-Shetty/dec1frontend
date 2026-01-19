@@ -1092,8 +1092,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         houseName: address.houseName || "",
         apartmentName: address.apartmentName || "",
         companyName: address.companyName || "",
-        customerType: address.customerType || "",
+        // customerType: address.customerType || "",
         companyId: address.companyId || "",
+        customerType:user.status || ""
       };
 
       // console.log("🚀 proceedToPlan - Making API call with:", {

@@ -66,6 +66,7 @@ const HubWiseProductManagement = () => {
     remainingQuantity: 0,
     hubPriority: 0,
     product: null,
+    preOrderPrice: 0,
   });
 
   const [selectedProductForDelete, setSelectedProductForDelete] =
@@ -176,6 +177,7 @@ const HubWiseProductManagement = () => {
       setIsLoading(true);
       const updateData = {
         hubPrice: Number(editHubProductForm.hubPrice),
+        preOrderPrice: Number(editHubProductForm.preOrderPrice),
         totalQuantity: Number(editHubProductForm.totalQuantity),
         remainingQuantity: Number(editHubProductForm.remainingQuantity),
         hubPriority: Number(editHubProductForm.hubPriority),
@@ -365,6 +367,7 @@ const HubWiseProductManagement = () => {
       productId: menuItem.productId._id,
       foodname: menuItem.productId.foodname,
       hubPrice: menuItem.hubPrice,
+      preOrderPrice: menuItem.preOrderPrice,
       totalQuantity: menuItem.totalQuantity,
       remainingQuantity: menuItem.remainingQuantity,
       hubPriority: menuItem.hubPriority,
@@ -1065,6 +1068,21 @@ const HubWiseProductManagement = () => {
                         setEditHubProductForm({
                           ...editHubProductForm,
                           hubPrice: e.target.value,
+                        })
+                      }
+                    />
+                  </Form.Group>
+                </div>
+                <div className="col-md-6">
+                  <Form.Group className="mb-3">
+                    <Form.Label>Pre Order Price (₹)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={editHubProductForm.preOrderPrice}
+                      onChange={(e) =>
+                        setEditHubProductForm({
+                          ...editHubProductForm,
+                          preOrderPrice: e.target.value,
                         })
                       }
                     />

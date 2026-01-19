@@ -664,8 +664,8 @@ const CorporateBookings = () => {
                         {items?.Mobilenumber}
                       </td>
                       <td style={{ paddingTop: "20px" }}>
-                        {items?.companyName}
-                      </td>{" "}
+                        {items?.customerType}
+                      </td>
                       {/* Using companyName */}
                       <td style={{ paddingTop: "20px" }}>
                         {items?.addressType}
