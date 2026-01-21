@@ -1111,6 +1111,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           userId: user._id,
           mobile: user.Mobile,
           username: user.Fname,
+          companyId: user?.companyId || "",
           items: Carts,
           addressDetails: addressDetails,
         }
