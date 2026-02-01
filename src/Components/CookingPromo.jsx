@@ -57,9 +57,9 @@ const CookingPromo = () => {
             />
           </span>
           <span className="offer-text" style={{marginRight:"2px"}}>
-            ₹50 
+            ₹75 
           </span>
-          <span className="offer-text2" >off each on your first 3 confirmed plans.</span>
+          <span className="offer-text2" >off across your first 3 plans.</span>
           <span className="rupee-symbol">
             <img 
               src={discountIcon} 

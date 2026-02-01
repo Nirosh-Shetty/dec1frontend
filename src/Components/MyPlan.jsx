@@ -298,7 +298,6 @@ const ViewPlanModal = ({
   const handleAddressSelected = async (address) => {
     try {
       setLoading(true);
-      // Call backend to update plan address
       const response = await axios.post(
         "https://dailydish.in/api/user/plan/update-address",
         {
@@ -1016,7 +1015,7 @@ const ViewPlanModal = ({
             </>
           )}
 
-          {/* {isPaidEditable && (
+           {isPaidEditable && (
             <button
               className="skip-btn"
               onClick={handleSkipOrCancel}
@@ -1029,7 +1028,7 @@ const ViewPlanModal = ({
                 style={{ marginLeft: 6, width: 16 }}
               />
             </button>
-          )} */}
+          )}
           {isConfirmed && (
             <button
               className="track-order-btn"
@@ -1125,7 +1124,9 @@ const MyPlan = () => {
   const [showQuickAnswers, setShowQuickAnswers] = useState(false);
   const [processingPlanId, setProcessingPlanId] = useState(null);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
-  const { fetchWalletData } = useContext(WalletContext);
+  const [isProcessingAllPlans, setIsProcessingAllPlans] = useState(false);
+  const { wallet, fetchWalletData } = useContext(WalletContext);
+  const walletBalance = wallet?.balance || 0;
   const [sessionDetails, setSessionDetails] = useState(null);
   // TODO: wire this to your auth/user context
   // parse stored user once so we can access properties safely
@@ -1648,6 +1649,174 @@ const MyPlan = () => {
   //   }
   // }
 
+  async function proceedWithPayment(walletDeduction = 0) {
+    try {
+      setIsProcessingAllPlans(true);
+      
+      // Get ALL pending payment plans from entire list (not just current tab)
+      const allPendingPlans = plans.filter(
+        (p) => p.status === "Pending Payment"
+      );
+
+      if (allPendingPlans.length === 0) {
+        toast.error("No pending plans to confirm");
+        setIsProcessingAllPlans(false);
+        return;
+      }
+
+      // Calculate total amount
+      const totalAmount = allPendingPlans.reduce(
+        (sum, plan) => sum + (plan.payableAmount || plan.slotTotalAmount || 0),
+        0
+      );
+
+      // Apply wallet deduction
+      const finalPayableAmount = Math.max(0, totalAmount - walletDeduction);
+
+      // If amount is 0, directly confirm without payment gateway
+      if (finalPayableAmount === 0) {
+        const res = await axios.post(
+          "https://dailydish.in/api/user/plan/confirm-all",
+          {
+            userId,
+            planIds: allPendingPlans.map((p) => p._id),
+            discountWallet: walletDeduction,
+          }
+        );
+
+        if (res.data.success) {
+          Swal2.fire({
+            toast: true,
+            position: "bottom",
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            html: `
+              <div class="myplans-toast-content">
+                <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+                <div class="myplans-toast-text">
+                  <div class="myplans-toast-title">Success!</div>
+                  <div class="myplans-toast-subtitle">All ${allPendingPlans.length} plan(s) confirmed! 🎉</div>
+                </div>
+              </div>
+            `,
+          });
+          await fetchWalletData();
+          await fetchPlans();
+        } else {
+          toast.error(res.data.message || "Failed to confirm plans");
+        }
+        setIsProcessingAllPlans(false);
+        return;
+      }
+
+      // Generate config for payment callback to execute
+      const configObj = {
+        method: "post",
+        baseURL: "https://dailydish.in/api/",
+        url: "/user/plan/confirm-all",
+        headers: { "content-type": "application/json" },
+        data: {
+          userId,
+          planIds: allPendingPlans.map((p) => p._id),
+          discountWallet: walletDeduction,
+        },
+      };
+
+      // Call payment gateway with config
+      const paymentConfig = {
+        method: "post",
+        baseURL: "https://dailydish.in/api/",
+        url: "/user/addpaymentphoneMultiple",
+        headers: { "content-type": "application/json" },
+        data: {
+          userId,
+          username: username,
+          Mobile: mobile,
+          amount: finalPayableAmount,
+          planIds: allPendingPlans.map((p) => p._id),
+          discountWallet: walletDeduction,
+          config: JSON.stringify(configObj),
+        },
+      };
+
+      const res = await axios(paymentConfig);
+
+      if (res.data?.url) {
+        // Redirect to PhonePe payment
+        window.location.href = res.data.url;
+      } else {
+        toast.error("Payment gateway not available");
+      }
+    } catch (err) {
+      console.error("Error in payment for all plans:", err);
+      toast.error(err.response?.data?.message || "Payment initiation failed");
+    } finally {
+      setIsProcessingAllPlans(false);
+    }
+  }
+
+  function handlePayAllPlans() {
+    // Get pending plans and calculate totals
+    const allPendingPlans = plans.filter(
+      (p) => p.status === "Pending Payment"
+    );
+
+    if (allPendingPlans.length === 0) {
+      toast.error("No pending plans to confirm");
+      return;
+    }
+
+    const totalAmount = allPendingPlans.reduce(
+      (sum, plan) => sum + (plan.payableAmount || plan.slotTotalAmount || 0),
+      0
+    );
+
+    // If wallet balance is 0 or total is 0, proceed directly
+    if (walletBalance <= 0 || totalAmount === 0) {
+      proceedWithPayment(0);
+      return;
+    }
+
+    const maxWalletDeduction = Math.min(walletBalance, totalAmount);
+    const finalAmount = totalAmount - maxWalletDeduction;
+
+    // Show wallet dialog
+    Swal2.fire({
+      title: "Use Wallet Credit?",
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <div style="margin: 12px 0; font-size: 14px;">
+            <span style="color: #666;">Total Amount:</span>
+            <span style="float: right; font-weight: 600;">₹${totalAmount.toFixed(0)}</span>
+          </div>
+          <div style="margin: 12px 0; font-size: 14px;">
+            <span style="color: #666;">Wallet Available:</span>
+            <span style="float: right; font-weight: 600; color: #6b8e23;">₹${maxWalletDeduction.toFixed(0)}</span>
+          </div>
+          <div style="border-top: 1px solid #eee; margin: 12px 0;"></div>
+          <div style="margin: 12px 0; font-size: 16px;">
+            <span style="color: #333;">You Pay:</span>
+            <span style="float: right; font-weight: 700; color: #6b8e23; font-size: 18px;">₹${finalAmount.toFixed(0)}</span>
+          </div>
+        </div>
+      `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Use Wallet",
+      cancelButtonText: "Pay Full Amount",
+      confirmButtonColor: "#6b8e23",
+      cancelButtonColor: "#999",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        proceedWithPayment(maxWalletDeduction);
+      } else if (result.dismiss === Swal2.DismissReason.cancel) {
+        proceedWithPayment(0);
+      }
+    });
+  }
+
   return (
     <div className="my-plan-container mainbg">
       <div className="checkoutcontainer">
@@ -2103,6 +2272,47 @@ const MyPlan = () => {
             )}
           </div>
         </div>
+
+        {/* Pay All Button - Show only if there are pending plans */}
+        {(() => {
+          const pendingPlans = currentTabOrders.filter(
+            (p) => p.status === "Pending Payment"
+          );
+          const totalAmount = pendingPlans.reduce(
+            (sum, p) => sum + (p.payableAmount || 0),
+            0
+          );
+
+          return (
+            pendingPlans.length > 0 && (
+              <div className="pay-all-btn-container">
+                <button
+                  className={`pay-all-btn ${
+                    isProcessingAllPlans ? "processing" : ""
+                  }`}
+                  onClick={handlePayAllPlans}
+                  disabled={isProcessingAllPlans}
+                >
+                  <div className="pay-all-btn-left">
+                    {isProcessingAllPlans ? (
+                      <>
+                        <span className="button-loader"></span>
+                        <span style={{ marginTop: "4px" }}>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Confirm & Pay All</span>
+                        <span className="pay-all-total">
+                          ₹{totalAmount.toFixed(0)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              </div>
+            )
+          );
+        })()}
       </div>
 
       {selectedPlan && (
@@ -2581,8 +2791,8 @@ const MyPlan = () => {
               Discounts apply automatically where eligible.
               <br />
               <br />
-              <strong>New Users:</strong> Get <strong>₹50 off</strong> on your
-              first <strong>3</strong> confirmed orders.
+              Get <strong>₹75 off</strong> accross
+              your <strong>first 3</strong> orders.
               <br />
               <br />
               You'll see the discount breakdown inside "View Plan" before you
@@ -2685,6 +2895,48 @@ const MyPlan = () => {
       </Modal>
 
       <BottomNav />
+
+      {/* Pay All Button - Fixed at bottom */}
+      {(() => {
+        const allPendingPlans = plans.filter((p) => p.status === "Pending Payment");
+        if (allPendingPlans.length === 0) return null;
+
+        const totalAmount = allPendingPlans.reduce(
+          (sum, plan) => sum + (plan.payableAmount || plan.slotTotalAmount || 0),
+          0
+        );
+
+        return (
+          <div className="pay-all-btn-container">
+            <div className="pay-all-btn-content">
+              <div className="pay-all-info">
+                <div className="pay-all-label">Confirm & Pay All</div>
+                <div className="pay-all-total">₹{totalAmount.toFixed(0)}</div>
+                <div className="pay-all-count">{allPendingPlans.length} plan{allPendingPlans.length > 1 ? "s" : ""}</div>
+              </div>
+              <button
+                className={`pay-all-btn ${isProcessingAllPlans ? "processing" : ""}`}
+                onClick={handlePayAllPlans}
+                disabled={isProcessingAllPlans}
+              >
+                <div className="pay-all-btn-text">
+                  {isProcessingAllPlans ? (
+                    <>
+                      <span className="button-loader"></span>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <span className="pay-all-btn-icon">✓</span>
+                      Confirm All
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
