@@ -69,13 +69,13 @@ const ViewPlanModal = ({
     // setDeliveryNotes(plan.deliveryNotes || "");
   }, [plan]);
 
-  // Only allow editing if before cutoff (10am Lunch, 4pm Dinner)
+  // Only allow editing if before cutoff (10am Lunch, 5pm Dinner)
   function getCutoffTime(deliveryDate, session) {
     const cutoff = new Date(deliveryDate);
     if (session === "Lunch") {
       cutoff.setHours(10, 0, 0, 0);
     } else {
-      cutoff.setHours(16, 0, 0, 0);
+      cutoff.setHours(17, 0, 0, 0);
     }
     return cutoff;
   }
@@ -2109,12 +2109,12 @@ const MyPlan = () => {
                               /> */}
                               <div className="reminder-banner">
                                 {`Confirm before ${
-                                  plan.session === "Lunch" ? "10AM" : "4PM"
+                                  plan.session === "Lunch" ? "10AM" : "5PM"
                                 }`}
                               </div>
                               {/* <div className="reminder-banner">
                                 {`Before ${
-                                  plan.session === "Lunch" ? "10AM" : "4PM"
+                                  plan.session === "Lunch" ? "10AM" : "5PM"
                                 }, pay ₹ ${(
                                   plan.slotHubTotalAmount -
                                   plan.slotTotalAmount
@@ -2656,7 +2656,7 @@ const MyPlan = () => {
             >
               <strong>Lunch:</strong> Confirm by <strong>10:00 AM</strong>{" "}
               (Delivered <strong>12:15–1:00 PM</strong>)<br />
-              <strong>Dinner:</strong> Confirm by <strong>4:00 PM</strong>{" "}
+              <strong>Dinner:</strong> Confirm by <strong>5:00 PM</strong>{" "}
               (Delivered <strong>7:30–8:30 PM</strong>)<br />
               After these times, ordering for that meal is closed.
             </p>
