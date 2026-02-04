@@ -1723,13 +1723,10 @@ const MyPlan = () => {
         },
       };
 
-      // Call payment gateway with config
-      const paymentConfig = {
-        method: "post",
-        baseURL: "https://dailydish.in/api/",
-        url: "/user/addpaymentphoneMultiple",
-        headers: { "content-type": "application/json" },
-        data: {
+      // Create Razorpay order for multiple plans
+      const orderResponse = await axios.post(
+        "https://dailydish.in/api/user/razorpay/create-order-multiple",
+        {
           userId,
           username: username,
           Mobile: mobile,
@@ -1737,21 +1734,83 @@ const MyPlan = () => {
           planIds: allPendingPlans.map((p) => p._id),
           discountWallet: walletDeduction,
           config: JSON.stringify(configObj),
+        }
+      );
+
+      if (!orderResponse.data?.razorpayOrderId) {
+        toast.error("Failed to create payment order");
+        setIsProcessingAllPlans(false);
+        return;
+      }
+
+      // Initialize Razorpay payment
+      const options = {
+        key: orderResponse.data.key,
+        amount: orderResponse.data.amount,
+        currency: orderResponse.data.currency,
+        order_id: orderResponse.data.razorpayOrderId,
+        handler: async (paymentResponse) => {
+          try {
+            // Verify payment signature
+            const verifyResponse = await axios.post(
+              "https://dailydish.in/api/user/razorpay/verify-payment",
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+                transactionId: orderResponse.data.id,
+              }
+            );
+
+            if (verifyResponse.data?.success) {
+              Swal2.fire({
+                toast: true,
+                position: "bottom",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                html: `
+                  <div class="myplans-toast-content">
+                    <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+                    <div class="myplans-toast-text">
+                      <div class="myplans-toast-title">Success!</div>
+                      <div class="myplans-toast-subtitle">All ${allPendingPlans.length} plan(s) confirmed! 🎉</div>
+                    </div>
+                  </div>
+                `,
+              });
+              await fetchWalletData();
+              await fetchPlans();
+            } else {
+              toast.error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            toast.error("Payment verification failed");
+          } finally {
+            setIsProcessingAllPlans(false);
+          }
+        },
+        prefill: {
+          name: username,
+          contact: mobile,
+        },
+        theme: {
+          color: "#6b8e23",
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessingAllPlans(false);
+            toast.error("Payment cancelled");
+          },
         },
       };
 
-      const res = await axios(paymentConfig);
-
-      if (res.data?.url) {
-        // Redirect to PhonePe payment
-        window.location.href = res.data.url;
-      } else {
-        toast.error("Payment gateway not available");
-      }
+      const razorpayWindow = new window.Razorpay(options);
+      razorpayWindow.open();
     } catch (err) {
       console.error("Error in payment for all plans:", err);
       toast.error(err.response?.data?.message || "Payment initiation failed");
-    } finally {
       setIsProcessingAllPlans(false);
     }
   }
