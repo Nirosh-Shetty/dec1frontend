@@ -589,7 +589,8 @@ const getNextSevenDays = () => {
   const result = [];
   const now = new Date();
 
-  for (let i = 0; i < 4; i++) {
+  // Limit to 3 days: Today, Tomorrow, and one more day
+  for (let i = 0; i < 3; i++) {
     const dUtc = new Date(
       Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + i),
     );
@@ -625,20 +626,22 @@ const DateSessionSelector = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   
   // State for dynamic cutoff times - Initialize with default values
+  // For regular users: cutoff is 11:59 PM previous day (shown as "00:00" = midnight)
+  // For employees: cutoff is 10:00 AM / 5:00 PM same day
   const [cutoffTimes, setCutoffTimes] = useState({
     lunch: { 
-      cutoffTime: "10:00", 
-      formattedCutoff: "10:00 AM",
-      deliveryTime: "01:00 PM", 
+      cutoffTime: "00:00", // Midnight = previous day cutoff
+      formattedCutoff: "11:59 PM (Previous Day)",
+      deliveryTime: "01:00 PM (Next Day)", 
       isEmployeeCutoff: false,
-      rawCutoff: "10:00"
+      rawCutoff: "00:00"
     },
     dinner: { 
-      cutoffTime: "17:00", 
-      formattedCutoff: "05:00 PM",
-      deliveryTime: "08:00 PM", 
+      cutoffTime: "00:00", // Midnight = previous day cutoff
+      formattedCutoff: "11:59 PM (Previous Day)",
+      deliveryTime: "08:00 PM (Next Day)", 
       isEmployeeCutoff: false,
-      rawCutoff: "17:00"
+      rawCutoff: "00:00"
     }
   });
   const [cutoffLoading, setCutoffLoading] = useState(true);
@@ -806,7 +809,22 @@ const DateSessionSelector = ({
       return false;
     }
     
-    // Then check if cutoff time has passed (only for today)
+    // For REGULAR USERS: cutoff is 11:59 PM PREVIOUS DAY
+    // This means: no same-day orders allowed, minimum tomorrow
+    if (!isEmployee) {
+      const todayUtcKey = dateToKeyUTC(now());
+      const keyToCheck = dateToKeyUTC(dateObj);
+      
+      // TODAY is never available (cutoff was yesterday)
+      if (keyToCheck === todayUtcKey) {
+        return false;
+      }
+      
+      // TOMORROW+ is available (menu permitting)
+      return true;
+    }
+    
+    // For EMPLOYEES: can order same day until cutoff time (10 AM / 5 PM)
     const todayUtcKey = dateToKeyUTC(now());
     const keyToCheck = dateToKeyUTC(dateObj);
     
@@ -815,7 +833,7 @@ const DateSessionSelector = ({
       return true;
     }
     
-    // For today, check cutoff time
+    // For today, check employee cutoff time
     const nowDate = now();
     const currentHour = nowDate.getHours();
     const currentMinute = nowDate.getMinutes();
@@ -826,11 +844,6 @@ const DateSessionSelector = ({
     if (!cutoffConfig) return false;
     
     const cutoffTimeStr = cutoffConfig.rawCutoff;
-    
-    // If cutoff is midnight (00:00), today is always blocked
-    if (cutoffTimeStr === "00:00") {
-      return false;
-    }
     
     const [cutoffHour, cutoffMinute] = cutoffTimeStr.split(':').map(Number);
     const cutoffTimeInMinutes = cutoffHour * 60 + cutoffMinute;
@@ -1000,29 +1013,26 @@ const DateSessionSelector = ({
   // Get cutoff description text - FIXED with safety checks
   const getCutoffDescription = (session) => {
     const cutoff = session === "Lunch" ? cutoffTimes?.lunch : cutoffTimes?.dinner;
-    if (!cutoff) return isEmployee ? "Confirm before 10:00 AM" : "Pre-order";
     
     if (isEmployee) {
-      return `Confirm before ${cutoff.formattedCutoff}`;
+      // Employees: same-day ordering until cutoff time
+      const defaultTime = session === "Lunch" ? "10:00 AM" : "05:00 PM";
+      return cutoff ? `Confirm by ${cutoff.formattedCutoff}` : `Confirm before ${defaultTime}`;
     } else {
-      if (cutoff.rawCutoff === "00:00") {
-        return "Pre-order (Previous day)";
-      }
-      return `Confirm before ${cutoff.formattedCutoff} (Previous day)`;
+      // Regular users: must pre-order by 11:59 PM previous day
+      return "Pre-order by 11:59 PM (Previous Day)";
     }
   };
 
   // Get delivery description - FIXED with safety checks
   const getDeliveryDescription = (session) => {
-    const cutoff = session === "Lunch" ? cutoffTimes?.lunch : cutoffTimes?.dinner;
-    if (!cutoff) {
+    if (isEmployee) {
+      // Employees: same-day delivery
       return session === "Lunch" ? "Delivered by 01:00 PM" : "Delivered by 08:00 PM";
-    }
-    
-    if (!isEmployee && cutoff.rawCutoff === "00:00") {
+    } else {
+      // Regular users: next-day delivery (pre-order from previous day)
       return session === "Lunch" ? "Delivered by 01:00 PM (Next Day)" : "Delivered by 08:00 PM (Next Day)";
     }
-    return session === "Lunch" ? "Delivered by 01:00 PM" : "Delivered by 08:00 PM";
   };
 
   // FIXED: Get tooltip message for disabled session - with safety checks
@@ -1031,6 +1041,11 @@ const DateSessionSelector = ({
     
     const todayUtcKey = dateToKeyUTC(now());
     const isToday = dateToKeyUTC(dateObj) === todayUtcKey;
+    
+    // For regular users, today is always blocked (cutoff was yesterday)
+    if (!isEmployee && isToday) {
+      return "Orders must be placed by 11:59 PM the previous day";
+    }
     
     if (!isToday) return "No sessions available for this date";
     

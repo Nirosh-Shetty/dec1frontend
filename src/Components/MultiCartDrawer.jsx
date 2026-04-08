@@ -651,7 +651,7 @@ const MultiCartDrawer = ({
                   >
                     <div className="my-meal-text">
                       <img src={arrow} alt="Arrow" className="button-arrow" />
-                      Move to My Plans
+                      Review My Plan
                     </div>
                   </div>
                 ) : user && !address ? (
