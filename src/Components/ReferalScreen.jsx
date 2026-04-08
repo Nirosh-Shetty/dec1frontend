@@ -12,7 +12,7 @@ import "../Styles/ReferScreen.css";
 // Add this line after your imports
 // Import animation data
 import referralAnimation from "../assets/referral.json";
-axios.defaults.baseURL = "https://dailydish.in/api";
+axios.defaults.baseURL = "http://localhost:7013/api";
 
 export default function ReferScreen() {
   // const [copied, setCopied] = useState(false);
@@ -28,7 +28,7 @@ export default function ReferScreen() {
   const [friendReward, setFriendReward] = useState(0);
   const [referrerReward, setReferrerReward] = useState(0);
   const [userReferralCode, setUserReferralCode] = useState(
-    user?.referralCode || null
+    user?.referralCode || null,
   );
   useEffect(() => {
     if (!user || !user._id) {
@@ -57,7 +57,7 @@ export default function ReferScreen() {
         if (!codeFromStorage) {
           console.log("No code in storage, fetching from backend...");
           apiCalls.push(
-            axios.get(`/user/get-my-referral-code/${user._id}`) // Call 3
+            axios.get(`/user/get-my-referral-code/${user._id}`), // Call 3
           );
         }
 
@@ -155,7 +155,7 @@ export default function ReferScreen() {
   const openWhatsApp = () => {
     if (!user || !user.referralCode) {
       console.error(
-        "User referral code is not available. Cannot create referral link."
+        "User referral code is not available. Cannot create referral link.",
       );
       return;
     }
@@ -168,7 +168,7 @@ export default function ReferScreen() {
         `I use DailyDish to pre-plan simple home-style meals.  
 It saves me time and hassle.\n\n` +
         `Get ₹25 off your first meal:\n` +
-        ` ${referralLink} 📱`
+        ` ${referralLink} 📱`,
     );
 
     const whatsappUrl = `https://api.whatsapp.com/send?text=${message}`;

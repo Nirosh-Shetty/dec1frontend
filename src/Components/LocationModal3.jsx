@@ -71,7 +71,7 @@ const LocationModal3 = ({ show, onClose }) => {
       }
       if (!placesServiceRef.current) {
         placesServiceRef.current = new window.google.maps.places.PlacesService(
-          document.createElement("div")
+          document.createElement("div"),
         );
       }
     }
@@ -102,13 +102,13 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -155,7 +155,7 @@ const LocationModal3 = ({ show, onClose }) => {
           } else {
             setSearchSuggestions([]);
           }
-        }
+        },
       );
     } else {
       setSearchSuggestions([]);
@@ -166,7 +166,7 @@ const LocationModal3 = ({ show, onClose }) => {
   const handleLocationSelect = (place) => {
     if (!placesServiceRef.current) {
       placesServiceRef.current = new window.google.maps.places.PlacesService(
-        document.createElement("div")
+        document.createElement("div"),
       );
     }
 
@@ -197,7 +197,7 @@ const LocationModal3 = ({ show, onClose }) => {
             },
           });
         }
-      }
+      },
     );
   };
 
@@ -215,13 +215,13 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {

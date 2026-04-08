@@ -1,3 +1,4544 @@
+// import React, {
+//   useState,
+//   useEffect,
+//   useRef,
+//   useCallback,
+//   useContext,
+//   useMemo,
+// } from "react";
+// import "../Styles/Banner.css";
+
+// import { Button, Modal, Form, Dropdown, InputGroup } from "react-bootstrap";
+// import {
+//   FaUser,
+//   FaEye,
+//   FaEyeSlash,
+//   FaWallet,
+//   FaMapMarkerAlt,
+//   FaSpinner,
+//   FaCheckCircle,
+//   FaTimesCircle,
+// } from "react-icons/fa";
+// import locationIcon from "./../assets/red-location.png";
+
+// import axios from "axios";
+// import { useNavigate, useLocation } from "react-router-dom";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import { FaLock } from "react-icons/fa";
+// import Swal2 from "sweetalert2";
+// import swal from "sweetalert";
+// import { FaSquareWhatsapp } from "react-icons/fa6";
+// import { WalletContext } from "../WalletContext";
+// import usericon from "./../assets/login_profile.png";
+// import Selectlocation from "../assets/selectlocation.svg";
+// import UserIcons from "../assets/userp.svg";
+// import clockone from "./../assets/mynaui_clock-one.png";
+
+// import UserBanner from "./UserBanner";
+// import ProfileOffcanvas from "./Navbar2";
+// import LocationModal2 from "./LocationModal2";
+// import CookingPromo from "./CookingPromo";
+
+// function useWindowWidth() {
+//   const [w, setW] = React.useState(
+//     typeof window !== "undefined" ? window.innerWidth : 1024,
+//   );
+//   React.useEffect(() => {
+//     const onResize = () => setW(window.innerWidth);
+//     window.addEventListener("resize", onResize);
+//     return () => window.removeEventListener("resize", onResize);
+//   }, []);
+//   return w;
+// }
+
+// const Banner = ({
+//   Carts,
+//   getAllOffer,
+//   isVegOnly,
+//   setIsVegOnly,
+//   onLocationDetected,
+// }) => {
+//   const width = useWindowWidth();
+//   const isSmall = width <= 768; // For general mobile adjustments
+//   const isVerySmall = width <= 360; // For stacking buttons vertically
+//   const addresstype = localStorage.getItem("addresstype");
+//   const corporateaddress = JSON.parse(localStorage.getItem("coporateaddress"));
+//   const [user, setUser] = useState(() => {
+//     try {
+//       return JSON.parse(localStorage.getItem("user"));
+//     } catch {
+//       return null;
+//     }
+//   });
+
+//   const navigate = useNavigate("");
+//   const [OTP, setOTP] = useState(["", "", "", ""]);
+//   const [PasswordShow, setPasswordShow] = useState(false);
+
+//   const { wallet, walletSeting, rateorder, rateMode } =
+//     useContext(WalletContext);
+//   const [show, setShow] = useState(false);
+//   const handleClose = () => setShow(false);
+//   const handleShow = () => setShow(true);
+
+//   const [show2, setShow2] = useState(false);
+//   const handleClose2 = () => setShow2(false);
+//   const handleShow2 = () => setShow2(true);
+//   const [showCart, setShowCart] = useState(false);
+
+//   const [show3, setShow3] = useState(false);
+//   const handleClose3 = () => setShow3(false);
+//   const handleShow3 = () => {
+//     handleClose4();
+//     setShow3(true);
+//   };
+
+//   const [show4, setShow4] = useState(false);
+//   const handleShow4 = () => setShow4(true);
+//   const handleClose4 = () => setShow4(false);
+
+//   const [show5, setShow5] = useState(false);
+//   const handleClose5 = () => setShow5(false);
+//   const handleShow5 = () => setShow5(true);
+
+//   const [show7, setShow7] = useState(false);
+//   const handleClose7 = () => setShow7(false);
+//   const handleShow7 = () => setShow7(true);
+//   const [Mobile, setMobile] = useState("");
+
+//   const [addresses, setAddresses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [showLocationModal, setShowLocationModal] = useState(false);
+//   const [expandedSections, setExpandedSections] = useState({});
+
+//   // New states for automatic location detection
+//   const [currentLocation, setCurrentLocation] = useState(null);
+//   const [isLocating, setIsLocating] = useState(false);
+//   const [locationError, setLocationError] = useState(null);
+//   const [isCheckingServiceability, setIsCheckingServiceability] =
+//     useState(false);
+//   const [isServiceable, setIsServiceable] = useState(null);
+//   const [showServiceablePopup, setShowServiceablePopup] = useState(false);
+//   const [serviceRequestName, setServiceRequestName] = useState("");
+//   const [serviceRequestPhone, setServiceRequestPhone] = useState("");
+//   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+//   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
+
+//   // Default hub ID for non-serviceable areas
+//   const DEFAULT_HUB_ID = "69613cb1145c1aaedd9859cd";
+
+//   // Function to get location using browser's geolocation API
+//   const getCurrentLocation = useCallback(() => {
+//     return new Promise((resolve, reject) => {
+//       if (!navigator.geolocation) {
+//         setIsLocationEnabled(false);
+//         reject(new Error("Geolocation is not supported by your browser"));
+//         return;
+//       }
+
+//       setIsLocating(true);
+//       setLocationError(null);
+
+//       // Set a timeout for location detection
+//       const locationTimeout = setTimeout(() => {
+//         setIsLocating(false);
+//         reject(new Error("Location request timed out"));
+//       }, 15000);
+
+//       navigator.geolocation.getCurrentPosition(
+//         async (position) => {
+//           clearTimeout(locationTimeout);
+//           try {
+//             const { latitude, longitude } = position.coords;
+
+//             // console.log("Raw coordinates:", { latitude, longitude });
+
+//             // Get more accurate address using multiple methods
+//             const address = await getAccurateAddress(latitude, longitude);
+
+//             const locationData = {
+//               lat: latitude,
+//               lng: longitude,
+//               fullAddress: address,
+//               isAutoDetected: true,
+//               timestamp: new Date().toISOString(),
+//               addressType: "Current Location",
+//               houseName: "Current Location",
+//               location: {
+//                 type: "Point",
+//                 coordinates: [longitude, latitude],
+//               },
+//             };
+
+//             // console.log("Location data:", locationData);
+
+//             // Save to localStorage
+//             localStorage.setItem(
+//               "currentLocation",
+//               JSON.stringify(locationData),
+//             );
+
+//             setCurrentLocation(locationData);
+//             setIsLocating(false);
+
+//             // Check serviceability after getting location
+//             checkServiceability(latitude, longitude, address);
+
+//             resolve(locationData);
+//           } catch (error) {
+//             clearTimeout(locationTimeout);
+//             setIsLocating(false);
+//             setLocationError("Could not get address from coordinates");
+//             reject(error);
+//           }
+//         },
+//         (error) => {
+//           clearTimeout(locationTimeout);
+//           setIsLocating(false);
+//           let errorMessage = "Unable to get your location";
+
+//           switch (error.code) {
+//             case error.PERMISSION_DENIED:
+//               errorMessage =
+//                 "Location permission denied. Please enable location services.";
+//               setIsLocationEnabled(false);
+//               break;
+//             case error.POSITION_UNAVAILABLE:
+//               errorMessage = "Location information is unavailable.";
+//               break;
+//             case error.TIMEOUT:
+//               errorMessage = "Location request timed out.";
+//               break;
+//             default:
+//               errorMessage = "An unknown error occurred.";
+//               break;
+//           }
+
+//           setLocationError(errorMessage);
+//           reject(new Error(errorMessage));
+//         },
+//         {
+//           enableHighAccuracy: true,
+//           timeout: 10000,
+//           maximumAge: 0,
+//         },
+//       );
+//     });
+//   }, []);
+
+//   // Multiple methods to get accurate address
+//   const getAccurateAddress = async (lat, lng) => {
+//     try {
+//       // Try method 2: Use Google Maps API if available
+//       const googleApiKey = import.meta.env.VITE_MAP_KEY;
+//       if (googleApiKey) {
+//         try {
+//           const response = await fetch(
+//             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleApiKey}&result_type=street_address|premise`,
+//           );
+
+//           if (response.ok) {
+//             const data = await response.json();
+//             if (data.status === "OK" && data.results[0]) {
+//               return data.results[0].formatted_address;
+//             }
+//           }
+//         } catch (e) {
+//           console.log("Google geocoding failed:", e);
+//         }
+//       }
+
+//       // Fallback: Return coordinates
+//       return `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+//     } catch (error) {
+//       console.error("All geocoding methods failed:", error);
+//       return `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+//     }
+//   };
+
+//   // Format browser address
+//   const formatBrowserAddress = (address) => {
+//     const parts = [];
+//     if (address.street) parts.push(address.street);
+//     if (address.city) parts.push(address.city);
+//     if (address.region) parts.push(address.region);
+//     if (address.country) parts.push(address.country);
+//     return parts.join(", ") || "Address not available";
+//   };
+
+//   // Verify location coordinates are valid
+//   const isValidCoordinates = (lat, lng) => {
+//     return (
+//       typeof lat === "number" &&
+//       !isNaN(lat) &&
+//       typeof lng === "number" &&
+//       !isNaN(lng) &&
+//       lat >= -90 &&
+//       lat <= 90 &&
+//       lng >= -180 &&
+//       lng <= 180
+//     );
+//   };
+
+//   // Check serviceability of a location
+//   const checkServiceability = async (lat, lng, address = "") => {
+//     try {
+//       setIsCheckingServiceability(true);
+
+//       const response = await fetch(
+//         "http://localhost:7013/api/Hub/validate-location",
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({
+//             lat: lat.toString(),
+//             lng: lng.toString(),
+//           }),
+//         },
+//       );
+
+//       const data = await response.json();
+
+//       if (data.success) {
+//         setIsServiceable(data.serviceable);
+
+//         // If serviceable, save the hub information
+//         if (data.serviceable && data.hubs && data.hubs.length > 0) {
+//           const hubData = data.hubs[0];
+//           const locationData = {
+//             location: {
+//               type: "Point",
+//               coordinates: [lng, lat],
+//             },
+//             fullAddress: address,
+//             hubName: hubData?.hubName || "",
+//             hubId: hubData?.hub || null,
+//             isAutoDetected: true,
+//             timestamp: new Date().toISOString(),
+//             lat: lat,
+//             lng: lng,
+//           };
+
+//           // Save to localStorage
+//           localStorage.setItem("currentLocation", JSON.stringify(locationData));
+
+//           // Update current location state
+//           setCurrentLocation(locationData);
+
+//           // ✅ NEW: Notify parent component that location is detected
+//           if (onLocationDetected) {
+//             onLocationDetected(locationData);
+//           }
+//         } else if (!data.serviceable) {
+//           // If NOT serviceable, still save location but with default hub ID
+//           const locationData = {
+//             location: {
+//               type: "Point",
+//               coordinates: [lng, lat],
+//             },
+//             fullAddress: address,
+//             hubName: "Default Hub",
+//             hubId: DEFAULT_HUB_ID, // Use default hub ID for non-serviceable areas
+//             isAutoDetected: true,
+//             isServiceable: false, // Mark as non-serviceable
+//             timestamp: new Date().toISOString(),
+//             lat: lat,
+//             lng: lng,
+//           };
+
+//           // Save to localStorage
+//           localStorage.setItem("currentLocation", JSON.stringify(locationData));
+
+//           // Update current location state
+//           setCurrentLocation(locationData);
+
+//           // Notify parent component
+//           if (onLocationDetected) {
+//             onLocationDetected(locationData);
+//           }
+
+//           // REMOVED: Don't automatically show popup
+//           // Only show the "We're not here yet" popup, NOT the "Coming Soon" modal
+//         }
+//       } else {
+//         console.error("Serviceability validation failed:", data.message);
+//         setIsServiceable(null);
+//       }
+//     } catch (error) {
+//       console.error("Serviceability validation error:", error);
+//       setIsServiceable(null);
+//     } finally {
+//       setIsCheckingServiceability(false);
+//     }
+//   };
+
+//   // Handle service request submission
+//   // const handleServiceRequest = async () => {
+//   //   // Convert to string and handle null/undefined
+//   //   const name = String(serviceRequestName || "");
+//   //   const phone = String(serviceRequestPhone || "");
+
+//   //   if (!name.trim()) {
+//   //     Swal2.fire({
+//   //       toast: true,
+//   //       position: "bottom",
+//   //       icon: "error",
+//   //       title: "Please enter your name",
+//   //       showConfirmButton: false,
+//   //       timer: 3000,
+//   //       customClass: {
+//   //         popup: "me-small-toast",
+//   //         title: "me-small-toast-title",
+//   //       },
+//   //     });
+//   //     return;
+//   //   }
+
+//   //   if (!phone.trim()) {
+//   //     Swal2.fire({
+//   //       toast: true,
+//   //       position: "bottom",
+//   //       icon: "error",
+//   //       title: "Please enter your phone number",
+//   //       showConfirmButton: false,
+//   //       timer: 3000,
+//   //       customClass: {
+//   //         popup: "me-small-toast",
+//   //         title: "me-small-toast-title",
+//   //       },
+//   //     });
+//   //     return;
+//   //   }
+
+//   //   // Basic phone validation
+//   //   const phoneRegex = /^[0-9]{10}$/;
+//   //   if (!phoneRegex.test(phone.trim())) {
+//   //     Swal2.fire({
+//   //       toast: true,
+//   //       position: "bottom",
+//   //       icon: "error",
+//   //       title: "Please enter a valid 10-digit phone number",
+//   //       showConfirmButton: false,
+//   //       timer: 3000,
+//   //       customClass: {
+//   //         popup: "me-small-toast",
+//   //         title: "me-small-toast-title",
+//   //       },
+//   //     });
+//   //     return;
+//   //   }
+
+//   //   try {
+//   //     setIsSubmittingRequest(true);
+
+//   //     const requestData = {
+//   //       name: name.trim(),
+//   //       phone: phone.trim(),
+//   //       location: {
+//   //         lat: currentLocation?.lat || 0,
+//   //         lng: currentLocation?.lng || 0,
+//   //       },
+//   //       address: currentLocation?.fullAddress || "Address not available",
+//   //       customerId: user?._id || null,
+//   //     };
+
+//   //     console.log("Submitting service request:", requestData);
+
+//   //     const response = await fetch(
+//   //       "http://localhost:7013/api/service-requests",
+//   //       {
+//   //         method: "POST",
+//   //         headers: {
+//   //           "Content-Type": "application/json",
+//   //         },
+//   //         body: JSON.stringify(requestData),
+//   //       }
+//   //     );
+
+//   //     const result = await response.json();
+
+//   //     if (result.success) {
+//   //       // Close the service request popup first
+//   //       setShowServiceablePopup(false);
+//   //       setServiceRequestName("");
+//   //       setServiceRequestPhone("");
+
+//   //       // Show success popup with improved mobile responsiveness
+//   //       await Swal2.fire({
+//   //         title: "🎉 Request Submitted Successfully!",
+//   //         html: `
+//   //           <div style="text-align: center; padding: ${
+//   //             isSmall ? "8px" : "12px"
+//   //           };">
+//   //             <div style="font-size: ${
+//   //               isSmall ? "16px" : "18px"
+//   //             }; color: #6B8E23; margin-bottom: ${
+//   //           isSmall ? "12px" : "15px"
+//   //         }; font-weight: 600;">
+//   //               ✅ Your service request has been successfully submitted!
+//   //             </div>
+//   //             <div style="font-size: ${
+//   //               isSmall ? "13px" : "14px"
+//   //             }; color: #666; line-height: 1.5; margin-bottom: ${
+//   //           isSmall ? "12px" : "15px"
+//   //         };">
+//   //               <p style="margin: ${
+//   //                 isSmall ? "8px 0" : "10px 0"
+//   //               }; font-weight: 600;">What happens next?</p>
+//   //               <div style="text-align: left; margin: 0 auto; max-width: ${
+//   //                 isSmall ? "280px" : "320px"
+//   //               };">
+//   //                 <p style="margin: ${
+//   //                   isSmall ? "6px 0" : "8px 0"
+//   //                 };">• Our team will review your location</p>
+//   //                 <p style="margin: ${
+//   //                   isSmall ? "6px 0" : "8px 0"
+//   //                 };">• We'll contact you within 24 hours</p>
+//   //                 <p style="margin: ${
+//   //                   isSmall ? "6px 0" : "8px 0"
+//   //                 };">• You'll be notified when service starts in your area</p>
+//   //               </div>
+//   //             </div>
+//   //             <div style="font-size: ${
+//   //               isSmall ? "11px" : "12px"
+//   //             }; color: #999; margin-top: ${
+//   //           isSmall ? "12px" : "15px"
+//   //         }; padding: ${
+//   //           isSmall ? "8px" : "10px"
+//   //         }; background: #f8f9fa; border-radius: 8px; line-height: 1.4;">
+//   //               Thank you for your interest in DailyDish! We're excited to serve you soon. 🍽️
+//   //             </div>
+//   //           </div>
+//   //         `,
+//   //         icon: "success",
+//   //         confirmButtonText: "Got it!",
+//   //         confirmButtonColor: "#6B8E23",
+//   //         width: isSmall ? "90%" : "500px",
+//   //         padding: isSmall ? "1rem" : "1.5rem",
+//   //         customClass: {
+//   //           popup: "custom-success-popup",
+//   //           title: "custom-success-title",
+//   //           confirmButton: "custom-success-button",
+//   //           htmlContainer: "custom-success-content",
+//   //         },
+//   //         showClass: {
+//   //           popup: "animate__animated animate__fadeInUp animate__faster",
+//   //         },
+//   //         hideClass: {
+//   //           popup: "animate__animated animate__fadeOutDown animate__faster",
+//   //         },
+//   //         backdrop: true,
+//   //         allowOutsideClick: true,
+//   //         allowEscapeKey: true,
+//   //         focusConfirm: true,
+//   //       });
+//   //     } else {
+//   //       throw new Error(result.message || "Failed to submit request");
+//   //     }
+//   //   } catch (error) {
+//   //     console.error("Error submitting service request:", error);
+//   //     Swal2.fire({
+//   //       toast: true,
+//   //       position: "bottom",
+//   //       icon: "error",
+//   //       title: error.message || "Failed to submit request. Please try again.",
+//   //       showConfirmButton: false,
+//   //       timer: 4000,
+//   //       timerProgressBar: true,
+//   //       customClass: {
+//   //         popup: "me-small-toast",
+//   //         title: "me-small-toast-title",
+//   //       },
+//   //     });
+//   //   } finally {
+//   //     setIsSubmittingRequest(false);
+//   //   }
+//   // };
+
+//   const handleServiceRequest = async () => {
+//     // Convert to string and handle null/undefined
+//     const name = String(serviceRequestName || "");
+//     const phone = String(serviceRequestPhone || "");
+
+//     if (!name.trim()) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: "Please enter your name",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     if (!phone.trim()) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: "Please enter your phone number",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     // Basic phone validation
+//     const phoneRegex = /^[0-9]{10}$/;
+//     if (!phoneRegex.test(phone.trim())) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: "Please enter a valid 10-digit phone number",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     try {
+//       setIsSubmittingRequest(true);
+
+//       const requestData = {
+//         name: name.trim(),
+//         phone: phone.trim(),
+//         location: {
+//           lat: currentLocation?.lat || 0,
+//           lng: currentLocation?.lng || 0,
+//         },
+//         address: currentLocation?.fullAddress || "Address not available",
+//         customerId: user?._id || null,
+//       };
+
+//       // console.log("Submitting service request:", requestData);
+
+//       const response = await fetch(
+//         "http://localhost:7013/api/service-requests",
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify(requestData),
+//         },
+//       );
+
+//       const result = await response.json();
+
+//       if (response.status === 409) {
+//         // Handle duplicate request case
+//         setIsSubmittingRequest(false);
+//         setShowServiceablePopup(false);
+
+//         setTimeout(() => {
+//           Swal2.fire({
+//             // title: "⏳ Already Requested",
+//             html: `
+//         <div style="text-align: center; padding: 16px;">
+//           <h4 style="color: #856404; margin: 0 0 12px 0;">Request Already Exists</h4>
+//           <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
+//             You've already submitted a service request for this location.
+//           </p>
+//           <p style="color: #888; font-size: 12px;">
+//             Our team will contact you once service is available in your area.
+//           </p>
+//         </div>
+//       `,
+//             confirmButtonText: "OK",
+//             confirmButtonColor: "#856404",
+//             width: isSmall ? "300px" : "360px",
+//             showCloseButton: true,
+//             backdrop: true,
+//           });
+//         }, 300);
+
+//         return;
+//       }
+
+//       if (result.success) {
+//         // Store the success data first
+//         const successData = {
+//           name: name.trim(),
+//           phone: phone.trim(),
+//           address: currentLocation?.fullAddress || "Address not available",
+//         };
+
+//         // Close the service request popup
+//         setShowServiceablePopup(false);
+
+//         // Clear form fields
+//         setServiceRequestName("");
+//         setServiceRequestPhone("");
+
+//         // Reset submitting state
+//         setIsSubmittingRequest(false);
+
+//         // Wait for modal to fully close before showing success
+//         setTimeout(() => {
+//           // Use a simpler Swal2 configuration without custom classes
+//           Swal2.fire({
+//             // title: "🎉 Request Submitted Successfully!",
+//             html: `
+//             <div style="text-align: center; zIndex:999999 padding: ${
+//               isSmall ? "8px" : "12px"
+//             };">
+//               <div style="font-size: ${
+//                 isSmall ? "16px" : "18px"
+//               }; color: #6B8E23; margin-bottom: ${
+//                 isSmall ? "12px" : "15px"
+//               }; font-weight: 600;">
+//                 ✅ Your service request has been successfully submitted!
+//               </div>
+//               <div style="font-size: ${
+//                 isSmall ? "13px" : "14px"
+//               }; color: #666; line-height: 1.5; margin-bottom: ${
+//                 isSmall ? "12px" : "15px"
+//               };">
+//                 <div style="text-align: left; margin: 0 auto; max-width: ${
+//                   isSmall ? "280px" : "320px"
+//                 }; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+//                   <p style="margin: 6px 0;"><strong>Name:</strong> ${
+//                     successData.name
+//                   }</p>
+//                   <p style="margin: 6px 0;"><strong>Phone:</strong> ${
+//                     successData.phone
+//                   }</p>
+//                   <p style="margin: 6px 0;"><strong>Address:</strong> ${
+//                     successData.address
+//                   }</p>
+//                 </div>
+//                 <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
+//                 <div style="text-align: left; margin: 0 auto; max-width: ${
+//                   isSmall ? "280px" : "320px"
+//                 };">
+//                   <p style="margin: 4px 0;">• Our team will review your location</p>
+//                   <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
+//                 </div>
+//               </div>
+//             </div>
+//           `,
+//             icon: "success",
+//             confirmButtonText: "Got it!",
+//             confirmButtonColor: "#6B8E23",
+//             width: isSmall ? "90%" : "500px",
+//             padding: isSmall ? "0rem" : "1.5rem",
+//             backdrop: true,
+//             allowOutsideClick: true,
+//             allowEscapeKey: true,
+//             focusConfirm: true,
+//             showConfirmButton: true,
+//           });
+//         }, 500); // Increased delay to ensure modal is fully closed
+//       } else {
+//         throw new Error(result.message || "Failed to submit request");
+//       }
+//     } catch (error) {
+//       console.error("Error submitting service request:", error);
+//       setIsSubmittingRequest(false);
+
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: error.message || "Failed to submit request. Please try again.",
+//         showConfirmButton: false,
+//         timer: 4000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   // Function to handle Request Location click
+//   const handleRequestLocationClick = () => {
+//     setShowServiceablePopup(true);
+//   };
+
+//   // Check location permissions
+//   const checkLocationPermissions = useCallback(async () => {
+//     if (!navigator.permissions) {
+//       return "prompt"; // If permissions API not available, assume prompt state
+//     }
+
+//     try {
+//       const permission = await navigator.permissions.query({
+//         name: "geolocation",
+//       });
+//       return permission.state;
+//     } catch (error) {
+//       console.error("Error checking permissions:", error);
+//       return "prompt";
+//     }
+//   }, []);
+
+//   // Get primary address from state
+//   const [primaryAddress, setPrimaryAddress] = useState(null);
+
+//   // Replace the problematic autoDetectLocation useEffect with this:
+//   useEffect(() => {
+//     let isMounted = true;
+//     let timerId = null;
+
+//     const autoDetectLocation = async () => {
+//       if (!isMounted) return;
+
+//       try {
+//         const savedCurrentLocation = localStorage.getItem("currentLocation");
+//         const savedLocation = savedCurrentLocation
+//           ? JSON.parse(savedCurrentLocation)
+//           : null;
+
+//         const savedPrimaryAddress = localStorage.getItem("primaryAddress");
+//         if (savedPrimaryAddress) {
+//           try {
+//             const parsedPrimaryAddress = JSON.parse(savedPrimaryAddress);
+//             if (isMounted) {
+//               setPrimaryAddress(parsedPrimaryAddress);
+//             }
+//             return;
+//           } catch (e) {
+//             console.error("Error parsing saved primary address:", e);
+//           }
+//         }
+
+//         // Check if location was manually selected by user
+//         const manualLocationFlag = localStorage.getItem(
+//           "locationManuallySelected",
+//         );
+//         if (manualLocationFlag === "true") {
+//           console.log(
+//             "Location was manually selected, skipping auto-detection",
+//           );
+//           return; // Don't auto-detect if user manually selected location
+//         }
+
+//         // For non-logged-in users, always attempt location detection on refresh
+//         // For logged-in users, only detect if no saved location exists
+//         const shouldDetectLocation = !user || !savedLocation;
+
+//         if (shouldDetectLocation && isMounted) {
+//           const permissionState = await checkLocationPermissions();
+
+//           if (permissionState === "denied") {
+//             if (isMounted) {
+//               setIsLocationEnabled(false);
+//             }
+//             return;
+//           }
+
+//           if (permissionState === "granted" || permissionState === "prompt") {
+//             timerId = setTimeout(() => {
+//               if (isMounted) {
+//                 getCurrentLocation().catch((error) => {
+//                   console.error("Auto location detection failed:", error);
+//                   if (
+//                     error.message.includes("permission denied") &&
+//                     isMounted
+//                   ) {
+//                     setIsLocationEnabled(false);
+//                   }
+//                 });
+//               }
+//             }, 1000);
+//           }
+//         }
+//       } catch (error) {
+//         console.error("Auto location detection setup failed:", error);
+//       }
+//     };
+
+//     autoDetectLocation();
+
+//     return () => {
+//       isMounted = false;
+//       if (timerId) clearTimeout(timerId);
+//     };
+//     // Only include these dependencies
+//   }, [checkLocationPermissions, user]); // Added user as dependency
+
+//   // Manual location detection function
+//   const handleDetectLocation = async () => {
+//     try {
+//       const location = await getCurrentLocation();
+
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "success",
+//         title: `Location updated successfully`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     } catch (error) {
+//       console.error("Location detection failed:", error);
+
+//       if (error.message.includes("permission denied")) {
+//         setIsLocationEnabled(false);
+//         Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title:
+//             "Location permission denied. Please enable location in browser settings.",
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       } else {
+//         Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Location detection failed: ${error.message}`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//     }
+//   };
+
+//   // Handle location from LocationModal2
+//   const handleLocationFromModal = useCallback(
+//     (locationData) => {
+//       if (locationData) {
+//         // First, save the location data
+//         const locationToSave = {
+//           ...locationData,
+//           isAutoDetected: false, // Mark as user-selected, not auto-detected
+//           timestamp: new Date().toISOString(),
+//         };
+
+//         // Save to localStorage
+//         localStorage.setItem("currentLocation", JSON.stringify(locationToSave));
+
+//         // Set manual location flag to prevent auto-detection
+//         localStorage.setItem("locationManuallySelected", "true");
+
+//         // Update state
+//         setCurrentLocation(locationToSave);
+
+//         // Check serviceability for the new location
+//         if (locationData.lat && locationData.lng) {
+//           checkServiceability(
+//             locationData.lat,
+//             locationData.lng,
+//             locationData.fullAddress,
+//           );
+//         }
+
+//         // Notify parent component
+//         if (onLocationDetected) {
+//           onLocationDetected(locationToSave);
+//         }
+//       }
+//     },
+//     [onLocationDetected],
+//   );
+
+//   // Modified handleLocationClick to show location modal
+//   const handleLocationClick = () => {
+//     setShowLocationModal(true);
+//   };
+
+//   // Rest of your existing functions remain the same...
+//   const userLogin = async () => {
+//     if (!Mobile) {
+//       return Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "info",
+//         title: `Enter Your Mobile Number`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//     try {
+//       const config = {
+//         url: "/User/Sendotp",
+//         method: "post",
+//         baseURL: "http://localhost:7013/api",
+//         headers: { "content-type": "application/json" },
+//         data: {
+//           Mobile: Mobile,
+//         },
+//       };
+
+//       const res = await axios(config);
+//       if (res.status === 401) {
+//         return Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Invalid Mobile Number`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (res.status === 402) {
+//         return Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Error sending OTP`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (res.status === 200) {
+//         handleClose3();
+//         handleShow7();
+//       }
+//     } catch (error) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: error.response.data.error || `Something went wrong!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   const [show8, setShow8] = useState(false);
+//   const handleClose8 = () => setShow8(false);
+//   const handleShow8 = () => setShow8(true);
+
+//   const handleShowCart = () => setShowCart(true);
+
+//   const phoneNumber = "7204188504";
+//   const message = "Hello! I need assistance.";
+//   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+//     message,
+//   )}`;
+
+//   const logOut = () => {
+//     swal({
+//       title: "Yeah!",
+//       text: "Successfully Logged Out",
+//       icon: "success",
+//       button: "Ok!",
+//     });
+//     setTimeout(() => {
+//       window.location.assign("/");
+//     }, 5000);
+//     localStorage.clear();
+//   };
+
+//   const [apartmentdata, setapartmentdata] = useState([]);
+//   const getapartmentd = async () => {
+//     try {
+//       let res = await axios.get("http://localhost:7013/api/admin/getapartment");
+//       if (res.status === 200) {
+//         setapartmentdata(res.data.corporatedata);
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     getapartmentd();
+//   }, []);
+
+//   const [corporatedata, setcorporatedata] = useState([]);
+//   const getcorporate = async () => {
+//     try {
+//       let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
+//       if (res.status === 200) {
+//         setcorporatedata(res.data.corporatedata);
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     getcorporate();
+//   }, []);
+
+//   const [storyLength, setStoryLength] = useState(0);
+
+//   useEffect(() => {
+//     const getAddWebstory = async () => {
+//       try {
+//         let res = await axios.get("http://localhost:7013/api/admin/getstories");
+//         if (res.status === 200) {
+//           setStoryLength(res.data.getbanner.length);
+//         }
+//       } catch (error) {
+//         // console.log(error);
+//       }
+//     };
+//     getAddWebstory();
+//   }, []);
+
+//   const address = JSON.parse(
+//     localStorage.getItem(
+//       addresstype === "apartment" ? "address" : "coporateaddress",
+//     ),
+//   );
+
+//   const Handeledata = (ab, def) => {
+//     try {
+//       if (ab) {
+//         if (!user) return navigate("/", { replace: true });
+//         let data = JSON.parse(ab);
+//         const addressData = {
+//           Address: data?.Address,
+//           Delivarycharge: data?.apartmentdelivaryprice,
+//           doordelivarycharge: data?.doordelivaryprice,
+//           apartmentname: data?.Apartmentname,
+//           pincode: data?.pincode,
+//           approximatetime: data?.approximatetime,
+//           prefixcode: data?.prefixcode,
+//           name: ab?.Name || user?.Fname || "",
+//           flatno: ab?.fletNumber || "",
+//           mobilenumber: ab?.Number || user?.Mobile || "",
+//           towerName: ab?.towerName ? ab?.towerName : "",
+//           lunchSlots: data?.lunchSlots ? data?.lunchSlots : [],
+//           dinnerSlots: data?.dinnerSlots ? data?.dinnerSlots : [],
+//           deliverypoint: data?.deliverypoint ? data?.deliverypoint : "",
+//           locationType: data?.locationType || "",
+//         };
+//         if (!def) {
+//           saveSelectedAddress(data);
+//         }
+
+//         if (addresstype === "apartment") {
+//           localStorage.setItem("address", JSON.stringify(addressData));
+//         } else {
+//           localStorage.setItem("coporateaddress", JSON.stringify(addressData));
+//         }
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   //Request Location
+//   const [Name, setName] = useState("");
+//   const [Number, setNumber] = useState("");
+//   const [ApartmentName, setApartmentName] = useState("");
+//   const [Message, setMessage] = useState("");
+
+//   function validateIndianMobileNumber(mobileNumber) {
+//     const regex = /^[6-9]\d{9}$/;
+//     return regex.test(mobileNumber);
+//   }
+
+//   const verifyOTP = async () => {
+//     try {
+//       if (!OTP) {
+//         return Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Enter a valid OTP`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       const config = {
+//         url: "User/mobileotpverification",
+//         method: "post",
+//         baseURL: "http://localhost:7013/api/",
+//         header: { "content-type": "application/json" },
+//         data: {
+//           Mobile: Mobile,
+//           otp: OTP,
+//         },
+//       };
+//       const res = await axios(config);
+//       if (res.status === 200) {
+//         localStorage.setItem("user", JSON.stringify(res.data.details));
+//         sessionStorage.setItem("user", JSON.stringify(res.data.details));
+//         window.dispatchEvent(new Event("userUpdated"));
+//         Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "success",
+//           title: `OTP verified successfully`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//         window.location.reload();
+//       }
+//     } catch (error) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: error.response.data.error || `Something went wrong!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   const [selectedAddress, setSelectedAddress] = useState({});
+
+//   const getSelectedAddress = async () => {
+//     try {
+//       let res = await axios.get(
+//         `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`,
+//       );
+//       if (res.status === 200) {
+//         setSelectedAddress(res.data.getdata);
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (user) {
+//       getSelectedAddress();
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     if (selectedAddress) {
+//       if (addresstype === "apartment") {
+//         const am = apartmentdata.find(
+//           (ele) => ele?._id?.toString() === selectedAddress?.addressid,
+//         );
+//         if (am) {
+//           Handeledata(JSON.stringify({ ...am, ...selectedAddress }), "def");
+//         }
+//       } else {
+//         const co = corporatedata.find(
+//           (ele) => ele?._id?.toString() === selectedAddress?.addressid,
+//         );
+//         if (co) {
+//           Handeledata(JSON.stringify({ ...co, ...selectedAddress }), "def");
+//         }
+//       }
+//     }
+//   }, [selectedAddress, addresstype, apartmentdata, corporatedata]);
+
+//   const saveSelectedAddress = async (data) => {
+//     try {
+//       if (!user) return;
+//       let res = await axios.post(`http://localhost:7013/api/user/addressadd`, {
+//         Name: user?.Fname,
+//         Number: user?.Mobile,
+//         userId: user?._id,
+//         ApartmentName: data?.Apartmentname,
+//         addresstype: addresstype,
+//         addressid: data?._id,
+//       });
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   const inputRef = useRef(null);
+//   const [open, setOpen] = useState(false);
+//   const [searchValue, setSearchValue] = useState("");
+
+//   // Get customer ID from localStorage
+//   const getCustomerId = () => {
+//     return user?._id;
+//   };
+
+//   // Get auth headers
+//   const getAuthHeaders = () => {
+//     const token = localStorage.getItem("token");
+//     return {
+//       "Content-Type": "application/json",
+//       ...(token && { Authorization: `Bearer ${token}` }),
+//     };
+//   };
+
+//   const [userData, setUserData] = useState([]);
+//   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+
+//   const showAlert = (message, type) => {
+//     setAlert({ show: true, message, type });
+//     setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
+//   };
+
+//   const [primaryAddressId, setPrimaryAddressId] = useState(null);
+
+//   // Fetch addresses
+//   // 1. First, fix the fetchAddresses function to use stable dependencies
+//   const fetchAddresses = useMemo(() => {
+//     return async () => {
+//       try {
+//         setLoading(true);
+//         const customerId = user?._id;
+
+//         if (!customerId) {
+//           return;
+//         }
+
+//         const response = await fetch(
+//           `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+//           {
+//             method: "GET",
+//             headers: getAuthHeaders(),
+//           },
+//         );
+
+//         if (!response.ok) {
+//           throw new Error("Failed to fetch addresses");
+//         }
+
+//         const result = await response.json();
+
+//         if (result.success) {
+//           const addresses = result.addresses || [];
+//           setAddresses(addresses);
+//           setPrimaryAddressId(result.primaryAddress || null);
+
+//           const primaryAddr = addresses.find(
+//             (addr) => addr._id === result.primaryAddress,
+//           );
+//           setPrimaryAddress(primaryAddr || null);
+
+//           if (primaryAddr) {
+//             localStorage.setItem("primaryAddress", JSON.stringify(primaryAddr));
+//           }
+
+//           if (addresses && addresses.length > 0) {
+//             const firstType = addresses[0].addressType;
+//             setExpandedSections({ [firstType]: true });
+//           }
+//         }
+//       } catch (error) {
+//         console.error("Error fetching addresses:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//   }, [user?._id]);
+
+//   useEffect(() => {
+//     if (user?._id) {
+//       fetchAddresses();
+//     }
+//   }, [user?._id, fetchAddresses]);
+
+//   // Get display name for address
+//   const getDisplayName = (address) => {
+//     if (!address) return "";
+
+//     switch (address.addressType) {
+//       case "Home":
+//         return address.homeName || address.houseName || "";
+//       case "PG":
+//         return address.apartmentName || address.houseName || "";
+//       case "School":
+//         return address.schoolName || address.houseName || "";
+//       case "Work":
+//         return address.companyName || address.houseName || "";
+//       default:
+//         return address.fullAddress || "";
+//     }
+//   };
+
+//   // Get display address text - with proper priority based on requirements
+//   const getDisplayAddress = () => {
+//     // If we're actively detecting location, show loading
+//     if (isLocating) {
+//       return "Detecting location...";
+//     }
+
+//     // If location is disabled, show message
+//     if (!isLocationEnabled && !addresses.length && !primaryAddress) {
+//       return "Enable location";
+//     }
+
+//     // Priority 1: Show primary address if set (from saved addresses)
+//     if (primaryAddress) {
+//       const name = getDisplayName(primaryAddress);
+//       return name.length > 40 ? `${name.substring(0, 37)}...` : name;
+//     }
+
+//     // Priority 2: Show user-selected location from LocationModal2 (not auto-detected)
+//     const savedLocation = localStorage.getItem("currentLocation");
+//     if (savedLocation) {
+//       try {
+//         const parsedLocation = JSON.parse(savedLocation);
+//         // Only show if it's not auto-detected (user selected it manually)
+//         if (!parsedLocation.isAutoDetected) {
+//           const address =
+//             parsedLocation.fullAddress || parsedLocation.houseName || "";
+//           return address.length > 40
+//             ? `${address.substring(0, 37)}...`
+//             : address;
+//         }
+//       } catch (e) {
+//         console.error("Error parsing saved location:", e);
+//       }
+//     }
+
+//     // Priority 3: Show auto-detected location ONLY if no primary address and no user-selected location
+//     if (currentLocation?.fullAddress && !primaryAddress) {
+//       const address =
+//         currentLocation.fullAddress.length > 40
+//           ? `${currentLocation.fullAddress.substring(0, 37)}...`
+//           : currentLocation.fullAddress;
+//       return address;
+//     }
+
+//     // Priority 4: Show any saved address
+//     if (addresses.length > 0) {
+//       const name = getDisplayName(addresses[0]);
+//       return name.length > 40 ? `${name.substring(0, 37)}...` : name;
+//     }
+
+//     // Default fallback
+//     return "Select Location";
+//   };
+
+//   // Add this function to get a more detailed tooltip
+//   const getAddressTooltip = () => {
+//     if (isLocating) return "Detecting your location...";
+
+//     if (primaryAddress) {
+//       const name = getDisplayName(primaryAddress);
+//       const type = primaryAddress.addressType || "Primary Address";
+//       return `${type}: ${name}`;
+//     }
+
+//     // Check for user-selected location from modal
+//     const savedLocation = localStorage.getItem("currentLocation");
+//     if (savedLocation) {
+//       try {
+//         const parsedLocation = JSON.parse(savedLocation);
+//         if (!parsedLocation.isAutoDetected) {
+//           return `Selected: ${
+//             parsedLocation.fullAddress || parsedLocation.houseName
+//           }`;
+//         }
+//       } catch (e) {
+//         console.error("Error parsing saved location:", e);
+//       }
+//     }
+
+//     if (currentLocation?.fullAddress) {
+//       return `Detected: ${currentLocation.fullAddress}`;
+//     }
+
+//     return "Click to select or detect location";
+//   };
+
+//   // Get serviceability status icon and text
+//   const getServiceabilityStatus = () => {
+//     if (!currentLocation) return null;
+
+//     if (isCheckingServiceability) {
+//       return {
+//         icon: <FaSpinner className="fa-spin" />,
+//         text: "Checking serviceability...",
+//         color: "#ff9800",
+//       };
+//     }
+
+//     if (isServiceable === true) {
+//       return {
+//         icon: <FaCheckCircle />,
+//         text: "Service available",
+//         color: "#4caf50",
+//       };
+//     }
+
+//     if (isServiceable === false) {
+//       return {
+//         icon: <FaTimesCircle />,
+//         text: "Service not available",
+//         color: "#f44336",
+//       };
+//     }
+
+//     return null;
+//   };
+
+//   // Handle location disabled state
+//   const handleLocationDisabledClick = () => {
+//     Swal2.fire({
+//       title: "Location Access Required",
+//       text: "Please enable location services in your browser settings to use this feature.",
+//       icon: "info",
+//       confirmButtonText: "OK",
+//       confirmButtonColor: "#6B8E23",
+//     });
+//   };
+
+//   return (
+//     <div>
+//       <div className="ban-container">
+//         <div className="mobile-banner-updated">
+//           <div className="screen-3" style={{ padding: "0 24px 8px 24px" }}>
+//             <div className="screen-2 mb-3 mt-2 d-flex align-items-center">
+//               <div
+//                 className="d-flex align-items-center gap-2 w-100"
+//                 onClick={
+//                   isLocationEnabled
+//                     ? handleLocationClick
+//                     : handleLocationDisabledClick
+//                 }
+//                 style={{ cursor: "pointer" }}
+//               >
+//                 {isLocating ? (
+//                   <FaSpinner
+//                     className="fa-spin"
+//                     style={{
+//                       width: "32px",
+//                       height: "32px",
+//                       color: "#6B8E23",
+//                     }}
+//                   />
+//                 ) : (
+//                   <img
+//                     src={Selectlocation}
+//                     alt="select-location"
+//                     className="flex-shrink-0"
+//                     style={{
+//                       width: "32px",
+//                       height: "32px",
+//                       opacity: isLocationEnabled ? 1 : 0.5,
+//                     }}
+//                   />
+//                 )}
+
+//                 <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center">
+//                   <div className="d-flex align-items-center">
+//                     <p
+//                       className={`select-location-text fw-semibold text-truncate mb-0 banner-address-line ${
+//                         user ? "with-user-icon" : "with-login-btn"
+//                       }`}
+//                       title={getAddressTooltip()}
+//                       style={{ opacity: isLocationEnabled ? 1 : 0.7 }}
+//                     >
+//                       {getDisplayAddress()}
+//                     </p>
+
+//                     {/* Show location icon for auto-detected location */}
+//                     {currentLocation?.isAutoDetected && !primaryAddress && (
+//                       <span
+//                         className="ms-1"
+//                         title="Auto-detected location"
+//                         style={{ color: "#6B8E23", fontSize: "12px" }}
+//                       >
+//                         <FaMapMarkerAlt />
+//                       </span>
+//                     )}
+
+//                     {/* Show primary address badge */}
+//                     {primaryAddress && (
+//                       <span
+//                         className="ms-1"
+//                         title="Primary Address"
+//                         style={{ color: "#6B8E23", fontSize: "12px" }}
+//                       >
+//                         ★
+//                       </span>
+//                     )}
+
+//                     {/* Show refresh button for location - only if no primary address */}
+//                     {currentLocation &&
+//                       !isLocating &&
+//                       isLocationEnabled &&
+//                       !primaryAddress && (
+//                         <button
+//                           onClick={(e) => {
+//                             e.stopPropagation();
+//                             handleDetectLocation();
+//                           }}
+//                           style={{
+//                             background: "none",
+//                             border: "none",
+//                             color: "#6B8E23",
+//                             marginLeft: "8px",
+//                             cursor: "pointer",
+//                             fontSize: "12px",
+//                           }}
+//                           title="Refresh location"
+//                         >
+//                           ↻
+//                         </button>
+//                       )}
+//                   </div>
+
+//                   {user && (
+//                     <p
+//                       className="select-location-text-small mb-0 banner-user-details"
+//                       style={{
+//                         color: "rgba(255, 255, 255, 0.8)",
+//                       }}
+//                     >
+//                       {user?.Fname} | {user?.Mobile}
+//                       {primaryAddress && ""}
+//                     </p>
+//                   )}
+//                 </div>
+//               </div>
+
+//               <div className="d-flex gap-1 justify-content-end align-items-center referbtn">
+//                 {/* <button
+//                   className="refer-earn-btn"
+//                   onClick={() => navigate("/refer")}
+//                 >
+//                   <img
+//                     src="/Assets/gifticon.svg"
+//                     alt="refer"
+//                     className="refer-icon"
+//                   />
+//                   <span className="refer-earn-text">Refer & Earn</span>
+//                 </button> */}
+
+//                 {user ? (
+//                   <img
+//                     src={UserIcons}
+//                     alt="user-icon"
+//                     onClick={handleShow8}
+//                     className="p-2"
+//                   />
+//                 ) : (
+//                   <button
+//                     className="d-flex gap-2 justify-content-center align-items-center"
+//                     style={{
+//                       background: "#FFF8DC",
+//                       border: "2px solid #F5DEB3",
+//                       color: "#2c2c2c",
+//                       cursor: "pointer",
+//                       fontSize: "16px",
+//                       fontFamily: "Inter",
+//                       fontWeight: "600",
+//                       width: "106px",
+//                       height: "44px",
+//                       borderRadius: "18px",
+//                     }}
+//                     onClick={() => {
+//                       navigate("/login");
+//                     }}
+//                   >
+//                     <img
+//                       src={usericon}
+//                       alt=""
+//                       style={{ width: "27px", height: "27px" }}
+//                     />
+//                     LOGIN
+//                   </button>
+//                 )}
+//               </div>
+//             </div>
+
+//             {/* <div
+//               className="d-flex align-items-center m-0 order-row"
+//               style={{ width: "100%" }}
+//             >
+//               <div
+//                 className="d-flex align-items-center flex-grow-1 min-w-0"
+//                 style={{ gap: "4px" }}
+//               >
+//                 <img
+//                   src={clockone}
+//                   alt=""
+//                   style={{ width: "24px", height: "24px" }}
+//                 />
+//                 <span className="clock-text mt-2">
+//                   Order by 12 & Get Lunch by 1:00 PM
+//                 </span>
+//               </div>
+
+//               <div
+//                 className="veg-btn d-flex flex-column align-items-center ms-2"
+//                 onClick={() => setIsVegOnly(!isVegOnly)}
+//               >
+//                 <h6 className="m-0 veg-title">Veg Only</h6>
+//                 <div className="veg-btn-toggle" style={{ cursor: "pointer" }}>
+//                   <div
+//                     className="veg-btn-switch"
+//                     style={{
+//                       transform: isVegOnly
+//                         ? "translateX(18px)"
+//                         : "translateX(0)",
+//                       backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d",
+//                       transition: "all 0.3s ease",
+//                     }}
+//                   ></div>
+//                 </div>
+//               </div>
+//             </div> */}
+//           </div>
+//           <div style={{ marginBottom: "10px" }}>
+//             <CookingPromo />
+//           </div>
+//         </div>
+
+//         {/* Serviceability Popup - Only show when explicitly not serviceable */}
+//         {isServiceable === false && !showServiceablePopup && (
+//           <div
+//             style={{
+//               position: "fixed",
+//               left: 0,
+//               right: 0,
+//               bottom: 0,
+//               padding: isSmall ? "0 12px 16px" : "0 16px 20px",
+//               zIndex: 999990,
+//               display: "flex",
+//               justifyContent: "center",
+//               pointerEvents: "none",
+//             }}
+//           >
+//             <div
+//               style={{
+//                 width: "100%",
+//                 maxWidth: "600px",
+//                 backgroundColor: "#F5DEB3",
+//                 borderRadius: isSmall ? "16px" : "18px",
+//                 padding: isSmall ? "16px" : "20px",
+//                 boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
+//                 pointerEvents: "auto",
+//               }}
+//             >
+//               <div
+//                 style={{
+//                   display: "flex",
+//                   alignItems: "flex-start",
+//                   gap: isSmall ? "12px" : "16px",
+//                   marginBottom: isSmall ? "16px" : "20px",
+//                 }}
+//               >
+//                 <div
+//                   style={{
+//                     width: isSmall ? "40px" : "44px",
+//                     height: isSmall ? "40px" : "44px",
+//                     borderRadius: "12px",
+//                     backgroundColor: "rgba(139, 100, 68, 0.1)",
+//                     display: "flex",
+//                     alignItems: "center",
+//                     justifyContent: "center",
+//                     flexShrink: 0,
+//                   }}
+//                 >
+//                   <img
+//                     src={locationIcon}
+//                     alt="Location"
+//                     style={{
+//                       width: isSmall ? "24px" : "28px",
+//                       height: isSmall ? "24px" : "28px",
+//                       objectFit: "contain",
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div style={{ flex: 1, minWidth: 0 }}>
+//                   <h3
+//                     style={{
+//                       margin: 0,
+//                       color: "#3A2E2A",
+//                       fontSize: isSmall ? "18px" : "20px",
+//                       fontWeight: "700",
+//                       lineHeight: "1.2",
+//                       marginBottom: "4px",
+//                     }}
+//                   >
+//                     We're not here yet
+//                   </h3>
+
+//                   <p
+//                     style={{
+//                       margin: 0,
+//                       color: "#6A5A52",
+//                       fontSize: isSmall ? "14px" : "15px",
+//                       lineHeight: "1.4",
+//                     }}
+//                   >
+//                     We don't serve this address yet, but nearby areas are live
+//                   </p>
+//                 </div>
+//               </div>
+
+//               {/* Buttons - Side by side for most screens, stacked only on very small screens */}
+//               <div
+//                 style={{
+//                   display: "flex",
+//                   flexDirection: isVerySmall ? "row" : "row",
+//                   gap: "12px",
+//                   width: "100%",
+//                 }}
+//               >
+//                 <button
+//                   onClick={handleRequestLocationClick}
+//                   style={{
+//                     flex: 1,
+//                     backgroundColor: "transparent",
+//                     color: "#4B3B33",
+//                     border: "1.5px solid rgba(120, 92, 70, 0.35)",
+//                     borderRadius: isSmall ? "12px" : "14px",
+//                     padding: isSmall ? "12px 8px" : "14px 16px",
+//                     fontSize: isSmall ? "14px" : "16px",
+//                     fontWeight: "600",
+//                     cursor: "pointer",
+//                     transition: "all 0.2s ease",
+//                     textAlign: "center",
+//                     whiteSpace: "nowrap",
+//                     minWidth: 0, // Allows text truncation if needed
+//                   }}
+//                   onMouseEnter={(e) =>
+//                     (e.currentTarget.style.backgroundColor = "#E9D9C8")
+//                   }
+//                   onMouseLeave={(e) =>
+//                     (e.currentTarget.style.backgroundColor = "transparent")
+//                   }
+//                 >
+//                   Request Location
+//                 </button>
+
+//                 <button
+//                   onClick={() => (window.location.href = "/current-location")}
+//                   style={{
+//                     flex: 1,
+//                     backgroundColor: "#E6B800",
+//                     color: "#2C241B",
+//                     border: "none",
+//                     borderRadius: isSmall ? "12px" : "14px",
+//                     padding: isSmall ? "12px 8px" : "14px 16px",
+//                     fontSize: isSmall ? "14px" : "16px",
+//                     fontWeight: "700",
+//                     cursor: "pointer",
+//                     transition: "all 0.2s ease",
+//                     textAlign: "center",
+//                     whiteSpace: "nowrap",
+//                     minWidth: 0,
+//                   }}
+//                   onMouseEnter={(e) =>
+//                     (e.currentTarget.style.filter = "brightness(0.96)")
+//                   }
+//                   onMouseLeave={(e) => (e.currentTarget.style.filter = "none")}
+//                 >
+//                   Change address
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
+//         {showServiceablePopup && (
+//           <div
+//             style={{
+//               position: "fixed",
+//               top: 0,
+//               left: 0,
+//               right: 0,
+//               bottom: 0,
+//               backgroundColor: "rgba(0,0,0,0.7)",
+//               display: "flex",
+//               alignItems: "center",
+//               justifyContent: "center",
+//               zIndex: 3001, // Higher z-index to appear above the first popup
+//               padding: "20px",
+//             }}
+//           >
+//             <div
+//               style={{
+//                 backgroundColor: "#F8F6F0",
+//                 borderRadius: "16px",
+//                 padding: "24px",
+//                 maxWidth: "400px",
+//                 width: "100%",
+//                 textAlign: "center",
+//                 boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+//               }}
+//             >
+//               <div
+//                 style={{
+//                   width: isSmall ? "38px" : "44px",
+//                   height: isSmall ? "38px" : "44px",
+//                   borderRadius: "12px",
+//                   display: "flex",
+//                   alignItems: "center",
+//                   justifyContent: "center",
+//                   flex: "0 0 auto",
+//                   margin: "0 auto",
+//                 }}
+//               >
+//                 <img
+//                   src={locationIcon}
+//                   alt=""
+//                   style={{
+//                     width: isSmall ? "34px" : "40px",
+//                     height: isSmall ? "34px" : "40px",
+//                     objectFit: "contain",
+//                     display: "block",
+//                   }}
+//                 />
+//               </div>
+//               <h3
+//                 style={{
+//                   marginBottom: "12px",
+//                   color: "#333",
+//                   fontSize: "20px",
+//                   fontWeight: "600",
+//                 }}
+//               >
+//                 Coming Soon to Your Area!
+//               </h3>
+//               <p
+//                 style={{
+//                   marginBottom: "16px",
+//                   color: "#666",
+//                   fontSize: "14px",
+//                   lineHeight: "1.5",
+//                 }}
+//               >
+//                 We're not currently operating in this location, but we're
+//                 expanding rapidly! Let us know you're interested, and we'll
+//                 notify you as soon as we launch in your area.
+//               </p>
+
+//               <div style={{ marginBottom: "20px", textAlign: "left" }}>
+//                 <div style={{ marginBottom: "12px" }}>
+//                   <label
+//                     style={{
+//                       display: "block",
+//                       marginBottom: "4px",
+//                       fontSize: "14px",
+//                       fontWeight: "500",
+//                     }}
+//                   >
+//                     Your Name *
+//                   </label>
+//                   <input
+//                     type="text"
+//                     value={serviceRequestName}
+//                     onChange={(e) => setServiceRequestName(e.target.value)}
+//                     placeholder="Enter your name"
+//                     style={{
+//                       width: "100%",
+//                       padding: "12px",
+//                       border: "1px solid #ddd",
+//                       borderRadius: "8px",
+//                       fontSize: "14px",
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div style={{ marginBottom: "16px" }}>
+//                   <label
+//                     style={{
+//                       display: "block",
+//                       marginBottom: "4px",
+//                       fontSize: "14px",
+//                       fontWeight: "500",
+//                     }}
+//                   >
+//                     Phone Number *
+//                   </label>
+//                   <input
+//                     type="tel"
+//                     value={serviceRequestPhone}
+//                     onChange={(e) => setServiceRequestPhone(e.target.value)}
+//                     placeholder="Enter your phone number"
+//                     style={{
+//                       width: "100%",
+//                       padding: "12px",
+//                       border: "1px solid #ddd",
+//                       borderRadius: "8px",
+//                       fontSize: "14px",
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div
+//                   style={{
+//                     fontSize: "12px",
+//                     color: "#666",
+//                     marginBottom: "16px",
+//                   }}
+//                 >
+//                   <strong>Selected Location:</strong>{" "}
+//                   {currentLocation?.fullAddress || "Address not available"}
+//                 </div>
+//               </div>
+
+//               <div
+//                 style={{
+//                   display: "flex",
+//                   flexDirection: "column",
+//                   gap: "12px",
+//                 }}
+//               >
+//                 <button
+//                   onClick={handleServiceRequest}
+//                   disabled={
+//                     isSubmittingRequest ||
+//                     !serviceRequestName ||
+//                     !serviceRequestPhone
+//                   }
+//                   style={{
+//                     backgroundColor:
+//                       isSubmittingRequest ||
+//                       !serviceRequestName ||
+//                       !serviceRequestPhone
+//                         ? "#ccc"
+//                         : "#6B8E23",
+//                     color: "white",
+//                     border: "none",
+//                     borderRadius: "12px",
+//                     padding: "14px",
+//                     fontSize: "16px",
+//                     fontWeight: "600",
+//                     cursor:
+//                       isSubmittingRequest ||
+//                       !serviceRequestName ||
+//                       !serviceRequestPhone
+//                         ? "not-allowed"
+//                         : "pointer",
+//                     transition: "background-color 0.2s",
+//                   }}
+//                 >
+//                   {isSubmittingRequest ? "Submitting..." : "Request Service"}
+//                 </button>
+//                 <button
+//                   onClick={() => setShowServiceablePopup(false)}
+//                   style={{
+//                     backgroundColor: "transparent",
+//                     color: "#666",
+//                     border: "1px solid #ddd",
+//                     borderRadius: "12px",
+//                     padding: "14px",
+//                     fontSize: "16px",
+//                     fontWeight: "500",
+//                     cursor: "pointer",
+//                     transition: "background-color 0.2s",
+//                   }}
+//                   onMouseEnter={(e) => {
+//                     e.target.style.backgroundColor = "#f5f5f5";
+//                   }}
+//                   onMouseLeave={(e) => {
+//                     e.target.style.backgroundColor = "transparent";
+//                   }}
+//                 >
+//                   Cancel
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//         <ProfileOffcanvas show={show8} handleClose={handleClose8} />
+
+//         <Modal show={show3} backdrop="static" onHide={handleClose3}>
+//           <Modal.Header closeButton>
+//             <Modal.Title className="d-flex align-items-center gap-1">
+//               <FaLock color="#6B8E23" /> <span>Welcome to Dailydish</span>{" "}
+//             </Modal.Title>
+//           </Modal.Header>
+//           <Modal.Body>
+//             <Form>
+//               <div className="login-whatsappwithicon">
+//                 <FaSquareWhatsapp size={42} color="green" />
+
+//                 <Form.Control
+//                   type="number"
+//                   placeholder="Enter Your WhatsApp Number"
+//                   value={Mobile}
+//                   onChange={(e) => setMobile(e.target.value)}
+//                 />
+//               </div>
+
+//               <Button
+//                 variant=""
+//                 style={{
+//                   width: "100%",
+//                   marginTop: "24px",
+//                   backgroundColor: "#6B8E23",
+//                   color: "white",
+//                   textAlign: "center",
+//                 }}
+//                 onClick={() => {
+//                   if (!validateIndianMobileNumber(Mobile)) {
+//                     return Swal2.fire({
+//                       toast: true,
+//                       position: "bottom",
+//                       icon: "error",
+//                       title: `Invalid Mobile Number`,
+//                       showConfirmButton: false,
+//                       timer: 3000,
+//                       customClass: {
+//                         popup: "me-small-toast",
+//                         title: "me-small-toast-title",
+//                       },
+//                     });
+//                   }
+//                   userLogin();
+//                 }}
+//               >
+//                 Send otp
+//               </Button>
+//             </Form>
+//           </Modal.Body>
+//           <Modal.Footer>
+//             <Button variant="secondary" onClick={handleClose3}>
+//               Close
+//             </Button>
+//           </Modal.Footer>
+//         </Modal>
+
+//         <Modal
+//           show={show7}
+//           onHide={handleClose7}
+//           size="sm"
+//           style={{
+//             zIndex: "99999",
+//             position: "absolute",
+//             top: "30%",
+//             left: "0%",
+//           }}
+//         >
+//           <Modal.Header closeButton>
+//             <Modal.Title>Enter OTP</Modal.Title>
+//           </Modal.Header>
+//           <Modal.Body>
+//             <span style={{ fontSize: "13px" }}>
+//               An OTP has been sent to your whatsapp
+//             </span>
+//             <div className="d-flex gap-1 mt-3 mb-3">
+//               <InputGroup className="mb-2" style={{ background: "white" }}>
+//                 <Form.Control
+//                   type={PasswordShow ? "text" : "password"}
+//                   className="login-input"
+//                   placeholder="Enter OTP"
+//                   aria-describedby="basic-addon1"
+//                   onChange={(e) => setOTP(e.target.value)}
+//                 />
+//                 <Button
+//                   variant=""
+//                   style={{ borderRadius: "0px", border: "1px solid black" }}
+//                   onClick={() => setPasswordShow(!PasswordShow)}
+//                   className="passbtn"
+//                 >
+//                   {PasswordShow ? <FaEye /> : <FaEyeSlash />}
+//                 </Button>
+//               </InputGroup>
+//             </div>
+//             <div>
+//               <Button
+//                 variant=""
+//                 onClick={verifyOTP}
+//                 style={{
+//                   width: "100%",
+//                   marginTop: "24px",
+//                   backgroundColor: "#6B8E23",
+//                   color: "white",
+//                   textAlign: "center",
+//                 }}
+//               >
+//                 Continue
+//               </Button>
+//             </div>
+//           </Modal.Body>
+//         </Modal>
+//       </div>
+
+//       <div className="ban-container2">
+//         <div className="mobile-banner" style={{ position: "relative" }}>
+//           <UserBanner />
+//         </div>
+//         {/* <div style={{ alignSelf: "end", marginRight: "16px" }}> */}
+//         <div
+//           className="veg-btn d-flex flex-row align-items-center ms-2"
+//           onClick={() => setIsVegOnly(!isVegOnly)}
+//         >
+//           <h6 className="m-0 veg-title">Veg Only</h6>
+//           <div
+//             className="veg-btn-toggle"
+//             // 1. Toggle state on click
+//             style={{ cursor: "pointer" }}
+//           >
+//             <div
+//               className="veg-btn-switch"
+//               style={{
+//                 // 2. Dynamic styling for animation and color
+//                 transform: isVegOnly ? "translateX(18px)" : "translateX(0)",
+//                 backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d", // Green when Active, Grey when inactive
+//                 transition: "all 0.3s ease", // Smooth sliding effect
+//               }}
+//             ></div>
+//           </div>
+//         </div>
+//         {/* </div> */}
+//       </div>
+
+//       <LocationModal2
+//         show={showLocationModal}
+//         onClose={() => {
+//           setShowLocationModal(false);
+//           // Refresh addresses when modal closes to get updated primary address
+//           if (user) {
+//             fetchAddresses();
+//           }
+//         }}
+//         onLocationSelect={handleLocationFromModal} // Pass the handler
+//         currentLocation={currentLocation}
+//         onLocationDetect={handleDetectLocation}
+//         isLocationEnabled={isLocationEnabled}
+//       />
+//     </div>
+//   );
+// };
+
+// export default Banner;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React, {
+//   useState,
+//   useEffect,
+//   useRef,
+//   useCallback,
+//   useContext,
+//   useMemo,
+// } from "react";
+// import "../Styles/Banner.css";
+
+// import { Button, Modal, Form, Dropdown, InputGroup } from "react-bootstrap";
+// import {
+//   FaUser,
+//   FaEye,
+//   FaEyeSlash,
+//   FaWallet,
+//   FaMapMarkerAlt,
+//   FaSpinner,
+//   FaCheckCircle,
+//   FaTimesCircle,
+// } from "react-icons/fa";
+// import locationIcon from "./../assets/red-location.png";
+
+// import axios from "axios";
+// import { useNavigate, useLocation } from "react-router-dom";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import { FaLock } from "react-icons/fa";
+// import Swal2 from "sweetalert2";
+// import swal from "sweetalert";
+// import { FaSquareWhatsapp } from "react-icons/fa6";
+// import { WalletContext } from "../WalletContext";
+// import usericon from "./../assets/login_profile.png";
+// import Selectlocation from "../assets/selectlocation.svg";
+// import UserIcons from "../assets/userp.svg";
+// import clockone from "./../assets/mynaui_clock-one.png";
+
+// import UserBanner from "./UserBanner";
+// import ProfileOffcanvas from "./Navbar2";
+// import LocationModal2 from "./LocationModal2";
+// import CookingPromo from "./CookingPromo";
+
+// function useWindowWidth() {
+//   const [w, setW] = React.useState(
+//     typeof window !== "undefined" ? window.innerWidth : 1024,
+//   );
+//   React.useEffect(() => {
+//     const onResize = () => setW(window.innerWidth);
+//     window.addEventListener("resize", onResize);
+//     return () => window.removeEventListener("resize", onResize);
+//   }, []);
+//   return w;
+// }
+
+// const Banner = ({
+//   Carts,
+//   getAllOffer,
+//   isVegOnly,
+//   setIsVegOnly,
+//   onLocationDetected,
+// }) => {
+//   const width = useWindowWidth();
+//   const isSmall = width <= 768; // For general mobile adjustments
+//   const isVerySmall = width <= 360; // For stacking buttons vertically
+//   const addresstype = localStorage.getItem("addresstype");
+//   const corporateaddress = JSON.parse(localStorage.getItem("coporateaddress"));
+//   const [user, setUser] = useState(() => {
+//     try {
+//       return JSON.parse(localStorage.getItem("user"));
+//     } catch {
+//       return null;
+//     }
+//   });
+
+//   const navigate = useNavigate("");
+//   const [OTP, setOTP] = useState(["", "", "", ""]);
+//   const [PasswordShow, setPasswordShow] = useState(false);
+
+//   const { wallet, walletSeting, rateorder, rateMode } =
+//     useContext(WalletContext);
+//   const [show, setShow] = useState(false);
+//   const handleClose = () => setShow(false);
+//   const handleShow = () => setShow(true);
+
+//   const [show2, setShow2] = useState(false);
+//   const handleClose2 = () => setShow2(false);
+//   const handleShow2 = () => setShow2(true);
+//   const [showCart, setShowCart] = useState(false);
+
+//   const [show3, setShow3] = useState(false);
+//   const handleClose3 = () => setShow3(false);
+//   const handleShow3 = () => {
+//     handleClose4();
+//     setShow3(true);
+//   };
+
+//   const [show4, setShow4] = useState(false);
+//   const handleShow4 = () => setShow4(true);
+//   const handleClose4 = () => setShow4(false);
+
+//   const [show5, setShow5] = useState(false);
+//   const handleClose5 = () => setShow5(false);
+//   const handleShow5 = () => setShow5(true);
+
+//   const [show7, setShow7] = useState(false);
+//   const handleClose7 = () => setShow7(false);
+//   const handleShow7 = () => setShow7(true);
+//   const [Mobile, setMobile] = useState("");
+
+//   const [addresses, setAddresses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [showLocationModal, setShowLocationModal] = useState(false);
+//   const [expandedSections, setExpandedSections] = useState({});
+
+//   // New states for automatic location detection
+//   const [currentLocation, setCurrentLocation] = useState(null);
+//   const [isLocating, setIsLocating] = useState(false);
+//   const [locationError, setLocationError] = useState(null);
+//   const [isCheckingServiceability, setIsCheckingServiceability] =
+//     useState(false);
+//   const [isServiceable, setIsServiceable] = useState(null);
+//   const [showServiceablePopup, setShowServiceablePopup] = useState(false);
+//   const [serviceRequestName, setServiceRequestName] = useState("");
+//   const [serviceRequestPhone, setServiceRequestPhone] = useState("");
+//   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+//   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
+
+//   //live Default hub ID for non-serviceable areas
+//   const DEFAULT_HUB_ID = "69613cb1145c1aaedd9859cd";
+
+//   //testing Default hub ID for non-serviceable areas
+//   // const DEFAULT_HUB_ID = "69522e8c195d0cafeda7f611";
+
+//   // Add state to track if default hub is loaded
+//   const [defaultHubLoaded, setDefaultHubLoaded] = useState(false);
+
+//   // Function to get location using browser's geolocation API
+//   const getCurrentLocation = useCallback(() => {
+//     return new Promise((resolve, reject) => {
+//       if (!navigator.geolocation) {
+//         setIsLocationEnabled(false);
+//         reject(new Error("Geolocation is not supported by your browser"));
+//         return;
+//       }
+
+//       setIsLocating(true);
+//       setLocationError(null);
+
+//       // Set a timeout for location detection
+//       const locationTimeout = setTimeout(() => {
+//         setIsLocating(false);
+//         reject(new Error("Location request timed out"));
+//       }, 15000);
+
+//       navigator.geolocation.getCurrentPosition(
+//         async (position) => {
+//           clearTimeout(locationTimeout);
+//           try {
+//             const { latitude, longitude } = position.coords;
+
+//             // console.log("Raw coordinates:", { latitude, longitude });
+
+//             // Get more accurate address using multiple methods
+//             const address = await getAccurateAddress(latitude, longitude);
+
+//             const locationData = {
+//               lat: latitude,
+//               lng: longitude,
+//               fullAddress: address,
+//               isAutoDetected: true,
+//               timestamp: new Date().toISOString(),
+//               addressType: "Current Location",
+//               houseName: "Current Location",
+//               location: {
+//                 type: "Point",
+//                 coordinates: [longitude, latitude],
+//               },
+//             };
+
+//             // console.log("Location data:", locationData);
+
+//             // Save to localStorage
+//             localStorage.setItem(
+//               "currentLocation",
+//               JSON.stringify(locationData),
+//             );
+
+//             setCurrentLocation(locationData);
+//             setIsLocating(false);
+
+//             // Check serviceability after getting location
+//             checkServiceability(latitude, longitude, address);
+
+//             resolve(locationData);
+//           } catch (error) {
+//             clearTimeout(locationTimeout);
+//             setIsLocating(false);
+//             setLocationError("Could not get address from coordinates");
+//             reject(error);
+//           }
+//         },
+//         (error) => {
+//           clearTimeout(locationTimeout);
+//           setIsLocating(false);
+//           let errorMessage = "Unable to get your location";
+
+//           switch (error.code) {
+//             case error.PERMISSION_DENIED:
+//               errorMessage =
+//                 "Location permission denied. Please enable location services.";
+//               setIsLocationEnabled(false);
+//               break;
+//             case error.POSITION_UNAVAILABLE:
+//               errorMessage = "Location information is unavailable.";
+//               break;
+//             case error.TIMEOUT:
+//               errorMessage = "Location request timed out.";
+//               break;
+//             default:
+//               errorMessage = "An unknown error occurred.";
+//               break;
+//           }
+
+//           setLocationError(errorMessage);
+//           reject(new Error(errorMessage));
+//         },
+//         {
+//           enableHighAccuracy: true,
+//           timeout: 10000,
+//           maximumAge: 0,
+//         },
+//       );
+//     });
+//   }, []);
+
+//   // Multiple methods to get accurate address
+//   const getAccurateAddress = async (lat, lng) => {
+//     try {
+//       // Try method 2: Use Google Maps API if available
+//       const googleApiKey = import.meta.env.VITE_MAP_KEY;
+//       if (googleApiKey) {
+//         try {
+//           const response = await fetch(
+//             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleApiKey}&result_type=street_address|premise`,
+//           );
+
+//           if (response.ok) {
+//             const data = await response.json();
+//             if (data.status === "OK" && data.results[0]) {
+//               return data.results[0].formatted_address;
+//             }
+//           }
+//         } catch (e) {
+//           console.log("Google geocoding failed:", e);
+//         }
+//       }
+
+//       // Fallback: Return coordinates
+//       return `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+//     } catch (error) {
+//       console.error("All geocoding methods failed:", error);
+//       return `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+//     }
+//   };
+
+//   // Format browser address
+//   const formatBrowserAddress = (address) => {
+//     const parts = [];
+//     if (address.street) parts.push(address.street);
+//     if (address.city) parts.push(address.city);
+//     if (address.region) parts.push(address.region);
+//     if (address.country) parts.push(address.country);
+//     return parts.join(", ") || "Address not available";
+//   };
+
+//   // Verify location coordinates are valid
+//   const isValidCoordinates = (lat, lng) => {
+//     return (
+//       typeof lat === "number" &&
+//       !isNaN(lat) &&
+//       typeof lng === "number" &&
+//       !isNaN(lng) &&
+//       lat >= -90 &&
+//       lat <= 90 &&
+//       lng >= -180 &&
+//       lng <= 180
+//     );
+//   };
+
+//   // Check serviceability of a location
+//   const checkServiceability = async (lat, lng, address = "") => {
+//     try {
+//       setIsCheckingServiceability(true);
+
+//       const response = await fetch(
+//         "http://localhost:7013/api/Hub/validate-location",
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({
+//             lat: lat.toString(),
+//             lng: lng.toString(),
+//           }),
+//         },
+//       );
+
+//       const data = await response.json();
+
+//       if (data.success) {
+//         setIsServiceable(data.serviceable);
+
+//         // If serviceable, save the hub information
+//         if (data.serviceable && data.hubs && data.hubs.length > 0) {
+//           const hubData = data.hubs[0];
+//           const locationData = {
+//             location: {
+//               type: "Point",
+//               coordinates: [lng, lat],
+//             },
+//             fullAddress: address,
+//             hubName: hubData?.hubName || "",
+//             hubId: hubData?.hub || null,
+//             isAutoDetected: true,
+//             timestamp: new Date().toISOString(),
+//             lat: lat,
+//             lng: lng,
+//           };
+
+//           // Save to localStorage
+//           localStorage.setItem("currentLocation", JSON.stringify(locationData));
+
+//           // Update current location state
+//           setCurrentLocation(locationData);
+
+//           // ✅ NEW: Notify parent component that location is detected
+//           if (onLocationDetected) {
+//             onLocationDetected(locationData);
+//           }
+//         } else if (!data.serviceable) {
+//           // If NOT serviceable, still save location but with default hub ID
+//           const locationData = {
+//             location: {
+//               type: "Point",
+//               coordinates: [lng, lat],
+//             },
+//             fullAddress: address,
+//             hubName: "Default Hub",
+//             hubId: DEFAULT_HUB_ID, // Use default hub ID for non-serviceable areas
+//             isAutoDetected: true,
+//             isServiceable: false, // Mark as non-serviceable
+//             timestamp: new Date().toISOString(),
+//             lat: lat,
+//             lng: lng,
+//           };
+
+//           // Save to localStorage
+//           localStorage.setItem("currentLocation", JSON.stringify(locationData));
+
+//           // Update current location state
+//           setCurrentLocation(locationData);
+
+//           // Notify parent component
+//           if (onLocationDetected) {
+//             onLocationDetected(locationData);
+//           }
+
+//           // REMOVED: Don't automatically show popup
+//           // Only show the "We're not here yet" popup, NOT the "Coming Soon" modal
+//         }
+//       } else {
+//         console.error("Serviceability validation failed:", data.message);
+//         setIsServiceable(null);
+//       }
+//     } catch (error) {
+//       console.error("Serviceability validation error:", error);
+//       setIsServiceable(null);
+//     } finally {
+//       setIsCheckingServiceability(false);
+//     }
+//   };
+
+//   // Handle service request submission
+//   const handleServiceRequest = async () => {
+//     // Convert to string and handle null/undefined
+//     const name = String(serviceRequestName || "");
+//     const phone = String(serviceRequestPhone || "");
+
+//     if (!name.trim()) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: "Please enter your name",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     if (!phone.trim()) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: "Please enter your phone number",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     // Basic phone validation
+//     const phoneRegex = /^[0-9]{10}$/;
+//     if (!phoneRegex.test(phone.trim())) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: "Please enter a valid 10-digit phone number",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     try {
+//       setIsSubmittingRequest(true);
+
+//       const requestData = {
+//         name: name.trim(),
+//         phone: phone.trim(),
+//         location: {
+//           lat: currentLocation?.lat || 0,
+//           lng: currentLocation?.lng || 0,
+//         },
+//         address: currentLocation?.fullAddress || "Address not available",
+//         customerId: user?._id || null,
+//       };
+
+//       // console.log("Submitting service request:", requestData);
+
+//       const response = await fetch(
+//         "http://localhost:7013/api/service-requests",
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify(requestData),
+//         },
+//       );
+
+//       const result = await response.json();
+
+//       if (response.status === 409) {
+//         // Handle duplicate request case
+//         setIsSubmittingRequest(false);
+//         setShowServiceablePopup(false);
+
+//         setTimeout(() => {
+//           Swal2.fire({
+//             // title: "⏳ Already Requested",
+//             html: `
+//         <div style="text-align: center; padding: 16px;">
+//           <h4 style="color: #856404; margin: 0 0 12px 0;">Request Already Exists</h4>
+//           <p style="color: #666; font-size: 14px; margin-bottom: 8px;">
+//             You've already submitted a service request for this location.
+//           </p>
+//           <p style="color: #888; font-size: 12px;">
+//             Our team will contact you once service is available in your area.
+//           </p>
+//         </div>
+//       `,
+//             confirmButtonText: "OK",
+//             confirmButtonColor: "#856404",
+//             width: isSmall ? "300px" : "360px",
+//             showCloseButton: true,
+//             backdrop: true,
+//           });
+//         }, 300);
+
+//         return;
+//       }
+
+//       if (result.success) {
+//         // Store the success data first
+//         const successData = {
+//           name: name.trim(),
+//           phone: phone.trim(),
+//           address: currentLocation?.fullAddress || "Address not available",
+//         };
+
+//         // Close the service request popup
+//         setShowServiceablePopup(false);
+
+//         // Clear form fields
+//         setServiceRequestName("");
+//         setServiceRequestPhone("");
+
+//         // Reset submitting state
+//         setIsSubmittingRequest(false);
+
+//         // Wait for modal to fully close before showing success
+//         setTimeout(() => {
+//           // Use a simpler Swal2 configuration without custom classes
+//           Swal2.fire({
+//             // title: "🎉 Request Submitted Successfully!",
+//             html: `
+//             <div style="text-align: center; zIndex:999999 padding: ${
+//               isSmall ? "8px" : "12px"
+//             };">
+//               <div style="font-size: ${
+//                 isSmall ? "16px" : "18px"
+//               }; color: #6B8E23; margin-bottom: ${
+//                 isSmall ? "12px" : "15px"
+//               }; font-weight: 600;">
+//                 ✅ Your service request has been successfully submitted!
+//               </div>
+//               <div style="font-size: ${
+//                 isSmall ? "13px" : "14px"
+//               }; color: #666; line-height: 1.5; margin-bottom: ${
+//                 isSmall ? "12px" : "15px"
+//               };">
+//                 <div style="text-align: left; margin: 0 auto; max-width: ${
+//                   isSmall ? "280px" : "320px"
+//                 }; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+//                   <p style="margin: 6px 0;"><strong>Name:</strong> ${
+//                     successData.name
+//                   }</p>
+//                   <p style="margin: 6px 0;"><strong>Phone:</strong> ${
+//                     successData.phone
+//                   }</p>
+//                   <p style="margin: 6px 0;"><strong>Address:</strong> ${
+//                     successData.address
+//                   }</p>
+//                 </div>
+//                 <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
+//                 <div style="text-align: left; margin: 0 auto; max-width: ${
+//                   isSmall ? "280px" : "320px"
+//                 };">
+//                   <p style="margin: 4px 0;">• Our team will review your location</p>
+//                   <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
+//                 </div>
+//               </div>
+//             </div>
+//           `,
+//             icon: "success",
+//             confirmButtonText: "Got it!",
+//             confirmButtonColor: "#6B8E23",
+//             width: isSmall ? "90%" : "500px",
+//             padding: isSmall ? "0rem" : "1.5rem",
+//             backdrop: true,
+//             allowOutsideClick: true,
+//             allowEscapeKey: true,
+//             focusConfirm: true,
+//             showConfirmButton: true,
+//           });
+//         }, 500); // Increased delay to ensure modal is fully closed
+//       } else {
+//         throw new Error(result.message || "Failed to submit request");
+//       }
+//     } catch (error) {
+//       console.error("Error submitting service request:", error);
+//       setIsSubmittingRequest(false);
+
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: error.message || "Failed to submit request. Please try again.",
+//         showConfirmButton: false,
+//         timer: 4000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   // Function to handle Request Location click
+//   const handleRequestLocationClick = () => {
+//     setShowServiceablePopup(true);
+//   };
+
+//   // Check location permissions
+//   const checkLocationPermissions = useCallback(async () => {
+//     if (!navigator.permissions) {
+//       return "prompt"; // If permissions API not available, assume prompt state
+//     }
+
+//     try {
+//       const permission = await navigator.permissions.query({
+//         name: "geolocation",
+//       });
+//       return permission.state;
+//     } catch (error) {
+//       console.error("Error checking permissions:", error);
+//       return "prompt";
+//     }
+//   }, []);
+
+//   // Get primary address from state
+//   const [primaryAddress, setPrimaryAddress] = useState(null);
+
+//   // ============ NEW: Function to load default hub data for non-logged-in users ============
+//   const loadDefaultHubData = useCallback(async () => {
+//     if (user) return; // Don't load default hub for logged-in users
+
+//     try {
+//       // Check if we already have default hub data
+//       const savedDefaultHub = localStorage.getItem("defaultHubData");
+//       if (savedDefaultHub) {
+//         const hubData = JSON.parse(savedDefaultHub);
+//         setDefaultHubLoaded(true);
+
+//         // Set default location for non-logged-in users
+//         const defaultLocationData = {
+//           fullAddress: "Select your location to view menu",
+//           hubName: "Default Hub",
+//           hubId: DEFAULT_HUB_ID,
+//           isAutoDetected: false,
+//           isDefaultHub: true,
+//           timestamp: new Date().toISOString(),
+//         };
+
+//         setCurrentLocation(defaultLocationData);
+
+//         // Notify parent component about default hub
+//         if (onLocationDetected) {
+//           onLocationDetected({
+//             ...defaultLocationData,
+//             location: {
+//               type: "Point",
+//               coordinates: [0, 0], // Default coordinates
+//             },
+//           });
+//         }
+//         return;
+//       }
+
+//       // Fetch default hub data from API
+//       const response = await fetch(
+//         "http://localhost:7013/api/Hub/get-default-hub",
+//       );
+//       if (response.ok) {
+//         const data = await response.json();
+//         if (data.success && data.hub) {
+//           // Save default hub data
+//           localStorage.setItem("defaultHubData", JSON.stringify(data.hub));
+//           setDefaultHubLoaded(true);
+
+//           // Set default location for non-logged-in users
+//           const defaultLocationData = {
+//             fullAddress:
+//               data.hub.address || "Select your location to view menu",
+//             hubName: data.hub.name || "Default Hub",
+//             hubId: data.hub._id || DEFAULT_HUB_ID,
+//             isAutoDetected: false,
+//             isDefaultHub: true,
+//             timestamp: new Date().toISOString(),
+//           };
+
+//           setCurrentLocation(defaultLocationData);
+
+//           // Notify parent component about default hub
+//           if (onLocationDetected) {
+//             onLocationDetected({
+//               ...defaultLocationData,
+//               location: data.hub.location || {
+//                 type: "Point",
+//                 coordinates: [0, 0],
+//               },
+//             });
+//           }
+//         }
+//       }
+//     } catch (error) {
+//       console.error("Error loading default hub data:", error);
+
+//       // Fallback to default hub ID if API fails
+//       const defaultLocationData = {
+//         fullAddress: "Select your location to view menu",
+//         hubName: "Default Hub",
+//         hubId: DEFAULT_HUB_ID,
+//         isAutoDetected: false,
+//         isDefaultHub: true,
+//         timestamp: new Date().toISOString(),
+//       };
+
+//       setCurrentLocation(defaultLocationData);
+//       setDefaultHubLoaded(true);
+
+//       if (onLocationDetected) {
+//         onLocationDetected({
+//           ...defaultLocationData,
+//           location: {
+//             type: "Point",
+//             coordinates: [0, 0],
+//           },
+//         });
+//       }
+//     }
+//   }, [user, onLocationDetected, DEFAULT_HUB_ID]);
+
+//   // ============ UPDATED AUTO-DETECT LOCATION LOGIC ============
+//   // Replace the problematic autoDetectLocation useEffect with this:
+//   useEffect(() => {
+//     let isMounted = true;
+//     let timerId = null;
+
+//     const autoDetectLocation = async () => {
+//       if (!isMounted) return;
+
+//       try {
+//         // ============ KEY CHANGE: HANDLE NON-LOGGED-IN USERS FIRST ============
+//         if (!user) {
+//           // Non-logged-in users: Load default hub data immediately
+//           console.log("User not logged in, loading default hub data");
+
+//           // Load default hub data for non-logged-in users
+//           await loadDefaultHubData();
+
+//           // Clear any previous auto-detected location
+//           if (isMounted) {
+//             setIsServiceable(null);
+//           }
+//           return;
+//         }
+
+//         const savedCurrentLocation = localStorage.getItem("currentLocation");
+//         const savedLocation = savedCurrentLocation
+//           ? JSON.parse(savedCurrentLocation)
+//           : null;
+
+//         const savedPrimaryAddress = localStorage.getItem("primaryAddress");
+//         if (savedPrimaryAddress) {
+//           try {
+//             const parsedPrimaryAddress = JSON.parse(savedPrimaryAddress);
+//             if (isMounted) {
+//               setPrimaryAddress(parsedPrimaryAddress);
+//             }
+//             return;
+//           } catch (e) {
+//             console.error("Error parsing saved primary address:", e);
+//           }
+//         }
+
+//         // Check if location was manually selected by user
+//         const manualLocationFlag = localStorage.getItem(
+//           "locationManuallySelected",
+//         );
+//         if (manualLocationFlag === "true") {
+//           console.log(
+//             "Location was manually selected, skipping auto-detection",
+//           );
+//           return; // Don't auto-detect if user manually selected location
+//         }
+
+//         // For logged-in users, detect if no saved location exists
+//         if (!savedLocation) {
+//           const permissionState = await checkLocationPermissions();
+
+//           if (permissionState === "denied") {
+//             if (isMounted) {
+//               setIsLocationEnabled(false);
+//             }
+//             return;
+//           }
+
+//           if (permissionState === "granted" || permissionState === "prompt") {
+//             timerId = setTimeout(() => {
+//               if (isMounted) {
+//                 getCurrentLocation().catch((error) => {
+//                   console.error("Auto location detection failed:", error);
+//                   if (
+//                     error.message.includes("permission denied") &&
+//                     isMounted
+//                   ) {
+//                     setIsLocationEnabled(false);
+//                   }
+//                 });
+//               }
+//             }, 1000);
+//           }
+//         }
+//       } catch (error) {
+//         console.error("Auto location detection setup failed:", error);
+//       }
+//     };
+
+//     autoDetectLocation();
+
+//     return () => {
+//       isMounted = false;
+//       if (timerId) clearTimeout(timerId);
+//     };
+//   }, [checkLocationPermissions, user, loadDefaultHubData, getCurrentLocation]);
+//   // ============ END OF UPDATED AUTO-DETECT LOCATION LOGIC ============
+
+//   // Manual location detection function
+//   const handleDetectLocation = async () => {
+//     try {
+//       const location = await getCurrentLocation();
+
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "success",
+//         title: `Location updated successfully`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     } catch (error) {
+//       console.error("Location detection failed:", error);
+
+//       if (error.message.includes("permission denied")) {
+//         setIsLocationEnabled(false);
+//         Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title:
+//             "Location permission denied. Please enable location in browser settings.",
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       } else {
+//         Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Location detection failed: ${error.message}`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//     }
+//   };
+
+//   // Handle location from LocationModal2
+//   const handleLocationFromModal = useCallback(
+//     (locationData) => {
+//       if (locationData) {
+//         // First, save the location data
+//         const locationToSave = {
+//           ...locationData,
+//           isAutoDetected: false, // Mark as user-selected, not auto-detected
+//           timestamp: new Date().toISOString(),
+//         };
+
+//         // Save to localStorage
+//         localStorage.setItem("currentLocation", JSON.stringify(locationToSave));
+
+//         // Set manual location flag to prevent auto-detection
+//         localStorage.setItem("locationManuallySelected", "true");
+
+//         // Update state
+//         setCurrentLocation(locationToSave);
+
+//         // Check serviceability for the new location
+//         if (locationData.lat && locationData.lng) {
+//           checkServiceability(
+//             locationData.lat,
+//             locationData.lng,
+//             locationData.fullAddress,
+//           );
+//         }
+
+//         // Notify parent component
+//         if (onLocationDetected) {
+//           onLocationDetected(locationToSave);
+//         }
+//       }
+//     },
+//     [onLocationDetected],
+//   );
+
+//   // Modified handleLocationClick to show location modal
+//   const handleLocationClick = () => {
+//     setShowLocationModal(true);
+//   };
+
+//   // Rest of your existing functions remain the same...
+//   const userLogin = async () => {
+//     if (!Mobile) {
+//       return Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "info",
+//         title: `Enter Your Mobile Number`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//     try {
+//       const config = {
+//         url: "/User/Sendotp",
+//         method: "post",
+//         baseURL: "http://localhost:7013/api",
+//         headers: { "content-type": "application/json" },
+//         data: {
+//           Mobile: Mobile,
+//         },
+//       };
+
+//       const res = await axios(config);
+//       if (res.status === 401) {
+//         return Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Invalid Mobile Number`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (res.status === 402) {
+//         return Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Error sending OTP`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (res.status === 200) {
+//         handleClose3();
+//         handleShow7();
+//       }
+//     } catch (error) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: error.response.data.error || `Something went wrong!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   const [show8, setShow8] = useState(false);
+//   const handleClose8 = () => setShow8(false);
+//   const handleShow8 = () => setShow8(true);
+
+//   const handleShowCart = () => setShowCart(true);
+
+//   const phoneNumber = "7204188504";
+//   const message = "Hello! I need assistance.";
+//   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+//     message,
+//   )}`;
+
+//   const logOut = () => {
+//     swal({
+//       title: "Yeah!",
+//       text: "Successfully Logged Out",
+//       icon: "success",
+//       button: "Ok!",
+//     });
+//     setTimeout(() => {
+//       window.location.assign("/");
+//     }, 5000);
+//     localStorage.clear();
+//   };
+
+//   const [apartmentdata, setapartmentdata] = useState([]);
+//   const getapartmentd = async () => {
+//     try {
+//       let res = await axios.get("http://localhost:7013/api/admin/getapartment");
+//       if (res.status === 200) {
+//         setapartmentdata(res.data.corporatedata);
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     getapartmentd();
+//   }, []);
+
+//   const [corporatedata, setcorporatedata] = useState([]);
+//   const getcorporate = async () => {
+//     try {
+//       let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
+//       if (res.status === 200) {
+//         setcorporatedata(res.data.corporatedata);
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     getcorporate();
+//   }, []);
+
+//   const [storyLength, setStoryLength] = useState(0);
+
+//   useEffect(() => {
+//     const getAddWebstory = async () => {
+//       try {
+//         let res = await axios.get("http://localhost:7013/api/admin/getstories");
+//         if (res.status === 200) {
+//           setStoryLength(res.data.getbanner.length);
+//         }
+//       } catch (error) {
+//         // console.log(error);
+//       }
+//     };
+//     getAddWebstory();
+//   }, []);
+
+//   const address = JSON.parse(
+//     localStorage.getItem(
+//       addresstype === "apartment" ? "address" : "coporateaddress",
+//     ),
+//   );
+
+//   const Handeledata = (ab, def) => {
+//     try {
+//       if (ab) {
+//         if (!user) return navigate("/", { replace: true });
+//         let data = JSON.parse(ab);
+//         const addressData = {
+//           Address: data?.Address,
+//           Delivarycharge: data?.apartmentdelivaryprice,
+//           doordelivarycharge: data?.doordelivaryprice,
+//           apartmentname: data?.Apartmentname,
+//           pincode: data?.pincode,
+//           approximatetime: data?.approximatetime,
+//           prefixcode: data?.prefixcode,
+//           name: ab?.Name || user?.Fname || "",
+//           flatno: ab?.fletNumber || "",
+//           mobilenumber: ab?.Number || user?.Mobile || "",
+//           towerName: ab?.towerName ? ab?.towerName : "",
+//           lunchSlots: data?.lunchSlots ? data?.lunchSlots : [],
+//           dinnerSlots: data?.dinnerSlots ? data?.dinnerSlots : [],
+//           deliverypoint: data?.deliverypoint ? data?.deliverypoint : "",
+//           locationType: data?.locationType || "",
+//         };
+//         if (!def) {
+//           saveSelectedAddress(data);
+//         }
+
+//         if (addresstype === "apartment") {
+//           localStorage.setItem("address", JSON.stringify(addressData));
+//         } else {
+//           localStorage.setItem("coporateaddress", JSON.stringify(addressData));
+//         }
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   //Request Location
+//   const [Name, setName] = useState("");
+//   const [Number, setNumber] = useState("");
+//   const [ApartmentName, setApartmentName] = useState("");
+//   const [Message, setMessage] = useState("");
+
+//   function validateIndianMobileNumber(mobileNumber) {
+//     const regex = /^[6-9]\d{9}$/;
+//     return regex.test(mobileNumber);
+//   }
+
+//   const verifyOTP = async () => {
+//     try {
+//       if (!OTP) {
+//         return Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "error",
+//           title: `Enter a valid OTP`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       const config = {
+//         url: "User/mobileotpverification",
+//         method: "post",
+//         baseURL: "http://localhost:7013/api/",
+//         header: { "content-type": "application/json" },
+//         data: {
+//           Mobile: Mobile,
+//           otp: OTP,
+//         },
+//       };
+//       const res = await axios(config);
+//       if (res.status === 200) {
+//         localStorage.setItem("user", JSON.stringify(res.data.details));
+//         sessionStorage.setItem("user", JSON.stringify(res.data.details));
+//         window.dispatchEvent(new Event("userUpdated"));
+//         Swal2.fire({
+//           toast: true,
+//           position: "bottom",
+//           icon: "success",
+//           title: `OTP verified successfully`,
+//           showConfirmButton: false,
+//           timer: 3000,
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//         window.location.reload();
+//       }
+//     } catch (error) {
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "error",
+//         title: error.response.data.error || `Something went wrong!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   const [selectedAddress, setSelectedAddress] = useState({});
+
+//   const getSelectedAddress = async () => {
+//     try {
+//       let res = await axios.get(
+//         `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`,
+//       );
+//       if (res.status === 200) {
+//         setSelectedAddress(res.data.getdata);
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (user) {
+//       getSelectedAddress();
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     if (selectedAddress) {
+//       if (addresstype === "apartment") {
+//         const am = apartmentdata.find(
+//           (ele) => ele?._id?.toString() === selectedAddress?.addressid,
+//         );
+//         if (am) {
+//           Handeledata(JSON.stringify({ ...am, ...selectedAddress }), "def");
+//         }
+//       } else {
+//         const co = corporatedata.find(
+//           (ele) => ele?._id?.toString() === selectedAddress?.addressid,
+//         );
+//         if (co) {
+//           Handeledata(JSON.stringify({ ...co, ...selectedAddress }), "def");
+//         }
+//       }
+//     }
+//   }, [selectedAddress, addresstype, apartmentdata, corporatedata]);
+
+//   const saveSelectedAddress = async (data) => {
+//     try {
+//       if (!user) return;
+//       let res = await axios.post(`http://localhost:7013/api/user/addressadd`, {
+//         Name: user?.Fname,
+//         Number: user?.Mobile,
+//         userId: user?._id,
+//         ApartmentName: data?.Apartmentname,
+//         addresstype: addresstype,
+//         addressid: data?._id,
+//       });
+//     } catch (error) {
+//       // console.log(error);
+//     }
+//   };
+
+//   const inputRef = useRef(null);
+//   const [open, setOpen] = useState(false);
+//   const [searchValue, setSearchValue] = useState("");
+
+//   // Get customer ID from localStorage
+//   const getCustomerId = () => {
+//     return user?._id;
+//   };
+
+//   // Get auth headers
+//   const getAuthHeaders = () => {
+//     const token = localStorage.getItem("token");
+//     return {
+//       "Content-Type": "application/json",
+//       ...(token && { Authorization: `Bearer ${token}` }),
+//     };
+//   };
+
+//   const [userData, setUserData] = useState([]);
+//   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
+
+//   const showAlert = (message, type) => {
+//     setAlert({ show: true, message, type });
+//     setTimeout(() => setAlert({ show: false, message: "", type: "" }), 3000);
+//   };
+
+//   const [primaryAddressId, setPrimaryAddressId] = useState(null);
+
+//   // Fetch addresses
+//   // 1. First, fix the fetchAddresses function to use stable dependencies
+//   const fetchAddresses = useMemo(() => {
+//     return async () => {
+//       try {
+//         setLoading(true);
+//         const customerId = user?._id;
+
+//         if (!customerId) {
+//           return;
+//         }
+
+//         const response = await fetch(
+//           `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+//           {
+//             method: "GET",
+//             headers: getAuthHeaders(),
+//           },
+//         );
+
+//         if (!response.ok) {
+//           throw new Error("Failed to fetch addresses");
+//         }
+
+//         const result = await response.json();
+
+//         if (result.success) {
+//           const addresses = result.addresses || [];
+//           setAddresses(addresses);
+//           setPrimaryAddressId(result.primaryAddress || null);
+
+//           const primaryAddr = addresses.find(
+//             (addr) => addr._id === result.primaryAddress,
+//           );
+//           setPrimaryAddress(primaryAddr || null);
+
+//           if (primaryAddr) {
+//             localStorage.setItem("primaryAddress", JSON.stringify(primaryAddr));
+//           }
+
+//           if (addresses && addresses.length > 0) {
+//             const firstType = addresses[0].addressType;
+//             setExpandedSections({ [firstType]: true });
+//           }
+//         }
+//       } catch (error) {
+//         console.error("Error fetching addresses:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//   }, [user?._id]);
+
+//   useEffect(() => {
+//     if (user?._id) {
+//       fetchAddresses();
+//     }
+//   }, [user?._id, fetchAddresses]);
+
+//   // Get display name for address
+//   const getDisplayName = (address) => {
+//     if (!address) return "";
+
+//     switch (address.addressType) {
+//       case "Home":
+//         return address.homeName || address.houseName || "";
+//       case "PG":
+//         return address.apartmentName || address.houseName || "";
+//       case "School":
+//         return address.schoolName || address.houseName || "";
+//       case "Work":
+//         return address.companyName || address.houseName || "";
+//       default:
+//         return address.fullAddress || "";
+//     }
+//   };
+
+//   // Get display address text - with proper priority based on requirements
+//   const getDisplayAddress = () => {
+//     // If we're actively detecting location, show loading
+//     if (isLocating) {
+//       return "Detecting location...";
+//     }
+
+//     // If location is disabled, show message
+//     if (!isLocationEnabled && !addresses.length && !primaryAddress) {
+//       return "Enable location";
+//     }
+
+//     // Priority 1: Show primary address if set (from saved addresses)
+//     if (primaryAddress) {
+//       const name = getDisplayName(primaryAddress);
+//       return name.length > 40 ? `${name.substring(0, 37)}...` : name;
+//     }
+
+//     // Priority 2: Show user-selected location from LocationModal2 (not auto-detected)
+//     const savedLocation = localStorage.getItem("currentLocation");
+//     if (savedLocation && savedLocation !== "null") {
+//       try {
+//         const parsedLocation = JSON.parse(savedLocation);
+//         // Only show if it's not auto-detected (user selected it manually)
+//         if (!parsedLocation.isAutoDetected) {
+//           const address =
+//             parsedLocation.fullAddress || parsedLocation.houseName || "";
+//           if (address) {
+//             return address.length > 40
+//               ? `${address.substring(0, 37)}...`
+//               : address;
+//           }
+//         }
+//       } catch (e) {
+//         console.error("Error parsing saved location:", e);
+//       }
+//     }
+
+//     // Priority 3: Show auto-detected location ONLY if no primary address and no user-selected location
+//     if (currentLocation?.fullAddress && !primaryAddress) {
+//       const address =
+//         currentLocation.fullAddress.length > 40
+//           ? `${currentLocation.fullAddress.substring(0, 37)}...`
+//           : currentLocation.fullAddress;
+//       return address;
+//     }
+
+//     // Priority 4: Show any saved address
+//     if (addresses.length > 0) {
+//       const name = getDisplayName(addresses[0]);
+//       return name.length > 40 ? `${name.substring(0, 37)}...` : name;
+//     }
+
+//     // ============ SIMPLIFIED LOGIC ============
+//     // Check if we have a displayable address
+//     const hasDisplayableAddress = () => {
+//       // Check if we have any address that can be displayed
+//       if (primaryAddress && getDisplayName(primaryAddress)) return true;
+
+//       // Check addresses array
+//       if (addresses.length > 0 && getDisplayName(addresses[0])) return true;
+
+//       // Check currentLocation in state
+//       if (currentLocation?.fullAddress) return true;
+
+//       // Check localStorage currentLocation for displayable address
+//       const savedLoc = localStorage.getItem("currentLocation");
+//       if (savedLoc && savedLoc !== "null") {
+//         try {
+//           const parsed = JSON.parse(savedLoc);
+//           // Check if it has a displayable address
+//           if (parsed.fullAddress || parsed.houseName || parsed.address)
+//             return true;
+//           // Check if it's a valid location object (not just coordinates)
+//           if (
+//             parsed.lat &&
+//             parsed.lng &&
+//             (parsed.fullAddress || parsed.houseName || parsed.address)
+//           )
+//             return true;
+//         } catch (e) {
+//           // Ignore parse error
+//         }
+//       }
+
+//       return false;
+//     };
+
+//     // For logged-in users with no displayable address: Show "Add Location"
+//     if (user && !hasDisplayableAddress()) {
+//       return "Add Location";
+//     }
+
+//     // For everyone else: Show "Select Location"
+//     return "Select Location";
+//   };
+//   // Add this function to get a more detailed tooltip
+//   const getAddressTooltip = () => {
+//     if (isLocating) return "Detecting your location...";
+
+//     if (primaryAddress) {
+//       const name = getDisplayName(primaryAddress);
+//       const type = primaryAddress.addressType || "Primary Address";
+//       return `${type}: ${name}`;
+//     }
+
+//     // Check for user-selected location from modal
+//     const savedLocation = localStorage.getItem("currentLocation");
+//     if (savedLocation) {
+//       try {
+//         const parsedLocation = JSON.parse(savedLocation);
+//         if (!parsedLocation.isAutoDetected) {
+//           return `Selected: ${
+//             parsedLocation.fullAddress || parsedLocation.houseName
+//           }`;
+//         }
+//       } catch (e) {
+//         console.error("Error parsing saved location:", e);
+//       }
+//     }
+
+//     if (currentLocation?.fullAddress) {
+//       return `Detected: ${currentLocation.fullAddress}`;
+//     }
+
+//     // ============ UPDATED: Different messages for logged-in vs non-logged-in users ============
+//     if (user) {
+//       return "Click to add your delivery location";
+//     }
+
+//     return "Click to select your location from available hubs";
+//   };
+
+//   // Get serviceability status icon and text
+//   const getServiceabilityStatus = () => {
+//     if (!currentLocation) return null;
+
+//     if (isCheckingServiceability) {
+//       return {
+//         icon: <FaSpinner className="fa-spin" />,
+//         text: "Checking serviceability...",
+//         color: "#ff9800",
+//       };
+//     }
+
+//     if (isServiceable === true) {
+//       return {
+//         icon: <FaCheckCircle />,
+//         text: "Service available",
+//         color: "#4caf50",
+//       };
+//     }
+
+//     if (isServiceable === false) {
+//       return {
+//         icon: <FaTimesCircle />,
+//         text: "Service not available",
+//         color: "#f44336",
+//       };
+//     }
+
+//     return null;
+//   };
+
+//   // Handle location disabled state
+//   const handleLocationDisabledClick = () => {
+//     Swal2.fire({
+//       title: "Location Access Required",
+//       text: "Please enable location services in your browser settings to use this feature.",
+//       icon: "info",
+//       confirmButtonText: "OK",
+//       confirmButtonColor: "#6B8E23",
+//     });
+//   };
+
+//   return (
+//     <div>
+//       <div className="ban-container">
+//         <div className="mobile-banner-updated">
+//           <div className="screen-3" style={{ padding: "0 24px 8px 24px" }}>
+//             <div
+//               className="screen-2 mb-3 mt-2 d-flex align-items-center"
+//               style={{ width: "100%", justifyContent: "space-between" }}
+//             >
+//               {user && (
+//                 <div
+//                   className="d-flex align-items-center gap-2 w-100"
+//                   onClick={
+//                     isLocationEnabled
+//                       ? handleLocationClick
+//                       : handleLocationDisabledClick
+//                   }
+//                   style={{ cursor: "pointer" }}
+//                 >
+//                   {isLocating ? (
+//                     <FaSpinner
+//                       className="fa-spin"
+//                       style={{
+//                         width: "32px",
+//                         height: "32px",
+//                         color: "#6B8E23",
+//                       }}
+//                     />
+//                   ) : (
+//                     <img
+//                       src={Selectlocation}
+//                       alt="select-location"
+//                       className="flex-shrink-0"
+//                       style={{
+//                         width: "32px",
+//                         height: "32px",
+//                         opacity: isLocationEnabled ? 1 : 0.5,
+//                       }}
+//                     />
+//                   )}
+
+//                   <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center">
+//                     <div className="d-flex align-items-center">
+//                       <p
+//                         className={`select-location-text fw-semibold text-truncate mb-0 banner-address-line ${
+//                           user ? "with-user-icon" : "with-login-btn"
+//                         }`}
+//                         title={getAddressTooltip()}
+//                         style={{ opacity: isLocationEnabled ? 1 : 0.7 }}
+//                       >
+//                         {getDisplayAddress()}
+//                       </p>
+
+//                       {/* Show location icon for auto-detected location */}
+//                       {currentLocation?.isAutoDetected &&
+//                         !primaryAddress &&
+//                         user && (
+//                           <span
+//                             className="ms-1"
+//                             title="Auto-detected location"
+//                             style={{ color: "#6B8E23", fontSize: "12px" }}
+//                           >
+//                             <FaMapMarkerAlt />
+//                           </span>
+//                         )}
+
+//                       {/* Show primary address badge - only for logged-in users */}
+//                       {primaryAddress && user && (
+//                         <span
+//                           className="ms-1"
+//                           title="Primary Address"
+//                           style={{ color: "#6B8E23", fontSize: "12px" }}
+//                         >
+//                           ★
+//                         </span>
+//                       )}
+
+//                       {/* Show refresh button for location - only if no primary address and logged-in */}
+//                       {currentLocation &&
+//                         !isLocating &&
+//                         isLocationEnabled &&
+//                         !primaryAddress &&
+//                         user && (
+//                           <button
+//                             onClick={(e) => {
+//                               e.stopPropagation();
+//                               handleDetectLocation();
+//                             }}
+//                             style={{
+//                               background: "none",
+//                               border: "none",
+//                               color: "#6B8E23",
+//                               marginLeft: "8px",
+//                               cursor: "pointer",
+//                               fontSize: "12px",
+//                             }}
+//                             title="Refresh location"
+//                           >
+//                             ↻
+//                           </button>
+//                         )}
+//                     </div>
+
+//                     {user && (
+//                       <p
+//                         className="select-location-text-small mb-0 banner-user-details"
+//                         style={{
+//                           color: "rgba(255, 255, 255, 0.8)",
+//                         }}
+//                       >
+//                         {user?.Fname} | {user?.Mobile}
+//                         {primaryAddress && ""}
+//                       </p>
+//                     )}
+//                   </div>
+//                 </div>
+//               )}
+
+//               <div
+//                 className="d-flex gap-1 justify-content-end align-items-center referbtn"
+//                 style={{ marginLeft: "auto", flexShrink: 0 }}
+//               >
+//                 {/* <button
+//                   className="refer-earn-btn"
+//                   onClick={() => navigate("/refer")}
+//                 >
+//                   <img
+//                     src="/Assets/gifticon.svg"
+//                     alt="refer"
+//                     className="refer-icon"
+//                   />
+//                   <span className="refer-earn-text">Refer & Earn</span>
+//                 </button> */}
+
+//                 {user ? (
+//                   <img
+//                     src={UserIcons}
+//                     alt="user-icon"
+//                     onClick={handleShow8}
+//                     className="p-2"
+//                   />
+//                 ) : (
+//                   <button
+//                     className="d-flex gap-2 justify-content-center align-items-center"
+//                     style={{
+//                       background: "#FFF8DC",
+//                       border: "2px solid #F5DEB3",
+//                       color: "#2c2c2c",
+//                       cursor: "pointer",
+//                       fontSize: "16px",
+//                       fontFamily: "Inter",
+//                       fontWeight: "600",
+//                       width: "106px",
+//                       height: "44px",
+//                       borderRadius: "18px",
+//                     }}
+//                     onClick={() => {
+//                       navigate("/login");
+//                     }}
+//                   >
+//                     <img
+//                       src={usericon}
+//                       alt=""
+//                       style={{ width: "27px", height: "27px" }}
+//                     />
+//                     LOGIN
+//                   </button>
+//                 )}
+//               </div>
+//             </div>
+
+//             {/* <div
+//               className="d-flex align-items-center m-0 order-row"
+//               style={{ width: "100%" }}
+//             >
+//               <div
+//                 className="d-flex align-items-center flex-grow-1 min-w-0"
+//                 style={{ gap: "4px" }}
+//               >
+//                 <img
+//                   src={clockone}
+//                   alt=""
+//                   style={{ width: "24px", height: "24px" }}
+//                 />
+//                 <span className="clock-text mt-2">
+//                   Order by 12 & Get Lunch by 1:00 PM
+//                 </span>
+//               </div>
+
+//               <div
+//                 className="veg-btn d-flex flex-column align-items-center ms-2"
+//                 onClick={() => setIsVegOnly(!isVegOnly)}
+//               >
+//                 <h6 className="m-0 veg-title">Veg Only</h6>
+//                 <div className="veg-btn-toggle" style={{ cursor: "pointer" }}>
+//                   <div
+//                     className="veg-btn-switch"
+//                     style={{
+//                       transform: isVegOnly
+//                         ? "translateX(18px)"
+//                         : "translateX(0)",
+//                       backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d",
+//                       transition: "all 0.3s ease",
+//                     }}
+//                   ></div>
+//                 </div>
+//               </div>
+//             </div> */}
+//           </div>
+//           <div style={{ marginBottom: "-14px" }}>
+//             <CookingPromo />
+//           </div>
+//         </div>
+
+//         {/* Serviceability Popup - Only show when explicitly not serviceable */}
+//         {isServiceable === false && !showServiceablePopup && user && (
+//           <div
+//             style={{
+//               position: "fixed",
+//               left: 0,
+//               right: 0,
+//               bottom: 0,
+//               padding: isSmall ? "0 12px 16px" : "0 16px 20px",
+//               zIndex: 999990,
+//               display: "flex",
+//               justifyContent: "center",
+//               pointerEvents: "none",
+//             }}
+//           >
+//             <div
+//               style={{
+//                 width: "100%",
+//                 maxWidth: "600px",
+//                 backgroundColor: "#F5DEB3",
+//                 borderRadius: isSmall ? "16px" : "18px",
+//                 padding: isSmall ? "16px" : "20px",
+//                 boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
+//                 pointerEvents: "auto",
+//               }}
+//             >
+//               <div
+//                 style={{
+//                   display: "flex",
+//                   alignItems: "flex-start",
+//                   gap: isSmall ? "12px" : "16px",
+//                   marginBottom: isSmall ? "16px" : "20px",
+//                 }}
+//               >
+//                 <div
+//                   style={{
+//                     width: isSmall ? "40px" : "44px",
+//                     height: isSmall ? "40px" : "44px",
+//                     borderRadius: "12px",
+//                     backgroundColor: "rgba(139, 100, 68, 0.1)",
+//                     display: "flex",
+//                     alignItems: "center",
+//                     justifyContent: "center",
+//                     flexShrink: 0,
+//                   }}
+//                 >
+//                   <img
+//                     src={locationIcon}
+//                     alt="Location"
+//                     style={{
+//                       width: isSmall ? "24px" : "28px",
+//                       height: isSmall ? "24px" : "28px",
+//                       objectFit: "contain",
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div style={{ flex: 1, minWidth: 0 }}>
+//                   <h3
+//                     style={{
+//                       margin: 0,
+//                       color: "#3A2E2A",
+//                       fontSize: isSmall ? "18px" : "20px",
+//                       fontWeight: "700",
+//                       lineHeight: "1.2",
+//                       marginBottom: "4px",
+//                     }}
+//                   >
+//                     We're not here yet
+//                   </h3>
+
+//                   <p
+//                     style={{
+//                       margin: 0,
+//                       color: "#6A5A52",
+//                       fontSize: isSmall ? "14px" : "15px",
+//                       lineHeight: "1.4",
+//                     }}
+//                   >
+//                     We don't serve this address yet, but nearby areas are live
+//                   </p>
+//                 </div>
+//               </div>
+
+//               {/* Buttons - Side by side for most screens, stacked only on very small screens */}
+//               <div
+//                 style={{
+//                   display: "flex",
+//                   flexDirection: isVerySmall ? "row" : "row",
+//                   gap: "12px",
+//                   width: "100%",
+//                 }}
+//               >
+//                 <button
+//                   onClick={handleRequestLocationClick}
+//                   style={{
+//                     flex: 1,
+//                     backgroundColor: "transparent",
+//                     color: "#4B3B33",
+//                     border: "1.5px solid rgba(120, 92, 70, 0.35)",
+//                     borderRadius: isSmall ? "12px" : "14px",
+//                     padding: isSmall ? "12px 8px" : "14px 16px",
+//                     fontSize: isSmall ? "14px" : "16px",
+//                     fontWeight: "600",
+//                     cursor: "pointer",
+//                     transition: "all 0.2s ease",
+//                     textAlign: "center",
+//                     whiteSpace: "nowrap",
+//                     minWidth: 0, // Allows text truncation if needed
+//                   }}
+//                   onMouseEnter={(e) =>
+//                     (e.currentTarget.style.backgroundColor = "#E9D9C8")
+//                   }
+//                   onMouseLeave={(e) =>
+//                     (e.currentTarget.style.backgroundColor = "transparent")
+//                   }
+//                 >
+//                   Request Location
+//                 </button>
+
+//                 <button
+//                   onClick={() => (window.location.href = "/current-location")}
+//                   style={{
+//                     flex: 1,
+//                     backgroundColor: "#E6B800",
+//                     color: "#2C241B",
+//                     border: "none",
+//                     borderRadius: isSmall ? "12px" : "14px",
+//                     padding: isSmall ? "12px 8px" : "14px 16px",
+//                     fontSize: isSmall ? "14px" : "16px",
+//                     fontWeight: "700",
+//                     cursor: "pointer",
+//                     transition: "all 0.2s ease",
+//                     textAlign: "center",
+//                     whiteSpace: "nowrap",
+//                     minWidth: 0,
+//                   }}
+//                   onMouseEnter={(e) =>
+//                     (e.currentTarget.style.filter = "brightness(0.96)")
+//                   }
+//                   onMouseLeave={(e) => (e.currentTarget.style.filter = "none")}
+//                 >
+//                   Change address
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
+//         {showServiceablePopup && user && (
+//           <div
+//             style={{
+//               position: "fixed",
+//               top: 0,
+//               left: 0,
+//               right: 0,
+//               bottom: 0,
+//               backgroundColor: "rgba(0,0,0,0.7)",
+//               display: "flex",
+//               alignItems: "center",
+//               justifyContent: "center",
+//               zIndex: 3001, // Higher z-index to appear above the first popup
+//               padding: "20px",
+//             }}
+//           >
+//             <div
+//               style={{
+//                 backgroundColor: "#F8F6F0",
+//                 borderRadius: "16px",
+//                 padding: "24px",
+//                 maxWidth: "400px",
+//                 width: "100%",
+//                 textAlign: "center",
+//                 boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+//               }}
+//             >
+//               <div
+//                 style={{
+//                   width: isSmall ? "38px" : "44px",
+//                   height: isSmall ? "38px" : "44px",
+//                   borderRadius: "12px",
+//                   display: "flex",
+//                   alignItems: "center",
+//                   justifyContent: "center",
+//                   flex: "0 0 auto",
+//                   margin: "0 auto",
+//                 }}
+//               >
+//                 <img
+//                   src={locationIcon}
+//                   alt=""
+//                   style={{
+//                     width: isSmall ? "34px" : "40px",
+//                     height: isSmall ? "34px" : "40px",
+//                     objectFit: "contain",
+//                     display: "block",
+//                   }}
+//                 />
+//               </div>
+//               <h3
+//                 style={{
+//                   marginBottom: "12px",
+//                   color: "#333",
+//                   fontSize: "20px",
+//                   fontWeight: "600",
+//                 }}
+//               >
+//                 Coming Soon to Your Area!
+//               </h3>
+//               <p
+//                 style={{
+//                   marginBottom: "16px",
+//                   color: "#666",
+//                   fontSize: "14px",
+//                   lineHeight: "1.5",
+//                 }}
+//               >
+//                 We're not currently operating in this location, but we're
+//                 expanding rapidly! Let us know you're interested, and we'll
+//                 notify you as soon as we launch in your area.
+//               </p>
+
+//               <div style={{ marginBottom: "20px", textAlign: "left" }}>
+//                 <div style={{ marginBottom: "12px" }}>
+//                   <label
+//                     style={{
+//                       display: "block",
+//                       marginBottom: "4px",
+//                       fontSize: "14px",
+//                       fontWeight: "500",
+//                     }}
+//                   >
+//                     Your Name *
+//                   </label>
+//                   <input
+//                     type="text"
+//                     value={serviceRequestName}
+//                     onChange={(e) => setServiceRequestName(e.target.value)}
+//                     placeholder="Enter your name"
+//                     style={{
+//                       width: "100%",
+//                       padding: "12px",
+//                       border: "1px solid #ddd",
+//                       borderRadius: "8px",
+//                       fontSize: "14px",
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div style={{ marginBottom: "16px" }}>
+//                   <label
+//                     style={{
+//                       display: "block",
+//                       marginBottom: "4px",
+//                       fontSize: "14px",
+//                       fontWeight: "500",
+//                     }}
+//                   >
+//                     Phone Number *
+//                   </label>
+//                   <input
+//                     type="tel"
+//                     value={serviceRequestPhone}
+//                     onChange={(e) => setServiceRequestPhone(e.target.value)}
+//                     placeholder="Enter your phone number"
+//                     style={{
+//                       width: "100%",
+//                       padding: "12px",
+//                       border: "1px solid #ddd",
+//                       borderRadius: "8px",
+//                       fontSize: "14px",
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div
+//                   style={{
+//                     fontSize: "12px",
+//                     color: "#666",
+//                     marginBottom: "16px",
+//                   }}
+//                 >
+//                   <strong>Selected Location:</strong>{" "}
+//                   {currentLocation?.fullAddress || "Address not available"}
+//                 </div>
+//               </div>
+
+//               <div
+//                 style={{
+//                   display: "flex",
+//                   flexDirection: "column",
+//                   gap: "12px",
+//                 }}
+//               >
+//                 <button
+//                   onClick={handleServiceRequest}
+//                   disabled={
+//                     isSubmittingRequest ||
+//                     !serviceRequestName ||
+//                     !serviceRequestPhone
+//                   }
+//                   style={{
+//                     backgroundColor:
+//                       isSubmittingRequest ||
+//                       !serviceRequestName ||
+//                       !serviceRequestPhone
+//                         ? "#ccc"
+//                         : "#6B8E23",
+//                     color: "white",
+//                     border: "none",
+//                     borderRadius: "12px",
+//                     padding: "14px",
+//                     fontSize: "16px",
+//                     fontWeight: "600",
+//                     cursor:
+//                       isSubmittingRequest ||
+//                       !serviceRequestName ||
+//                       !serviceRequestPhone
+//                         ? "not-allowed"
+//                         : "pointer",
+//                     transition: "background-color 0.2s",
+//                   }}
+//                 >
+//                   {isSubmittingRequest ? "Submitting..." : "Request Service"}
+//                 </button>
+//                 <button
+//                   onClick={() => setShowServiceablePopup(false)}
+//                   style={{
+//                     backgroundColor: "transparent",
+//                     color: "#666",
+//                     border: "1px solid #ddd",
+//                     borderRadius: "12px",
+//                     padding: "14px",
+//                     fontSize: "16px",
+//                     fontWeight: "500",
+//                     cursor: "pointer",
+//                     transition: "background-color 0.2s",
+//                   }}
+//                   onMouseEnter={(e) => {
+//                     e.target.style.backgroundColor = "#f5f5f5";
+//                   }}
+//                   onMouseLeave={(e) => {
+//                     e.target.style.backgroundColor = "transparent";
+//                   }}
+//                 >
+//                   Cancel
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//         <ProfileOffcanvas show={show8} handleClose={handleClose8} />
+
+//         <Modal show={show3} backdrop="static" onHide={handleClose3}>
+//           <Modal.Header closeButton>
+//             <Modal.Title className="d-flex align-items-center gap-1">
+//               <FaLock color="#6B8E23" /> <span>Welcome to Dailydish</span>{" "}
+//             </Modal.Title>
+//           </Modal.Header>
+//           <Modal.Body>
+//             <Form>
+//               <div className="login-whatsappwithicon">
+//                 <FaSquareWhatsapp size={42} color="green" />
+
+//                 <Form.Control
+//                   type="number"
+//                   placeholder="Enter Your WhatsApp Number"
+//                   value={Mobile}
+//                   onChange={(e) => setMobile(e.target.value)}
+//                 />
+//               </div>
+
+//               <Button
+//                 variant=""
+//                 style={{
+//                   width: "100%",
+//                   marginTop: "24px",
+//                   backgroundColor: "#6B8E23",
+//                   color: "white",
+//                   textAlign: "center",
+//                 }}
+//                 onClick={() => {
+//                   if (!validateIndianMobileNumber(Mobile)) {
+//                     return Swal2.fire({
+//                       toast: true,
+//                       position: "bottom",
+//                       icon: "error",
+//                       title: `Invalid Mobile Number`,
+//                       showConfirmButton: false,
+//                       timer: 3000,
+//                       customClass: {
+//                         popup: "me-small-toast",
+//                         title: "me-small-toast-title",
+//                       },
+//                     });
+//                   }
+//                   userLogin();
+//                 }}
+//               >
+//                 Send otp
+//               </Button>
+//             </Form>
+//           </Modal.Body>
+//           <Modal.Footer>
+//             <Button variant="secondary" onClick={handleClose3}>
+//               Close
+//             </Button>
+//           </Modal.Footer>
+//         </Modal>
+
+//         <Modal
+//           show={show7}
+//           onHide={handleClose7}
+//           size="sm"
+//           style={{
+//             zIndex: "99999",
+//             position: "absolute",
+//             top: "30%",
+//             left: "0%",
+//           }}
+//         >
+//           <Modal.Header closeButton>
+//             <Modal.Title>Enter OTP</Modal.Title>
+//           </Modal.Header>
+//           <Modal.Body>
+//             <span style={{ fontSize: "13px" }}>
+//               An OTP has been sent to your whatsapp
+//             </span>
+//             <div className="d-flex gap-1 mt-3 mb-3">
+//               <InputGroup className="mb-2" style={{ background: "white" }}>
+//                 <Form.Control
+//                   type={PasswordShow ? "text" : "password"}
+//                   className="login-input"
+//                   placeholder="Enter OTP"
+//                   aria-describedby="basic-addon1"
+//                   onChange={(e) => setOTP(e.target.value)}
+//                 />
+//                 <Button
+//                   variant=""
+//                   style={{ borderRadius: "0px", border: "1px solid black" }}
+//                   onClick={() => setPasswordShow(!PasswordShow)}
+//                   className="passbtn"
+//                 >
+//                   {PasswordShow ? <FaEye /> : <FaEyeSlash />}
+//                 </Button>
+//               </InputGroup>
+//             </div>
+//             <div>
+//               <Button
+//                 variant=""
+//                 onClick={verifyOTP}
+//                 style={{
+//                   width: "100%",
+//                   marginTop: "24px",
+//                   backgroundColor: "#6B8E23",
+//                   color: "white",
+//                   textAlign: "center",
+//                 }}
+//               >
+//                 Continue
+//               </Button>
+//             </div>
+//           </Modal.Body>
+//         </Modal>
+//       </div>
+
+//       <div className="ban-container2">
+//         <div className="mobile-banner" style={{ position: "relative" }}>
+//           <UserBanner />
+//         </div>
+//         {/* <div style={{ alignSelf: "end", marginRight: "16px" }}> */}
+//         <div
+//           className="veg-btn d-flex flex-row align-items-center ms-2"
+//           onClick={() => setIsVegOnly(!isVegOnly)}
+//         >
+//           <h6 className="m-0 veg-title">Veg Only</h6>
+//           <div
+//             className="veg-btn-toggle"
+//             // 1. Toggle state on click
+//             style={{ cursor: "pointer" }}
+//           >
+//             <div
+//               className="veg-btn-switch"
+//               style={{
+//                 // 2. Dynamic styling for animation and color
+//                 transform: isVegOnly ? "translateX(18px)" : "translateX(0)",
+//                 backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d", // Green when Active, Grey when inactive
+//                 transition: "all 0.3s ease", // Smooth sliding effect
+//               }}
+//             ></div>
+//           </div>
+//         </div>
+//         {/* </div> */}
+//       </div>
+
+//       <LocationModal2
+//         show={showLocationModal}
+//         onClose={() => {
+//           setShowLocationModal(false);
+//           // Refresh addresses when modal closes to get updated primary address
+//           if (user) {
+//             fetchAddresses();
+//           }
+//         }}
+//         onLocationSelect={handleLocationFromModal} // Pass the handler
+//         currentLocation={currentLocation}
+//         onLocationDetect={handleDetectLocation}
+//         isLocationEnabled={isLocationEnabled}
+//       />
+//     </div>
+//   );
+// };
+
+// export default Banner;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, {
   useState,
   useEffect,
@@ -42,7 +4583,7 @@ import CookingPromo from "./CookingPromo";
 
 function useWindowWidth() {
   const [w, setW] = React.useState(
-    typeof window !== "undefined" ? window.innerWidth : 1024
+    typeof window !== "undefined" ? window.innerWidth : 1024,
   );
   React.useEffect(() => {
     const onResize = () => setW(window.innerWidth);
@@ -60,8 +4601,8 @@ const Banner = ({
   onLocationDetected,
 }) => {
   const width = useWindowWidth();
-  const isSmall = width <= 768; // For general mobile adjustments
-  const isVerySmall = width <= 360; // For stacking buttons vertically
+  const isSmall = width <= 768;
+  const isVerySmall = width <= 360;
   const addresstype = localStorage.getItem("addresstype");
   const corporateaddress = JSON.parse(localStorage.getItem("coporateaddress"));
   const [user, setUser] = useState(() => {
@@ -125,8 +4666,28 @@ const Banner = ({
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
 
-  // Default hub ID for non-serviceable areas
-  const DEFAULT_HUB_ID = "69522e8c195d0cafeda7f611";
+  // Cutoff time states
+  const [currentHubCutoffTimes, setCurrentHubCutoffTimes] = useState(null);
+  const [currentSession, setCurrentSession] = useState('lunch');
+  const [orderCutoffStatus, setOrderCutoffStatus] = useState({ 
+    allowed: true, 
+    message: '',
+    cutoffDateTime: null,
+    nextAvailableDateTime: null
+  });
+  const [cutoffLoading, setCutoffLoading] = useState(false);
+
+  // Determine if user is employee based on status (FIXED)
+  const isEmployee = user?.status === "Employee";
+
+  //live Default hub ID for non-serviceable areas
+  const DEFAULT_HUB_ID = "69613cb1145c1aaedd9859cd";
+
+  //testing Default hub ID for non-serviceable areas
+  // const DEFAULT_HUB_ID = "69522e8c195d0cafeda7f611";
+
+  // Add state to track if default hub is loaded
+  const [defaultHubLoaded, setDefaultHubLoaded] = useState(false);
 
   // Function to get location using browser's geolocation API
   const getCurrentLocation = useCallback(() => {
@@ -140,7 +4701,6 @@ const Banner = ({
       setIsLocating(true);
       setLocationError(null);
 
-      // Set a timeout for location detection
       const locationTimeout = setTimeout(() => {
         setIsLocating(false);
         reject(new Error("Location request timed out"));
@@ -151,10 +4711,6 @@ const Banner = ({
           clearTimeout(locationTimeout);
           try {
             const { latitude, longitude } = position.coords;
-
-            // console.log("Raw coordinates:", { latitude, longitude });
-
-            // Get more accurate address using multiple methods
             const address = await getAccurateAddress(latitude, longitude);
 
             const locationData = {
@@ -171,20 +4727,14 @@ const Banner = ({
               },
             };
 
-            // console.log("Location data:", locationData);
-
-            // Save to localStorage
             localStorage.setItem(
               "currentLocation",
-              JSON.stringify(locationData)
+              JSON.stringify(locationData),
             );
 
             setCurrentLocation(locationData);
             setIsLocating(false);
-
-            // Check serviceability after getting location
             checkServiceability(latitude, longitude, address);
-
             resolve(locationData);
           } catch (error) {
             clearTimeout(locationTimeout);
@@ -222,20 +4772,18 @@ const Banner = ({
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 0,
-        }
+        },
       );
     });
   }, []);
 
-  // Multiple methods to get accurate address
   const getAccurateAddress = async (lat, lng) => {
     try {
-      // Try method 2: Use Google Maps API if available
       const googleApiKey = import.meta.env.VITE_MAP_KEY;
       if (googleApiKey) {
         try {
           const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleApiKey}&result_type=street_address|premise`
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleApiKey}&result_type=street_address|premise`,
           );
 
           if (response.ok) {
@@ -249,7 +4797,6 @@ const Banner = ({
         }
       }
 
-      // Fallback: Return coordinates
       return `Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     } catch (error) {
       console.error("All geocoding methods failed:", error);
@@ -257,7 +4804,6 @@ const Banner = ({
     }
   };
 
-  // Format browser address
   const formatBrowserAddress = (address) => {
     const parts = [];
     if (address.street) parts.push(address.street);
@@ -267,7 +4813,6 @@ const Banner = ({
     return parts.join(", ") || "Address not available";
   };
 
-  // Verify location coordinates are valid
   const isValidCoordinates = (lat, lng) => {
     return (
       typeof lat === "number" &&
@@ -287,7 +4832,7 @@ const Banner = ({
       setIsCheckingServiceability(true);
 
       const response = await fetch(
-        "https://dailydish.in/api/Hub/validate-location",
+        "http://localhost:7013/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -297,7 +4842,7 @@ const Banner = ({
             lat: lat.toString(),
             lng: lng.toString(),
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -305,7 +4850,6 @@ const Banner = ({
       if (data.success) {
         setIsServiceable(data.serviceable);
 
-        // If serviceable, save the hub information
         if (data.serviceable && data.hubs && data.hubs.length > 0) {
           const hubData = data.hubs[0];
           const locationData = {
@@ -322,18 +4866,18 @@ const Banner = ({
             lng: lng,
           };
 
-          // Save to localStorage
           localStorage.setItem("currentLocation", JSON.stringify(locationData));
-
-          // Update current location state
           setCurrentLocation(locationData);
 
-          // ✅ NEW: Notify parent component that location is detected
+          // Fetch cutoff times for this hub
+          if (hubData?.hub) {
+            fetchHubCutoffTimes(hubData.hub);
+          }
+
           if (onLocationDetected) {
             onLocationDetected(locationData);
           }
         } else if (!data.serviceable) {
-          // If NOT serviceable, still save location but with default hub ID
           const locationData = {
             location: {
               type: "Point",
@@ -341,27 +4885,20 @@ const Banner = ({
             },
             fullAddress: address,
             hubName: "Default Hub",
-            hubId: DEFAULT_HUB_ID, // Use default hub ID for non-serviceable areas
+            hubId: DEFAULT_HUB_ID,
             isAutoDetected: true,
-            isServiceable: false, // Mark as non-serviceable
+            isServiceable: false,
             timestamp: new Date().toISOString(),
             lat: lat,
             lng: lng,
           };
 
-          // Save to localStorage
           localStorage.setItem("currentLocation", JSON.stringify(locationData));
-
-          // Update current location state
           setCurrentLocation(locationData);
 
-          // Notify parent component
           if (onLocationDetected) {
             onLocationDetected(locationData);
           }
-
-          // REMOVED: Don't automatically show popup
-          // Only show the "We're not here yet" popup, NOT the "Coming Soon" modal
         }
       } else {
         console.error("Serviceability validation failed:", data.message);
@@ -375,191 +4912,91 @@ const Banner = ({
     }
   };
 
+  // Fetch hub cutoff times
+  const fetchHubCutoffTimes = async (hubId) => {
+    if (!hubId) return;
+    
+    try {
+      const response = await fetch(`http://localhost:7013/api/Hub/get-cutoff-times/${hubId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentHubCutoffTimes(data.cutoffTimes);
+      }
+    } catch (error) {
+      console.error("Error fetching hub cutoff times:", error);
+    }
+  };
+
+  // Check order timing validation (FIXED: uses status instead of acquisition_channel)
+  const checkOrderTiming = useCallback(async () => {
+    const currentLocationData = localStorage.getItem('currentLocation');
+    if (!currentLocationData) return;
+    
+    try {
+      setCutoffLoading(true);
+      const location = JSON.parse(currentLocationData);
+      const hubId = location.hubId;
+      
+      if (!hubId) return;
+      
+      // FIXED: Use isEmployee flag based on status
+      const userType = isEmployee ? "employee" : "organic";
+      
+      const response = await fetch("http://localhost:7013/api/Hub/validate-order-timing", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          hubId: hubId,
+          session: currentSession,
+          acquisitionChannel: userType,
+          deliveryDate: new Date().toISOString()
+        }),
+      });
+      
+      const data = await response.json();
+      setOrderCutoffStatus({
+        allowed: data.allowed,
+        message: data.message,
+        cutoffDateTime: data.cutoffDateTime,
+        nextAvailableDateTime: data.nextAvailableDateTime
+      });
+      
+      // Show warning if not allowed
+      if (!data.allowed && user) {
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "warning",
+          title: "Order Timing Alert",
+          text: data.message,
+          showConfirmButton: true,
+          confirmButtonText: "OK",
+          timer: 5000,
+          timerProgressBar: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error checking order timing:", error);
+    } finally {
+      setCutoffLoading(false);
+    }
+  }, [currentSession, isEmployee, user]);
+
+  // Effect to check order timing when location or session changes
+  useEffect(() => {
+    checkOrderTiming();
+  }, [currentLocation, currentSession, checkOrderTiming]);
+
   // Handle service request submission
-  // const handleServiceRequest = async () => {
-  //   // Convert to string and handle null/undefined
-  //   const name = String(serviceRequestName || "");
-  //   const phone = String(serviceRequestPhone || "");
-
-  //   if (!name.trim()) {
-  //     Swal2.fire({
-  //       toast: true,
-  //       position: "bottom",
-  //       icon: "error",
-  //       title: "Please enter your name",
-  //       showConfirmButton: false,
-  //       timer: 3000,
-  //       customClass: {
-  //         popup: "me-small-toast",
-  //         title: "me-small-toast-title",
-  //       },
-  //     });
-  //     return;
-  //   }
-
-  //   if (!phone.trim()) {
-  //     Swal2.fire({
-  //       toast: true,
-  //       position: "bottom",
-  //       icon: "error",
-  //       title: "Please enter your phone number",
-  //       showConfirmButton: false,
-  //       timer: 3000,
-  //       customClass: {
-  //         popup: "me-small-toast",
-  //         title: "me-small-toast-title",
-  //       },
-  //     });
-  //     return;
-  //   }
-
-  //   // Basic phone validation
-  //   const phoneRegex = /^[0-9]{10}$/;
-  //   if (!phoneRegex.test(phone.trim())) {
-  //     Swal2.fire({
-  //       toast: true,
-  //       position: "bottom",
-  //       icon: "error",
-  //       title: "Please enter a valid 10-digit phone number",
-  //       showConfirmButton: false,
-  //       timer: 3000,
-  //       customClass: {
-  //         popup: "me-small-toast",
-  //         title: "me-small-toast-title",
-  //       },
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     setIsSubmittingRequest(true);
-
-  //     const requestData = {
-  //       name: name.trim(),
-  //       phone: phone.trim(),
-  //       location: {
-  //         lat: currentLocation?.lat || 0,
-  //         lng: currentLocation?.lng || 0,
-  //       },
-  //       address: currentLocation?.fullAddress || "Address not available",
-  //       customerId: user?._id || null,
-  //     };
-
-  //     console.log("Submitting service request:", requestData);
-
-  //     const response = await fetch(
-  //       "https://dailydish.in/api/service-requests",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(requestData),
-  //       }
-  //     );
-
-  //     const result = await response.json();
-
-  //     if (result.success) {
-  //       // Close the service request popup first
-  //       setShowServiceablePopup(false);
-  //       setServiceRequestName("");
-  //       setServiceRequestPhone("");
-
-  //       // Show success popup with improved mobile responsiveness
-  //       await Swal2.fire({
-  //         title: "🎉 Request Submitted Successfully!",
-  //         html: `
-  //           <div style="text-align: center; padding: ${
-  //             isSmall ? "8px" : "12px"
-  //           };">
-  //             <div style="font-size: ${
-  //               isSmall ? "16px" : "18px"
-  //             }; color: #6B8E23; margin-bottom: ${
-  //           isSmall ? "12px" : "15px"
-  //         }; font-weight: 600;">
-  //               ✅ Your service request has been successfully submitted!
-  //             </div>
-  //             <div style="font-size: ${
-  //               isSmall ? "13px" : "14px"
-  //             }; color: #666; line-height: 1.5; margin-bottom: ${
-  //           isSmall ? "12px" : "15px"
-  //         };">
-  //               <p style="margin: ${
-  //                 isSmall ? "8px 0" : "10px 0"
-  //               }; font-weight: 600;">What happens next?</p>
-  //               <div style="text-align: left; margin: 0 auto; max-width: ${
-  //                 isSmall ? "280px" : "320px"
-  //               };">
-  //                 <p style="margin: ${
-  //                   isSmall ? "6px 0" : "8px 0"
-  //                 };">• Our team will review your location</p>
-  //                 <p style="margin: ${
-  //                   isSmall ? "6px 0" : "8px 0"
-  //                 };">• We'll contact you within 24 hours</p>
-  //                 <p style="margin: ${
-  //                   isSmall ? "6px 0" : "8px 0"
-  //                 };">• You'll be notified when service starts in your area</p>
-  //               </div>
-  //             </div>
-  //             <div style="font-size: ${
-  //               isSmall ? "11px" : "12px"
-  //             }; color: #999; margin-top: ${
-  //           isSmall ? "12px" : "15px"
-  //         }; padding: ${
-  //           isSmall ? "8px" : "10px"
-  //         }; background: #f8f9fa; border-radius: 8px; line-height: 1.4;">
-  //               Thank you for your interest in DailyDish! We're excited to serve you soon. 🍽️
-  //             </div>
-  //           </div>
-  //         `,
-  //         icon: "success",
-  //         confirmButtonText: "Got it!",
-  //         confirmButtonColor: "#6B8E23",
-  //         width: isSmall ? "90%" : "500px",
-  //         padding: isSmall ? "1rem" : "1.5rem",
-  //         customClass: {
-  //           popup: "custom-success-popup",
-  //           title: "custom-success-title",
-  //           confirmButton: "custom-success-button",
-  //           htmlContainer: "custom-success-content",
-  //         },
-  //         showClass: {
-  //           popup: "animate__animated animate__fadeInUp animate__faster",
-  //         },
-  //         hideClass: {
-  //           popup: "animate__animated animate__fadeOutDown animate__faster",
-  //         },
-  //         backdrop: true,
-  //         allowOutsideClick: true,
-  //         allowEscapeKey: true,
-  //         focusConfirm: true,
-  //       });
-  //     } else {
-  //       throw new Error(result.message || "Failed to submit request");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting service request:", error);
-  //     Swal2.fire({
-  //       toast: true,
-  //       position: "bottom",
-  //       icon: "error",
-  //       title: error.message || "Failed to submit request. Please try again.",
-  //       showConfirmButton: false,
-  //       timer: 4000,
-  //       timerProgressBar: true,
-  //       customClass: {
-  //         popup: "me-small-toast",
-  //         title: "me-small-toast-title",
-  //       },
-  //     });
-  //   } finally {
-  //     setIsSubmittingRequest(false);
-  //   }
-  // };
-
   const handleServiceRequest = async () => {
-    // Convert to string and handle null/undefined
     const name = String(serviceRequestName || "");
     const phone = String(serviceRequestPhone || "");
 
@@ -595,7 +5032,6 @@ const Banner = ({
       return;
     }
 
-    // Basic phone validation
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(phone.trim())) {
       Swal2.fire({
@@ -627,29 +5063,25 @@ const Banner = ({
         customerId: user?._id || null,
       };
 
-      // console.log("Submitting service request:", requestData);
-
       const response = await fetch(
-        "https://dailydish.in/api/service-requests",
+        "http://localhost:7013/api/service-requests",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
-        }
+        },
       );
 
       const result = await response.json();
 
       if (response.status === 409) {
-        // Handle duplicate request case
         setIsSubmittingRequest(false);
         setShowServiceablePopup(false);
 
         setTimeout(() => {
           Swal2.fire({
-            // title: "⏳ Already Requested",
             html: `
         <div style="text-align: center; padding: 16px;">
           <h4 style="color: #856404; margin: 0 0 12px 0;">Request Already Exists</h4>
@@ -673,61 +5105,32 @@ const Banner = ({
       }
 
       if (result.success) {
-        // Store the success data first
         const successData = {
           name: name.trim(),
           phone: phone.trim(),
           address: currentLocation?.fullAddress || "Address not available",
         };
 
-        // Close the service request popup
         setShowServiceablePopup(false);
-
-        // Clear form fields
         setServiceRequestName("");
         setServiceRequestPhone("");
-
-        // Reset submitting state
         setIsSubmittingRequest(false);
 
-        // Wait for modal to fully close before showing success
         setTimeout(() => {
-          // Use a simpler Swal2 configuration without custom classes
           Swal2.fire({
-            // title: "🎉 Request Submitted Successfully!",
             html: `
-            <div style="text-align: center; zIndex:999999 padding: ${
-              isSmall ? "8px" : "12px"
-            };">
-              <div style="font-size: ${
-                isSmall ? "16px" : "18px"
-              }; color: #6B8E23; margin-bottom: ${
-              isSmall ? "12px" : "15px"
-            }; font-weight: 600;">
+            <div style="text-align: center; padding: ${isSmall ? "8px" : "12px"};">
+              <div style="font-size: ${isSmall ? "16px" : "18px"}; color: #6B8E23; margin-bottom: ${isSmall ? "12px" : "15px"}; font-weight: 600;">
                 ✅ Your service request has been successfully submitted!
               </div>
-              <div style="font-size: ${
-                isSmall ? "13px" : "14px"
-              }; color: #666; line-height: 1.5; margin-bottom: ${
-              isSmall ? "12px" : "15px"
-            };">
-                <div style="text-align: left; margin: 0 auto; max-width: ${
-                  isSmall ? "280px" : "320px"
-                }; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                  <p style="margin: 6px 0;"><strong>Name:</strong> ${
-                    successData.name
-                  }</p>
-                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${
-                    successData.phone
-                  }</p>
-                  <p style="margin: 6px 0;"><strong>Address:</strong> ${
-                    successData.address
-                  }</p>
+              <div style="font-size: ${isSmall ? "13px" : "14px"}; color: #666; line-height: 1.5; margin-bottom: ${isSmall ? "12px" : "15px"};">
+                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"}; background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                  <p style="margin: 6px 0;"><strong>Name:</strong> ${successData.name}</p>
+                  <p style="margin: 6px 0;"><strong>Phone:</strong> ${successData.phone}</p>
+                  <p style="margin: 6px 0;"><strong>Address:</strong> ${successData.address}</p>
                 </div>
                 <p style="font-weight: 600; color: #333; margin-bottom: 8px;">What happens next?</p>
-                <div style="text-align: left; margin: 0 auto; max-width: ${
-                  isSmall ? "280px" : "320px"
-                };">
+                <div style="text-align: left; margin: 0 auto; max-width: ${isSmall ? "280px" : "320px"};">
                   <p style="margin: 4px 0;">• Our team will review your location</p>
                   <p style="margin: 4px 0;">• You'll be notified when service starts in your area</p>
                 </div>
@@ -745,7 +5148,7 @@ const Banner = ({
             focusConfirm: true,
             showConfirmButton: true,
           });
-        }, 500); // Increased delay to ensure modal is fully closed
+        }, 500);
       } else {
         throw new Error(result.message || "Failed to submit request");
       }
@@ -769,15 +5172,13 @@ const Banner = ({
     }
   };
 
-  // Function to handle Request Location click
   const handleRequestLocationClick = () => {
     setShowServiceablePopup(true);
   };
 
-  // Check location permissions
   const checkLocationPermissions = useCallback(async () => {
     if (!navigator.permissions) {
-      return "prompt"; // If permissions API not available, assume prompt state
+      return "prompt";
     }
 
     try {
@@ -791,10 +5192,99 @@ const Banner = ({
     }
   }, []);
 
-  // Get primary address from state
   const [primaryAddress, setPrimaryAddress] = useState(null);
 
-  // Replace the problematic autoDetectLocation useEffect with this:
+  const loadDefaultHubData = useCallback(async () => {
+    if (user) return;
+
+    try {
+      const savedDefaultHub = localStorage.getItem("defaultHubData");
+      if (savedDefaultHub) {
+        const hubData = JSON.parse(savedDefaultHub);
+        setDefaultHubLoaded(true);
+
+        const defaultLocationData = {
+          fullAddress: "Select your location to view menu",
+          hubName: "Default Hub",
+          hubId: DEFAULT_HUB_ID,
+          isAutoDetected: false,
+          isDefaultHub: true,
+          timestamp: new Date().toISOString(),
+        };
+
+        setCurrentLocation(defaultLocationData);
+
+        if (onLocationDetected) {
+          onLocationDetected({
+            ...defaultLocationData,
+            location: {
+              type: "Point",
+              coordinates: [0, 0],
+            },
+          });
+        }
+        return;
+      }
+
+      const response = await fetch(
+        "http://localhost:7013/api/Hub/get-default-hub",
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.hub) {
+          localStorage.setItem("defaultHubData", JSON.stringify(data.hub));
+          setDefaultHubLoaded(true);
+
+          const defaultLocationData = {
+            fullAddress:
+              data.hub.address || "Select your location to view menu",
+            hubName: data.hub.name || "Default Hub",
+            hubId: data.hub._id || DEFAULT_HUB_ID,
+            isAutoDetected: false,
+            isDefaultHub: true,
+            timestamp: new Date().toISOString(),
+          };
+
+          setCurrentLocation(defaultLocationData);
+
+          if (onLocationDetected) {
+            onLocationDetected({
+              ...defaultLocationData,
+              location: data.hub.location || {
+                type: "Point",
+                coordinates: [0, 0],
+              },
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading default hub data:", error);
+
+      const defaultLocationData = {
+        fullAddress: "Select your location to view menu",
+        hubName: "Default Hub",
+        hubId: DEFAULT_HUB_ID,
+        isAutoDetected: false,
+        isDefaultHub: true,
+        timestamp: new Date().toISOString(),
+      };
+
+      setCurrentLocation(defaultLocationData);
+      setDefaultHubLoaded(true);
+
+      if (onLocationDetected) {
+        onLocationDetected({
+          ...defaultLocationData,
+          location: {
+            type: "Point",
+            coordinates: [0, 0],
+          },
+        });
+      }
+    }
+  }, [user, onLocationDetected, DEFAULT_HUB_ID]);
+
   useEffect(() => {
     let isMounted = true;
     let timerId = null;
@@ -803,6 +5293,15 @@ const Banner = ({
       if (!isMounted) return;
 
       try {
+        if (!user) {
+          console.log("User not logged in, loading default hub data");
+          await loadDefaultHubData();
+          if (isMounted) {
+            setIsServiceable(null);
+          }
+          return;
+        }
+
         const savedCurrentLocation = localStorage.getItem("currentLocation");
         const savedLocation = savedCurrentLocation
           ? JSON.parse(savedCurrentLocation)
@@ -821,22 +5320,17 @@ const Banner = ({
           }
         }
 
-        // Check if location was manually selected by user
         const manualLocationFlag = localStorage.getItem(
-          "locationManuallySelected"
+          "locationManuallySelected",
         );
         if (manualLocationFlag === "true") {
           console.log(
-            "Location was manually selected, skipping auto-detection"
+            "Location was manually selected, skipping auto-detection",
           );
-          return; // Don't auto-detect if user manually selected location
+          return;
         }
 
-        // For non-logged-in users, always attempt location detection on refresh
-        // For logged-in users, only detect if no saved location exists
-        const shouldDetectLocation = !user || !savedLocation;
-
-        if (shouldDetectLocation && isMounted) {
+        if (!savedLocation) {
           const permissionState = await checkLocationPermissions();
 
           if (permissionState === "denied") {
@@ -873,10 +5367,8 @@ const Banner = ({
       isMounted = false;
       if (timerId) clearTimeout(timerId);
     };
-    // Only include these dependencies
-  }, [checkLocationPermissions, user]); // Added user as dependency
+  }, [checkLocationPermissions, user, loadDefaultHubData, getCurrentLocation]);
 
-  // Manual location detection function
   const handleDetectLocation = async () => {
     try {
       const location = await getCurrentLocation();
@@ -931,50 +5423,40 @@ const Banner = ({
     }
   };
 
-  // Handle location from LocationModal2
   const handleLocationFromModal = useCallback(
     (locationData) => {
       if (locationData) {
-        // First, save the location data
         const locationToSave = {
           ...locationData,
-          isAutoDetected: false, // Mark as user-selected, not auto-detected
+          isAutoDetected: false,
           timestamp: new Date().toISOString(),
         };
 
-        // Save to localStorage
         localStorage.setItem("currentLocation", JSON.stringify(locationToSave));
-
-        // Set manual location flag to prevent auto-detection
         localStorage.setItem("locationManuallySelected", "true");
 
-        // Update state
         setCurrentLocation(locationToSave);
 
-        // Check serviceability for the new location
         if (locationData.lat && locationData.lng) {
           checkServiceability(
             locationData.lat,
             locationData.lng,
-            locationData.fullAddress
+            locationData.fullAddress,
           );
         }
 
-        // Notify parent component
         if (onLocationDetected) {
           onLocationDetected(locationToSave);
         }
       }
     },
-    [onLocationDetected]
+    [onLocationDetected],
   );
 
-  // Modified handleLocationClick to show location modal
   const handleLocationClick = () => {
     setShowLocationModal(true);
   };
 
-  // Rest of your existing functions remain the same...
   const userLogin = async () => {
     if (!Mobile) {
       return Swal2.fire({
@@ -994,7 +5476,7 @@ const Banner = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1059,7 +5541,7 @@ const Banner = ({
   const phoneNumber = "7204188504";
   const message = "Hello! I need assistance.";
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
+    message,
   )}`;
 
   const logOut = () => {
@@ -1078,7 +5560,7 @@ const Banner = ({
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getapartment");
+      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -1094,7 +5576,7 @@ const Banner = ({
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -1112,7 +5594,7 @@ const Banner = ({
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("https://dailydish.in/api/admin/getstories");
+        let res = await axios.get("http://localhost:7013/api/admin/getstories");
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -1125,8 +5607,8 @@ const Banner = ({
 
   const address = JSON.parse(
     localStorage.getItem(
-      addresstype === "apartment" ? "address" : "coporateaddress"
-    )
+      addresstype === "apartment" ? "address" : "coporateaddress",
+    ),
   );
 
   const Handeledata = (ab, def) => {
@@ -1166,7 +5648,6 @@ const Banner = ({
     }
   };
 
-  //Request Location
   const [Name, setName] = useState("");
   const [Number, setNumber] = useState("");
   const [ApartmentName, setApartmentName] = useState("");
@@ -1196,7 +5677,7 @@ const Banner = ({
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1243,7 +5724,7 @@ const Banner = ({
   const getSelectedAddress = async () => {
     try {
       let res = await axios.get(
-        `https://dailydish.in/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`
+        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`,
       );
       if (res.status === 200) {
         setSelectedAddress(res.data.getdata);
@@ -1263,14 +5744,14 @@ const Banner = ({
     if (selectedAddress) {
       if (addresstype === "apartment") {
         const am = apartmentdata.find(
-          (ele) => ele?._id?.toString() === selectedAddress?.addressid
+          (ele) => ele?._id?.toString() === selectedAddress?.addressid,
         );
         if (am) {
           Handeledata(JSON.stringify({ ...am, ...selectedAddress }), "def");
         }
       } else {
         const co = corporatedata.find(
-          (ele) => ele?._id?.toString() === selectedAddress?.addressid
+          (ele) => ele?._id?.toString() === selectedAddress?.addressid,
         );
         if (co) {
           Handeledata(JSON.stringify({ ...co, ...selectedAddress }), "def");
@@ -1282,7 +5763,7 @@ const Banner = ({
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(`https://dailydish.in/api/user/addressadd`, {
+      let res = await axios.post(`http://localhost:7013/api/user/addressadd`, {
         Name: user?.Fname,
         Number: user?.Mobile,
         userId: user?._id,
@@ -1299,12 +5780,10 @@ const Banner = ({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  // Get customer ID from localStorage
   const getCustomerId = () => {
     return user?._id;
   };
 
-  // Get auth headers
   const getAuthHeaders = () => {
     const token = localStorage.getItem("token");
     return {
@@ -1323,8 +5802,6 @@ const Banner = ({
 
   const [primaryAddressId, setPrimaryAddressId] = useState(null);
 
-  // Fetch addresses
-  // 1. First, fix the fetchAddresses function to use stable dependencies
   const fetchAddresses = useMemo(() => {
     return async () => {
       try {
@@ -1336,11 +5813,11 @@ const Banner = ({
         }
 
         const response = await fetch(
-          `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+          `http://localhost:7013/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: getAuthHeaders(),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -1355,7 +5832,7 @@ const Banner = ({
           setPrimaryAddressId(result.primaryAddress || null);
 
           const primaryAddr = addresses.find(
-            (addr) => addr._id === result.primaryAddress
+            (addr) => addr._id === result.primaryAddress,
           );
           setPrimaryAddress(primaryAddr || null);
 
@@ -1382,7 +5859,6 @@ const Banner = ({
     }
   }, [user?._id, fetchAddresses]);
 
-  // Get display name for address
   const getDisplayName = (address) => {
     if (!address) return "";
 
@@ -1400,43 +5876,38 @@ const Banner = ({
     }
   };
 
-  // Get display address text - with proper priority based on requirements
   const getDisplayAddress = () => {
-    // If we're actively detecting location, show loading
     if (isLocating) {
       return "Detecting location...";
     }
 
-    // If location is disabled, show message
     if (!isLocationEnabled && !addresses.length && !primaryAddress) {
       return "Enable location";
     }
 
-    // Priority 1: Show primary address if set (from saved addresses)
     if (primaryAddress) {
       const name = getDisplayName(primaryAddress);
       return name.length > 40 ? `${name.substring(0, 37)}...` : name;
     }
 
-    // Priority 2: Show user-selected location from LocationModal2 (not auto-detected)
     const savedLocation = localStorage.getItem("currentLocation");
-    if (savedLocation) {
+    if (savedLocation && savedLocation !== "null") {
       try {
         const parsedLocation = JSON.parse(savedLocation);
-        // Only show if it's not auto-detected (user selected it manually)
         if (!parsedLocation.isAutoDetected) {
           const address =
             parsedLocation.fullAddress || parsedLocation.houseName || "";
-          return address.length > 40
-            ? `${address.substring(0, 37)}...`
-            : address;
+          if (address) {
+            return address.length > 40
+              ? `${address.substring(0, 37)}...`
+              : address;
+          }
         }
       } catch (e) {
         console.error("Error parsing saved location:", e);
       }
     }
 
-    // Priority 3: Show auto-detected location ONLY if no primary address and no user-selected location
     if (currentLocation?.fullAddress && !primaryAddress) {
       const address =
         currentLocation.fullAddress.length > 40
@@ -1445,17 +5916,36 @@ const Banner = ({
       return address;
     }
 
-    // Priority 4: Show any saved address
     if (addresses.length > 0) {
       const name = getDisplayName(addresses[0]);
       return name.length > 40 ? `${name.substring(0, 37)}...` : name;
     }
 
-    // Default fallback
+    const hasDisplayableAddress = () => {
+      if (primaryAddress && getDisplayName(primaryAddress)) return true;
+      if (addresses.length > 0 && getDisplayName(addresses[0])) return true;
+      if (currentLocation?.fullAddress) return true;
+      
+      const savedLoc = localStorage.getItem("currentLocation");
+      if (savedLoc && savedLoc !== "null") {
+        try {
+          const parsed = JSON.parse(savedLoc);
+          if (parsed.fullAddress || parsed.houseName || parsed.address) return true;
+          if (parsed.lat && parsed.lng && (parsed.fullAddress || parsed.houseName || parsed.address)) return true;
+        } catch (e) {
+          // Ignore parse error
+        }
+      }
+      return false;
+    };
+
+    if (user && !hasDisplayableAddress()) {
+      return "Add Location";
+    }
+
     return "Select Location";
   };
 
-  // Add this function to get a more detailed tooltip
   const getAddressTooltip = () => {
     if (isLocating) return "Detecting your location...";
 
@@ -1465,15 +5955,12 @@ const Banner = ({
       return `${type}: ${name}`;
     }
 
-    // Check for user-selected location from modal
     const savedLocation = localStorage.getItem("currentLocation");
     if (savedLocation) {
       try {
         const parsedLocation = JSON.parse(savedLocation);
         if (!parsedLocation.isAutoDetected) {
-          return `Selected: ${
-            parsedLocation.fullAddress || parsedLocation.houseName
-          }`;
+          return `Selected: ${parsedLocation.fullAddress || parsedLocation.houseName}`;
         }
       } catch (e) {
         console.error("Error parsing saved location:", e);
@@ -1484,10 +5971,13 @@ const Banner = ({
       return `Detected: ${currentLocation.fullAddress}`;
     }
 
-    return "Click to select or detect location";
+    if (user) {
+      return "Click to add your delivery location";
+    }
+
+    return "Click to select your location from available hubs";
   };
 
-  // Get serviceability status icon and text
   const getServiceabilityStatus = () => {
     if (!currentLocation) return null;
 
@@ -1518,7 +6008,6 @@ const Banner = ({
     return null;
   };
 
-  // Handle location disabled state
   const handleLocationDisabledClick = () => {
     Swal2.fire({
       title: "Location Access Required",
@@ -1529,129 +6018,139 @@ const Banner = ({
     });
   };
 
+  // Get cutoff description for display (FIXED: uses status instead of acquisition_channel)
+  const getCutoffDescription = () => {
+    if (!currentHubCutoffTimes || !currentHubCutoffTimes[currentSession]) {
+      return null;
+    }
+    
+    // FIXED: Use isEmployee flag based on status
+    const cutoffTime = isEmployee 
+      ? currentHubCutoffTimes[currentSession].employeeCutoff 
+      : currentHubCutoffTimes[currentSession].defaultCutoff;
+    const description = isEmployee ? "Same day by" : "Previous day by";
+    
+    return `${description} ${cutoffTime}`;
+  };
+
   return (
     <div>
       <div className="ban-container">
         <div className="mobile-banner-updated">
           <div className="screen-3" style={{ padding: "0 24px 8px 24px" }}>
-            <div className="screen-2 mb-3 mt-2 d-flex align-items-center">
-              <div
-                className="d-flex align-items-center gap-2 w-100"
-                onClick={
-                  isLocationEnabled
-                    ? handleLocationClick
-                    : handleLocationDisabledClick
-                }
-                style={{ cursor: "pointer" }}
-              >
-                {isLocating ? (
-                  <FaSpinner
-                    className="fa-spin"
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      color: "#6B8E23",
-                    }}
-                  />
-                ) : (
-                  <img
-                    src={Selectlocation}
-                    alt="select-location"
-                    className="flex-shrink-0"
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      opacity: isLocationEnabled ? 1 : 0.5,
-                    }}
-                  />
-                )}
-
-                <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center">
-                  <div className="d-flex align-items-center">
-                    <p
-                      className={`select-location-text fw-semibold text-truncate mb-0 banner-address-line ${
-                        user ? "with-user-icon" : "with-login-btn"
-                      }`}
-                      title={getAddressTooltip()}
-                      style={{ opacity: isLocationEnabled ? 1 : 0.7 }}
-                    >
-                      {getDisplayAddress()}
-                    </p>
-
-                    {/* Show location icon for auto-detected location */}
-                    {currentLocation?.isAutoDetected && !primaryAddress && (
-                      <span
-                        className="ms-1"
-                        title="Auto-detected location"
-                        style={{ color: "#6B8E23", fontSize: "12px" }}
-                      >
-                        <FaMapMarkerAlt />
-                      </span>
-                    )}
-
-                    {/* Show primary address badge */}
-                    {primaryAddress && (
-                      <span
-                        className="ms-1"
-                        title="Primary Address"
-                        style={{ color: "#6B8E23", fontSize: "12px" }}
-                      >
-                        ★
-                      </span>
-                    )}
-
-                    {/* Show refresh button for location - only if no primary address */}
-                    {currentLocation &&
-                      !isLocating &&
-                      isLocationEnabled &&
-                      !primaryAddress && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDetectLocation();
-                          }}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            color: "#6B8E23",
-                            marginLeft: "8px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                          }}
-                          title="Refresh location"
-                        >
-                          ↻
-                        </button>
-                      )}
-                  </div>
-
-                  {user && (
-                    <p
-                      className="select-location-text-small mb-0 banner-user-details"
-                      style={{
-                        color: "rgba(255, 255, 255, 0.8)",
-                      }}
-                    >
-                      {user?.Fname} | {user?.Mobile}
-                      {primaryAddress && ""}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="d-flex gap-1 justify-content-end align-items-center referbtn">
-                {/* <button
-                  className="refer-earn-btn"
-                  onClick={() => navigate("/refer")}
+            <div
+              className="screen-2 mb-3 mt-2 d-flex align-items-center"
+              style={{ width: "100%", justifyContent: "space-between" }}
+            >
+              {user && (
+                <div
+                  className="d-flex align-items-center gap-2 w-100"
+                  onClick={
+                    isLocationEnabled
+                      ? handleLocationClick
+                      : handleLocationDisabledClick
+                  }
+                  style={{ cursor: "pointer" }}
                 >
-                  <img
-                    src="/Assets/gifticon.svg"
-                    alt="refer"
-                    className="refer-icon"
-                  />
-                  <span className="refer-earn-text">Refer & Earn</span>
-                </button> */}
+                  {isLocating ? (
+                    <FaSpinner
+                      className="fa-spin"
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        color: "#6B8E23",
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={Selectlocation}
+                      alt="select-location"
+                      className="flex-shrink-0"
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        opacity: isLocationEnabled ? 1 : 0.5,
+                      }}
+                    />
+                  )}
 
+                  <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center">
+                    <div className="d-flex align-items-center">
+                      <p
+                        className={`select-location-text fw-semibold text-truncate mb-0 banner-address-line ${
+                          user ? "with-user-icon" : "with-login-btn"
+                        }`}
+                        title={getAddressTooltip()}
+                        style={{ opacity: isLocationEnabled ? 1 : 0.7 }}
+                      >
+                        {getDisplayAddress()}
+                      </p>
+
+                      {currentLocation?.isAutoDetected &&
+                        !primaryAddress &&
+                        user && (
+                          <span
+                            className="ms-1"
+                            title="Auto-detected location"
+                            style={{ color: "#6B8E23", fontSize: "12px" }}
+                          >
+                            <FaMapMarkerAlt />
+                          </span>
+                        )}
+
+                      {primaryAddress && user && (
+                        <span
+                          className="ms-1"
+                          title="Primary Address"
+                          style={{ color: "#6B8E23", fontSize: "12px" }}
+                        >
+                          ★
+                        </span>
+                      )}
+
+                      {currentLocation &&
+                        !isLocating &&
+                        isLocationEnabled &&
+                        !primaryAddress &&
+                        user && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDetectLocation();
+                            }}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#6B8E23",
+                              marginLeft: "8px",
+                              cursor: "pointer",
+                              fontSize: "12px",
+                            }}
+                            title="Refresh location"
+                          >
+                            ↻
+                          </button>
+                        )}
+                    </div>
+
+                    {user && (
+                      <p
+                        className="select-location-text-small mb-0 banner-user-details"
+                        style={{
+                          color: "rgba(255, 255, 255, 0.8)",
+                        }}
+                      >
+                        {user?.Fname} | {user?.Mobile}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div
+                className="d-flex gap-1 justify-content-end align-items-center referbtn"
+                style={{ marginLeft: "auto", flexShrink: 0 }}
+              >
                 {user ? (
                   <img
                     src={UserIcons}
@@ -1688,52 +6187,24 @@ const Banner = ({
                 )}
               </div>
             </div>
-
-            {/* <div
-              className="d-flex align-items-center m-0 order-row"
-              style={{ width: "100%" }}
-            >
-              <div
-                className="d-flex align-items-center flex-grow-1 min-w-0"
-                style={{ gap: "4px" }}
-              >
-                <img
-                  src={clockone}
-                  alt=""
-                  style={{ width: "24px", height: "24px" }}
-                />
-                <span className="clock-text mt-2">
-                  Order by 12 & Get Lunch by 1:00 PM
-                </span>
-              </div>
-
-              <div
-                className="veg-btn d-flex flex-column align-items-center ms-2"
-                onClick={() => setIsVegOnly(!isVegOnly)}
-              >
-                <h6 className="m-0 veg-title">Veg Only</h6>
-                <div className="veg-btn-toggle" style={{ cursor: "pointer" }}>
-                  <div
-                    className="veg-btn-switch"
-                    style={{
-                      transform: isVegOnly
-                        ? "translateX(18px)"
-                        : "translateX(0)",
-                      backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d",
-                      transition: "all 0.3s ease",
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </div> */}
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div style={{ marginBottom: "-14px" }}>
             <CookingPromo />
           </div>
         </div>
 
-        {/* Serviceability Popup - Only show when explicitly not serviceable */}
-        {isServiceable === false && !showServiceablePopup && (
+        {/* Hidden Cutoff Info - Available for parent components */}
+        {currentHubCutoffTimes && user && (
+          <div style={{ display: 'none' }} data-cutoff-info={JSON.stringify({
+            hubCutoffTimes: currentHubCutoffTimes,
+            currentSession: currentSession,
+            orderAllowed: orderCutoffStatus.allowed,
+            cutoffMessage: orderCutoffStatus.message,
+            cutoffDescription: getCutoffDescription()
+          })} />
+        )}
+
+        {isServiceable === false && !showServiceablePopup && user && (
           <div
             style={{
               position: "fixed",
@@ -1816,11 +6287,10 @@ const Banner = ({
                 </div>
               </div>
 
-              {/* Buttons - Side by side for most screens, stacked only on very small screens */}
               <div
                 style={{
                   display: "flex",
-                  flexDirection: isVerySmall ? "column" : "row",
+                  flexDirection: isVerySmall ? "row" : "row",
                   gap: "12px",
                   width: "100%",
                 }}
@@ -1840,7 +6310,7 @@ const Banner = ({
                     transition: "all 0.2s ease",
                     textAlign: "center",
                     whiteSpace: "nowrap",
-                    minWidth: 0, // Allows text truncation if needed
+                    minWidth: 0,
                   }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.backgroundColor = "#E9D9C8")
@@ -1881,7 +6351,7 @@ const Banner = ({
           </div>
         )}
 
-        {showServiceablePopup && (
+        {showServiceablePopup && user && (
           <div
             style={{
               position: "fixed",
@@ -1893,7 +6363,7 @@ const Banner = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              zIndex: 3001, // Higher z-index to appear above the first popup
+              zIndex: 3001,
               padding: "20px",
             }}
           >
@@ -2202,7 +6672,6 @@ const Banner = ({
         <div className="mobile-banner" style={{ position: "relative" }}>
           <UserBanner />
         </div>
-        {/* <div style={{ alignSelf: "end", marginRight: "16px" }}> */}
         <div
           className="veg-btn d-flex flex-row align-items-center ms-2"
           onClick={() => setIsVegOnly(!isVegOnly)}
@@ -2210,33 +6679,29 @@ const Banner = ({
           <h6 className="m-0 veg-title">Veg Only</h6>
           <div
             className="veg-btn-toggle"
-            // 1. Toggle state on click
             style={{ cursor: "pointer" }}
           >
             <div
               className="veg-btn-switch"
               style={{
-                // 2. Dynamic styling for animation and color
                 transform: isVegOnly ? "translateX(18px)" : "translateX(0)",
-                backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d", // Green when Active, Grey when inactive
-                transition: "all 0.3s ease", // Smooth sliding effect
+                backgroundColor: isVegOnly ? "#6B8E23" : "#6c757d",
+                transition: "all 0.3s ease",
               }}
             ></div>
           </div>
         </div>
-        {/* </div> */}
       </div>
 
       <LocationModal2
         show={showLocationModal}
         onClose={() => {
           setShowLocationModal(false);
-          // Refresh addresses when modal closes to get updated primary address
           if (user) {
             fetchAddresses();
           }
         }}
-        onLocationSelect={handleLocationFromModal} // Pass the handler
+        onLocationSelect={handleLocationFromModal}
         currentLocation={currentLocation}
         onLocationDetect={handleDetectLocation}
         isLocationEnabled={isLocationEnabled}

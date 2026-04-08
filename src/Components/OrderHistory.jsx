@@ -18,7 +18,7 @@ function OrderHistory() {
   const message = "Hello! I need assistance.";
 
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
+    message,
   )}`;
 
   // --- Pagination state ---
@@ -32,7 +32,7 @@ function OrderHistory() {
   const getorders = async (id) => {
     try {
       let res = await axios.get(
-        `https://dailydish.in/api/admin/getallordersbyUserId/${id}`
+        `http://localhost:7013/api/admin/getallordersbyUserId/${id}`,
       );
       if (res.status === 200 && res.data.order) {
         const formattedOrders = res.data.order
@@ -457,7 +457,7 @@ function OrderHistory() {
   const deleteOrder = (orderId) => {
     if (
       window.confirm(
-        "Are you sure you want to delete this order? This action cannot be undone."
+        "Are you sure you want to delete this order? This action cannot be undone.",
       )
     ) {
       const updatedOrders = orders.filter((order) => order.id !== orderId);
@@ -487,7 +487,7 @@ function OrderHistory() {
     const comment = isFoodRating ? foodReview : deliveryReview;
 
     try {
-      await axios.put(`https://dailydish.in/api/admin/submitOrderRating`, {
+      await axios.put(`http://localhost:7013/api/admin/submitOrderRating`, {
         orderId: currentOrderId,
         ratingType,
         rating,
@@ -503,7 +503,7 @@ function OrderHistory() {
               : { ...o, ratingOnDelivery: rating, commentOnDelivery: comment };
           }
           return o;
-        })
+        }),
       );
 
       if (isFoodRating) {
@@ -624,10 +624,7 @@ function OrderHistory() {
                 "On the way",
                 "Delivered",
               ];
-              const statusMap = { 
-                inprocess: "Cooking",
-                undelivered: "Undelivered"
-              };
+              const statusMap = { inprocess: "Cooking" };
               const currentStatus =
                 statusMap[currentTrackedOrder.rawStatus] ||
                 currentTrackedOrder.rawStatus;
@@ -635,7 +632,7 @@ function OrderHistory() {
 
               const totalItems = currentTrackedOrder.items.reduce(
                 (acc, item) => acc + item.quantity,
-                0
+                0,
               );
 
               const getStepIconStyle = (stepIndex) => ({
@@ -862,7 +859,7 @@ function OrderHistory() {
                 <div className="headerText">
                   Your meal was delivered on:{" "}
                   {moment(currentOrderForRating.date).format(
-                    "DD MMM YYYY, hh:mm A"
+                    "DD MMM YYYY, hh:mm A",
                   )}
                 </div>
               </div>
@@ -957,7 +954,7 @@ function OrderHistory() {
                 <div className="headerText">
                   Your meal was delivered on:{" "}
                   {moment(currentOrderForRating.date).format(
-                    "DD MMM YYYY, hh:mm A"
+                    "DD MMM YYYY, hh:mm A",
                   )}
                 </div>
               </div>

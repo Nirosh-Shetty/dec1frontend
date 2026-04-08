@@ -21,7 +21,7 @@
 // import moment from "moment";
 // import { BsSearch } from "react-icons/bs";
 
-// const socket = io("https://dailydish.in/", {
+// const socket = io("http://localhost:7013", {
 //   reconnection: true, // Enable reconnection
 //   reconnectionAttempts: 5, // Retry up to 5 times
 //   reconnectionDelay: 1000, // Start with 1-second delay
@@ -75,7 +75,7 @@
 //     setLoading(true);
 //     try {
 //       const orderResponse = await axios.get(
-//         "https://dailydish.in/api/admin/getPackerOrders",
+//         "http://localhost:7013/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -185,7 +185,7 @@
 //         }
 //       }
 //       const orderResponse = await axios.get(
-//         "https://dailydish.in/api/admin/getPackerOrders",
+//         "http://localhost:7013/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -219,7 +219,7 @@
 
 //       // Fetch drivers
 //       setLocations([...new Set(allorder.map((ele) => ele?.delivarylocation))]);
-//       // const driverResponse = await axios.get('https://dailydish.in/api/admin/getDrivers');
+//       // const driverResponse = await axios.get('http://localhost:7013/api/admin/getDrivers');
 //       // setDrivers(driverResponse.data);
 //       setLoading(false);
 //     } catch (error) {
@@ -243,7 +243,7 @@
 
 //   const getBegs = async () => {
 //     try {
-//       let res = await axios.get("https://dailydish.in/api/admin/getbags");
+//       let res = await axios.get("http://localhost:7013/api/admin/getbags");
 //       if (res.status == 200) {
 //         setAllBags(res.data.bags);
 //       }
@@ -255,7 +255,7 @@
 //   const getAllReason = async () => {
 //     try {
 //       let res = await axios.get(
-//         "https://dailydish.in/api/admin/getdelayreasons"
+//         "http://localhost:7013/api/admin/getdelayreasons"
 //       );
 //       if (res.status == 200) {
 //         setAllReason(
@@ -699,7 +699,7 @@
 //     setLoading(true);
 //     try {
 //       const response = await axios.put(
-//         `https://dailydish.in/api/admin/updatePackerOrder`,
+//         `http://localhost:7013/api/admin/updatePackerOrder`,
 //         updatedData,
 //         {
 //           headers: {
@@ -2223,7 +2223,7 @@
 // import moment from "moment";
 // import { BsSearch } from "react-icons/bs";
 
-// const socket = io("https://dailydish.in/", {
+// const socket = io("http://localhost:7013", {
 //   reconnection: true, // Enable reconnection
 //   reconnectionAttempts: 5, // Retry up to 5 times
 //   reconnectionDelay: 1000, // Start with 1-second delay
@@ -2284,7 +2284,7 @@
 
 //   const getHubs = async () => {
 //     try {
-//       const res = await axios.get("https://dailydish.in/api/Hub/hubs");
+//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Error fetching hubs:", error);
@@ -2415,7 +2415,7 @@
 //     setLoading(true);
 //     try {
 //       const orderResponse = await axios.get(
-//         "https://dailydish.in/api/admin/getPackerOrders",
+//         "http://localhost:7013/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -2515,7 +2515,7 @@
 //         }
 //       }
 //       const orderResponse = await axios.get(
-//         "https://dailydish.in/api/admin/getPackerOrders",
+//         "http://localhost:7013/api/admin/getPackerOrders",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
@@ -2567,7 +2567,7 @@
 
 //   const getBegs = async () => {
 //     try {
-//       let res = await axios.get("https://dailydish.in/api/admin/getbags");
+//       let res = await axios.get("http://localhost:7013/api/admin/getbags");
 //       if (res.status == 200) {
 //         setAllBags(res.data.bags);
 //       }
@@ -2579,7 +2579,7 @@
 //   const getAllReason = async () => {
 //     try {
 //       let res = await axios.get(
-//         "https://dailydish.in/api/admin/getdelayreasons"
+//         "http://localhost:7013/api/admin/getdelayreasons"
 //       );
 //       if (res.status == 200) {
 //         setAllReason(
@@ -2660,7 +2660,7 @@
 //   }, []);
 
 //   useEffect(() => {
-//     fetch("https://dailydish.in/api/packer/packing")
+//     fetch("http://localhost:7013/api/packer/packing")
 //       .then((res) => res.json())
 //       .then((data) => setPackingStats(data.data));
 
@@ -3132,7 +3132,7 @@
 //     setLoading(true);
 //     try {
 //       const response = await axios.put(
-//         `https://dailydish.in/api/admin/updatePackerOrder`,
+//         `http://localhost:7013/api/admin/updatePackerOrder`,
 //         updatedData,
 //         {
 //           headers: {
@@ -4305,6 +4305,2094 @@
 
 // export default DashboardPage;
 
+// import React, { useState, useEffect, useRef } from "react";
+// import { Link, useLocation, useNavigate } from "react-router-dom";
+// import {
+//   FaPrint,
+//   FaSignOutAlt,
+//   FaEye,
+//   FaUser,
+//   FaTable,
+//   FaListAlt,
+//   FaCheckSquare,
+//   FaSquare,
+// } from "react-icons/fa";
+// import Swal from "sweetalert2";
+// import axios from "axios";
+// import "./PackerDashboard.css";
+// import PackerClock from "./PackerClock";
+// import io from "socket.io-client";
+// import moment from "moment";
+// import { BsSearch } from "react-icons/bs";
+
+// const socket = io("http://localhost:7013", {
+//   reconnection: true,
+//   reconnectionAttempts: 5,
+//   reconnectionDelay: 1000,
+//   reconnectionDelayMax: 5000,
+//   timeout: 20000,
+// });
+
+// // Function to get Indian Standard Time
+// const getIndianTime = () => {
+//   const now = new Date();
+//   // IST is UTC+5:30
+//   const istOffset = 330; // minutes
+//   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+//   return new Date(utc + istOffset * 60000);
+// };
+
+// // Get current session based on Indian time with updated cutoff times
+// const getCurrentSession = () => {
+//   const now = getIndianTime();
+//   const hours = now.getHours();
+//   const minutes = now.getMinutes();
+//   const currentTime = hours * 60 + minutes; // Convert to minutes for easier comparison
+
+//   // Updated cutoff times as per requirement:
+//   // Lunch: Auto-selected until 3:00 PM IST (900 minutes)
+//   // Dinner: Auto-selected after 3:30 PM IST (930 minutes)
+//   const lunchCutoff = 15 * 60; // 3:00 PM IST (900 minutes)
+//   const dinnerStart = 15 * 60 + 30; // 3:30 PM IST (930 minutes)
+
+//   console.log(
+//     `IST Time: ${hours}:${minutes
+//       .toString()
+//       .padStart(2, "0")}, Total minutes: ${currentTime}`
+//   );
+//   console.log(`Lunch cutoff: ${lunchCutoff}, Dinner start: ${dinnerStart}`);
+
+//   if (currentTime < lunchCutoff) {
+//     // Before 3:00 PM IST - Auto-select Lunch
+//     console.log("Auto-selecting Lunch (before 3:00 PM IST)");
+//     return "Lunch";
+//   } else if (currentTime >= dinnerStart) {
+//     // After 3:30 PM IST - Auto-select Dinner
+//     console.log("Auto-selecting Dinner (after 3:30 PM IST)");
+//     return "Dinner";
+//   } else {
+//     // Between 3:00 PM and 3:30 PM IST - Transition period, default to Lunch
+//     console.log("Transition period (3:00-3:30 PM IST), defaulting to Lunch");
+//     return "Lunch";
+//   }
+// };
+
+// const DashboardPage = () => {
+//   const navigate = useNavigate();
+//   const Admin = JSON.parse(localStorage.getItem("admin"));
+//   const Packer = JSON.parse(localStorage.getItem("packer"));
+//   console.log(Packer, "packer............");
+
+//   // Load initial state from localStorage or use default values
+//   const loadInitialState = (key, defaultValue) => {
+//     try {
+//       const saved = localStorage.getItem(`packer_${key}`);
+//       return saved ? JSON.parse(saved) : defaultValue;
+//     } catch (error) {
+//       return defaultValue;
+//     }
+//   };
+
+//   // State with localStorage persistence
+//   const [selectedSession, setSelectedSession] = useState(() => {
+//     // For packers, auto-select based on current time
+//     if (Packer && !Admin) {
+//       const currentSession = getCurrentSession();
+//       return currentSession;
+//     }
+//     // For admins, load from localStorage or use empty
+//     return loadInitialState("selectedSession", "");
+//   });
+//   const [selectedHubs, setSelectedHubs] = useState(() =>
+//     loadInitialState("selectedHubs", [])
+//   );
+//   const [statusFilter, setStatusFilter] = useState(() =>
+//     loadInitialState("statusFilter", "All")
+//   );
+//   const [selectedOrder, setSelectedOrder] = useState(null);
+//   const [orders, setOrders] = useState([]);
+//   const [hubs, setHubs] = useState([]);
+//   const [packerId] = useState(Packer?.packerId);
+//   const [packerName] = useState(Packer?.username);
+//   const [activeView, setActiveView] = useState("orders");
+//   const [AllBags, setAllBags] = useState([]);
+//   const [AllReason, setAllReason] = useState([]);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [previousQuantities, setPreviousQuantities] = useState({});
+//   const [OldOrder, setOldOrder] = useState([]);
+//   const [lastReload, setLastReload] = useState(null);
+//   const [timeLeft, setTimeLeft] = useState([]);
+//   const [timeShow, setTimeSHow] = useState("");
+//   const [viewOrder, setViewOrder] = useState({});
+//   const [viewProduct, setViewPrduct] = useState({});
+//   const [quantityStats, setQuantityStats] = useState([]);
+//   const [packingStats, setPackingStats] = useState([]);
+//   const [statusFilter2, setStatusFilter2] = useState("all");
+//   const [packedFilter, setPackedFilter] = useState("all");
+//   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+//   const dropdownRef = useRef(null);
+//   const [currentTimeSession, setCurrentTimeSession] = useState(
+//     getCurrentSession()
+//   );
+//   const [selectedOrders, setSelectedOrders] = useState([]);
+//   const [selectAll, setSelectAll] = useState(false);
+//     const [riders, setRiders] = useState([]);
+
+//   // Update current session every minute
+//   useEffect(() => {
+//     const updateSession = () => {
+//       const newSession = getCurrentSession();
+//       setCurrentTimeSession(newSession);
+
+//       // Auto-update session for packers
+//       if (Packer && !Admin) {
+//         setSelectedSession(newSession);
+//       }
+//     };
+
+//     // Update immediately
+//     updateSession();
+
+//     // Update every minute
+//     const interval = setInterval(updateSession, 60000);
+
+//     return () => clearInterval(interval);
+//   }, [Packer, Admin]);
+
+//   // Save to localStorage whenever filter state changes
+//   useEffect(() => {
+//     localStorage.setItem(
+//       "packer_selectedSession",
+//       JSON.stringify(selectedSession)
+//     );
+//   }, [selectedSession]);
+
+//   useEffect(() => {
+//     localStorage.setItem("packer_selectedHubs", JSON.stringify(selectedHubs));
+//   }, [selectedHubs]);
+
+//   useEffect(() => {
+//     localStorage.setItem("packer_statusFilter", JSON.stringify(statusFilter));
+//   }, [statusFilter]);
+
+//   useEffect(() => {
+//     localStorage.setItem("packer_searchTerm", JSON.stringify(searchTerm));
+//   }, [searchTerm]);
+
+//   // Reset selection when orders change
+//   useEffect(() => {
+//     setSelectedOrders([]);
+//     setSelectAll(false);
+//   }, [orders]);
+
+//   // Check if packer has access to the order's hub
+//   const checkLocation = (orderHubName) => {
+//     console.log("Checking location for hub:", orderHubName);
+//     console.log("Packer hubs:", Packer?.hubs);
+
+//     const packerHubNames = Packer?.hubs || [];
+
+//     if (!orderHubName) {
+//       console.log("No order hubName provided");
+//       return false;
+//     }
+
+//     const orderHubNameClean = orderHubName?.toString().trim();
+
+//     const result = packerHubNames.some(
+//       (packerHub) => packerHub?.toString().trim() === orderHubNameClean
+//     );
+
+//     console.log(
+//       "Check result:",
+//       result,
+//       "Order hub:",
+//       orderHubNameClean,
+//       "Packer hubs:",
+//       packerHubNames
+//     );
+
+//     return result;
+//   };
+
+//   const getHubs = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+//       const allHubs = res.data;
+
+//       // Filter hubs based on packer's assigned hubs
+//       if (Packer && !Admin) {
+//         const packerHubNames = Packer?.hubs || [];
+//         const filteredHubs = allHubs.filter((hub) =>
+//           packerHubNames.some(
+//             (packerHub) =>
+//               packerHub?.toString().trim() === hub.hubName?.toString().trim()
+//           )
+//         );
+//         setHubs(filteredHubs);
+//       } else {
+//         setHubs(allHubs);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching hubs:", error);
+//     }
+//   };
+
+//     // Fetch riders for filter dropdown
+//     const fetchRiders = async () => {
+//       try {
+//         const response = await axios.get("http://localhost:7013/api/admin/riders");
+//         console.log("Riders API response:", response.data);
+//         if (response.data && response.data.riders) {
+//           setRiders(response.data.riders);
+//           console.log("Riders set:", response.data.riders);
+//         }
+//       } catch (error) {
+//         console.error("Error fetching riders:", error);
+//       }
+//     };
+
+//   const oldOders = async () => {
+//     if (!Packer && !Admin) return;
+//     setLoading(true);
+//     try {
+//       const orderResponse = await axios.get(
+//         "http://localhost:7013/api/admin/getPackerOrders",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
+//           },
+//         }
+//       );
+
+//       if (orderResponse.status === 200) {
+//         const allorder = Admin
+//           ? orderResponse.data
+//           : orderResponse.data?.filter((ele) => checkLocation(ele?.hubName));
+
+//         const fetchedOrders = allorder?.map((order) => ({
+//           ...order,
+//           id: order.orderid || order._id,
+//           timeLeft: order.timeLeft || "15 Mins",
+//           items: order.allProduct.map((item) => ({
+//             ...item,
+//             foodItemId: item?.foodItemId?._id,
+//             category: item?.foodItemId?.categoryName,
+//             name: item?.foodItemId?.foodname,
+//             unit: item?.foodItemId?.unit,
+//             qty: item.quantity,
+//             packed: item.packed,
+//             missing: item.missing,
+//           })),
+//         }));
+
+//         setOldOrder((prevOrders) => {
+//           const currentQuantities = {};
+//           prevOrders.forEach((order) => {
+//             order.items.forEach((item) => {
+//               if (currentQuantities[item.name]) {
+//                 currentQuantities[item.name].ordered += item.qty || 0;
+//                 currentQuantities[item.name].packed +=
+//                   item.packed && !item.missing ? item.qty : 0;
+//                 currentQuantities[item.name].unit = item.unit;
+//               } else {
+//                 currentQuantities[item.name] = {
+//                   ordered: item.qty || 0,
+//                   packed: item.packed && !item.missing ? item.qty : 0,
+//                   unit: item.unit,
+//                 };
+//               }
+//             });
+//           });
+//           setPreviousQuantities(currentQuantities);
+
+//           const existingOrdersMap = new Map();
+//           prevOrders.forEach((order, index) => {
+//             existingOrdersMap.set(order.id, { order, index });
+//           });
+
+//           const mergedOrders = [...prevOrders];
+
+//           fetchedOrders.forEach((newOrder) => {
+//             const existingOrderData = existingOrdersMap.get(newOrder.id);
+
+//             if (existingOrderData) {
+//               mergedOrders[existingOrderData.index] = newOrder;
+//             } else {
+//               mergedOrders.push(newOrder);
+//             }
+//           });
+
+//           return mergedOrders;
+//         });
+
+//         setLastReload(new Date().toLocaleString());
+//         setLoading(false);
+//       }
+//     } catch (error) {
+//       console.log(error);
+//       setLoading(false);
+//     }
+//   };
+
+//   const fetchData = async (order) => {
+//     try {
+//       if (!Packer && !Admin) return;
+//       setLoading(true);
+//       if (order) {
+//         if (checkLocation(order?.hubName)) {
+//           Swal.fire({
+//             toast: true,
+//             position: "bottom",
+//             icon: "success",
+//             title: `Successfully getting new order!`,
+//             showConfirmButton: false,
+//             timer: 3000,
+//             timerProgressBar: true,
+//             customClass: {
+//               popup: "me-small-toast",
+//               title: "me-small-toast-title",
+//             },
+//           });
+//         }
+//       }
+//       const orderResponse = await axios.get(
+//         "http://localhost:7013/api/admin/getPackerOrders",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
+//           },
+//         }
+//       );
+
+//       const allorder = Admin
+//         ? orderResponse.data
+//         : orderResponse.data?.filter((ele) => checkLocation(ele?.hubName));
+
+//       const fetchedOrders = allorder?.map((order) => ({
+//         ...order,
+//         id: order.orderid || order._id,
+//         timeLeft: order.timeLeft || "15 Mins",
+//         items: order.allProduct.map((item) => ({
+//           ...item,
+//           foodItemId: item?.foodItemId?._id,
+//           category: item?.foodItemId?.categoryName,
+//           name: item?.foodItemId?.foodname,
+//           unit: item?.foodItemId?.unit,
+//           qty: item.quantity,
+//           packed: item.packed,
+//           missing: item.missing,
+//         })),
+//       }));
+
+//       setOrders(fetchedOrders);
+//       setLoading(false);
+//     } catch (error) {
+//       setLoading(false);
+//       Swal.fire({
+//         title: "Orders Info",
+//         text: "No orders found for today.",
+//         icon: "info",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   const getBegs = async () => {
+//     try {
+//       let res = await axios.get("http://localhost:7013/api/admin/getbags");
+//       if (res.status == 200) {
+//         setAllBags(res.data.bags);
+//       }
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+
+//   const getAllReason = async () => {
+//     try {
+//       let res = await axios.get(
+//         "http://localhost:7013/api/admin/getdelayreasons"
+//       );
+//       if (res.status == 200) {
+//         setAllReason(
+//           res.data.reasons?.filter((ele) => ele.reasonType === "delay")
+//         );
+//       }
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     socket.on("newOrder", (order) => {
+//       fetchData(order);
+//     });
+//     oldOders();
+//     getBegs();
+//     getAllReason();
+//     fetchData();
+//     getHubs();
+
+//     return () => {
+//       socket.off("newOrder");
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setIsDropdownOpen(false);
+//       }
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   // Multi-select functions
+//   const toggleOrderSelection = (orderId) => {
+//     setSelectedOrders((prev) => {
+//       if (prev.includes(orderId)) {
+//         return prev.filter((id) => id !== orderId);
+//       } else {
+//         return [...prev, orderId];
+//       }
+//     });
+//   };
+
+//   const toggleSelectAll = () => {
+//     const currentFilteredOrders = filteredOrders.filter(
+//       (order) => statusFilter2 === "all" || order.status === statusFilter2
+//     );
+
+//     if (selectAll) {
+//       setSelectedOrders([]);
+//     } else {
+//       const allOrderIds = currentFilteredOrders.map((order) => order.id);
+//       setSelectedOrders(allOrderIds);
+//     }
+//     setSelectAll(!selectAll);
+//   };
+
+//   const handlePrintSelected = () => {
+//     if (selectedOrders.length === 0) {
+//       Swal.fire({
+//         title: "No Orders Selected",
+//         text: "Please select at least one order to print.",
+//         icon: "warning",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     const selectedOrdersData = orders.filter((order) =>
+//       selectedOrders.includes(order.id)
+//     );
+
+//     navigate("/packer-thermal-print", { state: { items: selectedOrdersData } });
+//   };
+
+//   const handlePrintAll = () => {
+//     const currentFilteredOrders = filteredOrders.filter(
+//       (order) => statusFilter2 === "all" || order.status === statusFilter2
+//     );
+
+//     if (currentFilteredOrders.length === 0) {
+//       Swal.fire({
+//         title: "No Orders to Print",
+//         text: "There are no orders matching current filters.",
+//         icon: "info",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     navigate("/packer-thermal-print", {
+//       state: { items: currentFilteredOrders },
+//     });
+//   };
+
+//   const handleSessionChange = (session) => {
+//     // Only allow admins to change session
+//     if (!Admin) {
+//       Swal.fire({
+//         title: "Session Locked",
+//         text: "Session is auto-selected based on current time. Please contact admin to change session.",
+//         icon: "info",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     setSelectedSession(session);
+//     Swal.fire({
+//       title: "Session Selected",
+//       text: `Showing orders for ${session || "All Sessions"}.`,
+//       icon: "info",
+//       showConfirmButton: false,
+//       timer: 3000,
+//       timerProgressBar: true,
+//       toast: true,
+//       position: "bottom",
+//       customClass: {
+//         popup: "me-small-toast",
+//         title: "me-small-toast-title",
+//       },
+//     });
+//   };
+
+//   const handleHubToggle = (hubName) => {
+//     setSelectedHubs((prev) => {
+//       if (prev.includes(hubName)) {
+//         return prev.filter((hub) => hub !== hubName);
+//       } else {
+//         return [...prev, hubName];
+//       }
+//     });
+//   };
+
+//   const handleSelectAllHubs = () => {
+//     if (selectedHubs.length === hubs.length) {
+//       setSelectedHubs([]);
+//     } else {
+//       setSelectedHubs(hubs.map((hub) => hub.hubName));
+//     }
+//   };
+
+//   const handleStatusFilter = (status) => {
+//     setStatusFilter(status);
+//     Swal.fire({
+//       title: "Filter Applied",
+//       text: `Showing ${status} orders.`,
+//       icon: "info",
+//       showConfirmButton: false,
+//       timer: 3000,
+//       timerProgressBar: true,
+//       toast: true,
+//       position: "bottom",
+//       customClass: {
+//         popup: "me-small-toast",
+//         title: "me-small-toast-title",
+//       },
+//     });
+//   };
+
+//   const handleLogout = () => {
+//     const check = orders.find(
+//       (ele, i) =>
+//         ele.packBefore !== "Yes" && timeLeft[i] == "Delay" && !ele.reason
+//     );
+//     if (check) {
+//       Swal.fire({
+//         title: "Session Waiting",
+//         text: "You can not able to logout please give update order with reason.",
+//         icon: "info",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     } else {
+//       localStorage.clear();
+//       Swal.fire({
+//         title: "Session Submitted",
+//         text: "You have been logged out successfully.",
+//         icon: "success",
+//         confirmButtonColor: "#F81E0F",
+//         timer: 2000,
+//         timerProgressBar: true,
+//       }).then(() => navigate("/packer-login"));
+//     }
+//   };
+
+//   const filteredOrders = orders.filter((order) => {
+//     const matchesSession = selectedSession
+//       ? order.session === selectedSession
+//       : true;
+//     const matchesHub =
+//       selectedHubs.length > 0 ? selectedHubs.includes(order.hubName) : true;
+//     const matchesStatus =
+//       statusFilter === "All" ? true : order.status === statusFilter;
+
+//     const matchesSearch =
+//       searchTerm === ""
+//         ? true
+//         : order.orderid?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//           order.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//           order.hubName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//           order.delivarylocation
+//             ?.toLowerCase()
+//             .includes(searchTerm.toLowerCase()) ||
+//           order.items?.some((item) =>
+//             item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+//           );
+
+//     return matchesSession && matchesHub && matchesStatus && matchesSearch;
+//   });
+
+//   // Session-based time calculation - UPDATED WITH CORRECT TIMINGS
+//   useEffect(() => {
+//     if (filteredOrders.length == 0) return;
+//     const interval = setInterval(() => {
+//       const now = getIndianTime(); // Use Indian time for calculations
+//       const updated = filteredOrders.map((ele) => {
+//         const createdDate = new Date(ele.createdAt);
+
+//         // Determine session start time based on session type (IST)
+//         let sessionStart;
+//         switch (ele.session?.toLowerCase()) {
+//           case "lunch":
+//             sessionStart = new Date(createdDate);
+//             sessionStart.setHours(7, 0, 0, 0); // 7:00 AM for lunch (IST)
+//             break;
+//           case "dinner":
+//             sessionStart = new Date(createdDate);
+//             sessionStart.setHours(15, 30, 0, 0); // 3:30 PM for dinner (IST)
+//             break;
+//           default:
+//             sessionStart = new Date(createdDate);
+//             sessionStart.setHours(7, 0, 0, 0); // Default to lunch
+//         }
+
+//         // Session duration based on session type
+//         const sessionEnd = new Date(sessionStart);
+//         if (ele.session?.toLowerCase() === "lunch") {
+//           sessionEnd.setHours(15, 30, 0, 0); // Lunch ends at 3:30 PM
+//         } else {
+//           sessionEnd.setHours(22, 0, 0, 0); // Dinner ends at 10:00 PM
+//         }
+
+//         if (createdDate > now) {
+//           return ele.timeLeft;
+//         }
+
+//         if (now < sessionStart) {
+//           const diff = Math.floor((sessionStart - now) / 1000);
+//           const min = Math.floor(diff / 60);
+//           const sec = diff % 60;
+//           return `${min}m ${sec}s left`;
+//         }
+
+//         if (now >= sessionStart && now <= sessionEnd) {
+//           return "In Progress";
+//         }
+
+//         if (now > sessionEnd) {
+//           return "Delay";
+//         }
+//         return "-";
+//       });
+
+//       setTimeLeft(updated);
+//     }, 1000);
+
+//     return () => clearInterval(interval);
+//   }, [filteredOrders.length]);
+
+//   const handleOrderClick = (order, index, time) => {
+//     setSelectedOrder({
+//       ...order,
+//       packer: packerId,
+//       packername: packerName,
+//       _id: order?._id,
+//     });
+//     setTimeSHow(time);
+//     updateOrder(order.id, { packer: packerId, _id: order?._id });
+//   };
+
+//   const handleCoverUpdate = (cover, order) => {
+//     if (cover.trim()) {
+//       const updatedOrder = { ...order, cover };
+//       setSelectedOrder(updatedOrder);
+
+//       handleOrderUpdate(
+//         order.id,
+//         {
+//           cover,
+//           _id: order._id,
+//           status: "Packed",
+//         },
+//         order.items
+//       );
+
+//       Swal.fire({
+//         title: "Success",
+//         text: `Cover number ${cover} assigned to order ${order.id}`,
+//         icon: "success",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     } else {
+//       Swal.fire({
+//         title: "Invalid Cover Number",
+//         text: "Please enter a valid cover number.",
+//         icon: "error",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   // const handleViewProducts = (order, time, handleItemCheck) => {
+//   //   if (!order || !order.items) {
+//   //     Swal.fire({
+//   //       title: "Error",
+//   //       text: "Invalid order data",
+//   //       icon: "error",
+//   //       confirmButtonColor: "#6b8e23",
+//   //     });
+//   //     return;
+//   //   }
+
+//   //   const allPacked = order.items.every((item) => item.packed);
+
+//   //   Swal.fire({
+//   //     title: `Order ${order.id} - Products`,
+//   //     html: `
+//   //   <div style="
+//   //     font-family: 'Arial', sans-serif;
+//   //     max-width: 100%;
+//   //     padding: 20px;
+//   //     background: #f9f9f9;
+//   //     border-radius: 10px;
+//   //     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+//   //   ">
+//   //     <div style="
+//   //       display: flex;
+//   //       justify-content: space-between;
+//   //       align-items: center;
+//   //       margin-bottom: 20px;
+//   //       flex-wrap: wrap;
+//   //       gap: 10px;
+//   //     ">
+//   //       <h5 style="font-size: 18px; color: #333; margin: 0;">
+//   //         Pack Time: ${order?.packeTime ? order?.packBefore : timeLeft[time]}
+//   //       </h5>
+//   //       <p style="font-size: 16px; color: #555; margin: 0;">
+//   //         Status: ${order.status}
+//   //       </p>
+//   //       <h5 style="font-size: 18px; color: #333; margin: 0;">
+//   //         Cutlery: ${order?.Cutlery > 0 ? "Yes" : "No"}
+//   //       </h5>
+//   //       ${
+//   //         allPacked
+//   //           ? `<div style="background: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">All Packed ✓</div>`
+//   //           : ""
+//   //       }
+//   //     </div>
+
+//   //     ${
+//   //       allPacked
+//   //         ? `
+//   //     <div style="
+//   //       margin-bottom: 20px;
+//   //       padding: 15px;
+//   //       background: #e8f5e8;
+//   //       border-radius: 8px;
+//   //       border: 1px solid #28a745;
+//   //     ">
+//   //       <div style="
+//   //         display: flex;
+//   //         align-items: center;
+//   //         gap: 10px;
+//   //         margin-bottom: 10px;
+//   //       ">
+//   //         <label style="font-weight: 600; color: #2e7d32; min-width: 120px;">
+//   //           Cover Number:
+//   //         </label>
+//   //         <input
+//   //           type="number"
+//   //           id="coverNumberInput"
+//   //           placeholder="Enter cover number"
+//   //           value="${order.cover || ""}"
+//   //           style="
+//   //             flex: 1;
+//   //             padding: 10px 12px;
+//   //             border: 2px solid #28a745;
+//   //             border-radius: 6px;
+//   //             font-size: 16px;
+//   //             outline: none;
+//   //             transition: border-color 0.3s;
+//   //           "
+//   //           onfocus="this.style.borderColor='#1b5e20'"
+//   //           onblur="this.style.borderColor='#28a745'"
+//   //         />
+//   //       </div>
+//   //       ${
+//   //         order.cover
+//   //           ? `<div style="color: #2e7d32; font-size: 14px; margin-top: 5px;">
+//   //               Current cover: <strong>${order.cover}</strong>
+//   //              </div>`
+//   //           : ""
+//   //       }
+//   //     </div>
+//   //     `
+//   //         : ""
+//   //     }
+
+//   //     <table style="
+//   //       width: 100%;
+//   //       border-collapse: collapse;
+//   //       background: #fff;
+//   //       border-radius: 8px;
+//   //       overflow: hidden;
+//   //       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+//   //     ">
+//   //       <thead style="
+//   //         background: #6b8e23;
+//   //         color: #fff;
+//   //         font-weight: 600;
+//   //         text-align: left;
+//   //       ">
+//   //         <tr>
+//   //           <th style="padding: 12px 15px; font-size: 16px;">Category</th>
+//   //           <th style="padding: 12px 15px; font-size: 16px;">Quantity</th>
+//   //           <th style="padding: 12px 15px; font-size: 16px;">Packed</th>
+//   //           <th style="padding: 12px 15px; font-size: 16px;">Missing</th>
+//   //         </tr>
+//   //       </thead>
+//   //       <tbody>
+//   //         ${order.items
+//   //           .map(
+//   //             (item, index) => `
+//   //               <tr style="background: ${
+//   //                 index % 2 === 0 ? "#f8f8f8" : "#fff"
+//   //               };"><td style="padding: 12px 15px; font-size: 20px; color: #333; border-bottom: 1px solid #eee;">
+//   //                   ${item.category || "Unknown"}<br/>
+//   //                   <span style="font-size: 14px;">${item.name}</span>
+//   //                 </td>
+//   //                 <td style="padding: 12px 15px; font-size: 15px; text-align: center;">
+//   //                   <span style="
+//   //                     background-color: #28a745;
+//   //                     color: #fff;
+//   //                     padding: 5px 10px;
+//   //                     border-radius: 12px;
+//   //                     font-size: 13px;
+//   //                     font-weight: 500;
+//   //                   ">
+//   //                     ${item.qty || 0}
+//   //                   </span>
+//   //                 </td>
+//   //                 <td style="
+//   //                   padding: 12px 15px;
+//   //                   font-size: 15px;
+//   //                   text-align: center;
+//   //                   cursor: pointer;
+//   //                 " data-index="${index}" data-packed="${item.packed}">
+//   //                   ${item.packed ? "✅" : "⬜"}
+//   //                 </td>
+//   //                 <td style="padding: 12px 15px; font-size: 15px; text-align: center;">
+//   //                   ${item.missing ? "⚠️" : "—"}
+//   //                 </td>
+//   //               </tr>`
+//   //           )
+//   //           .join("")}
+//   //       </tbody>
+//   //     </table>
+//   //   </div>
+//   // `,
+//   //     confirmButtonColor: "#6b8e23",
+//   //     width: "90%",
+//   //     showCancelButton: true,
+//   //     confirmButtonText: "Save",
+//   //     cancelButtonText: "Close",
+//   //     showDenyButton: allPacked,
+//   //     denyButtonText: "🖨️ Print",
+//   //     denyButtonColor: "#1b5e20",
+//   //     preConfirm: () => {
+//   //       if (allPacked) {
+//   //         const coverInput = document.getElementById("coverNumberInput");
+//   //         if (coverInput) {
+//   //           return { cover: coverInput.value.trim() };
+//   //         }
+//   //       }
+//   //       return {};
+//   //     },
+//   //     didOpen: () => {
+//   //       const packedCells = document.querySelectorAll("td[data-index]");
+//   //       packedCells.forEach((cell) => {
+//   //         cell.addEventListener("click", () => {
+//   //           const index = parseInt(cell.getAttribute("data-index"));
+//   //           const packed = cell.getAttribute("data-packed") === "true";
+//   //           if (Admin) return;
+//   //           handleItemCheck(index, !packed, order, time);
+//   //         });
+//   //       });
+//   //     },
+//   //   }).then((result) => {
+//   //     if (result.isConfirmed) {
+//   //       if (allPacked && result.value?.cover !== undefined) {
+//   //         const coverNumber = result.value.cover;
+//   //         if (coverNumber.trim()) {
+//   //           handleCoverUpdate(coverNumber, order);
+//   //         }
+//   //       }
+//   //       Swal.fire({
+//   //         title: "Saved",
+//   //         text: "Changes saved successfully",
+//   //         icon: "success",
+//   //         timer: 2000,
+//   //         showConfirmButton: false,
+//   //       });
+//   //     } else if (result.isDenied) {
+//   //       navigate("/packer-thermal-print", {
+//   //         state: { items: [order] },
+//   //       });
+//   //     }
+//   //   });
+//   // };
+
+//   const handleViewProducts = (order, time, handleItemCheck) => {
+//     if (!order || !order.items) {
+//       Swal.fire({
+//         title: "Error",
+//         text: "Invalid order data",
+//         icon: "error",
+//         confirmButtonColor: "#6b8e23",
+//       });
+//       return;
+//     }
+
+//     const allPacked = order.items.every((item) => item.packed);
+
+//     Swal.fire({
+//       title: `Order ${order.id} - Products`,
+//       html: `
+//     <div style="
+//       font-family: 'Arial', sans-serif;
+//       max-width: 100%;
+//       padding: 20px;
+//       background: #f9f9f9;
+//       border-radius: 10px;
+//       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+//     ">
+//       <div style="
+//         display: flex;
+//         justify-content: space-between;
+//         align-items: center;
+//         margin-bottom: 20px;
+//         flex-wrap: wrap;
+//         gap: 10px;
+//       ">
+//         <h5 style="font-size: 18px; color: #333; margin: 0;">
+//           Pack Time: ${order?.packeTime ? order?.packBefore : timeLeft[time]}
+//         </h5>
+//         <p style="font-size: 16px; color: #555; margin: 0;">
+//           Status: ${order.status}
+//         </p>
+//         <h5 style="font-size: 18px; color: #333; margin: 0;">
+//           Cutlery: ${order?.Cutlery > 0 ? "Yes" : "No"}
+//         </h5>
+//         ${
+//           allPacked
+//             ? `<div style="background: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">All Packed ✓</div>`
+//             : ""
+//         }
+//       </div>
+
+//       ${
+//         allPacked
+//           ? `
+//       <div style="
+//         margin-bottom: 20px;
+//         padding: 15px;
+//         background: #e8f5e8;
+//         border-radius: 8px;
+//         border: 1px solid #28a745;
+//       ">
+//         <div style="
+//           display: flex;
+//           align-items: center;
+//           gap: 10px;
+//           margin-bottom: 10px;
+//         ">
+//           <label style="font-weight: 600; color: #2e7d32; min-width: 120px;">
+//             Cover Number: <span style="color: #d32f2f;">*</span>
+//           </label>
+//           <input
+//             type="number"
+//             id="coverNumberInput"
+//             placeholder="Enter cover number (required)"
+//             value="${order.cover || ""}"
+//             style="
+//               flex: 1;
+//               padding: 10px 12px;
+//               border: 2px solid #28a745;
+//               border-radius: 6px;
+//               font-size: 16px;
+//               outline: none;
+//               transition: border-color 0.3s;
+//             "
+//             onfocus="this.style.borderColor='#1b5e20'"
+//             onblur="this.style.borderColor='#28a745'"
+//             required
+//           />
+//         </div>
+//         <div id="coverError" style="color: #d32f2f; font-size: 14px; margin-top: 5px; display: none;">
+//           Cover number is required when all items are packed
+//         </div>
+//         ${
+//           order.cover
+//             ? `<div style="color: #2e7d32; font-size: 14px; margin-top: 5px;">
+//                 Current cover: <strong>${order.cover}</strong>
+//                </div>`
+//             : ""
+//         }
+//       </div>
+//       `
+//           : ""
+//       }
+
+//       <table style="
+//         width: 100%;
+//         border-collapse: collapse;
+//         background: #fff;
+//         border-radius: 8px;
+//         overflow: hidden;
+//         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+//       ">
+//         <thead style="
+//           background: #6b8e23;
+//           color: #fff;
+//           font-weight: 600;
+//           text-align: left;
+//         ">
+//           <tr>
+//             <th style="padding: 12px 15px; font-size: 16px;">Category</th>
+//             <th style="padding: 12px 15px; font-size: 16px;">Quantity</th>
+//             <th style="padding: 12px 15px; font-size: 16px;">Packed</th>
+//             <th style="padding: 12px 15px; font-size: 16px;">Missing</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           ${order.items
+//             .map(
+//               (item, index) => `
+//                 <tr style="background: ${
+//                   index % 2 === 0 ? "#f8f8f8" : "#fff"
+//                 };"><td style="padding: 12px 15px; font-size: 20px; color: #333; border-bottom: 1px solid #eee;">
+//                     ${item.category || "Unknown"}<br/>
+//                     <span style="font-size: 14px;">${item.name}</span>
+//                   </td>
+//                   <td style="padding: 12px 15px; font-size: 15px; text-align: center;">
+//                     <span style="
+//                       background-color: #28a745;
+//                       color: #fff;
+//                       padding: 5px 10px;
+//                       border-radius: 12px;
+//                       font-size: 13px;
+//                       font-weight: 500;
+//                     ">
+//                       ${item.qty || 0}
+//                     </span>
+//                   </td>
+//                   <td style="
+//                     padding: 12px 15px;
+//                     font-size: 15px;
+//                     text-align: center;
+//                     cursor: pointer;
+//                   " data-index="${index}" data-packed="${item.packed}">
+//                     ${item.packed ? "✅" : "⬜"}
+//                   </td>
+//                   <td style="padding: 12px 15px; font-size: 15px; text-align: center;">
+//                     ${item.missing ? "⚠️" : "—"}
+//                   </td>
+//                 </tr>`
+//             )
+//             .join("")}
+//         </tbody>
+//       </table>
+//     </div>
+//   `,
+//       confirmButtonColor: "#6b8e23",
+//       width: "90%",
+//       showCancelButton: true,
+//       confirmButtonText: "Save",
+//       cancelButtonText: "Close",
+//       showDenyButton: allPacked,
+//       denyButtonText: "🖨️ Print",
+//       denyButtonColor: "#1b5e20",
+//       preConfirm: () => {
+//         return new Promise((resolve) => {
+//           // If all items are packed, cover number is mandatory
+//           if (allPacked) {
+//             const coverInput = document.getElementById("coverNumberInput");
+//             const coverError = document.getElementById("coverError");
+
+//             if (coverInput) {
+//               const coverValue = coverInput.value.trim();
+
+//               if (!coverValue) {
+//                 // Show error message
+//                 if (coverError) {
+//                   coverError.style.display = "block";
+//                   coverInput.style.borderColor = "#d32f2f";
+//                 }
+//                 resolve(false); // Prevent SweetAlert from closing
+//                 return;
+//               }
+
+//               // Valid cover number provided
+//               resolve({ cover: coverValue });
+//             } else {
+//               // Should not happen, but just in case
+//               resolve(false);
+//             }
+//           } else {
+//             // Not all packed, no cover required
+//             resolve({});
+//           }
+//         });
+//       },
+//       didOpen: () => {
+//         const packedCells = document.querySelectorAll("td[data-index]");
+//         packedCells.forEach((cell) => {
+//           cell.addEventListener("click", () => {
+//             const index = parseInt(cell.getAttribute("data-index"));
+//             const packed = cell.getAttribute("data-packed") === "true";
+//             if (Admin) return;
+//             handleItemCheck(index, !packed, order, time);
+//           });
+//         });
+
+//         // Add input event listener to remove error when typing
+//         const coverInput = document.getElementById("coverNumberInput");
+//         if (coverInput) {
+//           coverInput.addEventListener("input", () => {
+//             const coverError = document.getElementById("coverError");
+//             if (coverError) {
+//               coverError.style.display = "none";
+//             }
+//             coverInput.style.borderColor = "#28a745";
+//           });
+//         }
+//       },
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         if (allPacked && result.value?.cover !== undefined) {
+//           const coverNumber = result.value.cover;
+//           if (coverNumber.trim()) {
+//             handleCoverUpdate(coverNumber, order);
+//           }
+//         }
+//         Swal.fire({
+//           title: "Saved",
+//           text: "Changes saved successfully",
+//           icon: "success",
+//           timer: 2000,
+//           showConfirmButton: false,
+//         });
+//       } else if (result.isDenied) {
+//         navigate("/packer-thermal-print", {
+//           state: { items: [order] },
+//         });
+//       }
+//     });
+//   };
+
+//   const updateOrder = async (orderId, updatedData) => {
+//     setLoading(true);
+//     try {
+//       const response = await axios.put(
+//         `http://localhost:7013/api/admin/updatePackerOrder`,
+//         updatedData,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
+//           },
+//         }
+//       );
+
+//       fetchData();
+//       if (response.status == 200) {
+//         const order1 = response.data?.order;
+//         const items = order1.allProduct?.map((item) => ({
+//           ...item,
+//           foodItemId: item?.foodItemId,
+//           name: item?.name,
+//           qty: item.quantity,
+//           packed: item.packed,
+//           missing: item.missing,
+//         }));
+
+//         if (updatedData.view) {
+//           handleViewProducts(
+//             { ...order1, items: items, id: order1?.orderid },
+//             updatedData.time,
+//             handleItemCheck
+//           );
+//         }
+//         setTimeout(() => {
+//           setLoading(false);
+//         }, 100);
+
+//         return response.data?.order;
+//       }
+//     } catch (error) {
+//       setTimeout(() => {
+//         setLoading(false);
+//       }, 1000);
+
+//       Swal.fire({
+//         title: "Error",
+//         text: "Failed to update order.",
+//         icon: "error",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//     }
+//   };
+
+//   const handleOrderUpdate = async (orderId, updatedData, items) => {
+//     const allProduct = items?.map((item) => ({
+//       ...item,
+//       packed: item.packed,
+//       missing: item.missing,
+//     }));
+//     const response = await updateOrder(orderId, {
+//       ...updatedData,
+//       allProduct,
+//       packer: packerId,
+//       packername: packerName,
+//       _id: updatedData?._id,
+//     });
+//     if (response) {
+//       if (updatedData.status && !updatedData.view) {
+//         Swal.fire({
+//           title: "Order Updated",
+//           text: `Order ${orderId} updated to ${updatedData.status}.`,
+//           icon: "success",
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           toast: true,
+//           position: "bottom",
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (updatedData.cover && !updatedData.view) {
+//         Swal.fire({
+//           title: "Cover Assigned",
+//           text: `Order ${orderId} has ${updatedData.cover} cover.`,
+//           icon: "success",
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           toast: true,
+//           position: "bottom",
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (updatedData.driver && !updatedData.view) {
+//         Swal.fire({
+//           title: "Driver Assigned",
+//           text: `Order ${orderId} assigned to Driver ${updatedData.driver}.`,
+//           icon: "success",
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           toast: true,
+//           position: "bottom",
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//       if (updatedData.reason && !updatedData.view) {
+//         Swal.fire({
+//           title: "Delay Reason Updated",
+//           text: `Reason for delay updated for Order ${orderId}.`,
+//           icon: "success",
+//           showConfirmButton: false,
+//           timer: 3000,
+//           timerProgressBar: true,
+//           toast: true,
+//           position: "bottom",
+//           customClass: {
+//             popup: "me-small-toast",
+//             title: "me-small-toast-title",
+//           },
+//         });
+//       }
+//     }
+//   };
+
+//   const handleItemCheck = (index, checked, order, time) => {
+//     if (order.items[index].missing) {
+//       Swal.fire({
+//         title: "Cannot Pack Item",
+//         text: "This item is marked as missing.",
+//         icon: "error",
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         toast: true,
+//         position: "bottom",
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+//     const updatedItems = [...order.items];
+//     updatedItems[index] = { ...updatedItems[index], packed: checked };
+//     const allPacked = updatedItems.every((item) => item.packed || item.missing);
+//     const somePacked = updatedItems.some(
+//       (item) => item.packed && !item.missing
+//     );
+//     const status = allPacked
+//       ? "Packed"
+//       : somePacked
+//       ? "Partially Packed"
+//       : "Cooking";
+//     const checkOntime = timeLeft[time] !== "Delay" && status == "Packed";
+
+//     const updatedOrder = {
+//       ...order,
+//       items: updatedItems,
+//       status,
+//       view: true,
+//       packBefore: checkOntime ? "Yes" : timeLeft[time],
+//       time: time,
+//       _id: order?._id,
+//       packeTime: status === "Packed" ? moment().format("LT") : null,
+//     };
+
+//     setSelectedOrder(updatedOrder);
+//     handleOrderUpdate(order.id, updatedOrder, updatedItems, true, time);
+//   };
+
+//   if (!Packer && !Admin) {
+//     navigate("/packer-login");
+//   }
+
+//   return (
+//     <div className="packer-dashboard-container container-fluid p-0">
+//       <div className="row g-0">
+//         <div className="col-12 packer-main-content p-4">
+//           <div className="packer-welcome-card mb-4 p-3 rounded shadow-sm">
+//             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+//               <PackerClock />
+//               {Admin ? (
+//                 <h4
+//                   className="mb-3 mb-md-0"
+//                   style={{ color: "#6B8E23", fontWeight: "bold" }}
+//                 >
+//                   Packer Tracking
+//                 </h4>
+//               ) : (
+//                 <h4
+//                   className="mb-3 mb-md-0"
+//                   style={{ color: "#6B8E23", fontWeight: "bold" }}
+//                 >
+//                   <FaUser className="me-2" /> Welcome Back,{" "}
+//                   {Admin ? "Admin" : `${packerName} (ID: ${packerId})`}
+//                 </h4>
+//               )}
+
+//               <div className="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto justify-content-end">
+//                 {selectedOrders.length > 0 && (
+//                   <button
+//                     className="btn packer-print-btn shadow-sm"
+//                     style={{
+//                       backgroundColor: "#1b5e20",
+//                       color: "white",
+//                       fontWeight: "bold",
+//                     }}
+//                     onClick={handlePrintSelected}
+//                   >
+//                     <FaPrint className="me-2" /> Print Selected (
+//                     {selectedOrders.length})
+//                   </button>
+//                 )}
+//                 <button
+//                   className="btn packer-print-btn shadow-sm "
+//                   style={{
+//                     backgroundColor: "#6B8E23",
+//                     color: "white",
+//                     fontWeight: "bold",
+//                   }}
+//                   onClick={handlePrintAll}
+//                 >
+//                   <FaPrint className="me-2" /> Print All
+//                 </button>
+//                 {Packer ? (
+//                   <button
+//                     className="btn packer-logout-btn shadow-sm "
+//                     style={{
+//                       backgroundColor: "#F81E0F",
+//                       color: "white",
+//                       fontWeight: "bold",
+//                     }}
+//                     onClick={handleLogout}
+//                   >
+//                     <FaSignOutAlt className="me-2" /> Submit & Logout
+//                   </button>
+//                 ) : (
+//                   <button
+//                     className="btn packer-logout-btn shadow-sm "
+//                     style={{
+//                       backgroundColor: "#F81E0F",
+//                       color: "white",
+//                       fontWeight: "bold",
+//                     }}
+//                     onClick={() => navigate("/dashboard")}
+//                   >
+//                     <FaSignOutAlt className="me-2" /> Back
+//                   </button>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Filter Section - Session and Hubs */}
+//           <div
+//             className="mb-4 d-flex flex-column flex-md-row justify-content-end gap-3 align-items-center"
+//             style={{ backgroundColor: "#fff8dc", padding: "40px" }}
+//           >
+//             {/* Session Filter */}
+//             <div className="position-relative">
+//               <select
+//                 className="form-select packer-session-select shadow-sm"
+//                 value={selectedSession}
+//                 onChange={(e) => handleSessionChange(e.target.value)}
+//                 style={{ minWidth: "200px" }}
+//                 disabled={!Admin} // Disable for packers
+//               >
+//                 <option value="">All Sessions</option>
+//                 <option value="Lunch">Lunch</option>
+//                 <option value="Dinner">Dinner</option>
+//               </select>
+
+//               {/* Show indicator for packers about auto-selected session */}
+//               {!Admin && (
+//                 <div
+//                   className="position-absolute top-0 end-0 translate-middle-y me-2"
+//                   style={{ pointerEvents: "none" }}
+//                   title={`Session auto-selected: ${currentTimeSession} (Based on current time)`}
+//                 >
+//                   <span className="badge bg-info">
+//                     Auto: {currentTimeSession}
+//                   </span>
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Hubs Filter */}
+//             <div className="dropdown " ref={dropdownRef}>
+//               <button
+//                 className="btn btn-outline-secondary dropdown-toggle form-select packer-hub-select shadow-sm d-flex justify-content-between align-items-center"
+//                 type="button"
+//                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+//                 style={{
+//                   textAlign: "left",
+//                   minHeight: "38px",
+//                   minWidth: "200px",
+//                 }}
+//               >
+//                 <span>
+//                   {selectedHubs.length === 0
+//                     ? "All Hubs"
+//                     : selectedHubs.length === 1
+//                     ? selectedHubs[0]
+//                     : `${selectedHubs.length} hubs selected`}
+//                 </span>
+//               </button>
+
+//               {isDropdownOpen && (
+//                 <div
+//                   className="dropdown-menu show w-100 shadow"
+//                   style={{
+//                     maxHeight: "300px",
+//                     overflowY: "auto",
+//                     zIndex: 2000,
+//                   }}
+//                 >
+//                   <div className="dropdown-item">
+//                     <div className="form-check">
+//                       <input
+//                         className="form-check-input"
+//                         type="checkbox"
+//                         id="select-all-hubs"
+//                         checked={selectedHubs.length === hubs.length}
+//                         onChange={handleSelectAllHubs}
+//                       />
+//                       <label
+//                         className="form-check-label fw-bold"
+//                         htmlFor="select-all-hubs"
+//                       >
+//                         {selectedHubs.length === hubs.length
+//                           ? "Clear All"
+//                           : "Select All"}
+//                       </label>
+//                     </div>
+//                   </div>
+
+//                   <hr className="dropdown-divider" />
+
+//                   {hubs.map((hub) => (
+//                     <div key={hub._id} className="dropdown-item">
+//                       <div className="form-check">
+//                         <input
+//                           className="form-check-input"
+//                           type="checkbox"
+//                           value={hub.hubName}
+//                           id={`hub-${hub._id}`}
+//                           checked={selectedHubs.includes(hub.hubName)}
+//                           onChange={() => handleHubToggle(hub.hubName)}
+//                         />
+//                         <label
+//                           className="form-check-label"
+//                           htmlFor={`hub-${hub._id}`}
+//                         >
+//                           {hub.hubName}
+//                         </label>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Status Filter */}
+//             <select
+//               className="form-select packer-status-select shadow-sm"
+//               value={statusFilter}
+//               onChange={(e) => handleStatusFilter(e.target.value)}
+//               style={{ minWidth: "200px" }}
+//             >
+//               <option value="All">All Status</option>
+//               <option value="Cooking">Cooking</option>
+//               <option value="Partially Packed">Partially Packed</option>
+//               <option value="Packed">Packed</option>
+//             </select>
+//           </div>
+
+//           {/* Session Info Banner for Packers */}
+//           {!Admin && (
+//             <div className="alert alert-info mb-3 d-flex align-items-center justify-content-between">
+//               <div>
+//                 <strong>Current Session:</strong> {currentTimeSession}
+//                 <span className="ms-2">
+//                   (Auto-selected based on current time:{" "}
+//                   {moment().format("h:mm A")} IST)
+//                 </span>
+//               </div>
+//               <div>
+//                 <small>
+//                   <strong>Session Timings (IST):</strong>
+//                   <span className="ms-2">Lunch: 7:00 AM - 3:30 PM</span>
+//                   <span className="ms-2">Dinner: 3:30 PM - 10:00 PM</span>
+//                 </small>
+//               </div>
+//             </div>
+//           )}
+
+//           {loading && (
+//             <div className="container mt-5">
+//               <div className={`loading-overlay ${loading ? "active" : ""}`}>
+//                 <div className="loading-container">
+//                   <div className="spinner-border text-orange" role="status">
+//                     <span className="visually-hidden">Loading...</span>
+//                   </div>
+//                   <span>Loading...</span>
+//                 </div>
+//               </div>
+//             </div>
+//           )}
+
+//           {activeView === "orders" && (
+//             <>
+//               <div className="d-flex justify-content-between align-items-center gap-2">
+//                 <div className="col-lg-4 d-flex justify-content-center">
+//                   <div className="input-group">
+//                     <span className="input-group-text " id="basic-addon1">
+//                       <BsSearch />
+//                     </span>
+//                     <input
+//                       type="text"
+//                       className="packer-session-select shadow-sm"
+//                       placeholder="Search..."
+//                       aria-describedby="basic-addon1"
+//                       onChange={(e) => setSearchTerm(e.target.value)}
+//                       value={searchTerm}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 <div className="d-flex gap-2">
+//                   <button
+//                     className={`btn packer-toggle-btn ${
+//                       activeView === "orders" ? "active" : ""
+//                     }`}
+//                     style={{
+//                       backgroundColor:
+//                         activeView === "orders" ? "#6B8E23" : "#6c757d",
+//                       color: "white",
+//                       fontWeight: "bold",
+//                     }}
+//                     onClick={() => setActiveView("orders")}
+//                   >
+//                     <FaTable className="me-2" /> View Orders
+//                   </button>
+//                   <Link to="/packers">
+//                     <button
+//                       className={`btn packer-toggle-btn ${
+//                         activeView === "quantity" ? "active" : ""
+//                       }`}
+//                       style={{
+//                         backgroundColor:
+//                           activeView === "quantity" ? "#6B8E23" : "#6c757d",
+//                         color: "white",
+//                         fontWeight: "bold",
+//                       }}
+//                     >
+//                       <FaListAlt className="me-2" /> View Quantity
+//                     </button>
+//                   </Link>
+//                 </div>
+//               </div>
+
+//               {/* Selection Stats Bar */}
+//               {/* {selectedOrders.length > 0 && (
+//                 <div className="alert alert-success mb-3 d-flex justify-content-between align-items-center">
+//                   <div>
+//                     <strong>
+//                       {selectedOrders.length} order{selectedOrders.length !== 1 ? 's' : ''} selected
+//                     </strong>
+//                     <span className="ms-3">
+//                       <button
+//                         className="btn btn-sm btn-outline-danger"
+//                         onClick={() => setSelectedOrders([])}
+//                       >
+//                         Clear Selection
+//                       </button>
+//                     </span>
+//                   </div>
+//                   <div>
+//                     <button
+//                       className="btn btn-success"
+//                       onClick={handlePrintSelected}
+//                     >
+//                       <FaPrint className="me-2" /> Print Selected
+//                     </button>
+//                   </div>
+//                 </div>
+//               )} */}
+
+//               {/* Stats Cards */}
+//               <div className="container">
+//                 <div
+//                   className="row text-center mt-3 sticky-top bg-white py-2"
+//                   style={{ zIndex: 1020 }}
+//                 >
+//                   <div className="col-12 col-sm-3 mb-3">
+//                     <div
+//                       className={`p-3 border rounded shadow-sm text-black  d-flex justify-content-center align-items-center${
+//                         statusFilter2 === "all"
+//                           ? "border-secondary border-3"
+//                           : ""
+//                       }`}
+//                       onClick={() => setStatusFilter2("all")}
+//                       style={{
+//                         backgroundColor:
+//                           statusFilter2 === "all" ? "transparent" : "#aeaeae",
+//                         cursor: "pointer",
+//                         borderColor:
+//                           statusFilter2 === "all" ? "#374151" : "transparent",
+//                         height: "80px",
+//                       }}
+//                     >
+//                       <p className="fw-bold mb-0 fs-5">
+//                         Total Orders: {filteredOrders?.length}
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="col-12 col-sm-3 mb-3">
+//                     <div
+//                       className={`p-3 border rounded shadow-sm  d-flex justify-content-center align-items-center ${
+//                         statusFilter2 === "Cooking"
+//                           ? "border-danger border-3"
+//                           : ""
+//                       }`}
+//                       style={{
+//                         backgroundColor:
+//                           statusFilter2 === "Cooking"
+//                             ? "transparent"
+//                             : "#ef4444",
+//                         cursor: "pointer",
+//                         borderColor:
+//                           statusFilter2 === "Cooking"
+//                             ? "#dc2626"
+//                             : "transparent",
+//                         height: "80px",
+//                       }}
+//                       onClick={() => setStatusFilter2("Cooking")}
+//                     >
+//                       <p
+//                         className="fw-bold mb-0  fs-5"
+//                         style={{
+//                           color:
+//                             statusFilter2 === "Cooking" ? "#dc2626" : "white",
+//                         }}
+//                       >
+//                         Pending:{" "}
+//                         {
+//                           filteredOrders?.filter(
+//                             (ele) => ele.status === "Cooking"
+//                           )?.length
+//                         }
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="col-12 col-sm-3 mb-3">
+//                     <div
+//                       className={`p-3 border rounded shadow-sm  d-flex justify-content-center align-items-center ${
+//                         statusFilter2 === "Partially Packed"
+//                           ? "border-warning border-3"
+//                           : ""
+//                       }`}
+//                       style={{
+//                         backgroundColor:
+//                           statusFilter2 === "Partially Packed"
+//                             ? "transparent"
+//                             : "#fbbf24",
+//                         cursor: "pointer",
+//                         borderColor:
+//                           statusFilter2 === "Partially Packed"
+//                             ? "#d97706"
+//                             : "transparent",
+//                         height: "80px",
+//                       }}
+//                       onClick={() => setStatusFilter2("Partially Packed")}
+//                     >
+//                       <p
+//                         className="fw-bold mb-0 text-black fs-5"
+//                         style={{
+//                           color:
+//                             statusFilter2 === "Partially Packed"
+//                               ? "#d97706"
+//                               : "black",
+//                         }}
+//                       >
+//                         Partially Packed:{" "}
+//                         {
+//                           filteredOrders?.filter(
+//                             (ele) => ele.status === "Partially Packed"
+//                           )?.length
+//                         }
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="col-12 col-sm-3 mb-3">
+//                     <div
+//                       className={`p-3 border rounded shadow-sm  d-flex justify-content-center align-items-center ${
+//                         statusFilter2 === "Packed"
+//                           ? "border-success border-3"
+//                           : ""
+//                       }`}
+//                       style={{
+//                         backgroundColor:
+//                           statusFilter2 === "Packed"
+//                             ? "transparent"
+//                             : "#6B8E23",
+//                         cursor: "pointer",
+//                         borderColor:
+//                           statusFilter2 === "Packed"
+//                             ? "#6B8E23"
+//                             : "transparent",
+//                         height: "80px",
+//                       }}
+//                       onClick={() => setStatusFilter2("Packed")}
+//                     >
+//                       <p
+//                         className="fw-bold mb-0  fs-5"
+//                         style={{
+//                           color:
+//                             statusFilter2 === "Packed" ? "#6B8E23" : "white",
+//                         }}
+//                       >
+//                         Packed:{" "}
+//                         {
+//                           filteredOrders?.filter(
+//                             (ele) => ele.status === "Packed"
+//                           )?.length
+//                         }
+//                       </p>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* Orders Table */}
+//               <div className="packer-table-responsive shadow-lg rounded">
+//                 <table className="table table-hover">
+//                   <thead style={{ backgroundColor: "#6B8E23", color: "white" }}>
+//                     <tr>
+//                       <th style={{ width: "50px" }}>
+//                         <div className="form-check">
+//                           <input
+//                             className="form-check-input"
+//                             type="checkbox"
+//                             checked={selectAll}
+//                             onChange={toggleSelectAll}
+//                             style={{ cursor: "pointer" }}
+//                           />
+//                         </div>
+//                       </th>
+//                       <th>Order ID</th>
+//                       <th>Order Time</th>
+//                       <th>Hub</th>
+//                       <th>Location</th>
+//                       <th>Cover</th>
+//                       <th>Session</th>
+//                       {Admin && <th>Packer</th>}
+//                       {Admin && <th>Packer Name</th>}
+//                       {Admin && <th>Packed Time</th>}
+//                       {Admin && <th>On Time</th>}
+//                       {Admin && <th>Reason</th>}
+//                       <th>Status</th>
+//                       {Admin && <th>Updated At</th>}
+//                       {statusFilter2 === "Packed" && <th>Print</th>}
+//                       <th>Print</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {filteredOrders
+//                       .filter(
+//                         (order) =>
+//                           statusFilter2 === "all" ||
+//                           order.status === statusFilter2
+//                       )
+//                       .map((order, index) => (
+//                         <tr key={order._id}>
+//                           <td>
+//                             <div className="form-check">
+//                               <input
+//                                 className="form-check-input"
+//                                 type="checkbox"
+//                                 checked={selectedOrders.includes(order.id)}
+//                                 onChange={() => toggleOrderSelection(order.id)}
+//                                 style={{ cursor: "pointer" }}
+//                               />
+//                             </div>
+//                           </td>
+//                           <td>
+//                             {order?.id} <br />
+//                             <span style={{ fontSize: "small" }}>
+//                               {order.username}
+//                             </span>
+//                             <br />
+//                             <span style={{ fontSize: "small" }}>
+//                               {order?.Mobilenumber}
+//                             </span>
+//                             <br />
+//                             <span style={{ fontSize: "small" }}>
+//                               Total :- {order?.totalOrder || 0}
+//                             </span>
+//                           </td>
+
+//                           <td>{moment(order.createdAt).format("hh:mm A")}</td>
+//                           <td>{order.hubName}</td>
+//                           <td>{order.delivarylocation}</td>
+//                           <td>{order.cover}</td>
+//                           <td>{order.session}</td>
+//                           {Admin && <td>{order.packer}</td>}
+//                           {Admin && <td>{order.packername}</td>}
+//                           {Admin && <td>{order?.packeTime}</td>}
+//                           {Admin && <td>{order?.packBefore} </td>}
+
+//                           {Admin && (
+//                             <td>
+//                               <select
+//                                 key={index}
+//                                 value={order.reason}
+//                                 onChange={(e) =>
+//                                   handleOrderUpdate(
+//                                     order.id,
+//                                     { reason: e.target.value, _id: order?._id },
+//                                     order.items
+//                                   )
+//                                 }
+//                                 className={
+//                                   order.reason
+//                                     ? `btn btn-outline-danger`
+//                                     : "btn btn-outline-info"
+//                                 }
+//                                 style={{ padding: "5px 10px" }}
+//                                 disabled={Admin ? true : false}
+//                               >
+//                                 <option value={"N/A"}>N/A</option>
+//                                 {AllReason?.map((ele) => (
+//                                   <option value={ele.reason}>
+//                                     {ele.reason}
+//                                   </option>
+//                                 ))}
+//                               </select>
+//                             </td>
+//                           )}
+//                           <td>
+//                             <button
+//                               type="button"
+//                               className={
+//                                 order.status == "Cooking" ||
+//                                 order.status == "Pending"
+//                                   ? "btn btn-outline-danger"
+//                                   : order.status == "Partially Packed"
+//                                   ? "btn btn-outline-info"
+//                                   : "btn btn-outline-success"
+//                               }
+//                               style={{ padding: "5px 10px" }}
+//                               onClick={(e) => {
+//                                 e.stopPropagation();
+//                                 setSelectedOrder({
+//                                   order,
+//                                   packer: packerId,
+//                                   packername: packerName,
+//                                   _id: order?._id,
+//                                 });
+//                                 setTimeout(() => {
+//                                   handleViewProducts(
+//                                     order,
+//                                     index,
+//                                     handleItemCheck
+//                                   );
+//                                 }, 100);
+//                               }}
+//                             >
+//                               <FaEye className="me-1" /> {order.status}
+//                             </button>
+//                           </td>
+//                           {Admin && (
+//                             <td>
+//                               {order.status == "Packed" ||
+//                               order.status == "Partially Packed"
+//                                 ? moment(order.updatedAt).format("lll")
+//                                 : "  "}
+//                             </td>
+//                           )}
+//                           {statusFilter2 === "Packed" && (
+//                             <td>
+//                               <button
+//                                 className="btn packer-back-btn"
+//                                 style={{
+//                                   backgroundColor: "#F81E0F",
+//                                   color: "white",
+//                                   fontWeight: "bold",
+//                                 }}
+//                                 onClick={() =>
+//                                   navigate("/packer-thermal-print", {
+//                                     state: { items: [order] },
+//                                   })
+//                                 }
+//                               >
+//                                 <FaPrint className="me-2" /> Print
+//                               </button>
+//                             </td>
+//                           )}
+//                           <td>
+//                             <button
+//                               className="btn packer-back-btn"
+//                               style={{
+//                                 backgroundColor: "#F81E0F",
+//                                 color: "white",
+//                                 fontWeight: "bold",
+//                               }}
+//                               onClick={() =>
+//                                 navigate("/packer-thermal-print", {
+//                                   state: { items: [order] },
+//                                 })
+//                               }
+//                             >
+//                               <FaPrint className="me-2" /> Print
+//                             </button>
+//                           </td>
+//                         </tr>
+//                       ))}
+//                   </tbody>
+//                 </table>
+//               </div>
+//             </>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DashboardPage;
+
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -4316,6 +6404,7 @@ import {
   FaListAlt,
   FaCheckSquare,
   FaSquare,
+  FaMotorcycle,
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -4325,7 +6414,7 @@ import io from "socket.io-client";
 import moment from "moment";
 import { BsSearch } from "react-icons/bs";
 
-const socket = io("https://dailydish.in/", {
+const socket = io("http://localhost:7013", {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
@@ -4358,7 +6447,7 @@ const getCurrentSession = () => {
   console.log(
     `IST Time: ${hours}:${minutes
       .toString()
-      .padStart(2, "0")}, Total minutes: ${currentTime}`
+      .padStart(2, "0")}, Total minutes: ${currentTime}`,
   );
   console.log(`Lunch cutoff: ${lunchCutoff}, Dinner start: ${dinnerStart}`);
 
@@ -4404,10 +6493,13 @@ const DashboardPage = () => {
     return loadInitialState("selectedSession", "");
   });
   const [selectedHubs, setSelectedHubs] = useState(() =>
-    loadInitialState("selectedHubs", [])
+    loadInitialState("selectedHubs", []),
   );
   const [statusFilter, setStatusFilter] = useState(() =>
-    loadInitialState("statusFilter", "All")
+    loadInitialState("statusFilter", "All"),
+  );
+  const [selectedRider, setSelectedRider] = useState(() =>
+    loadInitialState("selectedRider", "all"),
   );
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -4432,11 +6524,34 @@ const DashboardPage = () => {
   const [packedFilter, setPackedFilter] = useState("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [currentTimeSession, setCurrentTimeSession] = useState(
-    getCurrentSession()
-  );
+  const [currentTimeSession, setCurrentTimeSession] =
+    useState(getCurrentSession());
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [riders, setRiders] = useState([]);
+
+  // Fetch apartment orders
+  const [ApartmentOrder, setApartmentOrder] = useState([]);
+  const getApartmentOrder = async () => {
+    try {
+      let res = await axios.get("http://localhost:7013/api/admin/getallorders");
+      if (res.status === 200) {
+        setApartmentOrder(res.data.order.reverse());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const findNumberofOrders = (customerId) => {
+    return ApartmentOrder.filter(
+      (customer) => customer?.customerId === customerId,
+    ).length;
+  };
+
+  useEffect(() => {
+    getApartmentOrder();
+  }, []);
 
   // Update current session every minute
   useEffect(() => {
@@ -4463,7 +6578,7 @@ const DashboardPage = () => {
   useEffect(() => {
     localStorage.setItem(
       "packer_selectedSession",
-      JSON.stringify(selectedSession)
+      JSON.stringify(selectedSession),
     );
   }, [selectedSession]);
 
@@ -4474,6 +6589,10 @@ const DashboardPage = () => {
   useEffect(() => {
     localStorage.setItem("packer_statusFilter", JSON.stringify(statusFilter));
   }, [statusFilter]);
+
+  useEffect(() => {
+    localStorage.setItem("packer_selectedRider", JSON.stringify(selectedRider));
+  }, [selectedRider]);
 
   useEffect(() => {
     localStorage.setItem("packer_searchTerm", JSON.stringify(searchTerm));
@@ -4500,7 +6619,7 @@ const DashboardPage = () => {
     const orderHubNameClean = orderHubName?.toString().trim();
 
     const result = packerHubNames.some(
-      (packerHub) => packerHub?.toString().trim() === orderHubNameClean
+      (packerHub) => packerHub?.toString().trim() === orderHubNameClean,
     );
 
     console.log(
@@ -4509,7 +6628,7 @@ const DashboardPage = () => {
       "Order hub:",
       orderHubNameClean,
       "Packer hubs:",
-      packerHubNames
+      packerHubNames,
     );
 
     return result;
@@ -4517,7 +6636,7 @@ const DashboardPage = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dailydish.in/api/Hub/hubs");
+      const res = await axios.get("http://localhost:7013/api/Hub/hubs");
       const allHubs = res.data;
 
       // Filter hubs based on packer's assigned hubs
@@ -4526,8 +6645,8 @@ const DashboardPage = () => {
         const filteredHubs = allHubs.filter((hub) =>
           packerHubNames.some(
             (packerHub) =>
-              packerHub?.toString().trim() === hub.hubName?.toString().trim()
-          )
+              packerHub?.toString().trim() === hub.hubName?.toString().trim(),
+          ),
         );
         setHubs(filteredHubs);
       } else {
@@ -4538,17 +6657,37 @@ const DashboardPage = () => {
     }
   };
 
+  // Fetch riders for filter dropdown
+  const fetchRiders = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:7013/api/admin/riders",
+      );
+      console.log("Riders API response:", response.data);
+      if (response.data && response.data.riders) {
+        // Filter for active riders only
+        const activeRiders = response.data.riders.filter(
+          (rider) => rider.status === "active",
+        );
+        setRiders(activeRiders);
+        console.log("Active riders set:", activeRiders);
+      }
+    } catch (error) {
+      console.error("Error fetching riders:", error);
+    }
+  };
+
   const oldOders = async () => {
     if (!Packer && !Admin) return;
     setLoading(true);
     try {
       const orderResponse = await axios.get(
-        "https://dailydish.in/api/admin/getPackerOrders",
+        "http://localhost:7013/api/admin/getPackerOrders",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
           },
-        }
+        },
       );
 
       if (orderResponse.status === 200) {
@@ -4643,12 +6782,12 @@ const DashboardPage = () => {
         }
       }
       const orderResponse = await axios.get(
-        "https://dailydish.in/api/admin/getPackerOrders",
+        "http://localhost:7013/api/admin/getPackerOrders",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
           },
-        }
+        },
       );
 
       const allorder = Admin
@@ -4694,7 +6833,7 @@ const DashboardPage = () => {
 
   const getBegs = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getbags");
+      let res = await axios.get("http://localhost:7013/api/admin/getbags");
       if (res.status == 200) {
         setAllBags(res.data.bags);
       }
@@ -4706,17 +6845,27 @@ const DashboardPage = () => {
   const getAllReason = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getdelayreasons"
+        "http://localhost:7013/api/admin/getdelayreasons",
       );
       if (res.status == 200) {
         setAllReason(
-          res.data.reasons?.filter((ele) => ele.reasonType === "delay")
+          res.data.reasons?.filter((ele) => ele.reasonType === "delay"),
         );
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     socket.on("newOrder", (order) => {
@@ -4727,20 +6876,11 @@ const DashboardPage = () => {
     getAllReason();
     fetchData();
     getHubs();
+    fetchRiders();
 
     return () => {
       socket.off("newOrder");
     };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Multi-select functions
@@ -4756,7 +6896,7 @@ const DashboardPage = () => {
 
   const toggleSelectAll = () => {
     const currentFilteredOrders = filteredOrders.filter(
-      (order) => statusFilter2 === "all" || order.status === statusFilter2
+      (order) => statusFilter2 === "all" || order.status === statusFilter2,
     );
 
     if (selectAll) {
@@ -4788,7 +6928,7 @@ const DashboardPage = () => {
     }
 
     const selectedOrdersData = orders.filter((order) =>
-      selectedOrders.includes(order.id)
+      selectedOrders.includes(order.id),
     );
 
     navigate("/packer-thermal-print", { state: { items: selectedOrdersData } });
@@ -4796,7 +6936,7 @@ const DashboardPage = () => {
 
   const handlePrintAll = () => {
     const currentFilteredOrders = filteredOrders.filter(
-      (order) => statusFilter2 === "all" || order.status === statusFilter2
+      (order) => statusFilter2 === "all" || order.status === statusFilter2,
     );
 
     if (currentFilteredOrders.length === 0) {
@@ -4895,10 +7035,33 @@ const DashboardPage = () => {
     });
   };
 
+  const handleRiderFilterChange = (riderId) => {
+    setSelectedRider(riderId);
+    Swal.fire({
+      title: "Rider Filter Applied",
+      text:
+        riderId === "all"
+          ? "Showing all riders"
+          : riderId === "unassigned"
+            ? "Showing unassigned orders"
+            : "Filtering by selected rider",
+      icon: "info",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      toast: true,
+      position: "bottom",
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+  };
+
   const handleLogout = () => {
     const check = orders.find(
       (ele, i) =>
-        ele.packBefore !== "Yes" && timeLeft[i] == "Delay" && !ele.reason
+        ele.packBefore !== "Yes" && timeLeft[i] == "Delay" && !ele.reason,
     );
     if (check) {
       Swal.fire({
@@ -4938,6 +7101,18 @@ const DashboardPage = () => {
     const matchesStatus =
       statusFilter === "All" ? true : order.status === statusFilter;
 
+    // Rider filter logic
+    const matchesRider =
+      selectedRider === "all"
+        ? true
+        : selectedRider === "unassigned"
+          ? !order.riderId || order.riderId === null || order.riderId === ""
+          : order.riderId
+            ? typeof order.riderId === "object"
+              ? order.riderId._id === selectedRider
+              : order.riderId === selectedRider
+            : false;
+
     const matchesSearch =
       searchTerm === ""
         ? true
@@ -4948,10 +7123,16 @@ const DashboardPage = () => {
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           order.items?.some((item) =>
-            item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+            item.name?.toLowerCase().includes(searchTerm.toLowerCase()),
           );
 
-    return matchesSession && matchesHub && matchesStatus && matchesSearch;
+    return (
+      matchesSession &&
+      matchesHub &&
+      matchesStatus &&
+      matchesRider &&
+      matchesSearch
+    );
   });
 
   // Session-based time calculation - UPDATED WITH CORRECT TIMINGS
@@ -5036,7 +7217,7 @@ const DashboardPage = () => {
           _id: order._id,
           status: "Packed",
         },
-        order.items
+        order.items,
       );
 
       Swal.fire({
@@ -5136,12 +7317,12 @@ const DashboardPage = () => {
           margin-bottom: 10px;
         ">
           <label style="font-weight: 600; color: #2e7d32; min-width: 120px;">
-            Cover Number:
+            Cover Number: <span style="color: #d32f2f;">*</span>
           </label>
           <input
-            type="text"
+            type="number"
             id="coverNumberInput"
-            placeholder="Enter cover number"
+            placeholder="Enter cover number (required)"
             value="${order.cover || ""}"
             style="
               flex: 1;
@@ -5154,7 +7335,11 @@ const DashboardPage = () => {
             "
             onfocus="this.style.borderColor='#1b5e20'"
             onblur="this.style.borderColor='#28a745'"
+            required
           />
+        </div>
+        <div id="coverError" style="color: #d32f2f; font-size: 14px; margin-top: 5px; display: none;">
+          Cover number is required when all items are packed
         </div>
         ${
           order.cover
@@ -5222,7 +7407,7 @@ const DashboardPage = () => {
                   <td style="padding: 12px 15px; font-size: 15px; text-align: center;">
                     ${item.missing ? "⚠️" : "—"}
                   </td>
-                </tr>`
+                </tr>`,
             )
             .join("")}
         </tbody>
@@ -5238,13 +7423,36 @@ const DashboardPage = () => {
       denyButtonText: "🖨️ Print",
       denyButtonColor: "#1b5e20",
       preConfirm: () => {
-        if (allPacked) {
-          const coverInput = document.getElementById("coverNumberInput");
-          if (coverInput) {
-            return { cover: coverInput.value.trim() };
+        return new Promise((resolve) => {
+          // If all items are packed, cover number is mandatory
+          if (allPacked) {
+            const coverInput = document.getElementById("coverNumberInput");
+            const coverError = document.getElementById("coverError");
+
+            if (coverInput) {
+              const coverValue = coverInput.value.trim();
+
+              if (!coverValue) {
+                // Show error message
+                if (coverError) {
+                  coverError.style.display = "block";
+                  coverInput.style.borderColor = "#d32f2f";
+                }
+                resolve(false); // Prevent SweetAlert from closing
+                return;
+              }
+
+              // Valid cover number provided
+              resolve({ cover: coverValue });
+            } else {
+              // Should not happen, but just in case
+              resolve(false);
+            }
+          } else {
+            // Not all packed, no cover required
+            resolve({});
           }
-        }
-        return {};
+        });
       },
       didOpen: () => {
         const packedCells = document.querySelectorAll("td[data-index]");
@@ -5256,6 +7464,18 @@ const DashboardPage = () => {
             handleItemCheck(index, !packed, order, time);
           });
         });
+
+        // Add input event listener to remove error when typing
+        const coverInput = document.getElementById("coverNumberInput");
+        if (coverInput) {
+          coverInput.addEventListener("input", () => {
+            const coverError = document.getElementById("coverError");
+            if (coverError) {
+              coverError.style.display = "none";
+            }
+            coverInput.style.borderColor = "#28a745";
+          });
+        }
       },
     }).then((result) => {
       if (result.isConfirmed) {
@@ -5284,13 +7504,13 @@ const DashboardPage = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `https://dailydish.in/api/admin/updatePackerOrder`,
+        `http://localhost:7013/api/admin/updatePackerOrder`,
         updatedData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("packer-token")}`,
           },
-        }
+        },
       );
 
       fetchData();
@@ -5309,7 +7529,7 @@ const DashboardPage = () => {
           handleViewProducts(
             { ...order1, items: items, id: order1?.orderid },
             updatedData.time,
-            handleItemCheck
+            handleItemCheck,
           );
         }
         setTimeout(() => {
@@ -5443,13 +7663,13 @@ const DashboardPage = () => {
     updatedItems[index] = { ...updatedItems[index], packed: checked };
     const allPacked = updatedItems.every((item) => item.packed || item.missing);
     const somePacked = updatedItems.some(
-      (item) => item.packed && !item.missing
+      (item) => item.packed && !item.missing,
     );
     const status = allPacked
       ? "Packed"
       : somePacked
-      ? "Partially Packed"
-      : "Cooking";
+        ? "Partially Packed"
+        : "Cooking";
     const checkOntime = timeLeft[time] !== "Delay" && status == "Packed";
 
     const updatedOrder = {
@@ -5550,7 +7770,7 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Filter Section - Session and Hubs */}
+          {/* Filter Section - Session, Hubs, Status, and Rider */}
           <div
             className="mb-4 d-flex flex-column flex-md-row justify-content-end gap-3 align-items-center"
             style={{ backgroundColor: "#fff8dc", padding: "40px" }}
@@ -5562,14 +7782,13 @@ const DashboardPage = () => {
                 value={selectedSession}
                 onChange={(e) => handleSessionChange(e.target.value)}
                 style={{ minWidth: "200px" }}
-                disabled={!Admin} // Disable for packers
+                disabled={!Admin}
               >
                 <option value="">All Sessions</option>
                 <option value="Lunch">Lunch</option>
                 <option value="Dinner">Dinner</option>
               </select>
 
-              {/* Show indicator for packers about auto-selected session */}
               {!Admin && (
                 <div
                   className="position-absolute top-0 end-0 translate-middle-y me-2"
@@ -5584,7 +7803,7 @@ const DashboardPage = () => {
             </div>
 
             {/* Hubs Filter */}
-            <div className="dropdown btn" ref={dropdownRef}>
+            <div className="dropdown" ref={dropdownRef}>
               <button
                 className="btn btn-outline-secondary dropdown-toggle form-select packer-hub-select shadow-sm d-flex justify-content-between align-items-center"
                 type="button"
@@ -5599,8 +7818,8 @@ const DashboardPage = () => {
                   {selectedHubs.length === 0
                     ? "All Hubs"
                     : selectedHubs.length === 1
-                    ? selectedHubs[0]
-                    : `${selectedHubs.length} hubs selected`}
+                      ? selectedHubs[0]
+                      : `${selectedHubs.length} hubs selected`}
                 </span>
               </button>
 
@@ -5671,6 +7890,35 @@ const DashboardPage = () => {
               <option value="Partially Packed">Partially Packed</option>
               <option value="Packed">Packed</option>
             </select>
+
+            {/* Rider Filter */}
+            <div className="position-relative">
+              <select
+                className="form-select packer-rider-select shadow-sm"
+                value={selectedRider}
+                onChange={(e) => handleRiderFilterChange(e.target.value)}
+                style={{ minWidth: "220px", paddingLeft: "40px" }}
+              >
+                <option value="all">
+                  <FaMotorcycle className="me-2" /> All Riders
+                </option>
+                <option value="unassigned">Unassigned Orders</option>
+                {riders.map((rider) => (
+                  <option key={rider._id} value={rider._id}>
+                    {rider.name} ({rider.phone})
+                  </option>
+                ))}
+              </select>
+              <FaMotorcycle
+                className="position-absolute"
+                style={{
+                  left: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#6B8E23",
+                }}
+              />
+            </div>
           </div>
 
           {/* Session Info Banner for Packers */}
@@ -5758,33 +8006,6 @@ const DashboardPage = () => {
                 </div>
               </div>
 
-              {/* Selection Stats Bar */}
-              {/* {selectedOrders.length > 0 && (
-                <div className="alert alert-success mb-3 d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>
-                      {selectedOrders.length} order{selectedOrders.length !== 1 ? 's' : ''} selected
-                    </strong>
-                    <span className="ms-3">
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => setSelectedOrders([])}
-                      >
-                        Clear Selection
-                      </button>
-                    </span>
-                  </div>
-                  <div>
-                    <button
-                      className="btn btn-success"
-                      onClick={handlePrintSelected}
-                    >
-                      <FaPrint className="me-2" /> Print Selected
-                    </button>
-                  </div>
-                </div>
-              )} */}
-
               {/* Stats Cards */}
               <div className="container">
                 <div
@@ -5845,7 +8066,7 @@ const DashboardPage = () => {
                         Pending:{" "}
                         {
                           filteredOrders?.filter(
-                            (ele) => ele.status === "Cooking"
+                            (ele) => ele.status === "Cooking",
                           )?.length
                         }
                       </p>
@@ -5885,7 +8106,7 @@ const DashboardPage = () => {
                         Partially Packed:{" "}
                         {
                           filteredOrders?.filter(
-                            (ele) => ele.status === "Partially Packed"
+                            (ele) => ele.status === "Partially Packed",
                           )?.length
                         }
                       </p>
@@ -5923,7 +8144,7 @@ const DashboardPage = () => {
                         Packed:{" "}
                         {
                           filteredOrders?.filter(
-                            (ele) => ele.status === "Packed"
+                            (ele) => ele.status === "Packed",
                           )?.length
                         }
                       </p>
@@ -5950,10 +8171,12 @@ const DashboardPage = () => {
                       </th>
                       <th>Order ID</th>
                       <th>Order Time</th>
+                      {/* <th>Delivery Time</th> */}
                       <th>Hub</th>
                       <th>Location</th>
                       <th>Cover</th>
                       <th>Session</th>
+                      <th>Rider</th> {/* New Rider Column */}
                       {Admin && <th>Packer</th>}
                       {Admin && <th>Packer Name</th>}
                       {Admin && <th>Packed Time</th>}
@@ -5970,7 +8193,7 @@ const DashboardPage = () => {
                       .filter(
                         (order) =>
                           statusFilter2 === "all" ||
-                          order.status === statusFilter2
+                          order.status === statusFilter2,
                       )
                       .map((order, index) => (
                         <tr key={order._id}>
@@ -5996,15 +8219,43 @@ const DashboardPage = () => {
                             </span>
                             <br />
                             <span style={{ fontSize: "small" }}>
-                              Total :- {order?.totalOrder || 0}
+                              Total :- {findNumberofOrders(order?.customerId)}
                             </span>
                           </td>
 
                           <td>{moment(order.createdAt).format("hh:mm A")}</td>
+                          {/* <td>
+                            {order?.session === "Lunch"
+                              ? order.lunchSlots
+                              : order.dinnerSlots}
+                          </td> */}
                           <td>{order.hubName}</td>
                           <td>{order.delivarylocation}</td>
                           <td>{order.cover}</td>
                           <td>{order.session}</td>
+
+                          {/* Rider Information Cell */}
+                          <td>
+                            {order?.riderId ? (
+                              typeof order?.riderId === "object" ? (
+                                <div>
+                                  <div style={{ fontWeight: "bold" }}>
+                                    {order?.riderId?.name}
+                                  </div>
+                                  <small className="text-muted">
+                                    {order?.riderId?.phone}
+                                  </small>
+                                </div>
+                              ) : (
+                                <span>Rider ID: {order?.riderId}</span>
+                              )
+                            ) : (
+                              <span className="text-danger fw-bold">
+                                Unassigned
+                              </span>
+                            )}
+                          </td>
+
                           {Admin && <td>{order.packer}</td>}
                           {Admin && <td>{order.packername}</td>}
                           {Admin && <td>{order?.packeTime}</td>}
@@ -6019,7 +8270,7 @@ const DashboardPage = () => {
                                   handleOrderUpdate(
                                     order.id,
                                     { reason: e.target.value, _id: order?._id },
-                                    order.items
+                                    order.items,
                                   )
                                 }
                                 className={
@@ -6047,8 +8298,8 @@ const DashboardPage = () => {
                                 order.status == "Pending"
                                   ? "btn btn-outline-danger"
                                   : order.status == "Partially Packed"
-                                  ? "btn btn-outline-info"
-                                  : "btn btn-outline-success"
+                                    ? "btn btn-outline-info"
+                                    : "btn btn-outline-success"
                               }
                               style={{ padding: "5px 10px" }}
                               onClick={(e) => {
@@ -6063,7 +8314,7 @@ const DashboardPage = () => {
                                   handleViewProducts(
                                     order,
                                     index,
-                                    handleItemCheck
+                                    handleItemCheck,
                                   );
                                 }, 100);
                               }}

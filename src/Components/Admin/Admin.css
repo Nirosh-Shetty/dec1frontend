@@ -689,8 +689,8 @@ table thead tr th {
 .pagination > li {
   padding: 0 0;
   flex: 1 1 35px;
-  max-width: 25px;
-  min-width: 14px;
+  max-width: 103px;
+  min-width: -14px;
   float: left;
   font-size: 15px;
   border: 1px solid orange;

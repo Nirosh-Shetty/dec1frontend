@@ -75,8 +75,8 @@ const EmployeeOrders = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getAllOrdersByCompanyId/" +
-          corparate?._id
+        "http://localhost:7013/api/admin/getAllOrdersByCompanyId/" +
+          corparate?._id,
       );
       if (res.status === 200) {
         // Filter orders by corporate employees (assuming corporateId or employeeId linkage)
@@ -105,8 +105,8 @@ const EmployeeOrders = () => {
     if (searchTerm !== "") {
       const filteredData = noChangeData.filter((user) =>
         Object.values(user).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
+          String(value).toLowerCase().includes(searchTerm),
+        ),
       );
       setOrders(filteredData);
     } else {
@@ -158,7 +158,7 @@ const EmployeeOrders = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Employee Orders");
     XLSX.writeFile(
       workbook,
-      `EmployeeOrders_${moment().format("DDMMYYYY")}.xlsx`
+      `EmployeeOrders_${moment().format("DDMMYYYY")}.xlsx`,
     );
   };
 
@@ -382,7 +382,7 @@ const EmployeeOrders = () => {
                         acc +
                         Number(item?.quantity) *
                           Number(item?.foodItemId?.foodprice),
-                      0
+                      0,
                     )
                     .toFixed(2)}
                 </div>

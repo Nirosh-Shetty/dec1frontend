@@ -13,11 +13,13 @@ import { Colors } from "../Helper/themes";
 import "../Styles/Validate.css"; // We'll create this CSS file
 import Swal2 from "sweetalert2";
 import axios from "axios";
+import checkCircle from "./../assets/check_circle.png";
+import errorCircle from "./../assets/myplancancel.png";
 
 export default function Validate() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { phone, Fname } = location.state || {};
+  const { phone, Fname, acquisitionChannel } = location.state || {}; // Add acquisitionChannel
   const [loader, setLoader] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [countdown, setCountdown] = useState(15);
@@ -37,6 +39,8 @@ export default function Validate() {
       setLoader(true);
       try {
         const capturedReferralCode = localStorage.getItem("referralCode");
+        const storedAcquisitionChannel =
+          localStorage.getItem("acquisitionChannel");
         const payload = {
           Mobile: phone,
           otp: code,
@@ -47,10 +51,16 @@ export default function Validate() {
           payload.referralCode = capturedReferralCode;
         }
 
+        // Add acquisition channel if available (prioritize from props, then localStorage)
+        if (acquisitionChannel || storedAcquisitionChannel) {
+          payload.acquisition_channel =
+            acquisitionChannel || storedAcquisitionChannel;
+        }
+
         const config = {
           url: "/User/mobileotpverification",
           method: "post",
-          baseURL: "https://dailydish.in/api",
+          baseURL: "http://localhost:7013/api",
           headers: { "content-type": "application/json" },
           data: payload,
         };
@@ -62,6 +72,7 @@ export default function Validate() {
           const userData = res.data.details;
           localStorage.setItem("user", JSON.stringify(userData));
           localStorage.setItem("addresstype", "corporate");
+          localStorage.removeItem("acquisitionChannel");
           window.dispatchEvent(new Event("userUpdated"));
 
           if (capturedReferralCode) {
@@ -73,29 +84,29 @@ export default function Validate() {
           if (userData?.primaryAddress) {
             try {
               const response = await fetch(
-                `https://dailydish.in/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
+                `http://localhost:7013/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
-                }
+                },
               );
 
               if (response.ok) {
                 const addressData = await response.json();
                 console.log(
                   "Primary address set:",
-                  addressData?.primaryAddress
+                  addressData?.primaryAddress,
                 );
                 localStorage.setItem(
                   "primaryAddress",
-                  JSON.stringify(addressData?.primaryAddress)
+                  JSON.stringify(addressData?.primaryAddress),
                 );
               } else {
                 console.warn("Failed to set primary address:", response.status);
                 // Don't crash if this fails - just use user data as fallback
                 localStorage.setItem(
                   "primaryAddress",
-                  JSON.stringify(userData?.primaryAddress)
+                  JSON.stringify(userData?.primaryAddress),
                 );
               }
             } catch (fetchError) {
@@ -103,14 +114,14 @@ export default function Validate() {
               // Fallback to user data
               localStorage.setItem(
                 "primaryAddress",
-                JSON.stringify(userData?.primaryAddress)
+                JSON.stringify(userData?.primaryAddress),
               );
             }
           } else {
             // If no primaryAddress in userData, use userData as fallback
             localStorage.setItem(
               "primaryAddress",
-              JSON.stringify(userData?.primaryAddress)
+              JSON.stringify(userData?.primaryAddress),
             );
           }
 
@@ -128,14 +139,31 @@ export default function Validate() {
           Swal2.fire({
             toast: true,
             position: "bottom",
-            icon: "success",
-            title: `OTP verified successfully`,
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
+            html: `
+    <div class="myplans-toast-content">
+      <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+      <div class="myplans-toast-text">
+        <div class="myplans-toast-title">OTP Verified</div>
+        <div class="myplans-toast-subtitle">You’re logged in successfully</div>
+      </div>
+    </div>
+  `,
             customClass: {
-              popup: "me-small-toast",
-              title: "me-small-toast-title",
+              popup: "myplans-custom-toast",
+              htmlContainer: "myplans-toast-html",
+            },
+            didOpen: () => {
+              // Position above bottom nav
+              const toast = document.querySelector(".myplans-custom-toast");
+              if (toast) {
+                toast.style.bottom = "90px"; // adjust if needed
+                toast.style.left = "50%";
+                toast.style.transform = "translateX(-50%)";
+                toast.style.position = "fixed";
+              }
             },
           });
         }
@@ -144,23 +172,42 @@ export default function Validate() {
         Swal2.fire({
           toast: true,
           position: "bottom",
-          icon: "error",
-          title: `${
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            "Error verifying OTP"
-          }`,
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: true,
+          html: `
+    <div class="myplans-toast-content">
+      <img src="${errorCircle}" alt="Error" class="myplans-toast-check" />
+      <div class="myplans-toast-text">
+        <div class="myplans-toast-title">OTP Verification Failed</div>
+        <div class="myplans-toast-subtitle">
+          ${
+            error.response?.data?.error ||
+            error.response?.data?.message ||
+            "Error verifying OTP"
+          }
+        </div>
+      </div>
+    </div>
+  `,
           customClass: {
-            popup: "me-small-toast",
-            title: "me-small-toast-title",
+            popup: "myplans-custom-toast",
+            htmlContainer: "myplans-toast-html",
+          },
+          didOpen: () => {
+            // Position above bottom nav
+            const toast = document.querySelector(".myplans-custom-toast");
+            if (toast) {
+              toast.style.bottom = "90px";
+              toast.style.left = "50%";
+              toast.style.transform = "translateX(-50%)";
+              toast.style.position = "fixed";
+            }
           },
         });
       }
     },
-    [phone, Fname, navigate]
+    [phone, Fname, navigate, acquisitionChannel],
   );
 
   useEffect(() => {
@@ -230,7 +277,7 @@ export default function Validate() {
       // For mobile, prioritize clipboardData as it's more reliable
       const isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+          navigator.userAgent,
         );
 
       if (isMobile) {
@@ -309,7 +356,7 @@ export default function Validate() {
       let pastedData = "";
       const isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+          navigator.userAgent,
         );
 
       if (isMobile) {
@@ -581,7 +628,7 @@ export default function Validate() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
 
         headers: { "content-type": "application/json" },
         data: {

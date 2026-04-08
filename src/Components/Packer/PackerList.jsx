@@ -117,7 +117,7 @@ const PackerList = () => {
   // Fetch hubs
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dailydish.in/api/Hub/hubs", {
+      const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setHubs(res.data);
@@ -125,7 +125,7 @@ const PackerList = () => {
       console.error("Error fetching hubs:", error);
       showToast(
         error?.response?.data?.message || "Failed to fetch hubs.",
-        "error"
+        "error",
       );
     }
   };
@@ -135,10 +135,10 @@ const PackerList = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        "https://dailydish.in/api/packer/getAllPacker",
+        "http://localhost:7013/api/packer/getAllPacker",
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setPackers(res.data);
       setNoChangeData(res.data);
@@ -146,7 +146,7 @@ const PackerList = () => {
       console.error("Error fetching packers:", error);
       showToast(
         error?.response?.data?.message || "Failed to fetch packers.",
-        "error"
+        "error",
       );
     } finally {
       setLoading(false);
@@ -167,7 +167,7 @@ const PackerList = () => {
     if (!validatePhoneNumber(newPacker.mobileNumber)) {
       showToast(
         "Invalid Indian mobile number. It must be 10 digits starting with 6, 7, 8, or 9.",
-        "error"
+        "error",
       );
       return;
     }
@@ -178,11 +178,11 @@ const PackerList = () => {
         mobileNumber: cleanPhoneNumber(newPacker.mobileNumber),
       };
       const res = await axios.post(
-        "https://dailydish.in/api/packer/createpacker",
+        "http://localhost:7013/api/packer/createpacker",
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       if (res.status === 201) {
         showToast("Packer added successfully");
@@ -193,7 +193,7 @@ const PackerList = () => {
       console.error("Error adding packer:", error);
       showToast(
         error?.response?.data?.error || "Failed to add packer.",
-        "error"
+        "error",
       );
     } finally {
       setAddPackerLoading(false);
@@ -214,7 +214,7 @@ const PackerList = () => {
     if (!validatePhoneNumber(editPacker.mobileNumber)) {
       showToast(
         "Invalid Indian mobile number. It must be 10 digits starting with 6, 7, 8, or 9.",
-        "error"
+        "error",
       );
       return;
     }
@@ -226,9 +226,9 @@ const PackerList = () => {
         packerId: selectedPacker.packerId,
       };
       const res = await axios.put(
-        `https://dailydish.in/api/packer/updatePacker`,
+        `http://localhost:7013/api/packer/updatePacker`,
         payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.status === 200) {
         showToast("Packer updated successfully");
@@ -239,7 +239,7 @@ const PackerList = () => {
       console.error("Error updating packer:", error);
       showToast(
         error?.response?.data?.message || "Failed to update packer.",
-        "error"
+        "error",
       );
     } finally {
       setEditPackerLoading(false);
@@ -251,10 +251,10 @@ const PackerList = () => {
     setDeletePackerLoading(true);
     try {
       const res = await axios.delete(
-        `https://dailydish.in/api/packer/deletPacker/${selectedPacker.packerId}`,
+        `http://localhost:7013/api/packer/deletPacker/${selectedPacker.packerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       if (res.status === 200) {
         showToast("Packer deleted successfully");
@@ -266,7 +266,7 @@ const PackerList = () => {
       console.error("Error deleting packer:", error);
       showToast(
         error?.response?.data?.message || "Failed to delete packer.",
-        "error"
+        "error",
       );
     } finally {
       setDeletePackerLoading(false);
@@ -327,7 +327,7 @@ const PackerList = () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, "Packer List");
       XLSX.writeFile(
         workbook,
-        `PackerList_${moment().format("YYYYMMDD")}.xlsx`
+        `PackerList_${moment().format("YYYYMMDD")}.xlsx`,
       );
       showToast("Exported to Excel successfully");
     } catch (error) {
@@ -352,7 +352,7 @@ const PackerList = () => {
   // Handle hub change
   const handleHubChange = (e, isEdit = false) => {
     const selectedOptions = Array.from(e.target.selectedOptions).map(
-      (option) => option.value
+      (option) => option.value,
     );
     setSelectedHubs(selectedOptions);
     setSelectedLocations([]); // Reset locations when hubs change
@@ -366,7 +366,7 @@ const PackerList = () => {
   // Handle location change
   const handleLocationChange = (e, isEdit = false) => {
     const selectedOptions = Array.from(e.target.selectedOptions).map(
-      (option) => option.value
+      (option) => option.value,
     );
     setSelectedLocations(selectedOptions);
     if (isEdit) {

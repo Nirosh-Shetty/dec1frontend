@@ -102,7 +102,7 @@
 //       if (!customerId) return;
 
 //       const response = await fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+//         `http://localhost:7013/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: {
@@ -214,7 +214,7 @@
 //       if (!customerId) return;
 
 //       const response = await fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+//         `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
 //         {
 //           method: "PATCH",
 //           headers: {
@@ -898,7 +898,7 @@
 //       fetchAbortControllerRef.current = new AbortController();
 
 //       const response = await fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+//         `http://localhost:7013/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: { "Content-Type": "application/json" },
@@ -936,7 +936,7 @@
 //   const fetchAddressesInBackground = async (customerId) => {
 //     try {
 //       const response = await fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+//         `http://localhost:7013/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: { "Content-Type": "application/json" },
@@ -1086,7 +1086,7 @@
 
 //       // Background API call
 //       fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
+//         `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
 //         {
 //           method: "PATCH",
 //           headers: { "Content-Type": "application/json" },
@@ -1150,7 +1150,7 @@
 
 //         // API call in background
 //         const response = await fetch(
-//           `https://dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+//           `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
 //           {
 //             method: "PATCH",
 //             headers: { "Content-Type": "application/json" },
@@ -1544,8 +1544,8 @@
 //       }
 
 //       const endpoint = location.state?.editingAddress?._id
-//         ? `https://dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-//         : "https://dailydish.in/api/User/addresses";
+//         ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+//         : "http://localhost:7013/api/User/addresses";
 //       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
 //       const response = await fetch(endpoint, {
@@ -2512,7 +2512,7 @@
 //   const fetchAddressesInBackground = async (customerId) => {
 //     try {
 //       const response = await fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+//         `http://localhost:7013/api/User/customers/${customerId}/addresses`,
 //         { method: "GET", headers: { "Content-Type": "application/json" } }
 //       );
 
@@ -2573,7 +2573,7 @@
 //       fetchAbortControllerRef.current = new AbortController();
 
 //       const response = await fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+//         `http://localhost:7013/api/User/customers/${customerId}/addresses`,
 //         {
 //           method: "GET",
 //           headers: { "Content-Type": "application/json" },
@@ -2764,7 +2764,7 @@
 //       }
 
 //       fetch(
-//         `https://dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
+//         `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
 //         {
 //           method: "PATCH",
 //           headers: { "Content-Type": "application/json" },
@@ -2826,7 +2826,7 @@
 //         onClose();
 
 //         const response = await fetch(
-//           `https://dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+//           `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
 //           {
 //             method: "PATCH",
 //             headers: { "Content-Type": "application/json" },
@@ -2944,8 +2944,8 @@
 //       }
 
 //       const endpoint = location.state?.editingAddress?._id
-//         ? `https://dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-//         : "https://dailydish.in/api/User/addresses";
+//         ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+//         : "http://localhost:7013/api/User/addresses";
 //       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
 //       const response = await fetch(endpoint, {
@@ -4288,7 +4288,7 @@ const LocationModal = ({ show, onClose }) => {
     }
 
     const existingScript = document.querySelector(
-      `script[src*="maps.googleapis.com"]`
+      `script[src*="maps.googleapis.com"]`,
     );
 
     if (existingScript) {
@@ -4331,7 +4331,7 @@ const LocationModal = ({ show, onClose }) => {
     }
     if (!placesServiceRef.current) {
       placesServiceRef.current = new window.google.maps.places.PlacesService(
-        document.createElement("div")
+        document.createElement("div"),
       );
     }
   }, []);
@@ -4360,8 +4360,8 @@ const LocationModal = ({ show, onClose }) => {
   const fetchAddressesInBackground = async (customerId) => {
     try {
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
-        { method: "GET", headers: { "Content-Type": "application/json" } }
+        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        { method: "GET", headers: { "Content-Type": "application/json" } },
       );
 
       if (response.ok) {
@@ -4372,11 +4372,11 @@ const LocationModal = ({ show, onClose }) => {
 
           localStorage.setItem(
             `addresses_${customerId}`,
-            JSON.stringify({ addresses, primaryAddress: primaryId })
+            JSON.stringify({ addresses, primaryAddress: primaryId }),
           );
           localStorage.setItem(
             `addresses_timestamp_${customerId}`,
-            Date.now().toString()
+            Date.now().toString(),
           );
         }
       }
@@ -4402,7 +4402,7 @@ const LocationModal = ({ show, onClose }) => {
 
       const cachedAddresses = localStorage.getItem(`addresses_${customerId}`);
       const cacheTimestamp = localStorage.getItem(
-        `addresses_timestamp_${customerId}`
+        `addresses_timestamp_${customerId}`,
       );
       const CACHE_DURATION = 5 * 60 * 1000;
 
@@ -4421,12 +4421,12 @@ const LocationModal = ({ show, onClose }) => {
       fetchAbortControllerRef.current = new AbortController();
 
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           signal: fetchAbortControllerRef.current.signal,
-        }
+        },
       );
 
       if (response.ok) {
@@ -4440,11 +4440,11 @@ const LocationModal = ({ show, onClose }) => {
 
           localStorage.setItem(
             `addresses_${customerId}`,
-            JSON.stringify({ addresses, primaryAddress: primaryId })
+            JSON.stringify({ addresses, primaryAddress: primaryId }),
           );
           localStorage.setItem(
             `addresses_timestamp_${customerId}`,
-            Date.now().toString()
+            Date.now().toString(),
           );
         }
       }
@@ -4501,7 +4501,7 @@ const LocationModal = ({ show, onClose }) => {
             } else {
               setSearchSuggestions([]);
             }
-          }
+          },
         );
       }, 300);
     } else {
@@ -4513,7 +4513,7 @@ const LocationModal = ({ show, onClose }) => {
     (place) => {
       if (!placesServiceRef.current) {
         placesServiceRef.current = new window.google.maps.places.PlacesService(
-          document.createElement("div")
+          document.createElement("div"),
         );
       }
 
@@ -4547,10 +4547,10 @@ const LocationModal = ({ show, onClose }) => {
               },
             });
           }
-        }
+        },
       );
     },
-    [navigate, onClose]
+    [navigate, onClose],
   );
 
   const handleSelectSavedAddress = useCallback(
@@ -4581,7 +4581,7 @@ const LocationModal = ({ show, onClose }) => {
         },
       });
     },
-    [navigate, onClose]
+    [navigate, onClose],
   );
 
   const handleAddNewAddress = useCallback(() => {
@@ -4607,13 +4607,13 @@ const LocationModal = ({ show, onClose }) => {
       }
 
       fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
+        `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       ).catch((error) =>
-        console.error("Error removing primary address:", error)
+        console.error("Error removing primary address:", error),
       );
     } catch (error) {
       console.error("Error removing primary address:", error);
@@ -4668,18 +4668,18 @@ const LocationModal = ({ show, onClose }) => {
           cached.primaryAddress = address._id;
           localStorage.setItem(
             `addresses_${customerId}`,
-            JSON.stringify(cached)
+            JSON.stringify(cached),
           );
         }
 
         onClose();
 
         const response = await fetch(
-          `https://dailydish.in/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+          `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
 
         if (response.ok) {
@@ -4693,7 +4693,7 @@ const LocationModal = ({ show, onClose }) => {
         setActionLoading(null);
       }
     },
-    [onClose, actionLoading]
+    [onClose, actionLoading],
   );
 
   // Form validation - UPDATED WITH LOCATION CHECK
@@ -4796,7 +4796,7 @@ const LocationModal = ({ show, onClose }) => {
         case "School":
           if (!schoolName || !studentName || !studentClass || !studentSection) {
             setError(
-              "School name, student name, class, and section are required"
+              "School name, student name, class, and section are required",
             );
             return;
           }
@@ -4863,7 +4863,7 @@ const LocationModal = ({ show, onClose }) => {
 
       console.log("Final address data being sent:", addressData);
 
-      const response = await fetch("https://dailydish.in/api/User/addresses", {
+      const response = await fetch("http://localhost:7013/api/User/addresses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -4884,11 +4884,11 @@ const LocationModal = ({ show, onClose }) => {
       // Set as primary address in backend
       try {
         const primaryResponse = await fetch(
-          `https://dailydish.in/api/User/customers/${customerId}/addresses/${newAddress._id}/primary`,
+          `http://localhost:7013/api/User/customers/${customerId}/addresses/${newAddress._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
 
         if (primaryResponse.ok) {
@@ -4928,7 +4928,7 @@ const LocationModal = ({ show, onClose }) => {
       // Save to localStorage
       localStorage.setItem(
         "primaryAddress",
-        JSON.stringify(primaryAddressData)
+        JSON.stringify(primaryAddressData),
       );
 
       // Also update the addresses cache in localStorage
@@ -4945,7 +4945,7 @@ const LocationModal = ({ show, onClose }) => {
         localStorage.setItem(`addresses_${customerId}`, JSON.stringify(cached));
         localStorage.setItem(
           `addresses_timestamp_${customerId}`,
-          Date.now().toString()
+          Date.now().toString(),
         );
       }
 
@@ -5266,12 +5266,12 @@ const LocationModal = ({ show, onClose }) => {
 
   const isPrimaryAddress = useCallback(
     (addressId) => primaryAddressId === addressId,
-    [primaryAddressId]
+    [primaryAddressId],
   );
 
   const getPrimaryAddress = useCallback(
     () => savedAddresses.find((addr) => addr._id === primaryAddressId),
-    [savedAddresses, primaryAddressId]
+    [savedAddresses, primaryAddressId],
   );
 
   useEffect(() => {
@@ -5400,7 +5400,7 @@ const LocationModal = ({ show, onClose }) => {
           }}
         >
           {/* Search Input */}
-          {/* <div
+          <div
             style={{
               padding: "20px",
               position: "relative",
@@ -5508,7 +5508,7 @@ const LocationModal = ({ show, onClose }) => {
                 </div>
               )}
             </div>
-          </div> */}
+          </div>
 
           {/* Use Current Location Button */}
           <div
@@ -5651,8 +5651,8 @@ const LocationModal = ({ show, onClose }) => {
                     {loading
                       ? "Loading addresses..."
                       : savedAddresses.length > 0
-                      ? `${savedAddresses.length} Saved Addresses`
-                      : "No Saved Addresses"}
+                        ? `${savedAddresses.length} Saved Addresses`
+                        : "No Saved Addresses"}
                   </span>
                 </div>
                 <FaChevronDown

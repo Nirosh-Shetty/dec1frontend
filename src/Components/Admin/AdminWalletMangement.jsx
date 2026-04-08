@@ -49,7 +49,7 @@ const AdminWalletManagement = () => {
       });
 
       const response = await axios.get(
-        `https://dailydish.in/api/wallet/all?${params}`
+        `http://localhost:7013/api/wallet/all?${params}`,
       );
       setAllWallet(response.data.success);
       setPagination(response.data.pagination);
@@ -84,7 +84,7 @@ const AdminWalletManagement = () => {
   const indexOfFirstTxn = indexOfLastTxn - transactionsPerPage;
   const currentTransactions = transactions.slice(
     indexOfFirstTxn,
-    indexOfLastTxn
+    indexOfLastTxn,
   );
 
   // Handle page change for wallets
@@ -117,7 +117,7 @@ const AdminWalletManagement = () => {
         });
 
         const response = await axios.get(
-          `https://dailydish.in/api/wallet/export-all?${params}`
+          `http://localhost:7013/api/wallet/export-all?${params}`,
         );
         const chunkData = response.data.success;
         const pagination = response.data.pagination;
@@ -164,14 +164,14 @@ const AdminWalletManagement = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://dailydish.in/api/wallet/add-free-cash"
-          : "https://dailydish.in/api/wallet/deduct-cash",
+          ? "http://localhost:7013/api/wallet/add-free-cash"
+          : "http://localhost:7013/api/wallet/deduct-cash",
         {
           userId: selectedWallet?.userId?._id,
           amount: amount,
           description,
           expiryDays: actionType === "add" ? expiryDate : null,
-        }
+        },
       );
       setShowModal(false);
       AdminWallet(pagination.currentPage, searchQuery);
@@ -265,7 +265,7 @@ const AdminWalletManagement = () => {
               link.setAttribute("href", url);
               link.setAttribute(
                 "download",
-                `wallets_${moment().format("YYYYMMDD")}.csv`
+                `wallets_${moment().format("YYYYMMDD")}.csv`,
               );
               link.style.visibility = "hidden";
               document.body.appendChild(link);

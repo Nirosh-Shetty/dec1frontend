@@ -31,7 +31,7 @@ import { Download } from "lucide-react";
 import FileSaver from "file-saver";
 import moment from "moment";
 // IMPORTANT: Set this to your correct local backend URL
-axios.defaults.baseURL = "https://dailydish.in/api";
+axios.defaults.baseURL = "http://localhost:7013/api";
 
 const style = {
   position: "absolute",
@@ -67,14 +67,14 @@ const AdminReferralDashboard = () => {
         const settingsRes = await axios.get("/admin/referral-settings");
         if (settingsRes.data.success) {
           setDefaultReferrerReward(
-            settingsRes.data.settings.referrerRewardAmount
+            settingsRes.data.settings.referrerRewardAmount,
           );
           setDefaultFriendReward(settingsRes.data.settings.friendRewardAmount);
           setTotalFriendPayout(
-            settingsRes.data.settings.totalFriendPayout || 0
+            settingsRes.data.settings.totalFriendPayout || 0,
           );
           setTotalReferrerPayout(
-            settingsRes.data.settings.totalReferrerPayout || 0
+            settingsRes.data.settings.totalReferrerPayout || 0,
           );
         }
 
@@ -89,7 +89,7 @@ const AdminReferralDashboard = () => {
 
         // Fetch the list of referrers for the table
         const referrersRes = await axios.get(
-          "/admin/referral-settings/referrers-list"
+          "/admin/referral-settings/referrers-list",
         );
         if (referrersRes.data.success) {
           setReferrersList(referrersRes.data.users);
@@ -122,7 +122,7 @@ const AdminReferralDashboard = () => {
         "/admin/referral-settings/export-referrers",
         {
           responseType: "blob", // This is crucial for file downloads
-        }
+        },
       );
 
       // 3. Create a blob from the response
@@ -140,7 +140,7 @@ const AdminReferralDashboard = () => {
       Swal2.fire(
         "Error",
         "Could not generate the report. Please try again.",
-        "error"
+        "error",
       );
     }
   };
@@ -166,7 +166,7 @@ const AdminReferralDashboard = () => {
       };
       const res = await axios.post(
         `/admin/referral-settings/user/${currentUser._id}/custom-reward`,
-        payload
+        payload,
       );
       if (res.data.success) {
         setReferrersList((prevList) =>
@@ -176,8 +176,8 @@ const AdminReferralDashboard = () => {
                   ...user,
                   customReferralReward: res.data.user.customReferralReward,
                 } // Use the updated user data from response
-              : user
-          )
+              : user,
+          ),
         );
         Swal2.fire("Success", "Custom reward updated!", "success");
         handleCloseEditModal();
@@ -188,7 +188,7 @@ const AdminReferralDashboard = () => {
         "Error",
         "Could not save custom reward. " +
           (error.response?.data?.message || ""),
-        "error"
+        "error",
       );
     }
   };
@@ -211,7 +211,7 @@ const AdminReferralDashboard = () => {
         "Error",
         "Could not save default settings. " +
           (error.response?.data?.message || ""),
-        "error"
+        "error",
       );
     }
   };

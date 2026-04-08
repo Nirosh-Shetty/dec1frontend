@@ -91,7 +91,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/registercustomer",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -146,7 +146,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -171,7 +171,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -215,7 +215,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
 
     // Filter out the item with the specified foodItemId
     const updatedCart = cart.filter(
-      (cartItem) => cartItem.foodItemId !== foodItemId
+      (cartItem) => cartItem.foodItemId !== foodItemId,
     );
 
     // Log the cart after removal attempt
@@ -234,13 +234,14 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
         subtotal +
         (Carts[i]?.totalPrice * Carts[i]?.Quantity -
           Math.round(
-            Number(Carts[i]?.price * Carts[i]?.Quantity) * (Carts[i]?.gst / 100)
+            Number(Carts[i]?.price * Carts[i]?.Quantity) *
+              (Carts[i]?.gst / 100),
           ));
       total = total + Carts[i]?.totalPrice * Carts[i]?.Quantity;
       tax =
         tax +
         Math.round(
-          Number(Carts[i]?.price * Carts[i]?.Quantity) * (Carts[i]?.gst / 100)
+          Number(Carts[i]?.price * Carts[i]?.Quantity) * (Carts[i]?.gst / 100),
         );
     }
   }
@@ -248,7 +249,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
   const increaseQuantity = (foodItemId) => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const itemIndex = cart.findIndex(
-      (cartItem) => cartItem.foodItemId === foodItemId
+      (cartItem) => cartItem.foodItemId === foodItemId,
     );
 
     if (itemIndex !== -1) {
@@ -262,7 +263,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
   const decreaseQuantity = (foodItemId) => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const itemIndex = cart.findIndex(
-      (cartItem) => cartItem.foodItemId === foodItemId
+      (cartItem) => cartItem.foodItemId === foodItemId,
     );
 
     if (itemIndex !== -1) {
@@ -482,7 +483,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
                       <>
                         {user?.profileImage ? (
                           <img
-                            src={`https://dailydish.in/Customer/${user?.profileImage}`}
+                            src={`http://localhost:7013/Customer/${user?.profileImage}`}
                             alt=""
                             style={{ width: "50px", borderRadius: "50%" }}
                           />

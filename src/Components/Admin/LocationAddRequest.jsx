@@ -19,7 +19,7 @@ const LocationAddRequest = () => {
   const getEnquiry = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/User/getEnquiryenquiry"
+        "http://localhost:7013/api/User/getEnquiryenquiry",
       );
       if (res.status === 200) {
         setEnquiry(res.data.getdata.reverse());
@@ -35,7 +35,7 @@ const LocationAddRequest = () => {
   let DeleteEnquiry = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish.in/api/User/DeleteEnquiryList/${contactListId}`
+        `http://localhost:7013/api/User/DeleteEnquiryList/${contactListId}`,
       );
       if (res.status === 200) {
         alert(` Successfully Deleted..!`);
@@ -72,8 +72,8 @@ const LocationAddRequest = () => {
     if (searchTerm !== "") {
       const filteredData = nochangedata.filter((user) =>
         Object.values(user).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
+          String(value).toLowerCase().includes(searchTerm),
+        ),
       );
       setEnquiry(filteredData);
     } else {
@@ -276,7 +276,7 @@ const LocationAddRequest = () => {
                         </td>
                       </tr>
                     );
-                  }
+                  },
                 )}
               </tbody>
             </Table>

@@ -35,7 +35,7 @@ function PrivacyPolicy() {
           requires <b>"You"</b> or <b>"User"</b> shall mean any natural or legal
           person who visits our platform, either just for the purpose of
           browsing{" "}
-          <a href="http://www.dailydish.in" target="_blank">
+          <a href="https://www.dailydish.in" target="_blank">
             <u>www.dailydish.in</u>
           </a>{" "}
           (our <b>“Website”</b>) website or the <b>CULINARY CRAVINGS CONVENIENCE PVT LTD</b>,{" "}

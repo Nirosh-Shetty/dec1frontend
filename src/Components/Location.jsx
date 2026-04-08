@@ -110,11 +110,11 @@ const LocationConfirmation = () => {
       }
 
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${user._id}/addresses`,
+        `http://localhost:7013/api/User/customers/${user._id}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
 
       if (response.ok) {
@@ -350,7 +350,7 @@ const LocationConfirmation = () => {
 
       if (mapInstanceRef.current && !placesServiceRef.current) {
         placesServiceRef.current = new window.google.maps.places.PlacesService(
-          mapInstanceRef.current
+          mapInstanceRef.current,
         );
       }
     }
@@ -390,7 +390,7 @@ const LocationConfirmation = () => {
             } else {
               reject(new Error(`Geocoding failed: ${status}`));
             }
-          }
+          },
         );
       });
 
@@ -413,7 +413,7 @@ const LocationConfirmation = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "https://dailydish.in/api/Hub/validate-location",
+        "http://localhost:7013/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -423,7 +423,7 @@ const LocationConfirmation = () => {
             lat: location.lat.toString(),
             lng: location.lng.toString(),
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -502,7 +502,7 @@ const LocationConfirmation = () => {
     ) {
       console.log(
         "Script loaded and selected location available:",
-        selectedLocation
+        selectedLocation,
       );
 
       // Small delay to ensure DOM is ready
@@ -519,7 +519,7 @@ const LocationConfirmation = () => {
           ) {
             getAddressFromCoordinates(
               selectedLocation.lat,
-              selectedLocation.lng
+              selectedLocation.lng,
             );
           }
 
@@ -629,7 +629,7 @@ const LocationConfirmation = () => {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 60000,
-      }
+      },
     );
   };
 
@@ -668,7 +668,7 @@ const LocationConfirmation = () => {
 
       if (!placesServiceRef.current) {
         placesServiceRef.current = new window.google.maps.places.PlacesService(
-          map
+          map,
         );
       }
 
@@ -746,7 +746,7 @@ const LocationConfirmation = () => {
               // Get address for current location
               getAddressFromCoordinates(
                 currentLocation.lat,
-                currentLocation.lng
+                currentLocation.lng,
               );
 
               // Validate serviceability
@@ -766,7 +766,7 @@ const LocationConfirmation = () => {
               if (error.code === error.PERMISSION_DENIED) {
                 setLocationPermissionDenied(true);
                 alert(
-                  "Location access denied. Please enable location permissions in your browser settings."
+                  "Location access denied. Please enable location permissions in your browser settings.",
                 );
               } else {
                 alert("Unable to get your location. Please try again.");
@@ -782,7 +782,7 @@ const LocationConfirmation = () => {
               enableHighAccuracy: true,
               timeout: 10000,
               maximumAge: 0,
-            }
+            },
           );
         } else {
           alert("Geolocation is not supported by your browser");
@@ -791,7 +791,7 @@ const LocationConfirmation = () => {
 
       // Add button to map at bottom-right corner
       map.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(
-        locationButton
+        locationButton,
       );
 
       // Create fixed pin element
@@ -1111,7 +1111,7 @@ const LocationConfirmation = () => {
           } else {
             setSearchSuggestions([]);
           }
-        }
+        },
       );
     } else {
       setSearchSuggestions([]);
@@ -1136,7 +1136,7 @@ const LocationConfirmation = () => {
             setSelectedLocation(location);
             setAddress(placeResult.formatted_address);
             setHouseName(
-              placeResult.name || placeResult.formatted_address.split(",")[0]
+              placeResult.name || placeResult.formatted_address.split(",")[0],
             );
 
             if (mapInstanceRef.current && markerRef.current) {
@@ -1161,7 +1161,7 @@ const LocationConfirmation = () => {
             // Validate serviceability for the selected location
             validateServiceability(location);
           }
-        }
+        },
       );
     }
   };
@@ -1249,14 +1249,14 @@ const LocationConfirmation = () => {
       // console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
-        "https://dailydish.in/api/service-requests",
+        "http://localhost:7013/api/service-requests",
         requestData,
         {
           headers: {
             "Content-Type": "application/json",
           },
           timeout: 10000, // 10 second timeout
-        }
+        },
       );
 
       // console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrr");
@@ -1264,7 +1264,7 @@ const LocationConfirmation = () => {
       if (response.data.success) {
         // Show success message
         alert(
-          "Thank you! Your request has been submitted successfully. We'll notify you when we start operations in your area."
+          "Thank you! Your request has been submitted successfully. We'll notify you when we start operations in your area.",
         );
 
         // Reset and redirect
@@ -1306,7 +1306,7 @@ const LocationConfirmation = () => {
       } else {
         // Something else happened
         setError(
-          error.message || "Failed to submit request. Please try again."
+          error.message || "Failed to submit request. Please try again.",
         );
       }
     } finally {
@@ -1437,8 +1437,8 @@ const LocationConfirmation = () => {
   //     }
 
   //     const endpoint = location.state?.editingAddress?._id
-  //       ? `https://dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-  //       : "https://dailydish.in/api/User/addresses";
+  //       ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+  //       : "http://localhost:7013/api/User/addresses";
   //     const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
   //     const response = await fetch(endpoint, {
@@ -1558,8 +1558,8 @@ const LocationConfirmation = () => {
       }
 
       const endpoint = location.state?.editingAddress?._id
-        ? `https://dailydish.in/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-        : "https://dailydish.in/api/User/addresses";
+        ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+        : "http://localhost:7013/api/User/addresses";
       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
       const response = await fetch(endpoint, {
@@ -1624,11 +1624,11 @@ const LocationConfirmation = () => {
   const setAddressAsPrimary = async (customerId, addressId) => {
     try {
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
 
       if (response.ok) {
@@ -1641,7 +1641,7 @@ const LocationConfirmation = () => {
           cached.primaryAddress = addressId;
           localStorage.setItem(
             `addresses_${customerId}`,
-            JSON.stringify(cached)
+            JSON.stringify(cached),
           );
         }
 
@@ -2040,11 +2040,11 @@ const LocationConfirmation = () => {
           if (error.code === error.PERMISSION_DENIED) {
             setLocationPermissionDenied(true);
             setError(
-              "Location access denied. Please enable location permissions in your browser settings."
+              "Location access denied. Please enable location permissions in your browser settings.",
             );
           } else {
             setError(
-              "Unable to detect your current location. Please make sure location services are enabled."
+              "Unable to detect your current location. Please make sure location services are enabled.",
             );
           }
         },
@@ -2052,7 +2052,7 @@ const LocationConfirmation = () => {
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 60000,
-        }
+        },
       );
     } else {
       setError("Geolocation is not supported by this browser.");
@@ -2070,7 +2070,7 @@ const LocationConfirmation = () => {
       }}
     >
       {/* Location Permission Popup */}
-      {showLocationPermission && (
+      {/* {showLocationPermission && (
         <div
           style={{
             position: "fixed",
@@ -2160,10 +2160,10 @@ const LocationConfirmation = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Location Denied Popup */}
-      {locationPermissionDenied && !showLocationPermission && (
+      {/* {locationPermissionDenied && !showLocationPermission && (
         <div
           style={{
             position: "fixed",
@@ -2253,7 +2253,7 @@ const LocationConfirmation = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Serviceability Popup */}
       {showServiceablePopup && (
@@ -2660,8 +2660,8 @@ const LocationConfirmation = () => {
                       window.innerWidth > 768
                         ? "30px 40px"
                         : window.innerWidth <= 360
-                        ? "16px"
-                        : "20px",
+                          ? "16px"
+                          : "20px",
                     position: "relative",
                     // Use dynamic viewport height on mobile so the form fits within the visible screen
                     maxHeight: window.innerWidth <= 768 ? "100dvh" : "90vh", // Full height on mobile
@@ -2683,36 +2683,36 @@ const LocationConfirmation = () => {
                         window.innerWidth <= 360
                           ? "12px"
                           : window.innerWidth <= 768
-                          ? "16px"
-                          : "24px",
+                            ? "16px"
+                            : "24px",
                       right:
                         window.innerWidth <= 360
                           ? "12px"
                           : window.innerWidth <= 768
-                          ? "16px"
-                          : "24px",
+                            ? "16px"
+                            : "24px",
                       background: "none",
                       border: "none",
                       fontSize:
                         window.innerWidth <= 360
                           ? "20px"
                           : window.innerWidth <= 768
-                          ? "24px"
-                          : "28px",
+                            ? "24px"
+                            : "28px",
                       color: "#666",
                       cursor: "pointer",
                       width:
                         window.innerWidth <= 360
                           ? "28px"
                           : window.innerWidth <= 768
-                          ? "32px"
-                          : "36px",
+                            ? "32px"
+                            : "36px",
                       height:
                         window.innerWidth <= 360
                           ? "28px"
                           : window.innerWidth <= 768
-                          ? "32px"
-                          : "36px",
+                            ? "32px"
+                            : "36px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -2738,8 +2738,8 @@ const LocationConfirmation = () => {
                         window.innerWidth <= 360
                           ? "30px"
                           : window.innerWidth <= 768
-                          ? "40px"
-                          : "50px",
+                            ? "40px"
+                            : "50px",
                     }}
                   >
                     <h3
@@ -2748,8 +2748,8 @@ const LocationConfirmation = () => {
                           window.innerWidth <= 360
                             ? "16px"
                             : window.innerWidth <= 768
-                            ? "18px"
-                            : "20px",
+                              ? "18px"
+                              : "20px",
                         fontWeight: "600",
                         color: "#2c2c2c",
                         margin: 0,
@@ -2772,8 +2772,8 @@ const LocationConfirmation = () => {
                               window.innerWidth <= 360
                                 ? "11px"
                                 : window.innerWidth <= 768
-                                ? "12px"
-                                : "14px",
+                                  ? "12px"
+                                  : "14px",
                             color: "#2c2c2c",
                             display: "flex",
                             alignItems: "flex-start",
@@ -2788,14 +2788,14 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "14px"
                                   : window.innerWidth <= 768
-                                  ? "16px"
-                                  : "18px",
+                                    ? "16px"
+                                    : "18px",
                               height:
                                 window.innerWidth <= 360
                                   ? "14px"
                                   : window.innerWidth <= 768
-                                  ? "16px"
-                                  : "18px",
+                                    ? "16px"
+                                    : "18px",
                               marginTop: "2px",
                               flexShrink: 0,
                             }}
@@ -2816,8 +2816,8 @@ const LocationConfirmation = () => {
                               window.innerWidth <= 360
                                 ? "11px"
                                 : window.innerWidth <= 768
-                                ? "12px"
-                                : "14px",
+                                  ? "12px"
+                                  : "14px",
                             display: "flex",
                             alignItems: "center",
                             gap: "8px",
@@ -2831,14 +2831,14 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "14px"
                                   : window.innerWidth <= 768
-                                  ? "16px"
-                                  : "18px",
+                                    ? "16px"
+                                    : "18px",
                               height:
                                 window.innerWidth <= 360
                                   ? "14px"
                                   : window.innerWidth <= 768
-                                  ? "16px"
-                                  : "18px",
+                                    ? "16px"
+                                    : "18px",
                               flexShrink: 0,
                             }}
                           />
@@ -2849,8 +2849,8 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "12px"
                                   : window.innerWidth <= 768
-                                  ? "14px"
-                                  : "16px",
+                                    ? "14px"
+                                    : "16px",
                               fontWeight: "500",
                               color: "#2c2c2c",
                               lineHeight: "1.3",
@@ -2880,8 +2880,8 @@ const LocationConfirmation = () => {
                             window.innerWidth <= 360
                               ? "8px"
                               : window.innerWidth <= 768
-                              ? "6px"
-                              : "8px",
+                                ? "6px"
+                                : "8px",
                           width: "100%",
                         }}
                       >
@@ -2896,20 +2896,20 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "38px"
                                   : window.innerWidth <= 768
-                                  ? "43px"
-                                  : "65px",
+                                    ? "43px"
+                                    : "65px",
                               padding:
                                 window.innerWidth <= 360
                                   ? "6px 4px"
                                   : window.innerWidth <= 768
-                                  ? "8px"
-                                  : "12px",
+                                    ? "8px"
+                                    : "12px",
                               borderRadius:
                                 window.innerWidth <= 360
                                   ? "8px"
                                   : window.innerWidth <= 768
-                                  ? "12px"
-                                  : "14px",
+                                    ? "12px"
+                                    : "14px",
                               border:
                                 addressType === type.key
                                   ? "1.2px solid #F5DEB3"
@@ -2928,8 +2928,8 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "4px"
                                   : window.innerWidth <= 768
-                                  ? "6px"
-                                  : "8px",
+                                    ? "6px"
+                                    : "8px",
                               overflow: "hidden",
                               flexShrink: 0,
                             }}
@@ -2958,14 +2958,14 @@ const LocationConfirmation = () => {
                                   window.innerWidth <= 360
                                     ? "14px"
                                     : window.innerWidth <= 768
-                                    ? "16px"
-                                    : "24px",
+                                      ? "16px"
+                                      : "24px",
                                 height:
                                   window.innerWidth <= 360
                                     ? "14px"
                                     : window.innerWidth <= 768
-                                    ? "16px"
-                                    : "24px",
+                                      ? "16px"
+                                      : "24px",
                                 objectFit: "contain",
                                 flexShrink: 0,
                               }}
@@ -2976,8 +2976,8 @@ const LocationConfirmation = () => {
                                   window.innerWidth <= 360
                                     ? "10px"
                                     : window.innerWidth <= 768
-                                    ? "11px"
-                                    : "14px",
+                                      ? "11px"
+                                      : "14px",
                                 fontWeight: "500",
                                 fontFamily: "Inter",
                                 color:
@@ -3019,8 +3019,8 @@ const LocationConfirmation = () => {
                             window.innerWidth <= 360
                               ? "8px"
                               : window.innerWidth <= 768
-                              ? "12px"
-                              : "16px",
+                                ? "12px"
+                                : "16px",
                           paddingTop: "20px",
                           borderTop: "1px solid rgba(0,0,0,0.1)",
                           width: "100%",
@@ -3037,23 +3037,23 @@ const LocationConfirmation = () => {
                               window.innerWidth <= 360
                                 ? "8px"
                                 : window.innerWidth <= 768
-                                ? "12px"
-                                : "14px",
+                                  ? "12px"
+                                  : "14px",
                             width: window.innerWidth <= 360 ? "48%" : "48%", // Percentage width
                             height:
                               window.innerWidth <= 360
                                 ? "40px"
                                 : window.innerWidth <= 768
-                                ? "45px"
-                                : "50px",
+                                  ? "45px"
+                                  : "50px",
                             fontWeight: "600",
                             textAlign: "center",
                             fontSize:
                               window.innerWidth <= 360
                                 ? "13px"
                                 : window.innerWidth <= 768
-                                ? "14px"
-                                : "16px",
+                                  ? "14px"
+                                  : "16px",
                             padding: "0 10px",
                             display: "flex",
                             flexDirection: "row",
@@ -3083,14 +3083,14 @@ const LocationConfirmation = () => {
                                 window.innerWidth <= 360
                                   ? "12px"
                                   : window.innerWidth <= 768
-                                  ? "14px"
-                                  : "16px",
+                                    ? "14px"
+                                    : "16px",
                               height:
                                 window.innerWidth <= 360
                                   ? "12px"
                                   : window.innerWidth <= 768
-                                  ? "14px"
-                                  : "16px",
+                                    ? "14px"
+                                    : "16px",
                             }}
                           />
                         </button>
@@ -3108,16 +3108,16 @@ const LocationConfirmation = () => {
                               window.innerWidth <= 360
                                 ? "8px"
                                 : window.innerWidth <= 768
-                                ? "12px"
-                                : "14px",
+                                  ? "12px"
+                                  : "14px",
                             border: "1px solid #c0c0c0",
                             width: window.innerWidth <= 360 ? "48%" : "48%", // Percentage width
                             height:
                               window.innerWidth <= 360
                                 ? "40px"
                                 : window.innerWidth <= 768
-                                ? "45px"
-                                : "50px",
+                                  ? "45px"
+                                  : "50px",
                             fontWeight: "600",
                             color: "black",
                             cursor:
@@ -3128,8 +3128,8 @@ const LocationConfirmation = () => {
                               window.innerWidth <= 360
                                 ? "13px"
                                 : window.innerWidth <= 768
-                                ? "14px"
-                                : "16px",
+                                  ? "14px"
+                                  : "16px",
                             padding: "0 12px",
                             gap: "6px",
                             display: "flex",
@@ -3155,8 +3155,8 @@ const LocationConfirmation = () => {
                           {isLoading
                             ? "Saving..."
                             : location.state?.editingAddress
-                            ? "Update Address"
-                            : "Save Address"}
+                              ? "Update Address"
+                              : "Save Address"}
                           {!isLoading && (
                             <CircleCheck
                               style={{
@@ -3164,14 +3164,14 @@ const LocationConfirmation = () => {
                                   window.innerWidth <= 360
                                     ? "14px"
                                     : window.innerWidth <= 768
-                                    ? "16px"
-                                    : "18px",
+                                      ? "16px"
+                                      : "18px",
                                 height:
                                   window.innerWidth <= 360
                                     ? "14px"
                                     : window.innerWidth <= 768
-                                    ? "16px"
-                                    : "18px",
+                                      ? "16px"
+                                      : "18px",
                                 marginTop: "1px",
                               }}
                             />
@@ -3507,8 +3507,8 @@ const LocationConfirmation = () => {
                   window.innerWidth <= 480
                     ? "12px 16px"
                     : window.innerWidth <= 768
-                    ? "16px 20px"
-                    : "20px 24px",
+                      ? "16px 20px"
+                      : "20px 24px",
                 maxWidth: "500px",
                 margin: "0 auto",
               }}
@@ -3588,8 +3588,8 @@ const LocationConfirmation = () => {
                       {isConfirmed
                         ? "Confirmed Location"
                         : location.state?.editingAddress
-                        ? "Editing Address"
-                        : "Your Location"}
+                          ? "Editing Address"
+                          : "Your Location"}
                     </div>
                     <div
                       style={{
@@ -3622,10 +3622,10 @@ const LocationConfirmation = () => {
                     isValidatingServiceability || !selectedLocation
                       ? "#ccc"
                       : isServiceable === false
-                      ? "#b22222"
-                      : isConfirmed
-                      ? "#4caf50"
-                      : "#6B8E23",
+                        ? "#b22222"
+                        : isConfirmed
+                          ? "#4caf50"
+                          : "#6B8E23",
                   color: "white",
                   border: "none",
                   borderRadius: "10px",
@@ -3651,12 +3651,12 @@ const LocationConfirmation = () => {
                 {isValidatingServiceability
                   ? "Checking serviceability..."
                   : isConfirmed
-                  ? "✅ Location Confirmed"
-                  : location.state?.editingAddress
-                  ? "Confirm Location to Edit"
-                  : isServiceable === false
-                  ? "Request Service for This Area"
-                  : "Confirm Location"}
+                    ? "✅ Location Confirmed"
+                    : location.state?.editingAddress
+                      ? "Confirm Location to Edit"
+                      : isServiceable === false
+                        ? "Request Service for This Area"
+                        : "Confirm Location"}
               </button>
             </div>
           </div>

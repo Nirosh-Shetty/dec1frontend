@@ -101,7 +101,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
         // Change text after 150ms delay (as per Figma)
         timeoutId = setTimeout(() => {
           setCurrentTextIndex((prevIndex) =>
-            prevIndex === textItems.length - 1 ? 0 : prevIndex + 1
+            prevIndex === textItems.length - 1 ? 0 : prevIndex + 1,
           );
 
           // Reset animation state after the full animation duration
@@ -173,7 +173,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,
@@ -731,7 +731,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
           } else {
             // Has addresses - prioritize primary address over pre-login location
             const primaryAddress = JSON.parse(
-              localStorage.getItem("primaryAddress") || "null"
+              localStorage.getItem("primaryAddress") || "null",
             );
 
             if (primaryAddress) {
@@ -757,7 +757,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
 
               localStorage.setItem(
                 "currentLocation",
-                JSON.stringify(locationData)
+                JSON.stringify(locationData),
               );
               localStorage.setItem("locationManuallySelected", "true");
 
@@ -766,7 +766,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
             }
 
             const currentLocation = JSON.parse(
-              localStorage.getItem("currentLocation") || "null"
+              localStorage.getItem("currentLocation") || "null",
             );
 
             if (!primaryAddress && !currentLocation) {

@@ -84,7 +84,7 @@ const ValidateModal = ({
         const config = {
           url: "/User/mobileotpverification",
           method: "post",
-          baseURL: "https://dailydish.in/api",
+          baseURL: "http://localhost:7013/api",
           headers: { "content-type": "application/json" },
           data: payload,
         };
@@ -106,38 +106,38 @@ const ValidateModal = ({
           if (userData?.primaryAddress) {
             try {
               const response = await fetch(
-                `https://dailydish.in/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
+                `http://localhost:7013/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
-                }
+                },
               );
 
               if (response.ok) {
                 const addressData = await response.json();
                 localStorage.setItem(
                   "primaryAddress",
-                  JSON.stringify(addressData?.primaryAddress)
+                  JSON.stringify(addressData?.primaryAddress),
                 );
               } else {
                 // Don't crash if this fails - just use user data as fallback
                 localStorage.setItem(
                   "primaryAddress",
-                  JSON.stringify(userData?.primaryAddress)
+                  JSON.stringify(userData?.primaryAddress),
                 );
               }
             } catch (fetchError) {
               // Fallback to user data
               localStorage.setItem(
                 "primaryAddress",
-                JSON.stringify(userData?.primaryAddress)
+                JSON.stringify(userData?.primaryAddress),
               );
             }
           } else {
             // If no primaryAddress in userData, use userData as fallback
             localStorage.setItem(
               "primaryAddress",
-              JSON.stringify(userData?.primaryAddress)
+              JSON.stringify(userData?.primaryAddress),
             );
           }
 
@@ -174,37 +174,37 @@ const ValidateModal = ({
             if (hasAddresses) {
               // User has addresses
               const primaryAddress = JSON.parse(
-                localStorage.getItem("primaryAddress") || "null"
+                localStorage.getItem("primaryAddress") || "null",
               );
               const currentLocation = JSON.parse(
-                localStorage.getItem("currentLocation") || "null"
+                localStorage.getItem("currentLocation") || "null",
               );
 
               console.log("🔍 ValidateModal - primaryAddress:", primaryAddress);
               console.log(
                 "🔍 ValidateModal - currentLocation:",
-                currentLocation
+                currentLocation,
               );
 
               // Debug address fields
               if (primaryAddress) {
                 console.log(
                   "🔍 ValidateModal - primaryAddress.fullAddress:",
-                  primaryAddress.fullAddress
+                  primaryAddress.fullAddress,
                 );
                 console.log(
                   "🔍 ValidateModal - primaryAddress.address:",
-                  primaryAddress.address
+                  primaryAddress.address,
                 );
               }
               if (currentLocation) {
                 console.log(
                   "🔍 ValidateModal - currentLocation.fullAddress:",
-                  currentLocation.fullAddress
+                  currentLocation.fullAddress,
                 );
                 console.log(
                   "🔍 ValidateModal - currentLocation.address:",
-                  currentLocation.address
+                  currentLocation.address,
                 );
               }
 
@@ -212,7 +212,7 @@ const ValidateModal = ({
               if (primaryAddress) {
                 // User has primary address - use it and clear any pre-login location
                 console.log(
-                  "🔄 ValidateModal - Using primary address after login"
+                  "🔄 ValidateModal - Using primary address after login",
                 );
 
                 // Convert primary address to currentLocation format if needed
@@ -234,7 +234,7 @@ const ValidateModal = ({
 
                 localStorage.setItem(
                   "currentLocation",
-                  JSON.stringify(locationData)
+                  JSON.stringify(locationData),
                 );
                 localStorage.setItem("locationManuallySelected", "true");
 
@@ -272,7 +272,7 @@ const ValidateModal = ({
         });
       }
     },
-    [phone, Fname, onVerificationSuccess, onHide, loader, navigate]
+    [phone, Fname, onVerificationSuccess, onHide, loader, navigate],
   );
 
   // Countdown timer (from Validate.jsx)
@@ -343,7 +343,7 @@ const ValidateModal = ({
       // For mobile, prioritize clipboardData as it's more reliable
       const isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+          navigator.userAgent,
         );
 
       if (isMobile) {
@@ -422,7 +422,7 @@ const ValidateModal = ({
       let pastedData = "";
       const isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+          navigator.userAgent,
         );
 
       if (isMobile) {
@@ -694,7 +694,7 @@ const ValidateModal = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
 
         headers: { "content-type": "application/json" },
         data: {

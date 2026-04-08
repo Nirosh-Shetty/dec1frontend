@@ -76,11 +76,11 @@ const AddressManagement = () => {
   const fetchAddressesInBackground = useCallback(async (customerId) => {
     try {
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
-        }
+        },
       );
 
       if (response.ok) {
@@ -93,11 +93,11 @@ const AddressManagement = () => {
           // Update cache silently
           localStorage.setItem(
             `addresses_${customerId}`,
-            JSON.stringify({ addresses, primaryAddress: primaryId })
+            JSON.stringify({ addresses, primaryAddress: primaryId }),
           );
           localStorage.setItem(
             `addresses_timestamp_${customerId}`,
-            Date.now().toString()
+            Date.now().toString(),
           );
         }
       }
@@ -123,7 +123,7 @@ const AddressManagement = () => {
       // Check localStorage cache first
       const cachedAddresses = localStorage.getItem(`addresses_${customerId}`);
       const cacheTimestamp = localStorage.getItem(
-        `addresses_timestamp_${customerId}`
+        `addresses_timestamp_${customerId}`,
       );
       const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -146,12 +146,12 @@ const AddressManagement = () => {
       fetchAbortControllerRef.current = new AbortController();
 
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: getAuthHeaders(),
           signal: fetchAbortControllerRef.current.signal,
-        }
+        },
       );
 
       if (!response.ok) {
@@ -182,11 +182,14 @@ const AddressManagement = () => {
       // Cache the results
       localStorage.setItem(
         `addresses_${customerId}`,
-        JSON.stringify({ addresses: addressesArray, primaryAddress: primaryId })
+        JSON.stringify({
+          addresses: addressesArray,
+          primaryAddress: primaryId,
+        }),
       );
       localStorage.setItem(
         `addresses_timestamp_${customerId}`,
-        Date.now().toString()
+        Date.now().toString(),
       );
 
       if (addressesArray.length === 0) {
@@ -244,11 +247,11 @@ const AddressManagement = () => {
       }
 
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses/${addressId}`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}`,
         {
           method: "DELETE",
           headers: getAuthHeaders(),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -260,7 +263,7 @@ const AddressManagement = () => {
       if (result.success) {
         // Update local state immediately
         const updatedAddresses = addresses.filter(
-          (addr) => addr._id !== addressId
+          (addr) => addr._id !== addressId,
         );
         setAddresses(updatedAddresses);
 
@@ -278,11 +281,11 @@ const AddressManagement = () => {
           JSON.stringify({
             addresses: updatedAddresses,
             primaryAddress: updatedPrimaryId,
-          })
+          }),
         );
         localStorage.setItem(
           `addresses_timestamp_${customerId}`,
-          Date.now().toString()
+          Date.now().toString(),
         );
 
         showAlert("Address deleted successfully!", "success");
@@ -323,22 +326,22 @@ const AddressManagement = () => {
         JSON.stringify({
           addresses: addresses,
           primaryAddress: addressId,
-        })
+        }),
       );
       localStorage.setItem(
         `addresses_timestamp_${customerId}`,
-        Date.now().toString()
+        Date.now().toString(),
       );
 
       showAlert("Primary address set successfully!", "success");
 
       // API call in background
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: getAuthHeaders(),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -383,22 +386,22 @@ const AddressManagement = () => {
         JSON.stringify({
           addresses: addresses,
           primaryAddress: null,
-        })
+        }),
       );
       localStorage.setItem(
         `addresses_timestamp_${customerId}`,
-        Date.now().toString()
+        Date.now().toString(),
       );
 
       showAlert("Primary address removed successfully!", "success");
 
       // API call in background
       const response = await fetch(
-        `https://dailydish.in/api/User/customers/${customerId}/primary-address/remove`,
+        `http://localhost:7013/api/User/customers/${customerId}/primary-address/remove`,
         {
           method: "PATCH",
           headers: getAuthHeaders(),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -458,6 +461,8 @@ const AddressManagement = () => {
         details.push(`Section: ${address.studentInformation.studentSection}`);
     } else if (address.addressType === "Work") {
       if (address.floorNo) details.push(`Floor: ${address.floorNo}`);
+      if (address.buildingName)
+        details.push(`Building Name: ${address.buildingName} `);
     }
 
     return details;
@@ -465,7 +470,7 @@ const AddressManagement = () => {
 
   // Filter addresses by selected type
   const filteredAddresses = addresses.filter(
-    (addr) => addr.addressType === selectedType
+    (addr) => addr.addressType === selectedType,
   );
 
   // Check if an address is primary
@@ -562,7 +567,7 @@ const AddressManagement = () => {
                   <span style={{ fontWeight: "500" }}>
                     {(() => {
                       const primaryAddress = addresses.find(
-                        (addr) => addr._id === primaryAddressId
+                        (addr) => addr._id === primaryAddressId,
                       );
                       if (!primaryAddress) return "Primary Address";
 
@@ -663,8 +668,8 @@ const AddressManagement = () => {
                       window.innerWidth <= 360
                         ? "10px"
                         : window.innerWidth <= 768
-                        ? "11px"
-                        : "14px",
+                          ? "11px"
+                          : "14px",
                     fontWeight: "500",
                     fontFamily: "Inter",
                     color: selectedType === type.key ? "#fff" : "#000",

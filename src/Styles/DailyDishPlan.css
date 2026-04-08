@@ -1,0 +1,459 @@
+/* DailyDishPlans.css */
+:root {
+  --cream-walls: #fff8dc;
+  --warm-marble: #f8f6f0;
+  --steel-light: #e8e8e8;
+  --app-foreground: #fafafa;
+  --primary-text: #2c2c2c;
+  --secondary-text: #6b6b6b;
+  --turmeric-golden: #e6b800;
+  --green-cardamom: #6b8e23;
+  --copper-accents: #B87333;
+}
+
+/* Base Styles */
+.plans-safe-area {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--warm-marble);
+  color: var(--primary-text);
+  min-height: 100vh;
+  width: 100%;
+}
+
+.plans-scroll-view {
+  padding-bottom: 20px;
+}
+
+/* Typography */
+.plans-main-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: -0.5px;
+  color: white;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.plans-subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.plans-section-title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.5px;
+  color: var(--green-cardamom);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--steel-light);
+}
+
+/* Header */
+.plans-sticky-wrap {
+  background-color: var(--green-cardamom);
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  padding: 16px 0 32px 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.plans-header-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 12px;
+  position: relative;
+}
+
+.plans-back-btn {
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  z-index: 2;
+  position: absolute;
+  top: 16px;
+  left: 12px;
+}
+
+.plans-center-wrap {
+  width: 100%;
+  padding-top: 8px;
+}
+
+/* Content Container */
+.plans-content {
+  padding: 24px 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Section Cards */
+.plans-section-card {
+  background-color: var(--app-foreground);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--steel-light);
+}
+
+.cancel-section {
+  background-color: #f8fff0;
+  border-color: var(--green-cardamom);
+}
+
+/* Table Styles */
+.plans-table-container {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr 1fr 1fr;
+  border: 1px solid var(--steel-light);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.plans-table-header {
+  display: contents;
+  background-color: var(--green-cardamom);
+  color: white;
+}
+
+.plans-table-header .plans-table-col {
+  font-weight: 700;
+  font-size: 14px;
+  padding: 16px 12px;
+  text-align: left;
+}
+
+.plans-table-row {
+  display: contents;
+  border-top: 1px solid var(--steel-light);
+}
+
+.plans-table-col {
+  padding: 16px 12px;
+  font-size: 14px;
+  line-height: 18px;
+  border-right: 1px solid var(--steel-light);
+}
+
+.plans-table-col:last-child {
+  border-right: none;
+}
+
+.step-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: var(--green-cardamom);
+  background-color: rgba(107, 142, 35, 0.05);
+}
+
+.what-col {
+  font-weight: 500;
+  color: var(--green-cardamom);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--turmeric-golden);
+  color: var(--primary-text);
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.step-text {
+  font-size: 15px;
+}
+
+/* Note Box */
+.plans-note-box {
+  background-color: rgba(230, 184, 0, 0.1);
+  border-left: 4px solid var(--turmeric-golden);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.plans-note-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-text);
+  margin: 0;
+}
+
+/* Instruction Rows */
+.plans-instruction-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.plans-instruction-row:last-child {
+  margin-bottom: 0;
+}
+
+.plans-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background-color: var(--turmeric-golden);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.plans-icon-symbol {
+  font-size: 20px;
+}
+
+.plans-instruction-block {
+  flex: 1;
+}
+
+.plans-instruction-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  margin-bottom: 8px;
+  color: var(--primary-text);
+}
+
+.plans-instruction-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--secondary-text);
+  margin: 0;
+}
+
+/* Cancel Section */
+.plans-cancel-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.plans-cancel-icon {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  background-color: var(--turmeric-golden);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cancel-icon-symbol {
+  font-size: 28px;
+}
+
+.plans-cancel-text {
+  flex: 1;
+}
+
+.plans-cancel-question {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-text);
+  margin-bottom: 16px;
+}
+
+.plans-cancel-action {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.cancel-action-text {
+  font-weight: 600;
+  color: var(--primary-text);
+}
+
+.cancel-action-highlight {
+  font-weight: 700;
+  color: var(--green-cardamom);
+}
+
+.plans-cancel-final {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Icon Image Styles */
+.icon-img-l {
+  width: 24px;
+  height: 24px;
+}
+
+.plans-back-btn .icon-img-l {
+  filter: brightness(0) invert(1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .plans-main-title {
+    font-size: 24px;
+    line-height: 28px;
+  }
+  
+  .plans-subtitle {
+    font-size: 14px;
+    line-height: 18px;
+  }
+  
+  .plans-section-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+  
+  .plans-table-container {
+    grid-template-columns: 1fr;
+    border: none;
+    background-color: transparent;
+  }
+  
+  .plans-table-header {
+    display: none;
+  }
+  
+  .plans-table-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid var(--steel-light);
+    border-radius: 12px;
+    background-color: var(--app-foreground);
+  }
+  
+  .plans-table-col {
+    padding: 8px 0;
+    border-right: none;
+    border-bottom: 1px solid var(--steel-light);
+  }
+  
+  .plans-table-col:last-child {
+    border-bottom: none;
+  }
+  
+  .step-col {
+    background-color: transparent;
+    padding-bottom: 12px;
+  }
+  
+  .what-col {
+    font-weight: 600;
+    color: var(--primary-text);
+  }
+  
+  .plans-table-col::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--secondary-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    display: block;
+  }
+  
+  .plans-table-row .plans-table-col:nth-child(1)::before { content: "Step"; }
+  .plans-table-row .plans-table-col:nth-child(2)::before { content: "What You Do"; }
+  .plans-table-row .plans-table-col:nth-child(3)::before { content: "Lunch"; }
+  .plans-table-row .plans-table-col:nth-child(4)::before { content: "Dinner"; }
+  
+  .plans-cancel-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .plans-cancel-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+  }
+  
+  .cancel-icon-symbol {
+    font-size: 24px;
+  }
+  
+  .plans-cancel-question {
+    font-size: 16px;
+  }
+  
+  .plans-cancel-action {
+    font-size: 14px;
+  }
+  
+  .plans-cancel-final {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .plans-content {
+    padding: 16px 12px;
+  }
+  
+  .plans-section-card {
+    padding: 20px 16px;
+  }
+  
+  .plans-table-row {
+    padding: 12px;
+  }
+  
+  .plans-instruction-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .plans-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+  
+  .plans-instruction-title {
+    font-size: 15px;
+  }
+  
+  .plans-instruction-body {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 800px) {
+  .plans-safe-area {
+    width: 30%;
+    margin: 0 auto;
+  }
+}

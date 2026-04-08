@@ -8,12 +8,12 @@
   --secondary-text: #6b6b6b;
   --turmeric-golden: #e6b800;
   --green-cardamom: #6b8e23;
-  --copper-accents: #B87333;
+  --copper-accents: #b87333;
 }
 
 /* --- Base Styles & Typography --- */
 .refer-safe-area {
-  font-family: 'Inter', sans-serif; /* Make sure to import 'Inter' font in your project */
+  font-family: "Inter", sans-serif; /* Make sure to import 'Inter' font in your project */
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -322,13 +322,77 @@
   filter: brightness(0) invert(1); /* Changes black SVG to white */
 }
 
-
 @media screen and (max-width: 799px) {
   .refer-safe-area {
     width: 100%;
   }
-  .refer-bottom-container{
+  .refer-bottom-container {
     width: 100%;
   }
 }
 
+/* Tablet-specific responsive styles (800px - 900px) */
+@media screen and (min-width: 800px) and (max-width: 900px) {
+  .refer-safe-area {
+    width: 85%;
+    margin: auto;
+  }
+
+  .refer-bottom-container {
+    width: 100%;
+    margin: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .refer-header-anim {
+    width: 70%;
+    max-width: 280px;
+    height: 160px;
+  }
+
+  .refer-content-card {
+    padding: 28px 0;
+    gap: 28px;
+  }
+
+  .refer-instruction-row {
+    padding: 0 28px;
+    gap: 20px;
+  }
+
+  .refer-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .refer-icon-number {
+    font-size: 22px;
+  }
+
+  .refer-footer {
+    padding: 0 28px;
+  }
+
+  .refer-header-title {
+    padding: 20px;
+  }
+
+  .refer-list-row {
+    padding: 14px 0;
+  }
+
+  .refer-code-box {
+    padding: 18px;
+  }
+
+  .refer-whatsapp-btn {
+    padding: 16px;
+    font-size: 15px;
+  }
+
+  .refer-scroll-view {
+    padding-bottom: 180px;
+  }
+}

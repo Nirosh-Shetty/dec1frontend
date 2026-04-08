@@ -118,7 +118,7 @@ function ReasonManagement() {
       const config = {
         url: "admin/adddelayreason",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: delayReason, reasonType: "delay" },
       };
@@ -143,7 +143,7 @@ function ReasonManagement() {
       const config = {
         url: `admin/updatedelayreason/${delayEditData._id}`,
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: delayReason, reasonType: "delay" },
       };
@@ -162,25 +162,25 @@ function ReasonManagement() {
   const getDelayReasons = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getdelayreasons"
+        "http://localhost:7013/api/admin/getdelayreasons",
       );
       if (res.status === 200) {
         const Reasons = res.data.reasons || [];
         setDelayReasonList(Reasons?.filter((ele) => ele.reasonType == "delay"));
         setDelayNoChangeData(
-          Reasons?.filter((ele) => ele.reasonType == "delay")
+          Reasons?.filter((ele) => ele.reasonType == "delay"),
         );
         setRescheduleReasonList(
-          Reasons?.filter((ele) => ele.reasonType == "reschedule")
+          Reasons?.filter((ele) => ele.reasonType == "reschedule"),
         );
         setRescheduleNoChangeData(
-          Reasons?.filter((ele) => ele.reasonType == "reschedule")
+          Reasons?.filter((ele) => ele.reasonType == "reschedule"),
         );
         setCancelReasonList(
-          Reasons?.filter((ele) => ele.reasonType == "cancel")
+          Reasons?.filter((ele) => ele.reasonType == "cancel"),
         );
         setCancelNoChangeData(
-          Reasons?.filter((ele) => ele.reasonType == "cancel")
+          Reasons?.filter((ele) => ele.reasonType == "cancel"),
         );
       }
     } catch (error) {
@@ -191,7 +191,7 @@ function ReasonManagement() {
   const deleteDelayReason = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish.in/api/admin/deletedelayreason/${delayDelData._id}`
+        `http://localhost:7013/api/admin/deletedelayreason/${delayDelData._id}`,
       );
       if (res.status === 200) {
         alert("Delay Reason Deleted Successfully");
@@ -213,7 +213,7 @@ function ReasonManagement() {
       const config = {
         url: "admin/adddelayreason",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: rescheduleReason, reasonType: "reschedule" },
       };
@@ -238,7 +238,7 @@ function ReasonManagement() {
       const config = {
         url: `admin/updatedelayreason/${rescheduleEditData._id}`,
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: rescheduleReason, reasonType: "reschedule" },
       };
@@ -257,7 +257,7 @@ function ReasonManagement() {
   const deleteRescheduleReason = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish.in/api/admin/deletedelayreason/${rescheduleDelData._id}`
+        `http://localhost:7013/api/admin/deletedelayreason/${rescheduleDelData._id}`,
       );
       if (res.status === 200) {
         alert("Reschedule Reason Deleted Successfully");
@@ -279,7 +279,7 @@ function ReasonManagement() {
       const config = {
         url: "admin/adddelayreason",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: cancelReason, reasonType: "cancel" },
       };
@@ -304,7 +304,7 @@ function ReasonManagement() {
       const config = {
         url: `admin/updatedelayreason/${cancelEditData._id}`,
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { reason: cancelReason, reasonType: "cancel" },
       };
@@ -323,7 +323,7 @@ function ReasonManagement() {
   const deleteCancelReason = async () => {
     try {
       let res = await axios.delete(
-        `https://dailydish.in/api/admin/deletedelayreason/${cancelDelData._id}`
+        `http://localhost:7013/api/admin/deletedelayreason/${cancelDelData._id}`,
       );
       if (res.status === 200) {
         alert("Cancel Reason Deleted Successfully");
@@ -348,7 +348,7 @@ function ReasonManagement() {
       setDelayReasonList(delayNoChangeData);
     } else {
       const filtered = delayNoChangeData.filter((item) =>
-        item.reason.toLowerCase().includes(term)
+        item.reason.toLowerCase().includes(term),
       );
       setDelayReasonList(filtered);
     }
@@ -368,7 +368,7 @@ function ReasonManagement() {
       setRescheduleReasonList(rescheduleNoChangeData);
     } else {
       const filtered = rescheduleNoChangeData.filter((item) =>
-        item.reason.toLowerCase().includes(term)
+        item.reason.toLowerCase().includes(term),
       );
       setRescheduleReasonList(filtered);
     }
@@ -378,7 +378,7 @@ function ReasonManagement() {
   const rescheduleUsersPerPage = 6;
   const reschedulePagesVisited = reschedulePageNumber * rescheduleUsersPerPage;
   const reschedulePageCount = Math.ceil(
-    rescheduleReasonList.length / rescheduleUsersPerPage
+    rescheduleReasonList.length / rescheduleUsersPerPage,
   );
   const rescheduleChangePage = ({ selected }) =>
     setReschedulePageNumber(selected);
@@ -391,7 +391,7 @@ function ReasonManagement() {
       setCancelReasonList(cancelNoChangeData);
     } else {
       const filtered = cancelNoChangeData.filter((item) =>
-        item.reason.toLowerCase().includes(term)
+        item.reason.toLowerCase().includes(term),
       );
       setCancelReasonList(filtered);
     }
@@ -401,7 +401,7 @@ function ReasonManagement() {
   const cancelUsersPerPage = 6;
   const cancelPagesVisited = cancelPageNumber * cancelUsersPerPage;
   const cancelPageCount = Math.ceil(
-    cancelReasonList.length / cancelUsersPerPage
+    cancelReasonList.length / cancelUsersPerPage,
   );
   const cancelChangePage = ({ selected }) => setCancelPageNumber(selected);
 
@@ -447,7 +447,7 @@ function ReasonManagement() {
               {delayReasonList
                 ?.slice(
                   delayPagesVisited,
-                  delayPagesVisited + delayUsersPerPage
+                  delayPagesVisited + delayUsersPerPage,
                 )
                 ?.map((item, i) => (
                   <tr key={i}>
@@ -614,7 +614,7 @@ function ReasonManagement() {
               {rescheduleReasonList
                 ?.slice(
                   reschedulePagesVisited,
-                  reschedulePagesVisited + rescheduleUsersPerPage
+                  reschedulePagesVisited + rescheduleUsersPerPage,
                 )
                 ?.map((item, i) => (
                   <tr key={i}>
@@ -784,7 +784,7 @@ function ReasonManagement() {
               {cancelReasonList
                 ?.slice(
                   cancelPagesVisited,
-                  cancelPagesVisited + cancelUsersPerPage
+                  cancelPagesVisited + cancelUsersPerPage,
                 )
                 ?.map((item, i) => (
                   <tr key={i}>

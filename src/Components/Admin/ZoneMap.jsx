@@ -34,10 +34,10 @@ const ZoneMap = () => {
 
   const axiosCfg = useMemo(
     () => ({
-      baseURL: "https://dailydish.in/api",
+      baseURL: "http://localhost:7013/api",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }),
-    [token]
+    [token],
   );
 
   const fetchHubs = async () => {
@@ -109,7 +109,7 @@ const ZoneMap = () => {
       await axios.put(
         `/Hub/zones/${zone._id}`,
         { active: !zone.active },
-        axiosCfg
+        axiosCfg,
       );
       fetchZones();
     } catch (e) {}

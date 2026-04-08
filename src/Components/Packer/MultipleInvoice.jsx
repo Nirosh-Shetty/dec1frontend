@@ -10,6 +10,8 @@ function MultipleInvoice() {
   const receiptContainerRef = useRef(null);
   const hasPrinted = useRef(false);
 
+
+
   // Function to print all receipts - SIMPLE WORKING VERSION
   const printReceipts = () => {
     if (!items.length) {
@@ -47,7 +49,6 @@ function MultipleInvoice() {
     }
   }, []);
 
-  console.log(items, "..........................ssssssssss");
 
   // Alternative manual print function for the button
   const handleManualPrint = () => {
@@ -165,6 +166,7 @@ function MultipleInvoice() {
                 fontWeight: 600,
               }}
             >
+              {console.log(item, "=================item=================")}
               {/* Header */}
               <div style={{ textAlign: "center", marginBottom: "10px" }}>
                 <div
@@ -189,18 +191,50 @@ function MultipleInvoice() {
               <div style={{ marginBottom: "10px" }}>
                 <table style={{ width: "100%", fontSize: "11px" }}>
                   <tbody>
+                    {item?.addressType === "School" && (
+                      <>
+                        <tr>
+                          <td style={{ padding: "2px 0" }}>
+                            Student Details :
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "right",
+                              padding: "2px 0",
+                              fontWeight: "bold",
+                              fontSize: "16px",
+                            }}
+                          >
+                            {item?.studentClass}, {item?.studentSection}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: "2px 0" }}>Student Name:</td>
+                          <td
+                            style={{
+                              textAlign: "right",
+                              padding: "2px 0",
+                              fontWeight: "bold",
+                              fontSize: "16px",
+                            }}
+                          >
+                            {item?.studentName}
+                          </td>
+                        </tr>
+                      </>
+                    )}
                     <tr>
                       <td style={{ padding: "2px 0" }}>Order #:</td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
                         {item?.orderid || "-"}
                       </td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <td style={{ padding: "2px 0" }}>Type:</td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
                         {item?.orderdelivarytype || "-"}
                       </td>
-                    </tr>
+                    </tr> */}
                     <tr>
                       <td style={{ padding: "2px 0" }}>Booking Date:</td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
@@ -229,22 +263,30 @@ function MultipleInvoice() {
                         {item?.username || "-"}
                       </td>
                     </tr>
-                    {item?.studentName && (
-                      <tr>
-                        <td style={{ padding: "2px 0" }}>Student:</td>
-                        <td style={{ textAlign: "right", padding: "2px 0" }}>
-                          {item?.studentName || "-"} {item?.studentClass || "-"}{" "}
-                          {item?.studentSection || "-"}
-                        </td>
-                      </tr>
-                    )}
+                    <tr>
+                      <td style={{ padding: "2px 0" }}>Phone No:</td>
+                      <td style={{ textAlign: "right", padding: "2px 0" }}>
+                        {item?.Mobilenumber}
+                      </td>
+                    </tr>
                     <tr>
                       <td style={{ padding: "2px 0" }}>Customer Type:</td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
                         {item?.customerType || "Normal"}
                       </td>
                     </tr>
-                   
+
+                    {item?.riderId ? (
+                      <tr>
+                        <td style={{ padding: "2px 0" }}>Rider:</td>
+                        <td style={{ textAlign: "right", padding: "2px 0" }}>
+                          {item?.riderId?.name}
+                        </td>
+                      </tr>
+                    ) : (
+                      ""
+                    )}
+
                     <tr>
                       <td
                         colSpan={2}
@@ -254,7 +296,7 @@ function MultipleInvoice() {
                           fontSize: "14px",
                         }}
                       >
-                       {item?.delivarylocation}
+                        {item?.delivarylocation}
                       </td>
                     </tr>
                   </tbody>
@@ -335,7 +377,11 @@ function MultipleInvoice() {
                             border: "0.5px solid #555",
                           }}
                         >
-                          {items?.foodItemId?.foodname || items?.name}
+                          {items?.foodItemId?.foodname || items?.name} (
+                          <span className="fw-bolder">
+                            {" "}
+                            {items?.foodItemId?.foodcategory})
+                          </span>
                         </td>
                         <td
                           style={{
@@ -356,8 +402,8 @@ function MultipleInvoice() {
                           ₹{" "}
                           {items?.totalPrice
                             ? Number(
-                                items?.totalPrice / items?.quantity
-                              ).toFixed(2)
+                                items?.totalPrice / items?.quantity,
+                              )
                             : "0.00"}
                         </td>
                         <td
@@ -369,7 +415,7 @@ function MultipleInvoice() {
                         >
                           ₹{" "}
                           {items?.quantity
-                            ? items?.totalPrice.toFixed(2)
+                            ? items?.totalPrice
                             : "0.00"}
                         </td>
                       </tr>
@@ -385,46 +431,79 @@ function MultipleInvoice() {
               <div>
                 <table style={{ width: "100%", fontSize: "11px" }}>
                   <tbody>
+                    {/* 1. Item Total (Before Tax) */}
                     <tr>
                       <td style={{ textAlign: "left", padding: "2px 0" }}>
-                        Subtotal:
+                        Item Total (Excl. Tax):
                       </td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        ₹{" "}
-                        {item?.subTotal
-                          ? ((Number(item.subTotal) * 100) / 105).toFixed(2)
-                          : "0.00"}
+                        ₹{item?.subTotal?.toFixed(2)}
+                        {/* {item?.amountBeforeTax
+                      ? Number(item.amountBeforeTax).toFixed(2)
+                      : // Fallback for old orders: (Inclusive SubTotal - Tax)
+                        ((item?.subTotal || 0) - (item?.tax || 0)).toFixed(2)} */}
                       </td>
                     </tr>
+
+                        {/* Delivery */}
                     <tr>
                       <td style={{ textAlign: "left", padding: "2px 0" }}>
                         Delivery:
                       </td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        {/* {item?.delivarytype <= 0
+                        {item?.deliveryCharge <= 0
                           ? "Free"
-                          : `₹ ${Number(item.delivarytype).toFixed(2)}`} */}{" "}
-                        Free
+                          : `₹ ${Number(item.deliveryCharge).toFixed(2)}`}
                       </td>
                     </tr>
+
+                    {/* 2. Tax Amount */}
                     <tr>
                       <td style={{ textAlign: "left", padding: "2px 0" }}>
-                        Tax (5%):
+                        Tax ({item?.taxPercentage || 5}%):
                       </td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        ₹ {item?.tax ? Number(item.tax).toFixed(2) : "0.00"}
+                        ₹{item?.tax ? Number(item.tax).toFixed(2) : "0.00"}
                       </td>
                     </tr>
+
+                    {/* 3. Subtotal (Inclusive - Optional, or just keep as total order value) */}
+                    {/* If you want to show the inclusive subtotal sum explicitly before delivery/discounts: */}
+                    <tr>
+                      <td
+                        style={{
+                          textAlign: "left",
+                          padding: "2px 0",
+                          borderTop: "1px dotted #ccc",
+                        }}
+                      >
+                        Order Value (Inc. Tax):
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "right",
+                          padding: "2px 0",
+                          borderTop: "1px dotted #ccc",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        ₹{((item?.subTotal || 0) + (item?.tax || 0) + (item?.deliveryCharge || 0)).toFixed(2)}
+                      </td>
+                    </tr>
+
+                    {/* Cutlery */}
                     {item?.Cutlery > 0 && (
                       <tr>
                         <td style={{ textAlign: "left", padding: "2px 0" }}>
                           Cutlery:
                         </td>
                         <td style={{ textAlign: "right", padding: "2px 0" }}>
-                          ₹ {Number(item.Cutlery).toFixed(2)}
+                          ₹{Number(item.Cutlery).toFixed(2)}
                         </td>
                       </tr>
                     )}
+
+                    {/* Discounts */}
                     {item?.coupon > 0 && (
                       <tr>
                         <td style={{ textAlign: "left", padding: "2px 0" }}>
@@ -435,16 +514,51 @@ function MultipleInvoice() {
                         </td>
                       </tr>
                     )}
-                    {item?.discountWallet > 0 && (
+                   
+                    {item?.preorderDiscount > 0 && (
                       <tr>
                         <td style={{ textAlign: "left", padding: "2px 0" }}>
-                          Apply Wallet:
+                          Preorder Discount:
                         </td>
                         <td style={{ textAlign: "right", padding: "2px 0" }}>
+                          -₹{Number(item.preorderDiscount).toFixed(2)}
+                        </td>
+                      </tr>
+                    )}
+
+                     {item?.discountWallet > 0 && (
+                      <tr>
+                        <td style={{ textAlign: "left", padding: "2px 0" }}>
+                          Wallet Used:
+                        </td>
+                        <td style={{ textAlign: "right", padding: "2px 0" , width:"40%"}}>
                           -₹ {Number(item.discountWallet).toFixed(2)}
                         </td>
                       </tr>
                     )}
+
+                      {/* <tr>
+                      <td
+                        style={{
+                          textAlign: "left",
+                          padding: "2px 0",
+                          borderTop: "1px dotted #ccc",
+                        }}
+                      >
+                        Total:
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "right",
+                          padding: "2px 0",
+                          borderTop: "1px dotted #ccc",
+                        }}
+                      >
+                        ₹{((item?.subTotal || 0) + (item?.tax || 0) + (item?.deliveryCharge || 0) - (item.preorderDiscount || 0)).toFixed(2)}
+                      </td>
+                    </tr> */}
+
+                    {/* Final Total */}
                     <tr
                       style={{
                         borderTop: "1px dashed #000",
@@ -452,16 +566,13 @@ function MultipleInvoice() {
                       }}
                     >
                       <td style={{ textAlign: "left", padding: "6px 0 2px" }}>
-                        TOTAL:
+                        TOTAL PAID:
                       </td>
-                      <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        ₹
-                        {(
-                          (item?.tax ? Number(item.tax) : 0) +
-                          (item?.subTotal
-                            ? (Number(item.subTotal) * 100) / 105
-                            : 0)
-                        ).toFixed(2)}
+                      <td style={{ textAlign: "right", padding: "6px 0 2px" }}>
+                        ₹{" "}
+                        {item?.allTotal
+                          ? Number(item.allTotal).toFixed(2)
+                          : "0.00"}
                       </td>
                     </tr>
                   </tbody>

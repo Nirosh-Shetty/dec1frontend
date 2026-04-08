@@ -48,7 +48,7 @@ const OrderHistory = () => {
   const message = "Hello! I need assistance."; // Default message
 
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
+    message,
   )}`;
 
   const [show2, setShow2] = useState(false);
@@ -61,7 +61,7 @@ const OrderHistory = () => {
   const getorders = async (id) => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getallordersbyUserId/" + id
+        "http://localhost:7013/api/admin/getallordersbyUserId/" + id,
       );
       if (res.status === 200) {
         setorders(res.data.order);
@@ -99,8 +99,8 @@ const OrderHistory = () => {
       const config = {
         url: "/admin/addfoodorder",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           customerId: user?._id,
@@ -181,7 +181,7 @@ const OrderHistory = () => {
           setRemainingTime(
             `Delivery in ${minutes} minutes and ${
               seconds < 10 ? "0" + seconds : seconds
-            } seconeds left`
+            } seconeds left`,
           );
         }
       }
@@ -194,7 +194,7 @@ const OrderHistory = () => {
   const handleShow = (item) => {
     if (item?.orderstatus == "Instant") {
       setdeliveryTime(
-        addMinutesToCreatedAt(item?.createdAt, item?.approximatetime)
+        addMinutesToCreatedAt(item?.createdAt, item?.approximatetime),
       );
     }
     setShow(true);

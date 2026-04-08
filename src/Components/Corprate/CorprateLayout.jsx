@@ -52,7 +52,7 @@ const CorporateLayout = (props) => {
           <div className="admin-sidebar-display" >
             <div
               className="left-side"
-              style={{ position: "sticky", top: "0", height: "100vh" }}
+              style={{ position: "sticky", top: "0", height: "100vh" , width:'250px'}}
             >
                <div>
       <Navbar expand="lg" className=" p-0">

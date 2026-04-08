@@ -18,7 +18,7 @@ const AdminCategory = () => {
   const fetchMenuCategories = async () => {
     try {
       const res = await axios.get(
-        "https://dailydish.in/api/admin/menuCategory/getmenucategory"
+        "http://localhost:7013/api/admin/menuCategory/getmenucategory",
       );
       setMenuCategories(res.data.categories);
       console.log(res, "categoriessssssssssssssssssssssssssssssss");
@@ -31,7 +31,7 @@ const AdminCategory = () => {
   const fetchPackersCategories = async () => {
     try {
       const res = await axios.get(
-        "https://dailydish.in/api/admin/getcategory"
+        "http://localhost:7013/api/admin/getcategory",
       );
       setPackersCategories(res.data.categories);
     } catch (error) {
@@ -50,18 +50,18 @@ const AdminCategory = () => {
     try {
       if (menuEditId) {
         await axios.put(
-          `https://dailydish.in/api/admin/menuCategory/updatemenucategory/${menuEditId}`,
+          `http://localhost:7013/api/admin/menuCategory/updatemenucategory/${menuEditId}`,
           {
             menuCategory: menuCategoryName,
-          }
+          },
         );
         setMenuEditId(null);
       } else {
         await axios.post(
-          "https://dailydish.in/api/admin/menuCategory/addmenucategory",
+          "http://localhost:7013/api/admin/menuCategory/addmenucategory",
           {
             menuCategory: menuCategoryName,
-          }
+          },
         );
       }
       setMenuCategoryName("");
@@ -75,7 +75,7 @@ const AdminCategory = () => {
   const handleMenuDelete = async (id) => {
     try {
       await axios.delete(
-        `https://dailydish.in/api/admin/menuCategory/deletemenucategory/${id}`
+        `http://localhost:7013/api/admin/menuCategory/deletemenucategory/${id}`,
       );
       fetchMenuCategories();
     } catch (error) {
@@ -95,14 +95,14 @@ const AdminCategory = () => {
     try {
       if (packersEditId) {
         await axios.put(
-          `https://dailydish.in/api/admin/updatecategory/${packersEditId}`,
+          `http://localhost:7013/api/admin/updatecategory/${packersEditId}`,
           {
             CategoryName: packersCategoryName,
-          }
+          },
         );
         setPackersEditId(null);
       } else {
-        await axios.post("https://dailydish.in/api/admin/addcategory", {
+        await axios.post("http://localhost:7013/api/admin/addcategory", {
           CategoryName: packersCategoryName,
         });
       }
@@ -117,7 +117,7 @@ const AdminCategory = () => {
   const handlePackersDelete = async (id) => {
     try {
       await axios.delete(
-        `https://dailydish.in/api/admin/deletecategory/${id}`
+        `http://localhost:7013/api/admin/deletecategory/${id}`,
       );
       fetchPackersCategories();
     } catch (error) {

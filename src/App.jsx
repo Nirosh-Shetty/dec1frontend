@@ -93,6 +93,11 @@ import OnboardScreen from "./Components/OnboardScreen";
 import UpdateLocation from "./Components/UpdateLocation";
 import SplashScreen from "./Components/SplashScreen";
 import LocationDetection from "./Components/LocationDetection";
+import DailyDishPlans from "./Components/DailydishPlans";
+import LocationModal2 from "./Components/LocationModal2";
+import LocationPage from "./Components/LocationPage";
+import DeliveryRate from "./Components/Admin/DeliveryRate";
+import AiSensyImage from "./Components/Admin/AiSensyImage";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -123,7 +128,7 @@ const ThemeColorHandler = () => {
         themeColor = "#6F42C1"; // Purple for profile
       } else if (location.pathname.includes("/")) {
         themeColor = "#6B8E23"; // Red for admin pages
-      }
+      } 
 
       // Update meta theme-color
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -170,9 +175,11 @@ function App() {
 
           {/* Redirect from root to splash, then splash redirects to home */}
           <Route path="/" element={<Navigate to="/splash" replace />} />
-          <Route path="/location-permission" element={<LocationDetection />} />
+          <Route path="/select-location" element={<LocationPage />} />
 
           <Route path="/:referralCode" element={<LeafWithLogo />} />
+          <Route path="/apt/alpine" element={<LeafWithLogo />} />
+          <Route path="/apt/hiranandani" element={<LeafWithLogo />} />
           <Route path="/otp-varification" element={<Validate />} />
           <Route
             path="/home"
@@ -189,7 +196,7 @@ function App() {
                   Carts={Carts}
                   setCarts={setCarts}
                 />
-                <Footer />
+                {/* <Footer /> */}
               </>
             }
           />
@@ -204,6 +211,14 @@ function App() {
                 /> */}
                 <UserWallet />
                 <Footer />
+              </>
+            }
+          />
+            <Route
+            path="/lunch-dinner-plans"
+            element={
+              <>
+                <DailyDishPlans />
               </>
             }
           />
@@ -348,7 +363,7 @@ function App() {
             element={
               <>
                 <PaymentSuccess />
-                <Footer />
+                {/* <Footer /> */}
               </>
             }
           />
@@ -399,6 +414,8 @@ function App() {
             element={<Main children={<CorporateList />} />}
           />
           <Route path="/gst" element={<Main children={<Gst />} />} />
+          <Route path="/delivery-rate" element={<Main children={<DeliveryRate />} />} />
+          <Route path="/image-upload" element={<Main children={<AiSensyImage />} />} />
           <Route
             path="/all-products"
             element={<Main children={<Add_Products />} />}

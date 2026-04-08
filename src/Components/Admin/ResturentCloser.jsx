@@ -41,7 +41,7 @@ const RestaurantClosure = () => {
   const fetchClosureDetails = async () => {
     try {
       const response = await axios.get(
-        "https://dailydish.in/api/admin/getClosureDetails"
+        "http://localhost:7013/api/admin/getClosureDetails",
       );
       if (response.status === 200 && response.data.data) {
         setClosureDetails(response.data.data);
@@ -63,11 +63,11 @@ const RestaurantClosure = () => {
     const now = moment();
     const startDateTime = moment(
       `${closure.startDate} ${closure.startTime}`,
-      "YYYY-MM-DD HH:mm"
+      "YYYY-MM-DD HH:mm",
     );
     const endDateTime = moment(
       `${closure.endDate} ${closure.endTime}`,
-      "YYYY-MM-DD HH:mm"
+      "YYYY-MM-DD HH:mm",
     );
 
     // Check if current time is within closure period
@@ -88,7 +88,7 @@ const RestaurantClosure = () => {
       // Validate date range
       const startDateTime = moment(
         `${startDate} ${startTime}`,
-        "YYYY-MM-DD HH:mm"
+        "YYYY-MM-DD HH:mm",
       );
       const endDateTime = moment(`${endDate} ${endTime}`, "YYYY-MM-DD HH:mm");
       if (endDateTime.isBefore(startDateTime)) {
@@ -104,7 +104,7 @@ const RestaurantClosure = () => {
       ];
       if (!allowedImageTypes.includes(banner.type)) {
         return setError(
-          "Invalid file type. Please upload an image (JPEG, PNG, JPG, or GIF)"
+          "Invalid file type. Please upload an image (JPEG, PNG, JPG, or GIF)",
         );
       }
 
@@ -122,11 +122,11 @@ const RestaurantClosure = () => {
 
       // Send data to API
       const response = await axios.post(
-        "https://dailydish.in/api/admin/setClosure",
+        "http://localhost:7013/api/admin/setClosure",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -150,7 +150,7 @@ const RestaurantClosure = () => {
     try {
       setIsLoading(true);
       const response = await axios.delete(
-        "https://dailydish.in/api/admin/clearClosure"
+        "http://localhost:7013/api/admin/clearClosure",
       );
       if (response.status === 200) {
         setSuccess("Closure cleared successfully");

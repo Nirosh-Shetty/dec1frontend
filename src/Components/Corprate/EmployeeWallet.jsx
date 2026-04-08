@@ -29,7 +29,7 @@ const CorparateWallet = () => {
   const getCorporateWallet = async () => {
     try {
       const response = await axios.get(
-        `https://dailydish.in/api/wallet/getAllWalletCompsny/${corparate._id}`
+        `http://localhost:7013/api/wallet/getAllWalletCompsny/${corparate._id}`,
       );
       setAllWallet(response.data);
     } catch (error) {
@@ -75,7 +75,7 @@ const CorparateWallet = () => {
   const indexOfFirstWallet = indexOfLastWallet - walletsPerPage;
   const currentWallets = filteredWallets.slice(
     indexOfFirstWallet,
-    indexOfLastWallet
+    indexOfLastWallet,
   );
 
   // Pagination logic for transactions
@@ -84,7 +84,7 @@ const CorparateWallet = () => {
   const indexOfFirstTxn = indexOfLastTxn - transactionsPerPage;
   const currentTransactions = transactions.slice(
     indexOfFirstTxn,
-    indexOfLastTxn
+    indexOfLastTxn,
   );
 
   // Handle page change for wallets
@@ -119,14 +119,14 @@ const CorparateWallet = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://dailydish.in/api/wallet/add-free-cash"
-          : "https://dailydish.in/api/wallet/deduct-cash",
+          ? "http://localhost:7013/api/wallet/add-free-cash"
+          : "http://localhost:7013/api/wallet/deduct-cash",
         {
           userId: selectedWallet?.userId?._id,
           amount: amount,
           description,
           expiryDays: actionType === "add" ? expiryDate : null,
-        }
+        },
       );
       setShowModal(false);
       getCorporateWallet();

@@ -13,7 +13,7 @@ const Dashboard = () => {
   const getApartmentOrder = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getAllOrderCount"
+        "http://localhost:7013/api/admin/getAllOrderCount",
       );
       if (res.status === 200) {
         setApartmentOrder(res.data);
@@ -41,7 +41,7 @@ const Dashboard = () => {
   const [Adduser, setAdduser] = useState([]);
   const getAdduser = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/User/registeruser");
+      let res = await axios.get("http://localhost:7013/api/User/registeruser");
       if (res.status === 200) {
         setAdduser(res.data.success.reverse());
       }

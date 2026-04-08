@@ -130,7 +130,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "https://dailydish.in/api",
+//         baseURL: "http://localhost:7013/api",
 
 //         headers: { "content-type": "application/json" },
 //         data: {
@@ -534,7 +534,7 @@
 // }
 
 import React, { useMemo, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import Logo from "../assets/logo-container.png";
@@ -545,6 +545,8 @@ import axios from "axios";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import success from "./../assets/success-green.png";
 import tasty from "./../assets/tasty.png";
+import checkCircle from "./../assets/check_circle.png";
+import errorCircle from "./../assets/myplancancel.png";
 
 const LOGO_BASE_W = 768;
 const LOGO_BASE_H = 475;
@@ -614,6 +616,17 @@ export default function LeafWithLogo() {
 
   const { referralCode } = useParams();
 
+  const location = useLocation(); // Add this
+
+  // Determine acquisition channel based on the route
+  const getAcquisitionChannel = () => {
+    if (location.pathname.includes("/apt/alpine")) {
+      return "alpine";
+    } else if (location.pathname.includes("/apt/hiranandani")) {
+      return "hiranandani";
+    } else return null; // Let backend handle default
+  };
+
   useEffect(() => {
     if (referralCode) {
       localStorage.setItem("referralCode", referralCode);
@@ -637,7 +650,7 @@ export default function LeafWithLogo() {
         // Change text after 150ms delay (as per Figma)
         timeoutId = setTimeout(() => {
           setCurrentTextIndex((prevIndex) =>
-            prevIndex === textItems.length - 1 ? 0 : prevIndex + 1
+            prevIndex === textItems.length - 1 ? 0 : prevIndex + 1,
           );
 
           // Reset animation state after the full animation duration
@@ -700,16 +713,36 @@ export default function LeafWithLogo() {
       Swal2.fire({
         toast: true,
         position: "bottom",
-        icon: "error",
-        title: `Please enter your phone number.`,
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
+        html: `
+    <div class="myplans-toast-content">
+      <img src="${errorCircle}" alt="Error" class="myplans-toast-check" />
+      <div class="myplans-toast-text">
+        <div class="myplans-toast-title">Missing Phone Number</div>
+        <div class="myplans-toast-subtitle">
+          Please enter your phone number.
+        </div>
+      </div>
+    </div>
+  `,
         customClass: {
-          popup: "me-small-toast",
-          title: "me-small-toast-title",
+          popup: "myplans-custom-toast",
+          htmlContainer: "myplans-toast-html",
+        },
+        didOpen: () => {
+          // Position above bottom nav
+          const toast = document.querySelector(".myplans-custom-toast");
+          if (toast) {
+            toast.style.bottom = "90px";
+            toast.style.left = "50%";
+            toast.style.transform = "translateX(-50%)";
+            toast.style.position = "fixed";
+          }
         },
       });
+
       return;
     }
     const phoneRegex = /^\d{10}$/;
@@ -734,10 +767,11 @@ export default function LeafWithLogo() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,
+          acquisitionChannel: getAcquisitionChannel(), // Add this
         },
       };
 
@@ -773,23 +807,51 @@ export default function LeafWithLogo() {
         });
       }
       if (res.status === 200) {
+        // Store the acquisition channel in localStorage to use during OTP verification
+        if (getAcquisitionChannel()) {
+          localStorage.setItem("acquisitionChannel", getAcquisitionChannel());
+        }
         Swal2.fire({
           toast: true,
           position: "bottom",
-          icon: "success",
-          title: `Hi ${customerName}, OTP sent successfully on your whatsapp number`,
           showConfirmButton: false,
           timer: 2000,
           timerProgressBar: true,
+          html: `
+    <div class="myplans-toast-content">
+      <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+      <div class="myplans-toast-text">
+        <div class="myplans-toast-title">OTP Sent</div>
+        <div class="myplans-toast-subtitle">
+          Hi ${customerName}, OTP has been sent to your WhatsApp number
+        </div>
+      </div>
+    </div>
+  `,
           customClass: {
-            popup: "me-small-toast",
-            title: "me-small-toast-title",
+            popup: "myplans-custom-toast",
+            htmlContainer: "myplans-toast-html",
+          },
+          didOpen: () => {
+            // Position above bottom nav
+            const toast = document.querySelector(".myplans-custom-toast");
+            if (toast) {
+              toast.style.bottom = "90px";
+              toast.style.left = "50%";
+              toast.style.transform = "translateX(-50%)";
+              toast.style.position = "fixed";
+            }
           },
         });
+
         setTimeout(() => {
           setLoader(false);
           navigate("/otp-varification", {
-            state: { phone, Fname: customerName },
+            state: {
+              phone,
+              Fname: customerName,
+              acquisitionChannel: getAcquisitionChannel(),
+            }, // Pass acquisition
           });
         }, 2000);
       }

@@ -1,25 +1,602 @@
+// import React, { useRef, useMemo, useEffect, useState } from "react";
+// import "../Styles/DateSessionSelector.css";
+// import { FiInfo } from "react-icons/fi";
+// import { Colors } from "../Helper/themes.jsx";
+// import { BsClock } from "react-icons/bs";
+
+// /*
+//   Changes:
+//   - Use UTC-based YYYY-MM-DD keys for both menu items and date list
+//   - Add a fallback ISO-key mapping and a debug log for availability
+// */
+
+// const getNextSevenDays = () => {
+//   const result = [];
+//   const now = new Date(); // Browser time (Dec 30 00:28)
+
+//   for (let i = 0; i < 3; i++) {
+//     // This ensures if my laptop says 30th, the key is generated for 30th.
+//     const dUtc = new Date(
+//       Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + i),
+//     );
+
+//     result.push({
+//       label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : null,
+//       date: dUtc.getUTCDate(), // This will now be 30, 31, 1...
+//       month: dUtc.toLocaleString("default", { month: "short" }),
+//       weekday: dUtc.toLocaleString("default", { weekday: "long" }),
+//       dateObj: dUtc,
+//     });
+//   }
+//   return result;
+// };
+
+// // create YYYY-MM-DD from a Date using UTC components (stable)
+// const dateToKeyUTC = (date) => {
+//   const y = date.getUTCFullYear();
+//   const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+//   const d = String(date.getUTCDate()).padStart(2, "0");
+//   return `${y}-${m}-${d}`;
+// };
+
+// const DateSessionSelector = ({
+//   onChange,
+//   currentDate,
+//   currentSession,
+//   menuData = [],
+// }) => {
+//   const dates = getNextSevenDays();
+//   const scrollRef = useRef(null);
+//   const [canScrollLeft, setCanScrollLeft] = useState(false);
+//   const [canScrollRight, setCanScrollRight] = useState(false);
+
+//   // Build availability map YYYY-MM-DD (UTC) -> Set(session)
+//   const availability = useMemo(() => {
+//     const map = {};
+//     (menuData || []).forEach((item) => {
+//       if (!item?.deliveryDate || !item?.session) return;
+//       const d = new Date(item.deliveryDate);
+//       const keyUtc = dateToKeyUTC(d);
+//       if (!map[keyUtc]) map[keyUtc] = new Set();
+//       map[keyUtc].add(item.session);
+
+//       // fallback: also map ISO slice key if backend or other parts use that
+//       const isoKey = new Date(item.deliveryDate).toISOString().slice(0, 10);
+//       if (!map[isoKey]) map[isoKey] = new Set();
+//       map[isoKey].add(item.session);
+//     });
+
+//     // debug: inspect availability during dev
+//     // eslint-disable-next-line no-console
+//     console.debug("DateSessionSelector availability map:", map);
+//     return map;
+//   }, [menuData]);
+
+//   const now = () => new Date();
+
+//   const isSessionTimeBlocked = (dateObj, session) => {
+//     // Only block for today's date based on local time cutoffs
+//     const todayUtcKey = dateToKeyUTC(now());
+//     const key = dateToKeyUTC(dateObj);
+//     if (key !== todayUtcKey) return false;
+//     const hr = now().getHours();
+//     const min = now().getMinutes();
+//     if (session === "Lunch" && (hr > 10 || (hr === 10 && min >= 0)))
+//       return true; // block Lunch after 10:00am
+//     if (session === "Dinner" && (hr > 17 || (hr === 17 && min >= 0)))
+//       return true; // block Dinner after 5:00pm
+//     return false;
+//   };
+
+//   const sessionsForDate = (dateObj) => {
+//     if (!dateObj) return new Set();
+//     const key = dateToKeyUTC(dateObj);
+//     const base = availability[key] || new Set();
+//     const result = new Set(base);
+//     if (isSessionTimeBlocked(dateObj, "Lunch") && result.has("Lunch"))
+//       result.delete("Lunch");
+//     if (isSessionTimeBlocked(dateObj, "Dinner") && result.has("Dinner"))
+//       result.delete("Dinner");
+//     return result;
+//   };
+
+//   // Find nearest available session/date starting from given date (inclusive)
+//   const findNextAvailable = (startDateObj, preferredSession = null) => {
+//     const startKey = dateToKeyUTC(startDateObj);
+//     const startIndex = dates.findIndex(
+//       (d) => dateToKeyUTC(d.dateObj) === startKey,
+//     );
+//     const from = startIndex >= 0 ? startIndex : 0;
+//     for (let offset = 0; offset < dates.length; offset++) {
+//       const idx = from + offset;
+//       if (idx >= dates.length) break;
+//       const dobj = dates[idx].dateObj;
+//       const sessions = sessionsForDate(dobj);
+//       if (sessions.size === 0) continue;
+//       if (preferredSession && sessions.has(preferredSession))
+//         return { dateObj: dobj, session: preferredSession };
+//       if (sessions.has("Lunch")) return { dateObj: dobj, session: "Lunch" };
+//       if (sessions.has("Dinner")) return { dateObj: dobj, session: "Dinner" };
+//     }
+//     return null;
+//   };
+
+//   // Auto-switch when current session becomes unavailable - pick nearest available slot (today..+6)
+//   useEffect(() => {
+//     if (!currentDate || !currentSession) return;
+//     const available = sessionsForDate(currentDate);
+//     if (available.size === 0 || !available.has(currentSession)) {
+//       const next = findNextAvailable(currentDate);
+//       if (next) onChange(next.dateObj, next.session);
+//     }
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [currentDate, currentSession, menuData]);
+
+//   const handleDateClick = (dateObj) => {
+//     const sessions = sessionsForDate(dateObj);
+//     if (!sessions || sessions.size === 0) return;
+//     const sessionToUse =
+//       currentSession && sessions.has(currentSession)
+//         ? currentSession
+//         : sessions.has("Lunch")
+//           ? "Lunch"
+//           : "Dinner";
+//     onChange(dateObj, sessionToUse);
+//   };
+
+//   const handleSessionClick = (session) => {
+//     if (!currentDate) return;
+//     const sessions = sessionsForDate(currentDate);
+//     if (!sessions.has(session)) return;
+//     onChange(currentDate, session);
+//   };
+
+//   // --- scroll state handling
+//   const updateScrollState = () => {
+//     const el = scrollRef.current;
+//     if (!el) {
+//       setCanScrollLeft(false);
+//       setCanScrollRight(false);
+//       return;
+//     }
+//     const { scrollLeft, scrollWidth, clientWidth } = el;
+//     setCanScrollLeft(scrollLeft > 5);
+//     setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+//   };
+
+//   useEffect(() => {
+//     updateScrollState();
+//     const el = scrollRef.current;
+//     if (!el) return;
+//     const onScroll = () => updateScrollState();
+//     el.addEventListener("scroll", onScroll, { passive: true });
+//     window.addEventListener("resize", updateScrollState);
+//     return () => {
+//       el.removeEventListener("scroll", onScroll);
+//       window.removeEventListener("resize", updateScrollState);
+//     };
+//   }, [menuData, dates.length]);
+
+//   const scrollLeft = () => {
+//     if (!canScrollLeft) return;
+//     scrollRef.current?.scrollBy({ left: -200, behavior: "smooth" });
+//     setTimeout(updateScrollState, 220);
+//   };
+//   const scrollRight = () => {
+//     if (!canScrollRight) return;
+//     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
+//     setTimeout(updateScrollState, 220);
+//   };
+
+//   const handleReset = () => {
+//     const next = getNextSevenDays();
+//     onChange(next[0].dateObj, "Lunch");
+//   };
+
+//   // info modal state
+//   const [showInfoModal, setShowInfoModal] = useState(false);
+//   const toggleInfoModal = () => setShowInfoModal((s) => !s);
+
+//   // JS fallback sticky for session buttons: compute offsets and toggle fixed positioning
+//   const sessionRef = useRef(null);
+//   const [isFixedSession, setIsFixedSession] = useState(false);
+//   const [sessionRect, setSessionRect] = useState({
+//     top: 0,
+//     left: 0,
+//     width: 0,
+//     height: 0,
+//   });
+
+//   useEffect(() => {
+//     const compute = () => {
+//       if (sessionRef.current) {
+//         const r = sessionRef.current.getBoundingClientRect();
+//         setSessionRect({
+//           top: r.top + window.scrollY,
+//           left: r.left,
+//           width: r.width,
+//           height: r.height,
+//         });
+//       }
+//     };
+
+//     compute();
+//     window.addEventListener("resize", compute);
+//     return () => window.removeEventListener("resize", compute);
+//   }, []);
+
+//   useEffect(() => {
+//     const onScroll = () => {
+//       if (sessionRect.top === 0) return;
+//       const scrolled = window.scrollY || window.pageYOffset;
+//       setIsFixedSession(scrolled >= sessionRect.top);
+//     };
+//     window.addEventListener("scroll", onScroll, { passive: true });
+//     // initial check
+//     onScroll();
+//     return () => window.removeEventListener("scroll", onScroll);
+//   }, [sessionRect]);
+
+//   return (
+//     <div className="date-session-wrapper">
+//       {/* <div className="reset-line">
+//         <span className="reset-btn" onClick={handleReset}>
+//           Reset to now
+//           <img src="/Assets/reset_to_now.svg" alt="reset now"></img>
+//         </span>
+//       </div> */}
+//       {/* Centered banner like the reference image */}
+
+//       {/* <div
+//         className="info-banner1"
+//         role="button"
+//         tabIndex={0}
+//         onClick={toggleInfoModal}
+//         onKeyDown={(e) => e.key === "Enter" && toggleInfoModal()}
+//         style={{ color: Colors.greenCardamom }}
+//       >
+//         <span className="info-banner-text">Secret behind our pricing</span>
+//         <button
+//           className="info-banner-icon"
+//           aria-label="more info"
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             toggleInfoModal();
+//           }}
+//           style={{
+//             // background: Colors.greenCardamom,
+//             color: Colors.greenCardamom,
+//           }}
+//         >
+//           <FiInfo size={20} />
+//         </button>
+//       </div> */}
+
+//       {/* Flat Delivery Charge Section */}
+
+//       {/* <div className="flat-delivery-wrapper d-flex  align-center flex-column gap-0">
+//         <p className="flat-delivery-text">
+//           • Category-leading <span className="del-price">₹9</span> flat
+//           delivery.
+//         </p>
+//         <p className="sub-heading" style={{ marginTop: "0px" }}>
+//           One price. <span>&nbsp;</span>
+//           No surge.<span>&nbsp;</span>
+//           No fluctuations.
+//         </p>
+//       </div> */}
+
+
+
+//       {/* Secret Behind Pricing */}
+//       <div
+//         className="info-banner1"
+//         role="button"
+//         tabIndex={0}
+//         onClick={toggleInfoModal}
+//         onKeyDown={(e) => e.key === "Enter" && toggleInfoModal()}
+//         style={{ color: Colors.greenCardamom }}
+//       >
+//         <span className="info-banner-text">Secret behind our pricing</span>
+
+//         <button
+//           className="info-banner-icon"
+//           aria-label="more info"
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             toggleInfoModal();
+//           }}
+//           style={{
+//             color: Colors.greenCardamom,
+//           }}
+//         >
+//           <FiInfo size={20} />
+//         </button>
+//       </div>
+//       {isFixedSession && (
+//         <div style={{ height: sessionRect.height }} aria-hidden />
+//       )}
+
+//       <div
+//         ref={sessionRef}
+//         style={
+//           isFixedSession
+//             ? {
+//                 position: "fixed",
+//                 top: 0,
+//                 left: `${sessionRect.left}px`,
+//                 width: `${sessionRect.width}px`,
+//                 zIndex: 1100,
+//                 background: "inherit",
+//               }
+//             : undefined
+//         }
+//       >
+//         <div className="date-header">
+//           <button
+//             className={`nav-btn ${!canScrollLeft ? "disabled" : ""}`}
+//             onClick={scrollLeft}
+//             disabled={!canScrollLeft}
+//             aria-label="scroll-left"
+//           >
+//             <img
+//               src="/Assets/arrowCircleBrown.svg"
+//               style={{ transform: "rotate(180deg)" }}
+//               alt="prev"
+//             />
+//           </button>
+
+//           <div className="date-strip" ref={scrollRef}>
+//             {dates.map((d, i) => {
+//               const sessions = sessionsForDate(d.dateObj);
+//               const isDisabled = sessions.size === 0;
+//               const active =
+//                 currentDate &&
+//                 dateToKeyUTC(d.dateObj) === dateToKeyUTC(currentDate);
+//               return (
+//                 <div
+//                   key={i}
+//                   className={`date-card ${active ? "active" : ""} ${
+//                     isDisabled ? "disabled" : ""
+//                   }`}
+//                   onClick={() => !isDisabled && handleDateClick(d.dateObj)}
+//                 >
+//                   <div className="day">{d.label}</div>
+//                   <div className="date">{`${d.date} ${d.month}`}</div>
+//                   <div className="weekday">{d.weekday}</div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+
+//           {showInfoModal && (
+//             <div className="info-modal" role="dialog" aria-modal="true">
+//               <div className="info-modal-backdrop" onClick={toggleInfoModal} />
+//               <div className="info-modal-content">
+//                 <div className="info-modal-card">
+//                   <div className="info-modal-card-header">
+//                     <h3 style={{ margin: 0, color: Colors.greenCardamom }}>
+//                       Secret behind our pricing
+//                     </h3>
+//                     {/* <button
+//                       className="info-modal-close-small mb-4"
+//                       aria-label="close small"
+//                       onClick={toggleInfoModal}
+//                     >
+//                       ×
+//                     </button> */}
+//                   </div>
+
+//                   <div className="info-list">
+//                     <div className="info-item">
+//                       <div className="info-item-title">Cook-to-order model</div>
+//                       <div className="info-item-desc">
+//                         Meals are prepared only after confirmation, zero food
+//                         wastage, no excess inventory
+//                       </div>
+//                     </div>
+//                     <div className="info-item">
+//                       <div className="info-item-title">
+//                         Route-based delivery
+//                       </div>
+//                       <div className="info-item-desc">
+//                         Orders are grouped by location and delivered in
+//                         optimized routes, lowering delivery cost per order
+//                       </div>
+//                     </div>
+//                     <div className="info-item">
+//                       <div className="info-item-title">Direct kitchens</div>
+//                       <div className="info-item-desc">
+//                         We manage cooking and delivery end-to-end without
+//                         intermediaries.
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div className="info-modal-actions">
+//                     <button
+//                       className="info-modal-ok"
+//                       onClick={toggleInfoModal}
+//                       style={{
+//                         background: Colors.greenCardamom,
+//                         color: Colors.appForeground,
+//                       }}
+//                     >
+//                       OK
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           )}
+
+//           <button
+//             className={`nav-btn ${!canScrollRight ? "disabled" : ""}`}
+//             onClick={scrollRight}
+//             disabled={!canScrollRight}
+//             aria-label="scroll-right"
+//           >
+//             <img src="/Assets/arrowCircleBrown.svg" alt="next" />
+//           </button>
+//         </div>
+
+//         {/* spacer inserted when session becomes fixed to avoid layout jump */}
+
+//         {/* {isFixedSession && (
+//         <div style={{ height: sessionRect.height }} aria-hidden />
+//       )} */}
+
+//         <div className="session-container">
+//           <div></div>
+//           <div
+//             className={`session-btn-wrapper ${
+//               currentSession === "Lunch" ? "active" : ""
+//             } ${
+//               currentDate && !sessionsForDate(currentDate).has("Lunch")
+//                 ? "disabled"
+//                 : ""
+//             }`}
+//           >
+//             <button
+//               className={`session ${currentSession === "Lunch" ? "active" : ""} ${
+//                 currentDate && !sessionsForDate(currentDate).has("Lunch")
+//                   ? "disabled"
+//                   : ""
+//               }`}
+//               onClick={() => handleSessionClick("Lunch")}
+//               disabled={
+//                 currentDate && !sessionsForDate(currentDate).has("Lunch")
+//               }
+//             >
+//               <div className="title">Lunch</div>
+//               <div
+//                 className={`mb-1 subtext ${
+//                   currentSession === "Lunch" ? "active" : ""
+//                 }`}
+//               >
+//                 Confirm before 10AM
+//               </div>
+//               <div
+//                 className={`subtext2 ${
+//                   currentSession === "Lunch" ? "active" : "inactivebtn"
+//                 }`}
+//               >
+//                 Delivered by 01:00PM
+//               </div>
+//             </button>
+//           </div>
+
+//           <div
+//             className={`session-btn-wrapper ${
+//               currentSession === "Dinner" ? "active" : ""
+//             } ${
+//               currentDate && !sessionsForDate(currentDate).has("Dinner")
+//                 ? "disabled"
+//                 : ""
+//             }`}
+//           >
+//             <button
+//               className={` session ${
+//                 currentSession === "Dinner" ? "active" : ""
+//               } ${
+//                 currentDate && !sessionsForDate(currentDate).has("Dinner")
+//                   ? "disabled"
+//                   : ""
+//               }`}
+//               onClick={() => handleSessionClick("Dinner")}
+//               disabled={
+//                 currentDate && !sessionsForDate(currentDate).has("Dinner")
+//               }
+//             >
+//               <div className="title">Dinner</div>
+//               <div
+//                 className={`mb-1 subtext ${
+//                   currentSession === "Dinner" ? "active" : ""
+//                 }`}
+//               >
+//                 Confirm before 5PM
+//               </div>
+//               <div
+//                 className={`mt-2 subtext2 ${
+//                   currentSession === "Dinner" ? "active" : "inactivebtn"
+//                 }`}
+//               >
+//                 Delivered by 08:00PM
+//               </div>
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DateSessionSelector;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useRef, useMemo, useEffect, useState } from "react";
 import "../Styles/DateSessionSelector.css";
+import { FiInfo } from "react-icons/fi";
+import { Colors } from "../Helper/themes.jsx";
+import { BsClock } from "react-icons/bs";
+import axios from "axios";
 
 /*
   Changes:
-  - Use UTC-based YYYY-MM-DD keys for both menu items and date list
-  - Add a fallback ISO-key mapping and a debug log for availability
+  - Added dynamic cutoff times from hub
+  - Display hub-specific cutoff times for each session
+  - Fetch cutoff times when hub changes
+  - FIXED: Use user.status instead of acquisition_channel to identify employees
+  - FIXED: Properly disable dates/sessions when cutoff time has passed
+  - FIXED: Handle undefined cutoff times gracefully
 */
 
 const getNextSevenDays = () => {
   const result = [];
-  const now = new Date(); // Browser time (Dec 30 00:28)
-  
-  for (let i = 0; i < 7; i++) {
-    // This ensures if my laptop says 30th, the key is generated for 30th.
+  const now = new Date();
+
+  for (let i = 0; i < 4; i++) {
     const dUtc = new Date(
-      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + i)
+      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + i),
     );
-    
+
     result.push({
       label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : null,
-      date: dUtc.getUTCDate(), // This will now be 30, 31, 1...
+      date: dUtc.getUTCDate(),
       month: dUtc.toLocaleString("default", { month: "short" }),
       weekday: dUtc.toLocaleString("default", { weekday: "long" }),
       dateObj: dUtc,
@@ -46,6 +623,158 @@ const DateSessionSelector = ({
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  
+  // State for dynamic cutoff times - Initialize with default values
+  const [cutoffTimes, setCutoffTimes] = useState({
+    lunch: { 
+      cutoffTime: "10:00", 
+      formattedCutoff: "10:00 AM",
+      deliveryTime: "01:00 PM", 
+      isEmployeeCutoff: false,
+      rawCutoff: "10:00"
+    },
+    dinner: { 
+      cutoffTime: "17:00", 
+      formattedCutoff: "05:00 PM",
+      deliveryTime: "08:00 PM", 
+      isEmployeeCutoff: false,
+      rawCutoff: "17:00"
+    }
+  });
+  const [cutoffLoading, setCutoffLoading] = useState(true);
+  const [currentHubId, setCurrentHubId] = useState(null);
+
+  // Get user from localStorage and check status
+  const getUser = () => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  };
+  
+  const user = getUser();
+  const isEmployee = user?.status === "Employee";
+
+  // Fetch hub cutoff times
+  const fetchHubCutoffTimes = async (hubId) => {
+    if (!hubId) {
+      setCutoffLoading(false);
+      return;
+    }
+    
+    try {
+      setCutoffLoading(true);
+      const response = await axios.get(`http://localhost:7013/api/Hub/get-cutoff-times/${hubId}`);
+      
+      if (response.status === 200 && response.data.cutoffTimes) {
+        const hubCutoff = response.data.cutoffTimes;
+        
+        const lunchCutoff = isEmployee 
+          ? hubCutoff.lunch?.employeeCutoff || "10:00"
+          : hubCutoff.lunch?.defaultCutoff || "00:00";
+        
+        const dinnerCutoff = isEmployee
+          ? hubCutoff.dinner?.employeeCutoff || "17:00"
+          : hubCutoff.dinner?.defaultCutoff || "00:00";
+        
+        const formatCutoffTime = (timeStr) => {
+          if (!timeStr || timeStr === "00:00") return "Midnight";
+          const [hours, minutes] = timeStr.split(':');
+          const hour = parseInt(hours);
+          const ampm = hour >= 12 ? 'PM' : 'AM';
+          const displayHour = hour % 12 || 12;
+          return `${displayHour}:${minutes} ${ampm}`;
+        };
+        
+        const getDeliveryTime = (cutoffTime, session) => {
+          if (isEmployee) {
+            if (session === 'lunch') return "01:00 PM";
+            return "08:00 PM";
+          } else {
+            if (cutoffTime === "00:00") {
+              return session === 'lunch' ? "01:00 PM (Next Day)" : "08:00 PM (Next Day)";
+            }
+            return session === 'lunch' ? "01:00 PM" : "08:00 PM";
+          }
+        };
+        
+        setCutoffTimes({
+          lunch: {
+            cutoffTime: lunchCutoff,
+            formattedCutoff: formatCutoffTime(lunchCutoff),
+            deliveryTime: getDeliveryTime(lunchCutoff, 'lunch'),
+            isEmployeeCutoff: isEmployee,
+            rawCutoff: lunchCutoff
+          },
+          dinner: {
+            cutoffTime: dinnerCutoff,
+            formattedCutoff: formatCutoffTime(dinnerCutoff),
+            deliveryTime: getDeliveryTime(dinnerCutoff, 'dinner'),
+            isEmployeeCutoff: isEmployee,
+            rawCutoff: dinnerCutoff
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching hub cutoff times:", error);
+      // Keep default values
+    } finally {
+      setCutoffLoading(false);
+    }
+  };
+
+  // Get hub ID from address
+  const getHubIdFromAddress = () => {
+    try {
+      const primaryAddress = localStorage.getItem("primaryAddress");
+      const currentLocation = localStorage.getItem("currentLocation");
+      
+      if (primaryAddress && primaryAddress !== "null") {
+        const parsed = JSON.parse(primaryAddress);
+        return parsed.hubId;
+      }
+      if (currentLocation && currentLocation !== "null") {
+        const parsed = JSON.parse(currentLocation);
+        return parsed.hubId;
+      }
+    } catch (error) {
+      console.error("Error getting hub ID:", error);
+    }
+    return null;
+  };
+
+  // Watch for hub ID changes and fetch cutoff times
+  useEffect(() => {
+    const hubId = getHubIdFromAddress();
+    if (hubId && hubId !== currentHubId) {
+      setCurrentHubId(hubId);
+      fetchHubCutoffTimes(hubId);
+    } else if (!hubId) {
+      setCutoffLoading(false);
+    }
+  }, [currentHubId, isEmployee]);
+
+  // Also listen for location changes
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const hubId = getHubIdFromAddress();
+      if (hubId) {
+        setCurrentHubId(hubId);
+        fetchHubCutoffTimes(hubId);
+      }
+    };
+    
+    window.addEventListener("locationUpdated", handleLocationChange);
+    window.addEventListener("addressUpdated", handleLocationChange);
+    window.addEventListener("storage", handleLocationChange);
+    
+    return () => {
+      window.removeEventListener("locationUpdated", handleLocationChange);
+      window.removeEventListener("addressUpdated", handleLocationChange);
+      window.removeEventListener("storage", handleLocationChange);
+    };
+  }, []);
 
   // Build availability map YYYY-MM-DD (UTC) -> Set(session)
   const availability = useMemo(() => {
@@ -57,85 +786,127 @@ const DateSessionSelector = ({
       if (!map[keyUtc]) map[keyUtc] = new Set();
       map[keyUtc].add(item.session);
 
-      // fallback: also map ISO slice key if backend or other parts use that
       const isoKey = new Date(item.deliveryDate).toISOString().slice(0, 10);
       if (!map[isoKey]) map[isoKey] = new Set();
       map[isoKey].add(item.session);
     });
 
-    // debug: inspect availability during dev
-    // eslint-disable-next-line no-console
-    console.debug("DateSessionSelector availability map:", map);
     return map;
   }, [menuData]);
 
   const now = () => new Date();
 
-  const isSessionTimeBlocked = (dateObj, session) => {
-    // Only block for today's date based on local time cutoffs
-    const todayUtcKey = dateToKeyUTC(now());
+  // FIXED: Check if a session is available for a given date (considering menu availability AND cutoff time)
+  const isSessionAvailable = (dateObj, session) => {
+    // First check if menu has this session on this date
     const key = dateToKeyUTC(dateObj);
-    if (key !== todayUtcKey) return false;
-    const hr = now().getHours();
-    const min = now().getMinutes();
-    if (session === "Lunch" && (hr > 10 || (hr === 10 && min >= 0))) return true; // block Lunch after 10:00am
-    if (session === "Dinner" && (hr > 16 || (hr === 16 && min >= 0))) return true; // block Dinner after 4:00pm
-    return false;
+    const availableSessions = availability[key] || new Set();
+    
+    if (!availableSessions.has(session)) {
+      return false;
+    }
+    
+    // Then check if cutoff time has passed (only for today)
+    const todayUtcKey = dateToKeyUTC(now());
+    const keyToCheck = dateToKeyUTC(dateObj);
+    
+    if (keyToCheck !== todayUtcKey) {
+      // Future dates are always available (menu permitting)
+      return true;
+    }
+    
+    // For today, check cutoff time
+    const nowDate = now();
+    const currentHour = nowDate.getHours();
+    const currentMinute = nowDate.getMinutes();
+    const currentTimeInMinutes = currentHour * 60 + currentMinute;
+    
+    // Safely get cutoff config with fallback
+    const cutoffConfig = session === "Lunch" ? cutoffTimes?.lunch : cutoffTimes?.dinner;
+    if (!cutoffConfig) return false;
+    
+    const cutoffTimeStr = cutoffConfig.rawCutoff;
+    
+    // If cutoff is midnight (00:00), today is always blocked
+    if (cutoffTimeStr === "00:00") {
+      return false;
+    }
+    
+    const [cutoffHour, cutoffMinute] = cutoffTimeStr.split(':').map(Number);
+    const cutoffTimeInMinutes = cutoffHour * 60 + cutoffMinute;
+    
+    // Session is available only if current time is BEFORE cutoff
+    return currentTimeInMinutes < cutoffTimeInMinutes;
   };
 
+  // FIXED: Get all available sessions for a date (menu availability minus cutoff restrictions)
   const sessionsForDate = (dateObj) => {
     if (!dateObj) return new Set();
     const key = dateToKeyUTC(dateObj);
-    const base = availability[key] || new Set();
-    const result = new Set(base);
-    if (isSessionTimeBlocked(dateObj, "Lunch") && result.has("Lunch"))
-      result.delete("Lunch");
-    if (isSessionTimeBlocked(dateObj, "Dinner") && result.has("Dinner"))
-      result.delete("Dinner");
+    const menuSessions = availability[key] || new Set();
+    const result = new Set();
+    
+    // Only include sessions that are actually available (menu has them AND cutoff hasn't passed)
+    menuSessions.forEach(session => {
+      if (isSessionAvailable(dateObj, session)) {
+        result.add(session);
+      }
+    });
+    
     return result;
+  };
+
+  // FIXED: Check if a date has ANY available sessions
+  const isDateAvailable = (dateObj) => {
+    return sessionsForDate(dateObj).size > 0;
   };
 
   // Find nearest available session/date starting from given date (inclusive)
   const findNextAvailable = (startDateObj, preferredSession = null) => {
     const startKey = dateToKeyUTC(startDateObj);
     const startIndex = dates.findIndex(
-      (d) => dateToKeyUTC(d.dateObj) === startKey
+      (d) => dateToKeyUTC(d.dateObj) === startKey,
     );
     const from = startIndex >= 0 ? startIndex : 0;
+    
     for (let offset = 0; offset < dates.length; offset++) {
       const idx = from + offset;
       if (idx >= dates.length) break;
       const dobj = dates[idx].dateObj;
       const sessions = sessionsForDate(dobj);
       if (sessions.size === 0) continue;
-      if (preferredSession && sessions.has(preferredSession))
+      
+      if (preferredSession && sessions.has(preferredSession)) {
         return { dateObj: dobj, session: preferredSession };
+      }
       if (sessions.has("Lunch")) return { dateObj: dobj, session: "Lunch" };
       if (sessions.has("Dinner")) return { dateObj: dobj, session: "Dinner" };
     }
     return null;
   };
 
-  // Auto-switch when current session becomes unavailable - pick nearest available slot (today..+6)
+  // Auto-switch when current session becomes unavailable
   useEffect(() => {
     if (!currentDate || !currentSession) return;
     const available = sessionsForDate(currentDate);
     if (available.size === 0 || !available.has(currentSession)) {
-      const next = findNextAvailable(currentDate);
-      if (next) onChange(next.dateObj, next.session);
+      const next = findNextAvailable(currentDate, currentSession);
+      if (next) {
+        onChange(next.dateObj, next.session);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDate, currentSession, menuData]);
+  }, [currentDate, currentSession, menuData, cutoffTimes]);
 
   const handleDateClick = (dateObj) => {
     const sessions = sessionsForDate(dateObj);
     if (!sessions || sessions.size === 0) return;
+    
     const sessionToUse =
       currentSession && sessions.has(currentSession)
         ? currentSession
         : sessions.has("Lunch")
-        ? "Lunch"
-        : "Dinner";
+          ? "Lunch"
+          : "Dinner";
     onChange(dateObj, sessionToUse);
   };
 
@@ -183,12 +954,11 @@ const DateSessionSelector = ({
     setTimeout(updateScrollState, 220);
   };
 
-  const handleReset = () => {
-    const next = getNextSevenDays();
-    onChange(next[0].dateObj, "Lunch");
-  };
+  // info modal state
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const toggleInfoModal = () => setShowInfoModal((s) => !s);
 
-  // JS fallback sticky for session buttons: compute offsets and toggle fixed positioning
+  // JS fallback sticky for session buttons
   const sessionRef = useRef(null);
   const [isFixedSession, setIsFixedSession] = useState(false);
   const [sessionRect, setSessionRect] = useState({
@@ -223,24 +993,91 @@ const DateSessionSelector = ({
       setIsFixedSession(scrolled >= sessionRect.top);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    // initial check
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, [sessionRect]);
 
+  // Get cutoff description text - FIXED with safety checks
+  const getCutoffDescription = (session) => {
+    const cutoff = session === "Lunch" ? cutoffTimes?.lunch : cutoffTimes?.dinner;
+    if (!cutoff) return isEmployee ? "Confirm before 10:00 AM" : "Pre-order";
+    
+    if (isEmployee) {
+      return `Confirm before ${cutoff.formattedCutoff}`;
+    } else {
+      if (cutoff.rawCutoff === "00:00") {
+        return "Pre-order (Previous day)";
+      }
+      return `Confirm before ${cutoff.formattedCutoff} (Previous day)`;
+    }
+  };
+
+  // Get delivery description - FIXED with safety checks
+  const getDeliveryDescription = (session) => {
+    const cutoff = session === "Lunch" ? cutoffTimes?.lunch : cutoffTimes?.dinner;
+    if (!cutoff) {
+      return session === "Lunch" ? "Delivered by 01:00 PM" : "Delivered by 08:00 PM";
+    }
+    
+    if (!isEmployee && cutoff.rawCutoff === "00:00") {
+      return session === "Lunch" ? "Delivered by 01:00 PM (Next Day)" : "Delivered by 08:00 PM (Next Day)";
+    }
+    return session === "Lunch" ? "Delivered by 01:00 PM" : "Delivered by 08:00 PM";
+  };
+
+  // FIXED: Get tooltip message for disabled session - with safety checks
+  const getDisabledTooltip = (session, dateObj) => {
+    if (!dateObj) return "";
+    
+    const todayUtcKey = dateToKeyUTC(now());
+    const isToday = dateToKeyUTC(dateObj) === todayUtcKey;
+    
+    if (!isToday) return "No sessions available for this date";
+    
+    const cutoffConfig = session === "Lunch" ? cutoffTimes?.lunch : cutoffTimes?.dinner;
+    if (!cutoffConfig) return "Order cutoff has passed";
+    
+    const cutoffTimeStr = cutoffConfig.rawCutoff;
+    
+    if (cutoffTimeStr === "00:00") {
+      return `Order must be placed before midnight of previous day`;
+    }
+    
+    const cutoffFormatted = cutoffConfig.formattedCutoff || "cutoff time";
+    return `Order cutoff was ${cutoffFormatted}. Next available: Tomorrow`;
+  };
+
   return (
     <div className="date-session-wrapper">
-      <div className="reset-line">
-        <span className="reset-btn" onClick={handleReset}>
-          Reset to now 
-           <img src="/Assets/reset_to_now.svg" alt="reset now"></img>
-          </span>
+      {/* Secret Behind Pricing */}
+      <div
+        className="info-banner1"
+        role="button"
+        tabIndex={0}
+        onClick={toggleInfoModal}
+        onKeyDown={(e) => e.key === "Enter" && toggleInfoModal()}
+        style={{ color: Colors.greenCardamom }}
+      >
+        <span className="info-banner-text">Secret behind our pricing</span>
+        <button
+          className="info-banner-icon"
+          aria-label="more info"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleInfoModal();
+          }}
+          style={{ color: Colors.greenCardamom }}
+        >
+          <FiInfo size={20} />
+        </button>
       </div>
- {isFixedSession && (
-        <div style={{ height: sessionRect.height }} aria-hidden />
+
+      {isFixedSession && (
+        <div style={{ height: sessionRect.height }} aria-hidden="true" />
       )}
 
-<div ref={sessionRef}
+      <div
+        ref={sessionRef}
         style={
           isFixedSession
             ? {
@@ -252,128 +1089,192 @@ const DateSessionSelector = ({
                 background: "inherit",
               }
             : undefined
-        }>
-    <div className="date-header" >
-        <button
-          className={`nav-btn ${!canScrollLeft ? "disabled" : ""}`}
-          onClick={scrollLeft}
-          disabled={!canScrollLeft}
-          aria-label="scroll-left"
-        >
-          <img
-            src="/Assets/arrowCircleBrown.svg"
-            style={{ transform: "rotate(180deg)" }}
-            alt="prev"
-          />
-        </button>
+        }
+      >
+        <div className="date-header">
+          <button
+            className={`nav-btn ${!canScrollLeft ? "disabled" : ""}`}
+            onClick={scrollLeft}
+            disabled={!canScrollLeft}
+            aria-label="scroll-left"
+          >
+            <img
+              src="/Assets/arrowCircleBrown.svg"
+              style={{ transform: "rotate(180deg)" }}
+              alt="prev"
+            />
+          </button>
 
-        <div className="date-strip" ref={scrollRef}>
-          {dates.map((d, i) => {
-            const sessions = sessionsForDate(d.dateObj);
-            const isDisabled = sessions.size === 0;
-            const active =
-              currentDate &&
-              dateToKeyUTC(d.dateObj) === dateToKeyUTC(currentDate);
-            return (
-              <div
-                key={i}
-                className={`date-card ${active ? "active" : ""} ${
-                  isDisabled ? "disabled" : ""
-                }`}
-                onClick={() => !isDisabled && handleDateClick(d.dateObj)}
-              >
-                <div className="day">{d.label}</div>
-                <div className="date">{`${d.date} ${d.month}`}</div>
-                <div className="weekday">{d.weekday}</div>
+          <div className="date-strip" ref={scrollRef}>
+            {dates.map((d, i) => {
+              const isDisabled = !isDateAvailable(d.dateObj);
+              const active =
+                currentDate &&
+                dateToKeyUTC(d.dateObj) === dateToKeyUTC(currentDate);
+              return (
+                <div
+                  key={i}
+                  className={`date-card ${active ? "active" : ""} ${
+                    isDisabled ? "disabled" : ""
+                  }`}
+                  onClick={() => !isDisabled && handleDateClick(d.dateObj)}
+                  title={isDisabled ? "No sessions available for this date" : ""}
+                >
+                  <div className="day">{d.label}</div>
+                  <div className="date">{`${d.date} ${d.month}`}</div>
+                  <div className="weekday">{d.weekday}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {showInfoModal && (
+            <div className="info-modal" role="dialog" aria-modal="true">
+              <div className="info-modal-backdrop" onClick={toggleInfoModal} />
+              <div className="info-modal-content">
+                <div className="info-modal-card">
+                  <div className="info-modal-card-header">
+                    <h3 style={{ margin: 0, color: Colors.greenCardamom }}>
+                      Secret behind our pricing
+                    </h3>
+                  </div>
+
+                  <div className="info-list">
+                    <div className="info-item">
+                      <div className="info-item-title">Cook-to-order model</div>
+                      <div className="info-item-desc">
+                        Meals are prepared only after confirmation, zero food
+                        wastage, no excess inventory
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-item-title">
+                        Route-based delivery
+                      </div>
+                      <div className="info-item-desc">
+                        Orders are grouped by location and delivered in
+                        optimized routes, lowering delivery cost per order
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-item-title">Direct kitchens</div>
+                      <div className="info-item-desc">
+                        We manage cooking and delivery end-to-end without
+                        intermediaries.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="info-modal-actions">
+                    <button
+                      className="info-modal-ok"
+                      onClick={toggleInfoModal}
+                      style={{
+                        background: Colors.greenCardamom,
+                        color: Colors.appForeground,
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </div>
               </div>
-            );
-          })}
+            </div>
+          )}
+
+          <button
+            className={`nav-btn ${!canScrollRight ? "disabled" : ""}`}
+            onClick={scrollRight}
+            disabled={!canScrollRight}
+            aria-label="scroll-right"
+          >
+            <img src="/Assets/arrowCircleBrown.svg" alt="next" />
+          </button>
         </div>
 
-        <button
-          className={`nav-btn ${!canScrollRight ? "disabled" : ""}`}
-          onClick={scrollRight}
-          disabled={!canScrollRight}
-          aria-label="scroll-right"
-        >
-          <img src="/Assets/arrowCircleBrown.svg" alt="next" />
-        </button>
-      </div>
-
-      {/* spacer inserted when session becomes fixed to avoid layout jump */}
-      {/* {isFixedSession && (
-        <div style={{ height: sessionRect.height }} aria-hidden />
-      )} */}
-
-      <div
-        className="session-container"
-        
-      >
-        <div></div>
-        <div
-          className={`session-btn-wrapper ${
-            currentSession === "Lunch" ? "active" : ""
-          } ${
-            currentDate && !sessionsForDate(currentDate).has("Lunch")
-              ? "disabled"
-              : ""
-          }`}
-        >
-          <button
-            className={`session ${currentSession === "Lunch" ? "active" : ""} ${
+        <div className="session-container">
+          <div></div>
+          <div
+            className={`session-btn-wrapper ${
+              currentSession === "Lunch" ? "active" : ""
+            } ${
               currentDate && !sessionsForDate(currentDate).has("Lunch")
                 ? "disabled"
                 : ""
             }`}
-            onClick={() => handleSessionClick("Lunch")}
-            disabled={currentDate && !sessionsForDate(currentDate).has("Lunch")}
+            title={currentDate && !sessionsForDate(currentDate).has("Lunch") ? getDisabledTooltip("Lunch", currentDate) : ""}
           >
-            <div className="title">Lunch</div>
-            <div
-              className={`subtext ${
-                currentSession === "Lunch" ? "active" : ""
+            <button
+              className={`session ${currentSession === "Lunch" ? "active" : ""} ${
+                currentDate && !sessionsForDate(currentDate).has("Lunch")
+                  ? "disabled"
+                  : ""
               }`}
+              onClick={() => handleSessionClick("Lunch")}
+              disabled={
+                currentDate && !sessionsForDate(currentDate).has("Lunch")
+              }
             >
-              Order before 10:00 AM
-            </div>
-          </button>
-        </div>
+              <div className="title">Lunch</div>
+              <div
+                className={`mb-1 subtext ${
+                  currentSession === "Lunch" ? "active" : ""
+                }`}
+              >
+                {cutoffLoading ? "Loading..." : getCutoffDescription("Lunch")}
+              </div>
+              <div
+                className={`subtext2 ${
+                  currentSession === "Lunch" ? "active" : "inactivebtn"
+                }`}
+              >
+                {cutoffLoading ? "..." : getDeliveryDescription("Lunch")}
+              </div>
+            </button>
+          </div>
 
-        <div
-          className={`session-btn-wrapper ${
-            currentSession === "Dinner" ? "active" : ""
-          } ${
-            currentDate && !sessionsForDate(currentDate).has("Dinner")
-              ? "disabled"
-              : ""
-          }`}
-        >
-          <button
-            className={`session ${
+          <div
+            className={`session-btn-wrapper ${
               currentSession === "Dinner" ? "active" : ""
             } ${
               currentDate && !sessionsForDate(currentDate).has("Dinner")
                 ? "disabled"
                 : ""
             }`}
-            onClick={() => handleSessionClick("Dinner")}
-            disabled={
-              currentDate && !sessionsForDate(currentDate).has("Dinner")
-            }
+            title={currentDate && !sessionsForDate(currentDate).has("Dinner") ? getDisabledTooltip("Dinner", currentDate) : ""}
           >
-            <div className="title">Dinner</div>
-            <div
-              className={`subtext ${
+            <button
+              className={`session ${
                 currentSession === "Dinner" ? "active" : ""
+              } ${
+                currentDate && !sessionsForDate(currentDate).has("Dinner")
+                  ? "disabled"
+                  : ""
               }`}
+              onClick={() => handleSessionClick("Dinner")}
+              disabled={
+                currentDate && !sessionsForDate(currentDate).has("Dinner")
+              }
             >
-              Order before 04:00 PM
-            </div>
-          </button>
+              <div className="title">Dinner</div>
+              <div
+                className={`mb-1 subtext ${
+                  currentSession === "Dinner" ? "active" : ""
+                }`}
+              >
+                {cutoffLoading ? "Loading..." : getCutoffDescription("Dinner")}
+              </div>
+              <div
+                className={`mt-2 subtext2 ${
+                  currentSession === "Dinner" ? "active" : "inactivebtn"
+                }`}
+              >
+                {cutoffLoading ? "..." : getDeliveryDescription("Dinner")}
+              </div>
+            </button>
+          </div>
         </div>
       </div>
-</div>
-    
     </div>
   );
 };

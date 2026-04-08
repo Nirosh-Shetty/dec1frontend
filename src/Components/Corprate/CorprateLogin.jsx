@@ -20,7 +20,7 @@ function CorporateLogin() {
       const config = {
         url: "/admin/Loginwithotp",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: { mobile: mobileNumber },
       };
@@ -37,7 +37,7 @@ function CorporateLogin() {
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.error || "An error occurred while sending OTP"
+        error.response?.data?.error || "An error occurred while sending OTP",
       );
       console.log(error);
     }
@@ -52,7 +52,7 @@ function CorporateLogin() {
       const config = {
         url: "/admin/verifyOtpCorprate",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: { mobile: mobileNumber, otp: otp },
       };
@@ -70,7 +70,7 @@ function CorporateLogin() {
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.error || "An error occurred during verification"
+        error.response?.data?.error || "An error occurred during verification",
       );
       console.log(error);
     }

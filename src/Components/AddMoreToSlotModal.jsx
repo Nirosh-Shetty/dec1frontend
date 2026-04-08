@@ -6,7 +6,6 @@ import IsNonVeg from "./../assets/isVeg=no.svg";
 import "../Styles/AddMoreToSlotModal.css";
 import Swal2 from "sweetalert2";
 import checkCircle from "../assets/check_circle.png";
-
 const AddMoreToSlotModal = ({
   show,
   onClose,
@@ -31,7 +30,7 @@ const AddMoreToSlotModal = ({
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://dailydish.in/api/user/plan/menu-items-for-slot/${planId}`
+        `http://localhost:7013/api/user/plan/menu-items-for-slot/${planId}`,
       );
 
       if (response.data.success) {
@@ -72,45 +71,45 @@ const AddMoreToSlotModal = ({
       }));
 
       const response = await axios.post(
-        "https://dailydish.in/api/user/plan/batch-update-items",
+        "http://localhost:7013/api/user/plan/batch-update-items",
         {
           planId,
           userId,
           items: itemsToUpdate,
-        }
+        },
       );
 
       if (response.data.success) {
-         Swal2.fire({
-                toast: true,
-                position: "bottom",
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                html: `
-                  <div class="myplans-toast-content">
-                    <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
-                    <div class="myplans-toast-text">
-                      <div class="myplans-toast-title">Plan Updated</div>
-                      <div class="myplans-toast-subtitle">Item Updated Successfully</div>
-                    </div>
-                  </div>
-                `,
-                customClass: {
-                  popup: "myplans-custom-toast",
-                  htmlContainer: "myplans-toast-html",
-                },
-                didOpen: () => {
-                  // Position above bottom nav
-                  const toast = document.querySelector(".myplans-custom-toast");
-                  if (toast) {
-                    toast.style.bottom = "90px"; // Position above bottom nav
-                    toast.style.left = "50%";
-                    toast.style.transform = "translateX(-50%)";
-                    toast.style.position = "fixed";
-                  }
-                },
-              });
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          html: `
+                          <div class="myplans-toast-content">
+                            <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+                            <div class="myplans-toast-text">
+                              <div class="myplans-toast-title">Plan Updated</div>
+                              <div class="myplans-toast-subtitle">Item Updated Successfully</div>
+                            </div>
+                          </div>
+                        `,
+          customClass: {
+            popup: "myplans-custom-toast",
+            htmlContainer: "myplans-toast-html",
+          },
+          didOpen: () => {
+            // Position above bottom nav
+            const toast = document.querySelector(".myplans-custom-toast");
+            if (toast) {
+              toast.style.bottom = "90px"; // Position above bottom nav
+              toast.style.left = "50%";
+              toast.style.transform = "translateX(-50%)";
+              toast.style.position = "fixed";
+            }
+          },
+        });
         // Pass the updated plan back to parent
         onItemsUpdated && onItemsUpdated(response.data.data);
         onClose();
@@ -218,7 +217,7 @@ const AddMoreToSlotModal = ({
                         onClick={() =>
                           handleQuantityChange(
                             item._id,
-                            (quantities[item._id] || 0) - 1
+                            (quantities[item._id] || 0) - 1,
                           )
                         }
                       >
@@ -231,7 +230,7 @@ const AddMoreToSlotModal = ({
                         onChange={(e) =>
                           handleQuantityChange(
                             item._id,
-                            parseInt(e.target.value) || 0
+                            parseInt(e.target.value) || 0,
                           )
                         }
                         min="0"
@@ -241,7 +240,7 @@ const AddMoreToSlotModal = ({
                         onClick={() =>
                           handleQuantityChange(
                             item._id,
-                            (quantities[item._id] || 0) + 1
+                            (quantities[item._id] || 0) + 1,
                           )
                         }
                       >

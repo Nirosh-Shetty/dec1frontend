@@ -135,24 +135,24 @@ const CorporateList = () => {
       }
 
       const validLunchSlots = lunchSlots.filter(
-        (slot) => slot.time.trim() !== ""
+        (slot) => slot.time.trim() !== "",
       );
       for (let slot of validLunchSlots) {
         if (!isValidTimeSlot(slot.time.trim())) {
           return alert(
-            `Invalid Lunch Time Slot: ${slot.time} Please enter in this format 12:00 - 12:15 PM`
+            `Invalid Lunch Time Slot: ${slot.time} Please enter in this format 12:00 - 12:15 PM`,
           );
         }
       }
 
       // Validate dinner slots
       const validDinnerSlots = dinnerSlots.filter(
-        (slot) => slot.time.trim() !== ""
+        (slot) => slot.time.trim() !== "",
       );
       for (let slot of validDinnerSlots) {
         if (!isValidTimeSlot(slot.time.trim())) {
           return alert(
-            `Invalid Dinner Time Slot: ${slot.time} Please enter in this format 7:00 - 7:15 PM`
+            `Invalid Dinner Time Slot: ${slot.time} Please enter in this format 7:00 - 7:15 PM`,
           );
         }
       }
@@ -160,7 +160,7 @@ const CorporateList = () => {
       const config = {
         url: "/admin/addcorporate",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -206,7 +206,7 @@ const CorporateList = () => {
   const getAddCorporate = async () => {
     try {
       setLoading(true);
-      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
         setNoChangeData(res.data.corporatedata);
@@ -225,7 +225,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/deletecorporate/" + Data,
         method: "delete",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -281,24 +281,24 @@ const CorporateList = () => {
     try {
       // Validate lunch slots
       const validLunchSlots = lunchSlots.filter(
-        (slot) => slot.time.trim() !== ""
+        (slot) => slot.time.trim() !== "",
       );
       for (let slot of validLunchSlots) {
         if (!isValidTimeSlot(slot.time.trim())) {
           return alert(
-            `Invalid Lunch Time Slot: ${slot.time} Please enter in this format 12:00 - 12:15 PM`
+            `Invalid Lunch Time Slot: ${slot.time} Please enter in this format 12:00 - 12:15 PM`,
           );
         }
       }
 
       // Validate dinner slots
       const validDinnerSlots = dinnerSlots.filter(
-        (slot) => slot.time.trim() !== ""
+        (slot) => slot.time.trim() !== "",
       );
       for (let slot of validDinnerSlots) {
         if (!isValidTimeSlot(slot.time.trim())) {
           return alert(
-            `Invalid Dinner Time Slot: ${slot.time} Please enter in this format 7:00 - 7:15 PM`
+            `Invalid Dinner Time Slot: ${slot.time} Please enter in this format 7:00 - 7:15 PM`,
           );
         }
       }
@@ -306,7 +306,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/updatecorporatelist",
         method: "put",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -364,8 +364,8 @@ const CorporateList = () => {
     if (searchTerm !== "") {
       const filteredData = nochangedata.filter((user) =>
         Object.values(user).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
+          String(value).toLowerCase().includes(searchTerm),
+        ),
       );
       setAddCorporate(filteredData);
     } else {
@@ -396,12 +396,12 @@ const CorporateList = () => {
 
         lunchSlotsDisplay = lunchData
           .map(
-            (slot) => `${slot.time} (${slot.active ? "Active" : "Inactive"})`
+            (slot) => `${slot.time} (${slot.active ? "Active" : "Inactive"})`,
           )
           .join(", ");
         dinnerSlotsDisplay = dinnerData
           .map(
-            (slot) => `${slot.time} (${slot.active ? "Active" : "Inactive"})`
+            (slot) => `${slot.time} (${slot.active ? "Active" : "Inactive"})`,
           )
           .join(", ");
       } catch (error) {
@@ -523,7 +523,7 @@ const CorporateList = () => {
               )}
               {AddCorporate?.slice(
                 pagesVisited,
-                pagesVisited + usersPerPage
+                pagesVisited + usersPerPage,
               )?.map((items, i) => {
                 return (
                   <tr key={items._id}>

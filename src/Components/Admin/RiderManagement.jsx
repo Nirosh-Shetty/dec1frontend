@@ -53,7 +53,7 @@ const RiderManagement = () => {
   const fetchHubOptions = async () => {
     try {
       setHubLoading(true);
-      const res = await axios.get("https://dailydish.in/api/Hub/hubs");
+      const res = await axios.get("http://localhost:7013/api/Hub/hubs");
       if (res.status === 200) {
         setHubOptions(res.data || []);
       }
@@ -74,7 +74,7 @@ const RiderManagement = () => {
   const fetchRiders = async (opts = { showLoader: true }) => {
     try {
       if (opts.showLoader) setLoading(true);
-      const res = await axios.get("https://dailydish.in/api/admin/riders", {
+      const res = await axios.get("http://localhost:7013/api/admin/riders", {
         params: {
           status: statusFilter,
           search: search.trim() || undefined,
@@ -88,7 +88,7 @@ const RiderManagement = () => {
       console.error(error);
       alert(
         error.response?.data?.message ||
-          "Failed to load riders. Please try again."
+          "Failed to load riders. Please try again.",
       );
     } finally {
       if (opts.showLoader) setLoading(false);
@@ -160,7 +160,7 @@ const RiderManagement = () => {
       delete payload.licenseNumber;
 
       const baseConfig = {
-        baseURL: "https://dailydish.in/api/admin",
+        baseURL: "http://localhost:7013/api/admin",
         headers: { "Content-Type": "application/json" },
       };
 
@@ -185,7 +185,7 @@ const RiderManagement = () => {
         alert(
           selectedRider
             ? "Rider updated successfully"
-            : "Rider created successfully"
+            : "Rider created successfully",
         );
         closeFormModal();
         fetchRiders({ showLoader: false });
@@ -194,7 +194,7 @@ const RiderManagement = () => {
       console.error(error);
       alert(
         error.response?.data?.message ||
-          "Failed to save rider. Please try again."
+          "Failed to save rider. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -210,7 +210,7 @@ const RiderManagement = () => {
     if (!selectedRider?._id) return;
     try {
       const res = await axios.delete(
-        `https://dailydish.in/api/admin/riders/${selectedRider._id}`
+        `http://localhost:7013/api/admin/riders/${selectedRider._id}`,
       );
       if (res.status === 200) {
         alert("Rider removed successfully");
@@ -222,7 +222,7 @@ const RiderManagement = () => {
       console.error(error);
       alert(
         error.response?.data?.message ||
-          "Failed to delete rider. Please try again."
+          "Failed to delete rider. Please try again.",
       );
     }
   };
@@ -368,7 +368,7 @@ const RiderManagement = () => {
                     <td>{renderStatusBadge(rider.status)}</td>
                     <td>
                       {new Date(
-                        rider.updatedAt || rider.createdAt || Date.now()
+                        rider.updatedAt || rider.createdAt || Date.now(),
                       ).toLocaleDateString()}
                     </td>
                     <td>
@@ -573,8 +573,8 @@ const RiderManagement = () => {
             {submitting
               ? "Saving..."
               : selectedRider
-              ? "Update Rider"
-              : "Create Rider"}
+                ? "Update Rider"
+                : "Create Rider"}
           </Button>
         </Modal.Footer>
       </Modal>

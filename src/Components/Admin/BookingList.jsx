@@ -47,7 +47,7 @@ const BookingList = () => {
     try {
       setLoading(true);
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getAllAppartmentOrder"
+        "http://localhost:7013/api/admin/getAllAppartmentOrder",
       );
       if (res.status === 200) {
         const allorder = res.data.orders || [];
@@ -81,7 +81,7 @@ const BookingList = () => {
   const [Addproducts, setAddproducts] = useState([]);
   const getAddproducts = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getFoodItems");
+      let res = await axios.get("http://localhost:7013/api/admin/getFoodItems");
       if (res.status === 200) {
         setAddproducts(res.data.data);
         setNoChangeData(res.data.data);
@@ -96,7 +96,7 @@ const BookingList = () => {
     try {
       setLoading(true);
       let res = await axios.delete(
-        `https://dailydish.in/api/admin/deletefoodorder/${data}`
+        `http://localhost:7013/api/admin/deletefoodorder/${data}`,
       );
       if (res) {
         alert(`Bookings Data Deleted Successfully`);
@@ -122,7 +122,7 @@ const BookingList = () => {
           key={i}
           color={i <= rating ? "#ffc107" : "#e4e5e9"}
           style={{ marginRight: "2px" }}
-        />
+        />,
       );
     }
     return stars;
@@ -147,8 +147,8 @@ const BookingList = () => {
     if (searchTerm !== "") {
       const filteredData = nochangedata.filter((user) =>
         Object.values(user).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
+          String(value).toLowerCase().includes(searchTerm),
+        ),
       );
       setApartmentOrder(filteredData);
     } else {
@@ -189,7 +189,7 @@ const BookingList = () => {
   const handleExportExcel = () => {
     // Create a custom mapping for the column headers
     const customHeaders = ApartmentOrder.filter(
-      (item) => item?.orderdelivarytype === "apartment"
+      (item) => item?.orderdelivarytype === "apartment",
     ).map((item, i) => ({
       "S.No": i + 1,
       Date: moment(item?.Placedon).format("DD-MM-YYYY, hh:mm A"),
@@ -206,7 +206,7 @@ const BookingList = () => {
         item?.allProduct
           ?.map(
             (items) =>
-              `${items?.foodItemId?.foodname} -  (${items?.quantity}.Qyt)`
+              `${items?.foodItemId?.foodname} -  (${items?.quantity}.Qyt)`,
           )
           .join(", ") || "N/A",
       Unit:
@@ -241,7 +241,7 @@ const BookingList = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: {
           newStatus: statusdata,
@@ -364,7 +364,7 @@ const BookingList = () => {
       const config = {
         url: "/admin/updateMultipleOrderStatus",
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: {
           status: selectStatus,
@@ -438,8 +438,8 @@ const BookingList = () => {
               {selectedLocations.length === 0
                 ? "All Locations"
                 : selectedLocations.length === 1
-                ? selectedLocations[0]
-                : `${selectedLocations.length} locations selected`}
+                  ? selectedLocations[0]
+                  : `${selectedLocations.length} locations selected`}
             </span>
           </button>
 
@@ -632,7 +632,7 @@ const BookingList = () => {
               ) : (
                 ApartmentOrder?.slice(
                   pagesVisited,
-                  pagesVisited + usersPerPage
+                  pagesVisited + usersPerPage,
                 )?.map((items, i) => {
                   return (
                     <tr key={i}>

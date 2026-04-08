@@ -53,19 +53,7 @@ const GlobalZoomDisable = ({ children }) => {
     meta.content =
       "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no";
     document.head.appendChild(meta);
-    // const detectDevTools = () => {
-    //   const threshold = 160; // Detects DevTools height difference
-    //   if (
-    //     window.outerHeight - window.innerHeight > threshold ||
-    //     window.outerWidth - window.innerWidth > threshold
-    //   ) {
-    //     // document.body.innerHTML = `<h2 style="text-align:center; color:red; margin-top:20%;">
-    //     //   🚨 Access Denied! 🚨 <br> 
-    //     //   Developer tools are disabled for security reasons.
-    //     // </h2>`;
-    //     window.location.assign("about:blank")
-    //   }
-    // };
+
 
     // Disable Right Click
     document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -81,22 +69,13 @@ const GlobalZoomDisable = ({ children }) => {
       }
     });
 
-    // Detect DevTools
-    // window.addEventListener("resize", detectDevTools);
 
-    // Regularly check for DevTools
-    // const checkDevTools = setInterval(() => {
-    //   detectDevTools();
-    //   debugger; // Freezes DevTools
-    // }, 500);
-    // Cleanup on component unmount
     return () => {
       document.removeEventListener("wheel", preventZoom);
       document.removeEventListener("keydown", preventKeyZoom);
       document.removeEventListener("touchmove", preventTouchZoom);
       document.head.removeChild(meta);
-      // window.removeEventListener("resize", detectDevTools);
-      // clearInterval(checkDevTools);
+    
     };
   }, []);
 

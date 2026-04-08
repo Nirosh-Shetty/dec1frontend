@@ -1,52 +1,181 @@
+.privacyMain {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.backbtn {
+  width: 30%;
+  display: flex;
+  justify-content: flex-start;
+}
+.privacypolicy > h6 {
+  text-align: center;
+}
+.privacypolicy {
+  width: 30%;
+  padding: 10px;
+  text-align: justify;
+}
+.leftHead {
+  font-weight: 800;
+  text-align: left;
+}
 
-.privacyMain{
+/* Tab-friendly enhancements */
+.backbtn button,
+.backbtn a,
+.privacypolicy a,
+.privacypolicy button {
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.backbtn button:focus,
+.backbtn a:focus,
+.privacypolicy a:focus,
+.privacypolicy button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.backbtn button:focus-visible,
+.backbtn a:focus-visible,
+.privacypolicy a:focus-visible,
+.privacypolicy button:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Ensure headings are focusable for screen readers */
+.privacypolicy h1,
+.privacypolicy h2,
+.privacypolicy h3,
+.privacypolicy h4,
+.privacypolicy h5,
+.privacypolicy h6,
+.leftHead {
+  scroll-margin-top: 20px;
+}
+
+/* Skip link for better accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+  border-radius: 4px;
+}
+
+.skip-link:focus {
+  top: 6px;
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Tablet-specific styles for full width */
+@media screen and (min-width: 800px) and (max-width: 1024px) {
+  .backbtn {
+    width: 95%;
+    padding: 0 20px;
+  }
+
+  .privacypolicy {
+    width: 95%;
+    padding: 20px;
+    max-width: none;
+  }
+
+  .privacypolicy > h6 {
+    text-align: center;
+  }
+
+  .leftHead {
+    font-weight: 800;
+    text-align: left;
+  }
+
+  /* Tab-friendly enhancements for tablet */
+  .backbtn button:focus,
+  .backbtn a:focus,
+  .privacypolicy a:focus,
+  .privacypolicy button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+
+  .backbtn button:focus-visible,
+  .backbtn a:focus-visible,
+  .privacypolicy a:focus-visible,
+  .privacypolicy button:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+}
+
+@media screen and (max-width: 799px) {
+  .privacyMain {
     width: 100%;
     height: auto;
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
-}
-.backbtn{
-    width: 30%;
-    display: flex;
-    justify-content: flex-start;
-}
-.privacypolicy>h6{
+  }
+  .backbtn {
+    width: 100%;
+  }
+  .privacypolicy > h6 {
     text-align: center;
-}
-.privacypolicy{
-    width: 30%;
+  }
+  .privacypolicy {
+    width: 100%;
     padding: 10px;
     text-align: justify;
-}
-.leftHead{
+  }
+  .leftHead {
     font-weight: 800;
     text-align: left;
-}
+  }
 
-@media screen and (max-width: 799px) {
-    .privacyMain{
-        width: 100%;
-        height: auto;
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
-    }
-    .backbtn{
-        width: 100%;
-    }
-    .privacypolicy>h6{
-        text-align: center;
-    }
-    .privacypolicy{
-        width: 100%;
-        padding: 10px;
-        text-align: justify;
-    }
-    .leftHead{
-        font-weight: 800;
-        text-align: left;
-    }
+  /* Tab-friendly enhancements for mobile */
+  .backbtn button:focus,
+  .backbtn a:focus,
+  .privacypolicy a:focus,
+  .privacypolicy button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+
+  .backbtn button:focus-visible,
+  .backbtn a:focus-visible,
+  .privacypolicy a:focus-visible,
+  .privacypolicy button:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+
+  /* Enhanced touch targets for mobile */
+  .backbtn button,
+  .backbtn a,
+  .privacypolicy a,
+  .privacypolicy button {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

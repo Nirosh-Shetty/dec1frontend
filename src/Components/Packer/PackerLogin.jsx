@@ -18,10 +18,10 @@ const LoginPage = () => {
     try {
       if (whatsappNumber.length === 10) {
         let res = await axios.post(
-          "https://dailydish.in/api/packer/sendPackerOtp",
+          "http://localhost:7013/api/packer/sendPackerOtp",
           {
             mobileNumber: whatsappNumber,
-          }
+          },
         );
         if (res.status == 200) {
           // Swal.fire({
@@ -65,11 +65,11 @@ const LoginPage = () => {
     try {
       if (otp.length === 6) {
         let res = await axios.post(
-          "https://dailydish.in/api/packer/verificationPacker",
+          "http://localhost:7013/api/packer/verificationPacker",
           {
             mobileNumber: whatsappNumber,
             otp: otp,
-          }
+          },
         );
 
         if (res.status == 200) {

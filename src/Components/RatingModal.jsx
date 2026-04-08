@@ -11,6 +11,8 @@ const RatingModal = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
+  const isTablet = window.innerWidth <= 1024;
+
   // Determine which step to show based on order data
   const determineRatingStep = (order) => {
     if (order?.ratings?.order?.status === "pending") {
@@ -29,7 +31,7 @@ const RatingModal = () => {
       if (!userId) return;
 
       const res = await axios.get(
-        `https://dailydish.in/api/admin/getorderNotRatedByUserID/${userId?._id}`
+        `http://localhost:7013/api/admin/getorderNotRatedByUserID/${userId?._id}`,
       );
 
       if (res.status === 200 && res.data.order) {
@@ -64,8 +66,8 @@ const RatingModal = () => {
       };
 
       const res = await axios.put(
-        "https://dailydish.in/api/admin/submitOrderRating",
-        payload
+        "http://localhost:7013/api/admin/submitOrderRating",
+        payload,
       );
 
       if (res.status === 200) {
@@ -165,7 +167,7 @@ const RatingModal = () => {
               padding: "1.5rem",
               boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
               width: "100%",
-              maxWidth: "620px",
+              maxWidth: isTablet ? "100%" : "620px",
               position: "relative",
               animation: "slideUp 0.3s ease-out",
             }}

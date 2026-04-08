@@ -25,7 +25,7 @@ function AdminLogin() {
       const config = {
         url: "/admin/adminLogin",
         method: "post",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: { REmail: REmail, RPassword: RPassword },
       };
@@ -38,7 +38,7 @@ function AdminLogin() {
           toast.success("Successfully logged in");
           window.localStorage.setItem(
             "admin",
-            JSON.stringify(res.data.success)
+            JSON.stringify(res.data.success),
           );
           // window.location.assign("/dashboard");
           navigate("/dashboard");

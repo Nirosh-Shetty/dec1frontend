@@ -36,7 +36,7 @@ const Side = () => {
   const [AddApartment, setAddApartment] = useState([]);
   const getAddApartment = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getapartment");
+      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
       if (res.status === 200) {
         setAddApartment(res.data.corporatedata.reverse());
       }
@@ -53,7 +53,7 @@ const Side = () => {
   const getApartmentOrder = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getAllOrderCount"
+        "http://localhost:7013/api/admin/getAllOrderCount",
       );
       if (res.status === 200) {
         setApartmentOrder(res.data);
@@ -70,7 +70,7 @@ const Side = () => {
   const [AddCorporate, setAddCorporate] = useState([]);
   const getAddCorporate = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
       }
@@ -88,7 +88,7 @@ const Side = () => {
   const getEnquiry = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/User/getEnquiryenquiry"
+        "http://localhost:7013/api/User/getEnquiryenquiry",
       );
       if (res.status === 200) {
         setEnquiry(res.data.getdata.reverse());
@@ -106,7 +106,7 @@ const Side = () => {
   const [Adduser, setAdduser] = useState([]);
   const getAdduser = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/User/registeruser");
+      let res = await axios.get("http://localhost:7013/api/User/registeruser");
       if (res.status === 200) {
         setAdduser(res.data.success.reverse());
       }
@@ -290,6 +290,17 @@ const Side = () => {
                 </li>
               </Link>
 
+              <Link to="/delivery-rate" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <LuAlignHorizontalJustifyStart
+                      style={{ fontSize: "20px" }}
+                    />
+                  </span>
+                  <span className="ms-2">Delivery Rate </span>
+                </li>
+              </Link>
+
               <Link to="/category" onClick={handleNavCollapse}>
                 <li className="a-ele ">
                   <span>
@@ -298,6 +309,17 @@ const Side = () => {
                     />
                   </span>
                   <span className="ms-2">Category </span>
+                </li>
+              </Link>
+
+              <Link to="/image-upload" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <LuAlignHorizontalJustifyStart
+                      style={{ fontSize: "20px" }}
+                    />
+                  </span>
+                  <span className="ms-2">AiSensy </span>
                 </li>
               </Link>
 

@@ -15,6 +15,7 @@ import "../Styles/Normal.css";
 import { CircleCheck, ShieldAlert } from "lucide-react";
 import cross from "../assets/cross.png";
 import LocationModal from "./LocationModal";
+import RazorpayCheckout from "./RazorpayCheckout";
 
 // --- NEW: Import the new component and its CSS ---
 import CheckoutDateStrip from "./CheckoutDateStrip";
@@ -35,7 +36,7 @@ const Checkout = () => {
   //   ) || {}
   // );
   const [address, setAddress] = useState(
-    JSON.parse(localStorage.getItem("coporateaddress")) || {}
+    JSON.parse(localStorage.getItem("coporateaddress")) || {},
   );
 
   const [expandedSections, setExpandedSections] = useState({});
@@ -87,11 +88,11 @@ const Checkout = () => {
 
     try {
       const res = await axios.post(
-        "https://dailydish.in/api/User/addStudentInformation",
+        "http://localhost:7013/api/User/addStudentInformation",
         {
           customerId: user._id,
           ...newInfo,
-        }
+        },
       );
 
       if (res.status === 200 && res.data.success) {
@@ -107,6 +108,7 @@ const Checkout = () => {
   };
 
   const Carts = JSON.parse(localStorage.getItem("cart")) || [];
+
   const [cartdata, setCartData] = useState([]);
   // small ref to avoid repeated JSON.parse when nothing changed
   const lastCartRawRef = useRef(null);
@@ -152,7 +154,7 @@ const Checkout = () => {
 
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getapartment");
+      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
         // console.log("apartmentdata", res.data);
@@ -165,7 +167,7 @@ const Checkout = () => {
   const [corporatedata, setcorporatedata] = useState([]);
   const getCorporatedata = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getcorporate");
+      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
         // console.log("corporatedata", res.data);
@@ -194,7 +196,7 @@ const Checkout = () => {
       calculateTaxPrice + subtotal + Cutlery <=
         walletSeting.minCartValueForWallet
         ? discountWallet
-        : 0
+        : 0,
     );
   };
 
@@ -242,7 +244,7 @@ const Checkout = () => {
         return;
       } else {
         const offerPrXt = cartdata?.find(
-          (ele) => ele.foodItemId === itemdata?.foodItemId && ele.extra == true
+          (ele) => ele.foodItemId === itemdata?.foodItemId && ele.extra == true,
         );
         if (offerPrXt) {
           const updatedCart = cartdata.map((item) => {
@@ -276,7 +278,7 @@ const Checkout = () => {
           updateCartData(updatedCart);
         } else {
           const offerPr2 = cartdata?.find(
-            (ele) => ele.foodItemId === itemdata?.foodItemId && !ele.extra
+            (ele) => ele.foodItemId === itemdata?.foodItemId && !ele.extra,
           );
           if (offerPr2.offerQ > offerPr2.Quantity) {
             const updatedCart = cartdata.map((item) => {
@@ -347,7 +349,8 @@ const Checkout = () => {
         updateCartData(updatedCart);
       } else {
         const offerPrXt = cartdata?.find(
-          (ele) => ele.foodItemId === itemdata?.foodItemId && ele.extra === true
+          (ele) =>
+            ele.foodItemId === itemdata?.foodItemId && ele.extra === true,
         );
         if (offerPrXt) {
           const updatedStoredCart = cartdata
@@ -442,7 +445,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/applyCoupon",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         headers: { "content-type": "application/json" },
         data: {
           mobileNumber: user?.Mobile,
@@ -493,7 +496,7 @@ const Checkout = () => {
   useEffect(() => {
     const addonedCarts = async () => {
       try {
-        let res = await axios.post("https://dailydish.in/api/cart/addCart", {
+        let res = await axios.post("http://localhost:7013/api/cart/addCart", {
           userId: user?._id,
           items: Carts,
           lastUpdated: Date.now(),
@@ -516,18 +519,18 @@ const Checkout = () => {
   const validateSlotAndCart = async () => {
     try {
       const cartResponse = await axios.get(
-        "https://dailydish.in/api/admin/getFoodItemsUnBlocks",
+        "http://localhost:7013/api/admin/getFoodItemsUnBlocks",
         {
           cartItems: cartdata,
           slot: slotdata,
-        }
+        },
       );
 
       // console.log("Cart validation response:", cartResponse);
       if (!cartResponse.status === 200) {
         let soldOutItems = cartResponse.data.data || [];
         let card = cartdata.map((prevCart) =>
-          updateCartDataWithStock(prevCart, soldOutItems)
+          updateCartDataWithStock(prevCart, soldOutItems),
         );
         if (card.length > 0) {
           Swal2.fire({
@@ -578,10 +581,10 @@ const Checkout = () => {
     product,
     cartValue,
     offerPrice,
-    location
+    location,
   ) => {
     try {
-      await axios.post("https://dailydish.in/api/admin/createreports", {
+      await axios.post("http://localhost:7013/api/admin/createreports", {
         customerName,
         phone,
         totalOrders,
@@ -606,6 +609,372 @@ const Checkout = () => {
     return strTime;
   };
   const [loading, setLoading] = useState(false);
+
+  // Razorpay payment function
+  const placeOrderWithRazorpay = async () => {
+    try {
+      setLoading(true);
+
+      // All the validation logic from the original placeorder function
+      if (Carts.length < 1) {
+        setLoading(false);
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: "Cart Alert",
+          text: `Please add items to cart`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
+
+      if (!selectedOption && addresstype !== "corporate") {
+        setLoading(false);
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: "Delivery Type",
+          text: `Please select the delivery type!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
+
+      if (!defaultAddress) {
+        setLoading(false);
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: "Cart Alert",
+          text: `Please add address`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
+
+      if (!address?.name) {
+        setLoading(false);
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: "Address",
+          text: `Please enter your address`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
+
+      if (!addresstype) {
+        setLoading(false);
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: "Address type",
+          text: `Please select the address type!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
+
+      const isValid = await validateSlotAndCart();
+      if (!isValid) {
+        setLoading(false);
+        return;
+      }
+
+      let deliveryCharge = 0;
+      if (deliveryMethod === "express") {
+        deliveryCharge = address.expressDeliveryPrice || 0;
+      } else if (deliveryMethod === "slot") {
+        deliveryCharge = address.sequentialDeliveryPrice || 0;
+      }
+
+      const totalP = (
+        calculateTaxPrice +
+        subtotal +
+        Cutlery +
+        deliveryCharge -
+        delivarychargetype -
+        discountWallet -
+        coupon
+      ).toFixed(2);
+
+      if (totalP < 0) {
+        setLoading(false);
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "error",
+          title: "Order Amount",
+          text: `Invalid order amount`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+        return;
+      }
+
+      const checkMin = cartdata.find((ele) => ele.offerProduct === true);
+
+      if (checkMin && checkMin.minCart && checkMin.minCart > subtotal) {
+        setLoading(false);
+        return Swal2.fire({
+          toast: true,
+          position: "bottom",
+          icon: "info",
+          title: "Cart",
+          text: `₹${checkMin.minCart} needed - ${checkMin.foodname} | Cart: ₹${subtotal}`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "me-small-toast",
+            title: "me-small-toast-title",
+          },
+        });
+      }
+
+      // Prepare order data for Razorpay
+      const generateUniqueId = () => {
+        const timestamp = Date.now().toString().slice(-4);
+        const randomNumber = Math.floor(1000 + Math.random() * 9000);
+        return `${address?.prefixcode}${timestamp}${randomNumber}`;
+      };
+
+      const orderGroups = groupedCart.map((group) => {
+        const groupFormattedProducts = group.items.map((item) => ({
+          foodItemId: item.foodItemId,
+          totalPrice: item.totalPrice,
+          quantity: item.Quantity,
+        }));
+
+        const groupTax = (gstlist[0]?.TotalGst / 100) * group.groupSubtotal;
+        const groupSlotValue = `${new Date(group.date).toLocaleDateString()} - ${group.session}`;
+
+        return {
+          allProduct: groupFormattedProducts,
+          subTotal: group.groupSubtotal,
+          tax: groupTax,
+          allTotal: group.groupSubtotal + groupTax,
+          slot: groupSlotValue,
+          deliveryDate: group.date,
+          session: group.session,
+          orderid: generateUniqueId(),
+          customerId: user?._id,
+          Placedon: new Date(),
+          delivarylocation: defaultAddress?.fullAddress,
+          username: address?.name,
+          Mobilenumber: Number(user?.Mobile),
+          paymentmethod: "Online",
+          delivarytype: Number(delivarychargetype || 0),
+          deliveryMethod: deliveryMethod || "slot",
+          payid: "pay001",
+          addressline: `${address?.name} ${
+            addresstype === "apartment" ? `${address?.flatno},` : ""
+          } ${addresstype === "apartment" ? `${address?.towerName},` : ""} ${
+            address?.mobilenumber
+          }`,
+          status: "Cooking",
+          approximatetime:
+            deliveryMethod === "express"
+              ? address?.expressDeliveryTime
+              : address?.sequentialDeliveryTime,
+          deliveryCharge: 0,
+          Cutlery: 0,
+          orderdelivarytype: addresstype,
+          orderstatus: "Scheduled",
+          apartment: address?.apartmentname,
+          prefixcode: address?.prefixcode,
+          companyId: user?.companyId,
+          companyName: user?.companyName,
+          customerType: user?.status,
+          studentName: storedInfo?.studentName,
+          studentClass: storedInfo?.studentClass,
+          studentSection: storedInfo?.studentSection,
+          addressType: defaultAddress?.addressType,
+          hubName: defaultAddress?.hubName,
+          hubId: defaultAddress?.hubId,
+          coordinates: defaultAddress?.location,
+        };
+      });
+
+      const config = {
+        url: "/admin/addfoodorder",
+        method: "post",
+        baseURL: "http://localhost:7013/api/",
+        headers: { "content-type": "application/json" },
+        data: {
+          orderGroups: orderGroups,
+          mainCustomerId: user?._id,
+          mainUsername: defaultAddress?.name,
+          mainMobile: Number(user?.Mobile),
+          grandSubTotal: subtotal,
+          grandTax: calculateTaxPrice,
+          grandDeliveryCharge: deliveryCharge,
+          grandCutlery: Number(Cutlery),
+          grandAllTotal: totalP,
+          coupon: coupon,
+          couponId: couponId,
+          discountWallet: discountWallet,
+          cartId: adcartId?.cartId,
+          cart_id: adcartId?.data,
+          companyId: user?.companyId,
+          companyName: user?.companyName,
+          customerType: user?.status,
+          studentName: storedInfo?.studentName,
+          studentClass: storedInfo?.studentClass,
+          studentSection: storedInfo?.studentSection,
+          addressType: defaultAddress?.addressType,
+          hubName: defaultAddress?.hubName,
+          hubId: defaultAddress?.hubId,
+          coordinates: defaultAddress?.location,
+        },
+      };
+
+      const offerconfig = {
+        url: "/admin/createreports",
+        method: "post",
+        baseURL: "http://localhost:7013/api/",
+        headers: { "content-type": "application/json" },
+        data: {
+          customerName: address?.name,
+          phone: user?.Mobile,
+          totalOrders: totalP,
+          product: checkMin?.foodname,
+          cartValue: subtotal,
+          offerPrice: checkMin?.totalPrice,
+          location: address?.apartmentname,
+        },
+      };
+
+      // Prepare Razorpay order data
+      const razorpayOrderData = {
+        userId: user?._id,
+        username: address?.name,
+        Mobile: user?.Mobile,
+        amount: totalP,
+        config: JSON.stringify(config),
+        cartId: adcartId?.cartId,
+        cart_id: adcartId?.data,
+        offerconfig: checkMin ? JSON.stringify(offerconfig) : null,
+      };
+
+      setLoading(false);
+      return razorpayOrderData;
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "error",
+        title: "Warning",
+        text: "Order preparation failed",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "me-small-toast",
+          title: "me-small-toast-title",
+        },
+      });
+      return null;
+    }
+  };
+
+  const handlePaymentSuccess = (response) => {
+    Swal2.fire({
+      toast: true,
+      position: "bottom",
+      icon: "success",
+      title: "Order",
+      text: "Order Successfully Done",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+
+    localStorage.removeItem("cart");
+    setTimeout(() => {
+      navigate("/orders", { replace: true });
+    }, 600);
+  };
+
+  const handlePaymentFailure = (error) => {
+    console.error("Payment failed:", error);
+
+    // Show toast notification
+    Swal2.fire({
+      toast: true,
+      position: "bottom",
+      icon: "error",
+      title: "Payment Failed",
+      text: "Payment could not be processed. Please try again.",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: {
+        popup: "me-small-toast",
+        title: "me-small-toast-title",
+      },
+    });
+
+    // Redirect to payment success page with failure status
+    setTimeout(() => {
+      const failureParams = new URLSearchParams({
+        transactionId: "",
+        userId: user?._id || "",
+        status: "FAILED",
+        paymentMethod: "razorpay",
+        error: error.message || "Payment could not be processed",
+      });
+      navigate("/payment-success?" + failureParams.toString());
+    }, 3000);
+  };
+
   const placeorder = async () => {
     try {
       setLoading(true);
@@ -810,7 +1179,7 @@ const Checkout = () => {
         const groupTax = (gstlist[0]?.TotalGst / 100) * group.groupSubtotal;
 
         const groupSlotValue = `${new Date(
-          group.date
+          group.date,
         ).toLocaleDateString()} - ${group.session}`;
 
         return {
@@ -866,7 +1235,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/addfoodorder",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         headers: { "content-type": "application/json" },
         data: {
           orderGroups: orderGroups,
@@ -900,7 +1269,7 @@ const Checkout = () => {
       const offerconfig = {
         url: "/admin/createreports",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         headers: { "content-type": "application/json" },
         data: {
           customerName: address?.name,
@@ -916,7 +1285,7 @@ const Checkout = () => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId: user?._id,
@@ -940,7 +1309,7 @@ const Checkout = () => {
             checkMin?.foodname,
             subtotal,
             checkMin?.totalPrice,
-            address?.apartmentname
+            address?.apartmentname,
           );
         }
         Swal2.fire({
@@ -991,7 +1360,7 @@ const Checkout = () => {
     setApartmentname(id);
     try {
       let res = await axios.get(
-        `https://dailydish.in/api/user/getSelectedAddressByUserIDAddressID/${user?._id}/${id}`
+        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddressID/${user?._id}/${id}`,
       );
       if (res.status === 200) {
         let am = res.data.getdata;
@@ -1009,7 +1378,7 @@ const Checkout = () => {
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      await axios.post(`https://dailydish.in/api/user/addressadd`, {
+      await axios.post(`http://localhost:7013/api/user/addressadd`, {
         Name: name,
         Number: mobilenumber,
         userId: user?._id,
@@ -1045,7 +1414,7 @@ const Checkout = () => {
     )?.find((data) => data?.Apartmentname === apartmentname);
     const Savedaddress = {
       _id: (addresstype === "apartment" ? apartmentdata : corporatedata)?.find(
-        (data) => data?.Apartmentname === apartmentname
+        (data) => data?.Apartmentname === apartmentname,
       )?._id,
       apartmentname: (addresstype === "apartment"
         ? apartmentdata
@@ -1107,12 +1476,12 @@ const Checkout = () => {
     const updatedCart = cartData
       .map((cartItem) => {
         const matchedFood = foodItemData.find(
-          (food) => food._id === cartItem.foodItemId
+          (food) => food._id === cartItem.foodItemId,
         );
 
         if (matchedFood) {
           const matchedLocation = matchedFood.locationPrice?.find((loc) =>
-            loc.loccationAdreess?.includes(location)
+            loc.loccationAdreess?.includes(location),
           );
 
           if (matchedLocation) {
@@ -1143,7 +1512,7 @@ const Checkout = () => {
       const updatedCart = updateCartDataWithStock(
         prevCart,
         foodItemData,
-        address
+        address,
       );
       return updatedCart;
     });
@@ -1152,7 +1521,7 @@ const Checkout = () => {
   const getfooditems = async (shouldValidate = false) => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getFoodItemsUnBlocks"
+        "http://localhost:7013/api/admin/getFoodItemsUnBlocks",
       );
       if (res.status === 200) {
         const foodItemData = res.data.data;
@@ -1202,14 +1571,14 @@ const Checkout = () => {
     }, {});
 
     return Object.values(groups).sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
+      (a, b) => new Date(a.date) - new Date(b.date),
     );
   }, [cartdata]);
 
   const [gstlist, setGstList] = useState([]);
   const getGst = async () => {
     try {
-      let res = await axios.get("https://dailydish.in/api/admin/getgst");
+      let res = await axios.get("http://localhost:7013/api/admin/getgst");
       if (res.status === 200) {
         setGstList(res.data.gst);
       }
@@ -1252,7 +1621,7 @@ const Checkout = () => {
     if (cartDates.size > 0 && !activeDateKey) {
       // Find the earliest date that is in the cart
       const sortedCartDates = Array.from(cartDates).sort(
-        (a, b) => new Date(a) - new Date(b)
+        (a, b) => new Date(a) - new Date(b),
       );
       const firstAvailableDateKey = sortedCartDates[0];
 
@@ -1260,7 +1629,7 @@ const Checkout = () => {
         setActiveDateKey(firstAvailableDateKey);
         // Find the first session for that first date
         const firstSession = cartdata.find(
-          (item) => item.deliveryDate === firstAvailableDateKey
+          (item) => item.deliveryDate === firstAvailableDateKey,
         )?.session;
         if (firstSession) {
           setActiveSession(firstSession);
@@ -1299,7 +1668,7 @@ const Checkout = () => {
       let finalAmount = Math.min(
         walletBalance,
         maxUsableAmount,
-        maxWalletUsage
+        maxWalletUsage,
       );
       setDiscountWallet(finalAmount);
     }
@@ -1355,7 +1724,7 @@ const Checkout = () => {
       let finalAmount = Math.min(
         walletBalance,
         maxUsableAmount,
-        maxWalletUsage
+        maxWalletUsage,
       );
       setDiscountWallet(finalAmount);
       Swal2.fire({
@@ -1407,12 +1776,12 @@ const Checkout = () => {
   const clearSlot = () => {
     if (!activeDateKey || !activeSession) return;
     const removed = cartdata.filter(
-      (it) => it.deliveryDate === activeDateKey && it.session === activeSession
+      (it) => it.deliveryDate === activeDateKey && it.session === activeSession,
     );
     if (removed.length === 0) return;
     const newCart = cartdata.filter(
       (it) =>
-        !(it.deliveryDate === activeDateKey && it.session === activeSession)
+        !(it.deliveryDate === activeDateKey && it.session === activeSession),
     );
     localStorage.setItem("cart", JSON.stringify(newCart));
     // update local state immediately
@@ -1468,7 +1837,7 @@ const Checkout = () => {
               setActiveDateKey(dateKey);
               // When date changes, auto-select the first available session for that date
               const firstSession = cartdata.find(
-                (item) => item.deliveryDate === dateKey
+                (item) => item.deliveryDate === dateKey,
               )?.session;
               setActiveSession(firstSession || null);
             }}
@@ -1484,7 +1853,7 @@ const Checkout = () => {
                 cartdata.filter(
                   (it) =>
                     it.deliveryDate === activeDateKey &&
-                    it.session === activeSession
+                    it.session === activeSession,
                 ).length === 0
               }
               className="delete-slot-button"
@@ -1499,7 +1868,7 @@ const Checkout = () => {
                 cartdata.filter(
                   (it) =>
                     it.deliveryDate === activeDateKey &&
-                    it.session === activeSession
+                    it.session === activeSession,
                 ).length
               }{" "}
               items)
@@ -1572,7 +1941,7 @@ const Checkout = () => {
                     .filter(
                       (item) =>
                         item.deliveryDate === activeDateKey &&
-                        item.session === activeSession
+                        item.session === activeSession,
                     )
                     .map((item, i) => (
                       <div className="cart-item" key={i}>
@@ -1681,7 +2050,7 @@ const Checkout = () => {
                     cartdata.filter(
                       (item) =>
                         item.deliveryDate === activeDateKey &&
-                        item.session === activeSession
+                        item.session === activeSession,
                     ).length === 0 && (
                       <div className="text-center p-3">
                         <MdRemoveShoppingCart style={{ fontSize: "18px" }} />
@@ -2022,23 +2391,23 @@ const Checkout = () => {
                     defaultAddress?.addressType === "Home"
                       ? defaultAddress?.homeName
                       : defaultAddress?.addressType === "PG"
-                      ? defaultAddress?.apartmentName
-                      : defaultAddress?.addressType === "School"
-                      ? defaultAddress?.schoolName
-                      : defaultAddress?.addressType === "Work"
-                      ? defaultAddress?.companyName
-                      : defaultAddress?.houseName || "No default address"
+                        ? defaultAddress?.apartmentName
+                        : defaultAddress?.addressType === "School"
+                          ? defaultAddress?.schoolName
+                          : defaultAddress?.addressType === "Work"
+                            ? defaultAddress?.companyName
+                            : defaultAddress?.houseName || "No default address"
                   }
                 >
                   {defaultAddress?.addressType === "Home"
                     ? defaultAddress?.homeName
                     : defaultAddress?.addressType === "PG"
-                    ? defaultAddress?.apartmentName
-                    : defaultAddress?.addressType === "School"
-                    ? defaultAddress?.schoolName
-                    : defaultAddress?.addressType === "Work"
-                    ? defaultAddress?.companyName
-                    : defaultAddress?.houseName || "No default address"}
+                      ? defaultAddress?.apartmentName
+                      : defaultAddress?.addressType === "School"
+                        ? defaultAddress?.schoolName
+                        : defaultAddress?.addressType === "Work"
+                          ? defaultAddress?.companyName
+                          : defaultAddress?.houseName || "No default address"}
                 </p>
                 <p
                   className="small text-truncate mb-0"
@@ -2292,8 +2661,8 @@ const Checkout = () => {
                           (walletSeting?.minCartValueForWallet || 0) -
                             (Number(calculateTaxPrice) +
                               Number(subtotal) +
-                              Number(Cutlery) || 0)
-                        )
+                              Number(Cutlery) || 0),
+                        ),
                       )}{" "}
                       more to use
                     </p>
@@ -2416,57 +2785,63 @@ const Checkout = () => {
               justifyContent: "center",
             }}
           >
-            <Button
-              variant=""
-              style={{
-                width: "100%",
-                borderRadius: "12px",
-                border: "1px solid var(--steel_light, #E8E8E8)",
-                background: " var(--success-green, #6B8E23)",
-                display: "flex",
-                height: "48px",
-                padding: "8px",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "8px",
-                marginTop: "8px",
-              }}
-              onClick={() => placeorder()}
-              className="placeorder-bill"
+            <RazorpayCheckout
+              orderData={async () => await placeOrderWithRazorpay()}
+              onPaymentSuccess={handlePaymentSuccess}
+              onPaymentFailure={handlePaymentFailure}
               disabled={loading}
             >
-              {loading ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" />
-                  Ordering...
-                </>
-              ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <div className="paybutton">Pay with UPI | </div>
-                  <p className="price-pay">
-                    ₹
-                    {(
-                      calculateTaxPrice +
-                      subtotal +
-                      Cutlery +
-                      (deliveryMethod === "express"
-                        ? address.expressDeliveryPrice || 0
-                        : address.sequentialDeliveryPrice || 0) +
-                      (delivarychargetype || 0) -
-                      discountWallet -
-                      coupon
-                    ).toFixed(2)}
-                  </p>
-                </div>
-              )}
-            </Button>
+              <Button
+                variant=""
+                style={{
+                  width: "100%",
+                  borderRadius: "12px",
+                  border: "1px solid var(--steel_light, #E8E8E8)",
+                  background: " var(--success-green, #6B8E23)",
+                  display: "flex",
+                  height: "48px",
+                  padding: "8px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginTop: "8px",
+                }}
+                className="placeorder-bill"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Processing...
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <div className="paybutton">Pay with Razorpay | </div>
+                    <p className="price-pay">
+                      ₹
+                      {(
+                        calculateTaxPrice +
+                        subtotal +
+                        Cutlery +
+                        (deliveryMethod === "express"
+                          ? address.expressDeliveryPrice || 0
+                          : address.sequentialDeliveryPrice || 0) +
+                        (delivarychargetype || 0) -
+                        discountWallet -
+                        coupon
+                      ).toFixed(2)}
+                    </p>
+                  </div>
+                )}
+              </Button>
+            </RazorpayCheckout>
           </div>
         </div>
       </div>

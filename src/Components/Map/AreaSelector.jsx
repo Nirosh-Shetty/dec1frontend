@@ -1239,6 +1239,9 @@
 
 // export default AreaSelector;
 
+
+
+
 import React, {
   useCallback,
   useEffect,
@@ -1765,21 +1768,23 @@ const AreaSelector = ({
             }}
           >
             {!isDrawing && !isEditing && paths.length === 0 && (
-              <Button
-                variant="primary"
+              <button
+                // variant="primary"
                 onClick={startDrawing}
-                size="lg"
+                // size="lg"
                 style={{
-                  backgroundColor: "#fe4500",
+                  // backgroundColor: "#fe4500",
                   borderColor: "#fe4500",
                   fontWeight: "bold",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
                   padding: "12px 20px",
                   fontSize: "16px",
+                  border:"1px solid #fe4500",
+                  borderRadius: "6px",
                 }}
               >
                 ✏️ Start Drawing
-              </Button>
+              </button>
             )}
 
             {isDrawing && (

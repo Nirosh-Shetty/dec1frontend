@@ -57,10 +57,10 @@ body {
 
 /* Active tab: only top border in green */
 .nav-item.active {
-  border-color: transparent;        /* reset all sides */
-  border-top: 3px solid #6b8e23;    /* top border only */
-  border-radius: 0;                 /* flat like the screenshot */
-  padding-top: 9px;                 /* compensate for border height */
+  border-color: transparent; /* reset all sides */
+  border-top: 3px solid #6b8e23; /* top border only */
+  border-radius: 0; /* flat like the screenshot */
+  padding-top: 9px; /* compensate for border height */
 }
 
 .nav-label {
@@ -92,7 +92,7 @@ body {
     width: 33%;
     margin: 0 auto;
   }
-  
+
   body.nav-visible,
   body {
     padding-bottom: 70px;
@@ -103,5 +103,89 @@ body {
 @media screen and (max-width: 798px) {
   .bottom-nav-container {
     width: 100%;
+  }
+}
+
+/* Tablet styles for 820x1120 resolution */
+@media screen and (min-width: 800px) and (max-width: 900px) {
+  .bottom-nav-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-color: #ffffff;
+    box-shadow: 0 -5px 18px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    z-index: 9998;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    border-top: 1px solid #f0f0f0;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  @supports (padding: max(0px)) {
+    .bottom-nav-container {
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+      height: calc(80px + max(0px, env(safe-area-inset-bottom)));
+    }
+  }
+
+  body.nav-visible,
+  body {
+    padding-bottom: 80px;
+  }
+
+  .nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: #ffffff;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    box-shadow: none;
+    color: #555555;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .nav-item.active {
+    border-color: transparent;
+    border-top: 4px solid #6b8e23;
+    border-radius: 0;
+    padding-top: 11px;
+  }
+
+  .nav-label {
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #777777;
+  }
+
+  .nav-item.active .nav-label {
+    color: #6b8e23;
+    font-weight: bold;
+  }
+
+  .nav-icon-svg {
+    color: inherit;
+    transition: transform 0.2s ease;
+    width: 24px;
+    height: 24px;
+  }
+
+  .nav-item.active .nav-icon-svg {
+    color: #6b8e23;
+    transform: scale(1.1);
   }
 }

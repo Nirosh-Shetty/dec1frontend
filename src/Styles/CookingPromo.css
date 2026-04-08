@@ -10,7 +10,7 @@
 .promo-container {
   max-width: 613px;
   width: 100%;
-  background: #FFF8DC;
+  background: #fff8dc;
   border-radius: 20px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -25,12 +25,12 @@
 
 .plan-ahead {
   font-size: 30px;
-  font-weight:900;
+  font-weight: 900;
   color: #6b8e23;
   margin: 0 0 5px 0;
   line-height: 1.1;
   animation: slideInLeft 0.6s ease-out;
-  font-family: 'Inter';
+  font-family: "Inter";
 }
 
 .confirm-before {
@@ -50,10 +50,11 @@
 .feature-item {
   display: flex;
   align-items: center;
+  gap:5px;
   margin-bottom: 0px;
   font-size: 14px;
   color: #666;
-  line-height: 1;
+  line-height: 1.7;
   opacity: 0;
   transform: translateY(10px);
   animation: fadeInUp 0.5s ease-out forwards;
@@ -72,11 +73,16 @@
   animation-delay: 0.9s;
 }
 
+.feature-item:nth-child(4) {
+  animation-delay: 0.11s;
+}
+
 .bullet {
   color: #666;
-  margin: 0 12px 0 0;
+  /* margin: 0 5px 0 0; */
   font-weight: bold;
   font-size: 1.5rem;
+  margin-top: 4px;
 }
 
 .feature-text {
@@ -86,7 +92,7 @@
 }
 
 .offer-section {
-  background: #F5DEB3;
+  background: #f5deb3;
   padding: 20px 40px;
   display: flex;
   align-items: center;
@@ -148,16 +154,15 @@
   transition: all 0.5s ease-out 0.2s;
 }
 
-.offer-text2{
+.offer-text2 {
   font-size: 16px;
   font-weight: 500;
-  font-family: 'Inter';
+  font-family: "Inter";
   color: #333;
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.5s ease-out 0.4s;
 }
-
 
 .offer-section.offer-visible .offer-text {
   opacity: 1;
@@ -250,14 +255,14 @@
   .offer-section {
     padding: 15px 25px;
   }
-  
+
   .offer-section.offer-visible {
     padding: 15px 25px;
   }
 }
 
 @media (max-width: 480px) {
-  .plan-ahead{
+  .plan-ahead {
     font-size: 28px;
   }
   .confirm-before {
@@ -289,8 +294,119 @@
   .offer-section {
     padding: 12px 20px;
   }
-  
+
   .offer-section.offer-visible {
-    padding: 12px 20px;
+    padding: 12px 3px;
+  }
+}
+
+/* Tablet styles for 820x1120 resolution */
+@media screen and (min-width: 800px) and (max-width: 900px) {
+  .cooking-promo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", sans-serif;
+    margin-bottom: 24px;
+  }
+
+  .promo-container {
+    max-width: 750px;
+    width: 100%;
+    background: #fff8dc;
+    border-radius: 24px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+  }
+
+  .main-heading {
+    padding: 28px 48px 28px 48px;
+  }
+
+  .plan-ahead {
+    font-size: 36px;
+    font-weight: 900;
+    color: #6b8e23;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+    font-family: "Inter";
+  }
+
+  .confirm-before {
+    font-size: 32px;
+    font-weight: 900;
+    color: #6b8e23;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .features-list {
+    padding: 0 48px 28px 48px;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    font-size: 17px;
+    color: #666;
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  .bullet {
+    color: #666;
+    margin: 0 14px 0 0;
+    font-weight: bold;
+    font-size: 1.8rem;
+  }
+
+  .feature-text {
+    margin-right: 18px;
+    font-size: 17px;
+    letter-spacing: -0.5px;
+  }
+
+  .offer-section {
+    background: #f5deb3;
+    padding: 24px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0 0 24px 24px;
+    height: 48px;
+    width: 100%;
+  }
+
+  .offer-section.offer-visible {
+    max-height: 96px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .rupee-symbol {
+    font-size: 2.6rem;
+    color: #6b8e23;
+    font-weight: bold;
+    margin: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .offer-text {
+    font-size: 19px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .offer-text2 {
+    font-size: 19px;
+    font-weight: 500;
+    font-family: "Inter";
+    color: #333;
   }
 }

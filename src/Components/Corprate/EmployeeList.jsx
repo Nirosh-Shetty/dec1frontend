@@ -64,7 +64,7 @@ const EmployeeList = () => {
 
   const getAllWallet = async () => {
     const result = await axios.get(
-      `https://dailydish.in/api/wallet/getAllWalletCompsny/${corporate._id}`
+      `http://localhost:7013/api/wallet/getAllWalletCompsny/${corporate._id}`,
     );
     setAllWallet(result.data.data);
   };
@@ -129,7 +129,7 @@ const EmployeeList = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/User/getUserByCompany/" + corporate._id
+        "http://localhost:7013/api/User/getUserByCompany/" + corporate._id,
       );
       if (res.status === 200) {
         setEmployees(res.data.success);
@@ -152,16 +152,16 @@ const EmployeeList = () => {
     setAddEmployeeLoading(true);
     try {
       const res = await axios.post(
-        "https://dailydish.in/api/User/registercustomer",
+        "http://localhost:7013/api/User/registercustomer",
         {
           Fname: newEmployee.Fname,
           Mobile: newEmployee.Mobile,
           employeeId: newEmployee.employeeId,
           subsidyAmount: Number(newEmployee.subsidyAmount),
           status: "Employee",
-          companyId: corporate._id,
+          companyId: corporate?._id,
           companyName: corporate.Apartmentname,
-        }
+        },
       );
       if (res.status === 200) {
         alert("Employee added successfully");
@@ -176,7 +176,7 @@ const EmployeeList = () => {
       }
     } catch (error) {
       console.error("Error adding employee:", error);
-      alert(error?.response?.data?.error || "Failed to add employee.");
+      alert(error?.response?.data?.message || "Failed to add employee.");
     } finally {
       setAddEmployeeLoading(false);
     }
@@ -186,7 +186,7 @@ const EmployeeList = () => {
   const handleEditEmployee = async () => {
     setEditEmployeeLoading(true);
     try {
-      const res = await axios.put(`https://dailydish.in/api/User/updateuser`, {
+      const res = await axios.put(`http://localhost:7013/api/User/updateuser`, {
         Fname: editEmployee.Fname,
         Mobile: editEmployee.Mobile,
         employeeId: editEmployee.employeeId,
@@ -212,7 +212,7 @@ const EmployeeList = () => {
     setDeleteEmployeeLoading(true);
     try {
       const res = await axios.delete(
-        `https://dailydish.in/api/User/deleteUser/${selectedEmployee._id}`
+        `http://localhost:7013/api/User/deleteUser/${selectedEmployee._id}`,
       );
       if (res.status === 200) {
         alert("Employee deleted successfully");
@@ -231,7 +231,7 @@ const EmployeeList = () => {
   // Wallet management
   const handleManageWallet = (wallet, type) => {
     const walletData = AllWallet.find(
-      (ele) => ele?.userId?._id.toString() === wallet?.toString()
+      (ele) => ele?.userId?._id.toString() === wallet?.toString(),
     );
     setEmployeeW(wallet);
     setSelectedWallet(walletData);
@@ -247,15 +247,15 @@ const EmployeeList = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://dailydish.in/api/wallet/add-free-cash"
-          : "https://dailydish.in/api/wallet/deduct-cash",
+          ? "http://localhost:7013/api/wallet/add-free-cash"
+          : "http://localhost:7013/api/wallet/deduct-cash",
         {
           userId: employeeW,
           amount: Number(amount),
           description,
           companyId: corporate._id,
           expiryDays: actionType === "add" ? expiryDate : null,
-        }
+        },
       );
       if (actionType === "add") {
         setShowWalletModal(false);
@@ -318,7 +318,7 @@ const EmployeeList = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Employee List");
     XLSX.writeFile(
       workbook,
-      `EmployeeList_${moment().format("YYYYMMDD")}.xlsx`
+      `EmployeeList_${moment().format("YYYYMMDD")}.xlsx`,
     );
   };
 

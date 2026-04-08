@@ -1,7 +1,7 @@
 /* View All bubble - smaller and positioned higher like in reference images */
 .view-all-bubble {
   position: fixed;
-  bottom: 140px;
+  bottom: 118px;
   left: 50%;
   transform: translateX(-50%);
   background: #e6b800;
@@ -344,7 +344,7 @@
   }
 
   .view-all-bubble {
-    bottom: 140px;
+    bottom: 115px;
     font-size: 11px;
     padding: 5px 10px;
   }
@@ -623,3 +623,12 @@
 .swal2-popup.myplans-custom-toast .swal2-timer-progress-bar {
   background-color: #6b8e23 !important;
 }
+
+
+@media (max-width: 360px) {
+   .cartbtn .my-meal-text
+ {
+   font-size: 12.5px 
+  }
+}
+

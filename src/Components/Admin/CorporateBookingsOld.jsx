@@ -77,7 +77,7 @@ const CorporateBookingsOld = () => {
     page = 1,
     resetPagination = false,
     location = [],
-    customSearch = searchH
+    customSearch = searchH,
   ) => {
     setLoading(true);
     try {
@@ -96,8 +96,8 @@ const CorporateBookingsOld = () => {
       };
 
       const res = await axios.get(
-        "https://dailydish.in/api/admin/getallordersfilterold",
-        { params }
+        "http://localhost:7013/api/admin/getallordersfilterold",
+        { params },
       );
 
       if (res.data.success) {
@@ -130,7 +130,7 @@ const CorporateBookingsOld = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dailydish.in/api/Hub/hubs", {
+      const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
         // headers: { Authorization: `Bearer ${token}` },
       });
       setHubs(res.data);
@@ -161,7 +161,7 @@ const CorporateBookingsOld = () => {
       debounce((value) => {
         getApartmentOrder(1, true, [], value); // value passed as customSearch
       }, 1000),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -213,7 +213,7 @@ const CorporateBookingsOld = () => {
     try {
       setLoading(true);
       let res = await axios.delete(
-        `https://dailydish.in/api/admin/deletefoodorder/${data}`
+        `http://localhost:7013/api/admin/deletefoodorder/${data}`,
       );
       if (res) {
         Swal.fire({
@@ -289,7 +289,7 @@ const CorporateBookingsOld = () => {
       const config = {
         url: "/admin/updateMultipleOrderStatus",
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: {
           status: selectStatus,
@@ -350,7 +350,7 @@ const CorporateBookingsOld = () => {
       setExeclLoading(true);
 
       const res = await axios.get(
-        "https://dailydish.in/api/admin/exportExcelOrder",
+        "http://localhost:7013/api/admin/exportExcelOrder",
         {
           params,
           responseType: "blob", // Critical: Handle as binary data
@@ -360,11 +360,11 @@ const CorporateBookingsOld = () => {
           onDownloadProgress: (progressEvent) => {
             // Optional: Show download progress
             const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
+              (progressEvent.loaded * 100) / progressEvent.total,
             );
             console.log(`Download Progress: ${percentCompleted}%`);
           },
-        }
+        },
       );
 
       if (res.status === 200) {
@@ -405,19 +405,20 @@ const CorporateBookingsOld = () => {
       // Handle different types of errors
       if (error.code === "ECONNABORTED") {
         alert(
-          "Export timeout. The dataset might be too large. Please try with filters to reduce the number of records."
+          "Export timeout. The dataset might be too large. Please try with filters to reduce the number of records.",
         );
       } else if (error.response?.status === 400) {
         alert(
-          error.response.data.error || "Bad request. Please check your filters."
+          error.response.data.error ||
+            "Bad request. Please check your filters.",
         );
       } else if (error.response?.status === 500) {
         alert(
-          "Server error occurred during export. Please try again or contact support."
+          "Server error occurred during export. Please try again or contact support.",
         );
       } else {
         alert(
-          "Export failed. Please check your internet connection and try again."
+          "Export failed. Please check your internet connection and try again.",
         );
       }
     } finally {
@@ -432,7 +433,7 @@ const CorporateBookingsOld = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "https://dailydish.in/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: {
           newStatus: statusdata,
@@ -478,7 +479,7 @@ const CorporateBookingsOld = () => {
           key={i}
           color={i <= rating ? "#ffc107" : "#e4e5e9"}
           style={{ marginRight: "2px" }}
-        />
+        />,
       );
     }
     return stars;
@@ -497,7 +498,7 @@ const CorporateBookingsOld = () => {
             const data = e.target.value;
             if (data) {
               const loc = JSON.parse(data)?.locations?.map(
-                (ele) => ele?.split(", ")[0]
+                (ele) => ele?.split(", ")[0],
               );
               getApartmentOrder(1, false, loc);
               // setSelectLocation(JSON.parse(data)?.locations?.map((ele)=>ele?.split(', ')[0]))
@@ -542,8 +543,8 @@ const CorporateBookingsOld = () => {
               {selectedLocations.length === 0
                 ? "All Locations"
                 : selectedLocations.length === 1
-                ? selectedLocations[0]
-                : `${selectedLocations.length} locations selected`}
+                  ? selectedLocations[0]
+                  : `${selectedLocations.length} locations selected`}
             </span>
           </button>
 

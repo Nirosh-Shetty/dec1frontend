@@ -33,7 +33,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 function CorporateDashboard() {
@@ -157,7 +157,7 @@ function CorporateDashboard() {
   const getOrders = async () => {
     try {
       let res = await axios.get(
-        `https://dailydish.in/api/admin/getAllOrdersByCompanyId/${corporate?._id}`
+        `http://localhost:7013/api/admin/getAllOrdersByCompanyId/${corporate?._id}`,
       );
       if (res.status === 200) {
         const corporateOrders = res.data.orders;
@@ -171,7 +171,7 @@ function CorporateDashboard() {
   const getAllEmployees = async () => {
     try {
       let res = await axios.get(
-        `https://dailydish.in/api/User/getUserByCompany/${corporate?._id}`
+        `http://localhost:7013/api/User/getUserByCompany/${corporate?._id}`,
       );
       if (res.status === 200) {
         setEmployees(res.data.success);

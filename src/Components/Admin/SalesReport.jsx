@@ -68,7 +68,7 @@ const SalesReport = () => {
   //   setLoading(true);
   //   try {
   //     const res = await axios.get(
-  //       "https://dailydish.in/api/admin/getFoodItems"
+  //       "http://localhost:7013/api/admin/getFoodItems"
   //     );
   //     if (res.status === 200) {
   //       setProducts(res.data.data);
@@ -89,7 +89,7 @@ const SalesReport = () => {
       if (startDate)
         params.append(
           "startDate",
-          moment(startDate).startOf("day").toISOString()
+          moment(startDate).startOf("day").toISOString(),
         );
       if (endDate)
         params.append("endDate", moment(endDate).endOf("day").toISOString());
@@ -97,7 +97,7 @@ const SalesReport = () => {
         params.append("hubId", selectHub.hubId);
       if (locationData.length > 0) {
         locationData.forEach((location) =>
-          params.append("locations", location)
+          params.append("locations", location),
         );
       }
 
@@ -110,7 +110,7 @@ const SalesReport = () => {
       params.append("sortOrder", sortOrder);
 
       const res = await axios.get(
-        `https://dailydish.in/api/admin/getSalesReport?${params.toString()}`
+        `http://localhost:7013/api/admin/getSalesReport?${params.toString()}`,
       );
       if (res.status === 200) {
         setFilteredData(res.data.data);
@@ -125,7 +125,7 @@ const SalesReport = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dailydish.in/api/Hub/hubs", {
+      const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${"token"}` },
       });
       setHubs(res.data);
@@ -419,7 +419,7 @@ const SalesReport = () => {
                     <td>
                       {item.lastSoldTime
                         ? moment(item.lastSoldTime).format(
-                            "DD-MM-YYYY hh:mm:ss A"
+                            "DD-MM-YYYY hh:mm:ss A",
                           )
                         : "-"}
                     </td>

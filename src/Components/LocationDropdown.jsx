@@ -20,7 +20,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
       autocompleteServiceRef.current =
         new window.google.maps.places.AutocompleteService();
       placesServiceRef.current = new window.google.maps.places.PlacesService(
-        document.createElement("div")
+        document.createElement("div"),
       );
     }
   }, []);
@@ -62,7 +62,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
             console.error("Error fetching suggestions:", status);
           }
         }
-      }
+      },
     );
   }, []);
 
@@ -83,7 +83,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
 
           // Reverse geocode to get address
           const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${API_KEY}`,
           );
           const data = await response.json();
 
@@ -120,7 +120,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
             setError(
-              "Location permission denied. Please enable location services."
+              "Location permission denied. Please enable location services.",
             );
             break;
           case error.POSITION_UNAVAILABLE:
@@ -133,7 +133,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
             setError("An unknown error occurred.");
             break;
         }
-      }
+      },
     );
   }, [onClose, onLocationSelect]);
 
@@ -142,7 +142,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
     async (place) => {
       if (!placesServiceRef.current) {
         placesServiceRef.current = new window.google.maps.places.PlacesService(
-          document.createElement("div")
+          document.createElement("div"),
         );
       }
 
@@ -185,10 +185,10 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
           } else {
             setError("Failed to get location details");
           }
-        }
+        },
       );
     },
-    [onClose, onLocationSelect]
+    [onClose, onLocationSelect],
   );
 
   // Save location to localStorage
@@ -196,7 +196,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
     try {
       // Check serviceability
       const serviceabilityResponse = await fetch(
-        "https://dailydish.in/api/Hub/validate-location",
+        "http://localhost:7013/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -206,7 +206,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
             lat: location.lat.toString(),
             lng: location.lng.toString(),
           }),
-        }
+        },
       );
 
       const data = await serviceabilityResponse.json();

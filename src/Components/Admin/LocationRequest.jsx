@@ -26,7 +26,7 @@
 //       params.append('page', filters.page);
 //       params.append('limit', filters.limit);
 
-//       const response = await axios.get(`https://dailydish.in/api/service-requests?${params}`);
+//       const response = await axios.get(`http://localhost:7013/api/service-requests?${params}`);
 
 //       console.log(response,"/////b//////////")
 
@@ -48,7 +48,7 @@
 //   const fetchStats = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get('https://dailydish.in/api/service-requests/stats', {
+//       const response = await axios.get('http://localhost:7013/api/service-requests/stats', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -68,7 +68,7 @@
 //       const token = localStorage.getItem('token');
 
 //       const response = await axios.put(
-//         `https://dailydish.in/api/service-requests/${requestId}`,
+//         `http://localhost:7013/api/service-requests/${requestId}`,
 //         {
 //           status: updateStatus,
 //           notes: updateNotes
@@ -535,7 +535,7 @@
 //       params.append("limit", filters.limit);
 
 //       const response = await axios.get(
-//         `https://dailydish.in/api/service-requests?${params}`,
+//         `http://localhost:7013/api/service-requests?${params}`,
 //         {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
@@ -566,7 +566,7 @@
 //     try {
 //       const token = localStorage.getItem("token");
 //       const response = await axios.get(
-//         "https://dailydish.in/api/service-requests/stats",
+//         "http://localhost:7013/api/service-requests/stats",
 //         {
 //           headers: {
 //             Authorization: `Bearer ${token}`,
@@ -588,7 +588,7 @@
 //       const token = localStorage.getItem("token");
 
 //       const response = await axios.put(
-//         `https://dailydish.in/api/service-requests/${requestId}`,
+//         `http://localhost:7013/api/service-requests/${requestId}`,
 //         {
 //           status: updateStatus,
 //           notes: updateNotes,
@@ -1364,12 +1364,12 @@ const LocationRequest = () => {
       params.append("limit", filters.limit);
 
       const response = await axios.get(
-        `https://dailydish.in/api/service-requests?${params}`,
+        `http://localhost:7013/api/service-requests?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -1383,7 +1383,7 @@ const LocationRequest = () => {
       setError(
         error.response?.data?.message ||
           error.message ||
-          "Failed to fetch requests"
+          "Failed to fetch requests",
       );
     } finally {
       setLoading(false);
@@ -1400,12 +1400,12 @@ const LocationRequest = () => {
       if (filters.status) params.append("status", filters.status);
 
       const response = await axios.get(
-        `https://dailydish.in/api/service-requests/map-locations?${params}`,
+        `http://localhost:7013/api/service-requests/map-locations?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -1419,7 +1419,7 @@ const LocationRequest = () => {
       setError(
         error.response?.data?.message ||
           error.message ||
-          "Failed to fetch locations"
+          "Failed to fetch locations",
       );
     } finally {
       setMapLoading(false);
@@ -1431,12 +1431,12 @@ const LocationRequest = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "https://dailydish.in/api/service-requests/stats",
+        "http://localhost:7013/api/service-requests/stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -1453,7 +1453,7 @@ const LocationRequest = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        `https://dailydish.in/api/service-requests/${requestId}`,
+        `http://localhost:7013/api/service-requests/${requestId}`,
         {
           status: updateStatus,
           notes: updateNotes,
@@ -1463,7 +1463,7 @@ const LocationRequest = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -1485,7 +1485,7 @@ const LocationRequest = () => {
       setError(
         error.response?.data?.message ||
           error.message ||
-          "Failed to update status"
+          "Failed to update status",
       );
     }
   };
@@ -1607,7 +1607,7 @@ const LocationRequest = () => {
             <strong>${mapLocation.customerName}</strong><br/>
             <small>${mapLocation.address}</small><br/>
             <span class="badge" style="background-color: ${getStatusColor(
-              mapLocation.status
+              mapLocation.status,
             )}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
               ${mapLocation.status}
             </span>
@@ -1674,7 +1674,7 @@ const LocationRequest = () => {
               <small>${location.name} - ${location.phone}</small><br/>
               <small>${location.address}</small><br/>
               <span class="badge" style="background-color: ${getStatusColor(
-                location.status
+                location.status,
               )}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
                 ${location.status}
               </span><br/>
@@ -2000,7 +2000,7 @@ const LocationRequest = () => {
                           <td className="px-4">
                             <span
                               className={`badge ${getStatusBadge(
-                                request.status
+                                request.status,
                               )}`}
                             >
                               {request.status}
@@ -2059,7 +2059,7 @@ const LocationRequest = () => {
                       Showing {(filters.page - 1) * filters.limit + 1} to{" "}
                       {Math.min(
                         filters.page * filters.limit,
-                        pagination.totalRequests
+                        pagination.totalRequests,
                       )}{" "}
                       of {pagination.totalRequests} results
                     </div>
@@ -2156,7 +2156,7 @@ const LocationRequest = () => {
                       <div>
                         <span
                           className={`badge ${getStatusBadge(
-                            selectedRequest.status
+                            selectedRequest.status,
                           )}`}
                         >
                           {selectedRequest.status}
@@ -2300,7 +2300,7 @@ const LocationRequest = () => {
                           <div>
                             <span
                               className={`badge ${getStatusBadge(
-                                mapLocation.status
+                                mapLocation.status,
                               )}`}
                             >
                               {mapLocation.status}
@@ -2457,7 +2457,7 @@ const LocationRequest = () => {
                             <div className="fw-bold text-warning">
                               {
                                 allLocations.filter(
-                                  (loc) => loc.status === "pending"
+                                  (loc) => loc.status === "pending",
                                 ).length
                               }
                             </div>
@@ -2467,7 +2467,7 @@ const LocationRequest = () => {
                             <div className="fw-bold text-info">
                               {
                                 allLocations.filter(
-                                  (loc) => loc.status === "reviewed"
+                                  (loc) => loc.status === "reviewed",
                                 ).length
                               }
                             </div>
@@ -2477,7 +2477,7 @@ const LocationRequest = () => {
                             <div className="fw-bold text-success">
                               {
                                 allLocations.filter(
-                                  (loc) => loc.status === "approved"
+                                  (loc) => loc.status === "approved",
                                 ).length
                               }
                             </div>
@@ -2487,7 +2487,7 @@ const LocationRequest = () => {
                             <div className="fw-bold text-danger">
                               {
                                 allLocations.filter(
-                                  (loc) => loc.status === "rejected"
+                                  (loc) => loc.status === "rejected",
                                 ).length
                               }
                             </div>

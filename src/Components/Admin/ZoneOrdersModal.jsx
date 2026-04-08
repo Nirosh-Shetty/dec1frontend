@@ -66,7 +66,7 @@ const ZoneOrdersModal = ({
       currentZone.assignedRiders.length === 0
     ) {
       showWarning(
-        "No riders are assigned to this zone. Please assign riders to the zone first."
+        "No riders are assigned to this zone. Please assign riders to the zone first.",
       );
       return;
     }
@@ -94,11 +94,11 @@ const ZoneOrdersModal = ({
       showInfo("Processing auto-assignment...", 2000);
 
       const response = await axios.post(
-        "https://dailydish.in/api/admin/auto-assign-zone-riders",
+        "http://localhost:7013/api/admin/auto-assign-zone-riders",
         {
           zoneId: currentZone.id || currentZone._id,
           session: "all",
-        }
+        },
       );
 
       if (response.data.assignedCount > 0) {
@@ -618,14 +618,14 @@ const ZoneOrdersModal = ({
                                   order.status === "Delivered"
                                     ? "#ecfdf5"
                                     : order.status === "Cooking"
-                                    ? "#fef3c7"
-                                    : "#f0f9ff",
+                                      ? "#fef3c7"
+                                      : "#f0f9ff",
                                 color:
                                   order.status === "Delivered"
                                     ? "#059669"
                                     : order.status === "Cooking"
-                                    ? "#d97706"
-                                    : "#2563eb",
+                                      ? "#d97706"
+                                      : "#2563eb",
                               }}
                             >
                               {order.status}
@@ -1013,8 +1013,8 @@ const ZoneOrdersModal = ({
                                 order.status === "Delivered"
                                   ? "#059669"
                                   : order.status === "Cooking"
-                                  ? "#d97706"
-                                  : "#2563eb",
+                                    ? "#d97706"
+                                    : "#2563eb",
                             }}
                           >
                             {order.status}
@@ -1186,7 +1186,7 @@ const ZoneOrdersModal = ({
                     {filteredOrders
                       .reduce(
                         (sum, order) => sum + (parseFloat(order.allTotal) || 0),
-                        0
+                        0,
                       )
                       .toFixed(0)}
                   </div>

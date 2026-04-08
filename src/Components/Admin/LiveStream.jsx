@@ -38,7 +38,7 @@ const Livestreams = () => {
     ];
     if (!allowedVideoTypes.includes(Livestream.type)) {
       return alert(
-        "Invalid file type. Please upload a valid video (MP4, WEBM, OGG, AVI, MKV)."
+        "Invalid file type. Please upload a valid video (MP4, WEBM, OGG, AVI, MKV).",
       );
     }
 
@@ -49,7 +49,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/Livestream",
         method: "post",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -73,12 +73,12 @@ const Livestreams = () => {
   const getAddLivestream = async () => {
     try {
       let res = await axios.get(
-        "https://dailydish.in/api/admin/getLivestream"
+        "http://localhost:7013/api/admin/getLivestream",
       );
       if (res.status === 200) {
         // Sort by date (updatedAt or other date field) or ObjectId (_id)
         const sortedVideos = res.data.getLivestream.sort(
-          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
         );
         setAddLivestream(sortedVideos);
       }
@@ -94,7 +94,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/DeleteLivestream/" + Datav,
         method: "delete",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -130,7 +130,7 @@ const Livestreams = () => {
       const config = {
         url: "admin/editLivestream",
         method: "put",
-        baseURL: "https://dailydish.in/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };

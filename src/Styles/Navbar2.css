@@ -179,3 +179,19 @@
    /* This filter converts black to #c0c0c0 */
   filter: invert(85%) sepia(0%) saturate(231%) hue-rotate(188deg) brightness(88%) contrast(93%);
 }
+
+
+/* for 360px samsumg s23  */
+
+
+@media screen and  (max-width: 360px) {
+   .side-nav-item{
+  padding: 30px;
+}
+.profile-header {
+  margin-left: 20px;
+}
+}
+
+
+ 
