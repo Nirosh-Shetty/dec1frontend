@@ -5555,7 +5555,7 @@ import { WalletContext } from "../WalletContext";
 import RatingModal from "./RatingModal";
 import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
-import moment from "moment";
+// import moment from "moment";
 import IsVeg from "../assets/isVeg=yes.svg";
 import IsNonVeg from "../assets/isVeg=no.svg";
 import MultiCartDrawer from "./MultiCartDrawer";
@@ -5563,10 +5563,11 @@ import DateSessionSelector from "./DateSessionSelector";
 import chef from "./../assets/chef_3.png";
 import { Colors, FontFamily } from "../Helper/themes";
 import BottomNav from "./BottomNav";
-import LocationRequiredPopup from "./LocationRequiredPopup";
-import { MdAddLocationAlt } from "react-icons/md";
+// import LocationRequiredPopup from "./LocationRequiredPopup";
+// import { MdAddLocationAlt } from "react-icons/md";
 import availabity from "./../assets/weui_done2-filled.png";
 import Footer from "./Footer";
+import { addToCart } from "../Helper/cartHelper";
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // Store user in state to avoid infinite render loop
@@ -6151,7 +6152,7 @@ const isBeforeCutoff = (deliveryDate, session) => {
 
   // ============ Add to cart with cutoff validation ============
   const addCart1 = async (item, checkOf, matchedLocation) => {
-    // Check cutoff before adding to cart
+    // Validate cutoff before adding
     if (!cutoffValidation.allowed) {
       Swal2.fire({
         toast: true,
@@ -6169,6 +6170,7 @@ const isBeforeCutoff = (deliveryDate, session) => {
       return;
     }
 
+    // Validate stock
     if (!matchedLocation || matchedLocation?.Remainingstock === 0) {
       Swal2.fire({
         toast: true,
@@ -6186,20 +6188,17 @@ const isBeforeCutoff = (deliveryDate, session) => {
       return;
     }
 
+    // Prepare normalized item for cartHelper
     const eff = getEffectivePrice(item, matchedLocation, selectedSession);
     const appliedPrice = checkOf ? checkOf?.price : eff.price;
 
-    const newCartItem = {
-      deliveryDate: new Date(selectedDate).toISOString(),
-      session: selectedSession,
-      foodItemId: item?._id,
+    const itemToAdd = {
+      ...item,
+      itemName: item?.foodname,
       price: appliedPrice,
-      totalPrice: appliedPrice,
-      image: item?.Foodgallery[0]?.image2,
+      _id: item?._id,
+      image: item?.Foodgallery?.[0]?.image2,
       unit: item?.unit,
-      foodname: item?.foodname,
-      quantity: item?.quantity,
-      Quantity: 1,
       gst: item?.gst,
       discount: item?.discount,
       foodcategory: item?.foodcategory,
@@ -6207,28 +6206,19 @@ const isBeforeCutoff = (deliveryDate, session) => {
       offerProduct: !!checkOf,
       minCart: checkOf?.minCart || 0,
       actualPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
-      offerQ: 1,
       basePrice: matchedLocation?.basePrice || item?.basePrice || 0,
       hubPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
       preOrderPrice: matchedLocation?.preOrderPrice || item?.preOrderPrice || 0,
     };
 
-    const cart = JSON.parse(localStorage.getItem("cart"));
-    const cartArray = Array.isArray(cart) ? cart : [];
-
-    const itemIndex = cartArray.findIndex(
-      (cartItem) =>
-        cartItem?.foodItemId === newCartItem?.foodItemId &&
-        cartItem.deliveryDate === newCartItem.deliveryDate &&
-        cartItem.session === newCartItem.session,
-    );
-
-    if (itemIndex === -1) {
-      cartArray.push(newCartItem);
-      localStorage.setItem("cart", JSON.stringify(cartArray));
-      setCarts(cartArray);
-      handleShow();
-    } else {
+    // Check if item already exists in this slot
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const slotKey = `${selectedDate.toISOString().split('T')[0]}|${selectedSession.toLowerCase()}`;
+    const cartId = `${item._id}-${selectedDate.toISOString().split('T')[0]}-${selectedSession.toLowerCase()}`;
+    
+    const exists = cart.some(c => c.cartId === cartId);
+    
+    if (exists) {
       Swal2.fire({
         toast: true,
         position: "bottom",
@@ -6242,7 +6232,16 @@ const isBeforeCutoff = (deliveryDate, session) => {
           title: "me-small-toast-title",
         },
       });
+      return;
     }
+
+    // Use cartHelper to add item - normalizes data to new format
+    addToCart(itemToAdd, selectedDate, selectedSession, 1);
+    
+    // Update state with normalized cart
+    const updatedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCarts(updatedCart);
+    handleShow();
   };
 
   const [cart, setCart] = useState([]);
@@ -6277,7 +6276,13 @@ const isBeforeCutoff = (deliveryDate, session) => {
 
   const increaseQuantity = (foodItemId, checkOf, item, matchedLocation) => {
     const maxStock = matchedLocation?.Remainingstock || 0;
-    const selectedDateISO = selectedDate.toISOString();
+    
+    // Convert selected date to YYYY-MM-DD format (new cartHelper format)
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDate.getDate()).padStart(2, "0");
+    const selectedDateStr = `${year}-${month}-${day}`;
+    const sessionLower = selectedSession.toLowerCase();
     
     if (!checkOf) {
       if (!cutoffValidation.allowed) {
@@ -6299,16 +6304,14 @@ const isBeforeCutoff = (deliveryDate, session) => {
       
       const updatedCart = Carts.map((cartItem) => {
         if (
-          cartItem.foodItemId === foodItemId &&
-          cartItem.deliveryDate === selectedDateISO &&
-          cartItem.session === selectedSession &&
-          !cartItem.extra
+          cartItem._id === foodItemId &&
+          cartItem.deliveryDate === selectedDateStr &&
+          cartItem.session === sessionLower
         ) {
-          if (cartItem.Quantity < maxStock) {
+          if (cartItem.quantity < maxStock) {
             return {
               ...cartItem,
-              Quantity: cartItem.Quantity + 1,
-              totalPrice: cartItem.price * (cartItem.Quantity + 1),
+              quantity: cartItem.quantity + 1,
             };
           } else {
             Swal2.fire({
@@ -6332,25 +6335,22 @@ const isBeforeCutoff = (deliveryDate, session) => {
     } else {
       const offerPr = Carts.find(
         (ele) =>
-          ele.foodItemId == foodItemId &&
-          ele.deliveryDate === selectedDate.toISOString() &&
-          ele.session === selectedSession &&
-          !ele.extra,
+          ele._id === foodItemId &&
+          ele.deliveryDate === selectedDateStr &&
+          ele.session === sessionLower,
       );
 
-      if (offerPr && offerPr.offerQ > offerPr.Quantity) {
+      if (offerPr && offerPr.quantity < maxStock) {
         const updatedCart = Carts.map((cartItem) => {
           if (
-            cartItem.foodItemId === foodItemId &&
-            cartItem.deliveryDate === selectedDateISO &&
-            cartItem.session === selectedSession &&
-            !cartItem.extra
+            cartItem._id === foodItemId &&
+            cartItem.deliveryDate === selectedDateStr &&
+            cartItem.session === sessionLower
           ) {
-            if (cartItem.Quantity < maxStock) {
+            if (cartItem.quantity < maxStock) {
               return {
                 ...cartItem,
-                Quantity: cartItem.Quantity + 1,
-                totalPrice: cartItem.price * (cartItem.Quantity + 1),
+                quantity: cartItem.quantity + 1,
               };
             } else {
               Swal2.fire({
@@ -6372,76 +6372,6 @@ const isBeforeCutoff = (deliveryDate, session) => {
         });
 
         updateCartData(updatedCart);
-      } else {
-        const offerPrXt = Carts?.find(
-          (ele) =>
-            ele.foodItemId === foodItemId &&
-            ele.deliveryDate === selectedDate.toISOString() &&
-            ele.session === selectedSession &&
-            ele.extra === true,
-        );
-
-        if (offerPrXt) {
-          const updatedCart = Carts.map((cartItem) => {
-            if (
-              cartItem.foodItemId === foodItemId &&
-              cartItem.deliveryDate === selectedDateISO &&
-              cartItem.session === selectedSession &&
-              cartItem.extra === true
-            ) {
-              if (cartItem.Quantity < maxStock) {
-                return {
-                  ...cartItem,
-                  Quantity: cartItem.Quantity + 1,
-                  totalPrice: cartItem.price * (cartItem.Quantity + 1),
-                };
-              } else {
-                Swal2.fire({
-                  toast: true,
-                  position: "bottom",
-                  icon: "info",
-                  title: `No more stock available!`,
-                  showConfirmButton: false,
-                  timer: 3000,
-                  timerProgressBar: true,
-                  customClass: {
-                    popup: "me-small-toast",
-                    title: "me-small-toast-title",
-                  },
-                });
-              }
-            }
-            return cartItem;
-          });
-
-          updateCartData(updatedCart);
-        } else {
-          const effNew = getEffectivePrice(item, matchedLocation, selectedSession, true);
-          updateCartData([
-            ...Carts,
-            {
-              deliveryDate: selectedDate.toISOString(),
-              session: selectedSession,
-              foodItemId: item?._id,
-              price: effNew.price,
-              totalPrice: effNew.price,
-              image: item?.Foodgallery[0]?.image2,
-              unit: item?.unit,
-              foodname: item?.foodname,
-              quantity: item?.quantity,
-              Quantity: 1,
-              gst: item?.gst,
-              discount: item?.discount,
-              foodcategory: item?.foodcategory,
-              remainingstock: maxStock,
-              offerProduct: false,
-              minCart: 0,
-              actualPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
-              offerQ: 0,
-              extra: true,
-            },
-          ]);
-        }
       }
     }
   };
@@ -6450,109 +6380,72 @@ const isBeforeCutoff = (deliveryDate, session) => {
   const [expiryDays, setExpiryDays] = useState(0);
 
   const decreaseQuantity = (foodItemId, checkOf, matchedLocation) => {
-    const selectedDateISO = selectedDate.toISOString();
+    // Convert selected date to YYYY-MM-DD format (new cartHelper format)
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDate.getDate()).padStart(2, "0");
+    const selectedDateStr = `${year}-${month}-${day}`;
+    const sessionLower = selectedSession.toLowerCase();
+    
     if (!checkOf) {
       const updatedCart = Carts.map((item) => {
         if (
-          item.foodItemId === foodItemId &&
-          item.Quantity > 0 &&
-          item.deliveryDate === selectedDateISO &&
-          item.session === selectedSession &&
-          !item.extra
+          item._id === foodItemId &&
+          item.quantity > 0 &&
+          item.deliveryDate === selectedDateStr &&
+          item.session === sessionLower
         ) {
           return {
             ...item,
-            Quantity: item.Quantity - 1,
-            totalPrice: item.price * (item.Quantity - 1),
+            quantity: item.quantity - 1,
           };
         }
         return item;
-      }).filter((item) => item.Quantity > 0);
+      }).filter((item) => item.quantity > 0);
 
       updateCartData(updatedCart);
     } else {
       const offerPr = Carts.find(
         (ele) =>
-          ele.foodItemId == foodItemId &&
-          ele.deliveryDate === selectedDate.toISOString() &&
-          ele.session === selectedSession &&
-          !ele.extra,
+          ele._id === foodItemId &&
+          ele.deliveryDate === selectedDateStr &&
+          ele.session === sessionLower,
       );
 
-      if (offerPr && offerPr.offerQ > offerPr.Quantity) {
+      if (offerPr && offerPr.quantity > 0) {
         const updatedCart = Carts.map((item) => {
           if (
-            item.foodItemId === foodItemId &&
-            item.Quantity > 0 &&
-            item.deliveryDate === selectedDateISO &&
-            item.session === selectedSession &&
-            !item.extra
+            item._id === foodItemId &&
+            item.quantity > 0 &&
+            item.deliveryDate === selectedDateStr &&
+            item.session === sessionLower
           ) {
-            const newQuantity = item.Quantity - 1;
-            let newTotalPrice;
-            if (newQuantity <= offerPr.offerQ) {
-              newTotalPrice = offerPr.price * newQuantity;
-            } else {
-              newTotalPrice = offerPr.actualPrice * newQuantity;
-            }
-
             return {
               ...item,
-              Quantity: newQuantity,
-              totalPrice: newTotalPrice,
+              quantity: item.quantity - 1,
             };
           }
           return item;
-        }).filter((item) => item.Quantity > 0);
+        }).filter((item) => item.quantity > 0);
 
         updateCartData(updatedCart);
       } else {
-        const offerExtraItem = Carts?.find(
-          (ele) =>
-            ele.foodItemId === foodItemId &&
-            ele.deliveryDate === selectedDate.toISOString() &&
-            ele.session === selectedSession &&
-            ele.extra === true,
-        );
+        const updatedCart = Carts.map((item) => {
+          if (
+            item._id === foodItemId &&
+            item.quantity > 0 &&
+            item.deliveryDate === selectedDateStr &&
+            item.session === sessionLower
+          ) {
+            return {
+              ...item,
+              quantity: item.quantity - 1,
+            };
+          }
+          return item;
+        }).filter((item) => item.quantity > 0);
 
-        if (offerExtraItem) {
-          const updatedCart = Carts.map((item) => {
-            if (
-              item.foodItemId === foodItemId &&
-              item.extra === true &&
-              item.Quantity > 0 &&
-              item.deliveryDate === selectedDateISO &&
-              item.session === selectedSession
-            ) {
-              return {
-                ...item,
-                Quantity: item.Quantity - 1,
-                totalPrice: item.price * (item.Quantity - 1),
-              };
-            }
-            return item;
-          }).filter((item) => item.Quantity > 0);
-
-          updateCartData(updatedCart);
-        } else {
-          const updatedCart = Carts.map((item) => {
-            if (
-              item.foodItemId === foodItemId &&
-              item.Quantity > 0 &&
-              item.deliveryDate === selectedDateISO &&
-              item.session === selectedSession
-            ) {
-              return {
-                ...item,
-                Quantity: item.Quantity - 1,
-                totalPrice: item.price * (item.Quantity - 1),
-              };
-            }
-            return item;
-          }).filter((item) => item.Quantity > 0);
-
-          updateCartData(updatedCart);
-        }
+        updateCartData(updatedCart);
       }
     }
   };
@@ -6607,8 +6500,8 @@ const isBeforeCutoff = (deliveryDate, session) => {
         };
       }
 
-      acc[key].totalItems += item.Quantity;
-      acc[key].subtotal += item.price * item.Quantity;
+      acc[key].totalItems += item.quantity;
+      acc[key].subtotal += item.price * item.quantity;
       acc[key].items.push(item);
 
       return acc;
@@ -6660,7 +6553,8 @@ const isBeforeCutoff = (deliveryDate, session) => {
   const hubId = address?.hubId;
   const deliveryRate = findDeliveryRate(hubId, acquisitionChannelForDelivery, userStatus);
 
-  const proceedToPlan = async () => {
+  const proceedToCheckout = () => {
+    // Validate: User logged in
     if (!user) {
       Swal2.fire({
         toast: true,
@@ -6677,10 +6571,13 @@ const isBeforeCutoff = (deliveryDate, session) => {
       });
       return;
     }
+
+    // Validate: Cart not empty
     if (Carts.length === 0) {
       return;
     }
 
+    // Validate: Address selected
     if (!address) {
       Swal2.fire({
         toast: true,
@@ -6697,46 +6594,13 @@ const isBeforeCutoff = (deliveryDate, session) => {
       });
       return;
     }
-    
-    setloader(true);
-    try {
-      const addressDetails = {
-        addressId: address._id || "",
-        addressline: `${address.fullAddress}`,
-        addressType: address.addressType || "",
-        coordinates: address.location?.coordinates || [0, 0],
-        hubId: address.hubId || "",
-        hubName: address.hubName || "",
-        studentInformation: address.studentInformation,
-        schoolName: address.schoolName || "",
-        houseName: address.houseName || "",
-        apartmentName: address.apartmentName || "",
-        companyName: address.companyName || "",
-        companyId: address.companyId || "",
-        customerType: user.status || "",
-      };
 
-      const res = await axios.post("http://localhost:7013/api/user/plan/add-to-plan", {
-        userId: user._id,
-        mobile: user.Mobile,
-        username: user.Fname,
-        companyId: user?.companyId || "",
-        items: Carts,
-        addressDetails: addressDetails,
-        deliveryCharge: deliveryRate,
-      });
-
-      if (res.status === 200) {
-        localStorage.removeItem("cart");
-        setCarts([]);
-        navigate("/my-plan");
-      }
-    } catch (error) {
-      console.error("❌ proceedToPlan - Error:", error);
-    } finally {
-      setloader(false);
-    }
+    // All validations passed - navigate to checkout
+    navigate("/checkout-multiple");
   };
+
+  // Legacy alias for backwards compatibility (if used elsewhere)
+  const proceedToPlan = proceedToCheckout;
 
   // Time check effect
   useEffect(() => {
@@ -6942,13 +6806,18 @@ const isBeforeCutoff = (deliveryDate, session) => {
   };
 
   const getCartQuantity = (itemId) => {
-    const selectedDateISO = selectedDate.toISOString();
+    // Convert selected date to YYYY-MM-DD format (new cartHelper format)
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDate.getDate()).padStart(2, "0");
+    const selectedDateStr = `${year}-${month}-${day}`;
+    
     return Carts?.filter(
       (cartItem) =>
-        cartItem?.foodItemId === itemId &&
-        cartItem.deliveryDate === selectedDateISO &&
-        cartItem.session === selectedSession,
-    )?.reduce((total, curr) => total + curr?.Quantity, 0);
+        cartItem?._id === itemId &&
+        cartItem.deliveryDate === selectedDateStr &&
+        cartItem.session === selectedSession.toLowerCase(),
+    )?.reduce((total, curr) => total + curr?.quantity, 0);
   };
 
   // Automatically remove today's Lunch/Dinner cart items after cutoff times

@@ -98,6 +98,7 @@ import LocationModal2 from "./Components/LocationModal2";
 import LocationPage from "./Components/LocationPage";
 import DeliveryRate from "./Components/Admin/DeliveryRate";
 import AiSensyImage from "./Components/Admin/AiSensyImage";
+import CheckoutMultiple from "./Components/CheckoutMultiple";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -241,6 +242,15 @@ function App() {
             element={
               <>
                 <MyPlan />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/checkout-multiple"
+            element={
+              <>
+                <CheckoutMultiple />
                 <Footer />
               </>
             }
