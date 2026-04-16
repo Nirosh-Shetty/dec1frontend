@@ -42,6 +42,14 @@ const CheckoutMultiple = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [transactionId, setTransactionId] = useState(null);
+  
+  // Delivery & Payment states
+  const [selectedDeliveryType, setSelectedDeliveryType] = useState(null);
+  const [couponId, setCouponId] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [discountWallet, setDiscountWallet] = useState(0);
+  const [isBillingOpen, setIsBillingOpen] = useState(true);
+  const [gstPercent, setGstPercent] = useState(5); // Default 5% GST
 
   // Get cart data
   const cartItems = useMemo(() => getCart(), []);
