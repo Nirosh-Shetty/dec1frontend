@@ -491,6 +491,8 @@ veg {
 }
 
 .billdetail {
+  display: flex;
+  flex-direction: row !important;
   height: auto !important;
 }
 
@@ -961,7 +963,6 @@ justify-content: space-between; */
 /* --- FIX FOR SMALL SCREENS --- */
 @media (max-width: 600px) {
   .billdetail {
-    flex-direction: row;             /* keep in a row */
     justify-content: space-between;  /* space between */
     gap: 20px;                       /* reduce gap if needed */
   }

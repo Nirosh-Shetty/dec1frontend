@@ -17,8 +17,6 @@ import cross from "../assets/cross.png";
 import LocationModal from "./LocationModal";
 import {
   getCart,
-  getCartGroupedByDateSession,
-  calculateCartTotals,
   getCartSummary,
   clearCart,
 } from "../Helper/cartHelper";
@@ -45,24 +43,6 @@ const CheckoutMultiple = () => {
 
   // Get cart data from helper
   const cartItems = useMemo(() => getCart(), []);
-  const groupedCarts = useMemo(() => {
-    try {
-      return getCartGroupedByDateSession();
-    } catch (error) {
-      console.error("Error grouping cart items:", error);
-      return {};
-    }
-  }, [cartItems]);
-
-  const totals = useMemo(() => {
-    try {
-      return calculateCartTotals();
-    } catch (error) {
-      console.error("Error calculating totals:", error);
-      return { bySlot: {}, total: 0, itemCount: 0 };
-    }
-  }, [cartItems]);
-
   const summary = useMemo(() => {
     try {
       return getCartSummary();
@@ -143,7 +123,6 @@ const CheckoutMultiple = () => {
     getCorporatedata();
   }, []);
 
-  const [delivarychargetype, setdelivarychargetype] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
   const [Cutlery, setCutlery] = useState(0);
   const [name, setname] = useState("");
@@ -157,6 +136,7 @@ const CheckoutMultiple = () => {
   const [discountWallet, setDiscountWallet] = useState(0);
   const [loading, setLoading] = useState(false);
   const [gstRate, setGstRate] = useState(5); // Default GST rate
+  const [deliveryRates, setDeliveryRates] = useState([]);
 
   // Fetch GST rate from backend
   useEffect(() => {
@@ -173,7 +153,96 @@ const CheckoutMultiple = () => {
     fetchGST();
   }, []);
 
-  const subtotal = totals.total;
+  const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress")) || {};
+  const defaultAddress = primaryAddress;
+  const addressHubId = defaultAddress?.hubId || "";
+
+  useEffect(() => {
+    const fetchDeliveryRatesByHub = async () => {
+      if (!addressHubId) {
+        setDeliveryRates([]);
+        return;
+      }
+
+      try {
+        const res = await axios.get(
+          `http://localhost:7013/api/deliveryrate/hub/${encodeURIComponent(addressHubId)}`,
+        );
+        setDeliveryRates(Array.isArray(res.data?.data) ? res.data.data : []);
+      } catch (error) {
+        console.error("Error fetching delivery rates by hub:", error);
+        setDeliveryRates([]);
+      }
+    };
+
+    fetchDeliveryRatesByHub();
+  }, [addressHubId]);
+
+  const roundAmount = (value) => Math.round((Number(value) || 0) * 100) / 100;
+
+  const subtotal = useMemo(() => {
+    return roundAmount(
+      cartdata.reduce((sum, item) => {
+        const quantity = Number(item.quantity || item.Quantity || 1);
+        const itemTotal = Number(
+          item.totalPrice ??
+            ((item.preOrderPrice ?? item.price ?? item.hubPrice ?? 0) * quantity),
+        );
+        return sum + (Number.isFinite(itemTotal) ? itemTotal : 0);
+      }, 0),
+    );
+  }, [cartdata]);
+
+  const deliverySlotCount = useMemo(() => {
+    const slots = new Set(
+      cartdata.map((item) => `${item.deliveryDate}|${item.session}`),
+    );
+    return slots.size;
+  }, [cartdata]);
+
+  const findDeliveryRate = (rates, hubId, acquisitionChannel, status) => {
+    if (!hubId || !Array.isArray(rates) || rates.length === 0) return null;
+
+    const matchesHub = (rate) => String(rate.hubId) === String(hubId);
+    const matchers = [
+      (rate) =>
+        matchesHub(rate) &&
+        rate.acquisition_channel === acquisitionChannel &&
+        rate.status === status,
+      (rate) =>
+        matchesHub(rate) && rate.acquisition_channel === acquisitionChannel,
+      (rate) => matchesHub(rate) && rate.status === status,
+      (rate) =>
+        matchesHub(rate) &&
+        rate.acquisition_channel === "organic" &&
+        rate.status === "Normal",
+      matchesHub,
+    ];
+
+    const matchedRate = matchers
+      .map((matcher) => rates.find(matcher))
+      .find(Boolean);
+
+    return matchedRate ? Number(matchedRate.deliveryRate || 0) : null;
+  };
+
+  const userDeliveryStatus = user?.status === "Employee" ? "Employee" : "Normal";
+  const userAcquisitionChannel = user?.acquisition_channel || "organic";
+  const fallbackDeliveryRate = Number(
+    defaultAddress?.Delivarycharge ?? address?.Delivarycharge ?? 0,
+  );
+  const deliveryChargePerSlot = roundAmount(
+    findDeliveryRate(
+      deliveryRates,
+      addressHubId,
+      userAcquisitionChannel,
+      userDeliveryStatus,
+    ) ?? fallbackDeliveryRate,
+  );
+  const totalDeliveryCharge = roundAmount(deliveryChargePerSlot * deliverySlotCount);
+  const totalPayable = roundAmount(
+    Math.max(subtotal + Cutlery + totalDeliveryCharge - discountWallet - coupon, 0),
+  );
 
   // For TAX-INCLUSIVE products: break down the tax that's already in the price
   // Formula: If price = 105 with 5% tax included:
@@ -269,9 +338,9 @@ const CheckoutMultiple = () => {
       return;
     }
     if (e.target.checked) {
-      let maxUsableAmount =  subtotal + Cutlery;
+      let maxUsableAmount = subtotal + Cutlery + totalDeliveryCharge - coupon;
       let walletBalance = wallet?.balance || 0;
-      let finalAmount = Math.min(walletBalance, maxUsableAmount);
+      let finalAmount = Math.min(walletBalance, Math.max(maxUsableAmount, 0));
       setDiscountWallet(finalAmount);
     } else {
       setDiscountWallet(0);
@@ -283,9 +352,6 @@ const CheckoutMultiple = () => {
   };
 
   const [isBillingOpen, setIsBillingOpen] = useState(true);
-
-  const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress")) || {};
-  const defaultAddress = primaryAddress;
 
   const handleCheckout = async () => {
     if (!user) {
@@ -330,16 +396,11 @@ const CheckoutMultiple = () => {
     setLoading(true);
 
     try {
-      const payableAmount = Math.max(
-        subtotal +
-        Cutlery -
-        discountWallet -
-        coupon,
-        0
-      );
+      const payableAmount = totalPayable;
       const totalAmount = Math.round(payableAmount * 100) / 100;
       const enrichedCartItems = cartdata.map((item) => ({
         ...item,
+        deliveryCharge: deliveryChargePerSlot,
         username: user.Fname,
         mobile: user.Mobile,
         userId: user._id,
@@ -815,10 +876,7 @@ const CheckoutMultiple = () => {
                       className={`leftcard ${
                         selectedOption === "Door" ? "active" : ""
                       }`}
-                      onClick={() =>
-                        setdelivarychargetype(address?.doordelivarycharge) ||
-                        setSelectedOption("Door")
-                      }
+                      onClick={() => setSelectedOption("Door")}
                     >
                       {selectedOption === "Door" && (
                         <div className="top-right-icon">
@@ -831,8 +889,8 @@ const CheckoutMultiple = () => {
                         </div>
                       </div>
                       <div className="center mt-1">
-                        {address?.doordelivarycharge > 0 ? (
-                          <b>₹ {address?.doordelivarycharge}</b>
+                        {deliveryChargePerSlot > 0 ? (
+                          <b>₹ {deliveryChargePerSlot}</b>
                         ) : (
                           <b
                             style={{
@@ -857,10 +915,7 @@ const CheckoutMultiple = () => {
                       className={`rightcard ${
                         selectedOption === "Gate/Tower" ? "active" : ""
                       }`}
-                      onClick={() =>
-                        setdelivarychargetype(address?.Delivarycharge) ||
-                        setSelectedOption("Gate/Tower")
-                      }
+                      onClick={() => setSelectedOption("Gate/Tower")}
                     >
                       {selectedOption === "Gate/Tower" && (
                         <div className="top-right-icon">
@@ -873,8 +928,8 @@ const CheckoutMultiple = () => {
                         </div>
                       </div>
                       <div className="center mt-1">
-                        {address?.Delivarycharge > 0 ? (
-                          <b>₹ {address?.Delivarycharge}</b>
+                        {deliveryChargePerSlot > 0 ? (
+                          <b>₹ {deliveryChargePerSlot}</b>
                         ) : (
                           <b
                             style={{
@@ -901,10 +956,7 @@ const CheckoutMultiple = () => {
                     className={`rightcard ${
                       selectedOption === "Gate/Tower" ? "active" : ""
                     }`}
-                    onClick={() =>
-                      setdelivarychargetype(address?.Delivarycharge) ||
-                      setSelectedOption("Gate/Tower")
-                    }
+                    onClick={() => setSelectedOption("Gate/Tower")}
                   >
                     {selectedOption === "Gate/Tower" && (
                       <div className="top-right-icon">
@@ -917,8 +969,8 @@ const CheckoutMultiple = () => {
                       </div>
                     </div>
                     <div className="center mt-1">
-                      {address?.Delivarycharge > 0 ? (
-                        <b>₹ {address?.Delivarycharge}</b>
+                      {deliveryChargePerSlot > 0 ? (
+                        <b>₹ {deliveryChargePerSlot}</b>
                       ) : (
                         <b
                           style={{
@@ -1134,8 +1186,9 @@ const CheckoutMultiple = () => {
                         Math.min(
                           walletSeting?.minCartValueForWallet || 0,
                           (walletSeting?.minCartValueForWallet || 0) -
-                            (                              Number(subtotal) +
-                              Number(Cutlery) || 0),
+                            (Number(subtotal) +
+                              Number(Cutlery) +
+                              Number(totalDeliveryCharge) || 0),
                         ),
                       )}
                       {/* {Math.max(
@@ -1178,7 +1231,7 @@ const CheckoutMultiple = () => {
             <div className="deliverycard">
               <div className="maincard2 p-3">
                 <div
-                  className="billdetail d-flex justify-content-between align-items-start w-100 flex-wrap"
+                  className="billdetail  w-100 flex-wrap "
                   style={{ gap: "20px" }}
                 >
                   <div className="label-column">
@@ -1188,8 +1241,14 @@ const CheckoutMultiple = () => {
                     {coupon !== 0 && (
                       <div className="toatal-va">Coupon Discount</div>
                     )}
-                    {selectedOption && (
-                      <div className="toatal-va">{`${selectedOption} Delivery`}</div>
+                    {totalDeliveryCharge !== 0 && (
+                      <div className="toatal-va">
+                        {deliverySlotCount > 1
+                          ? `Delivery (${deliverySlotCount} slots)`
+                          : selectedOption
+                            ? `${selectedOption} Delivery`
+                            : "Delivery"}
+                      </div>
                     )}
                     {discountWallet !== 0 && (
                       <div className="toatal-va">Wallet Pay</div>
@@ -1211,8 +1270,8 @@ const CheckoutMultiple = () => {
                         - ₹ {coupon}
                       </div>
                     )}
-                    {selectedOption && (
-                      <div className="toatal-va">₹ {delivarychargetype}</div>
+                    {totalDeliveryCharge !== 0 && (
+                      <div className="toatal-va">₹ {totalDeliveryCharge}</div>
                     )}
                     {discountWallet !== 0 && (
                       <div className="toatal-va" style={{ color: "green" }}>
@@ -1222,13 +1281,7 @@ const CheckoutMultiple = () => {
                     <div className="toatal-va">
                       <b>
                         ₹{" "}
-                        {(
-                          // calculateTaxPrice +
-                          subtotal +
-                          Cutlery -
-                          discountWallet -
-                          coupon
-                        ).toFixed(2)}
+                        {totalPayable.toFixed(2)}
                       </b>
                     </div>
                   </div>
@@ -1280,13 +1333,7 @@ const CheckoutMultiple = () => {
                   <div className="paybutton">Place Order | </div>
                   <p className="price-pay">
                     ₹
-                    {(
-                      // calculateTaxPrice +
-                      subtotal +
-                      Cutlery -
-                      discountWallet -
-                      coupon
-                    ).toFixed(2)}
+                    {totalPayable.toFixed(2)}
                   </p>
                 </div>
               )}
