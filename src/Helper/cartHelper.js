@@ -221,7 +221,9 @@ export const calculateCartTotals = () => {
 
   Object.entries(grouped).forEach(([slot, items]) => {
     const slotTotal = items.reduce((sum, item) => {
-      return sum + (item.price * item.quantity);
+      // Use totalPrice if already calculated, otherwise use preOrderPrice * quantity
+      const itemTotal = item.totalPrice || (item.preOrderPrice * item.quantity);
+      return sum + itemTotal;
     }, 0);
     bySlot[slot] = slotTotal;
     grandTotal += slotTotal;

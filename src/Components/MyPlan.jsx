@@ -1426,7 +1426,7 @@ const MyPlan = () => {
         <div className="mobile-banner-updated">
           <div
             className="screen-checkout mb-2 checkout-header d-flex align-items-center justify-content-between"
-            style={{ gap: "24px" }}
+            style={{ gap: "24px",flexDirection:"row" }}
           >
             <div 
             style={{
@@ -1603,7 +1603,7 @@ const MyPlan = () => {
                           {(plan.products || []).map((product, idx) => (
                             <div key={product._id || idx} className="plan-item-line">
                               <div className="plan-item-info">
-                                <span style={{ marginRight: "6px", color: "#6b8e23", fontWeight: "600" }}>✓</span>
+                                <img src={product.foodCategory==="Veg" ? IsVeg : IsNonVeg} className="plan-item-category" />
                                 <span className="plan-item-food-name">
                                   {product.foodName}
                                   {product.quantity > 1 && <span style={{ marginLeft: '4px' }}>×{product.quantity}</span>}
@@ -1616,12 +1616,18 @@ const MyPlan = () => {
 
                         {/* DELIVERY ADDRESS - BEFORE FRESHNESS JOURNEY */}
                         <div className="plan-delivery-info">
-                          <div className="delivery-location-label">
-                            📍 DELIVERING TO
+                          <span className="plan-delivery-info-left">
+                            !
+                            </span>
+                            <div className="plan-delivery-info-right">
+                              <div className="delivery-location-label">
+                            DELIVERING TO
                           </div>
                           <div className="delivery-address-main">
                             {plan.delivarylocation || ""}
                           </div>
+                            </div>
+                          
                         </div>
 
                         {/* FRESHNESS JOURNEY - Only for confirmed orders */}

@@ -1705,7 +1705,7 @@ body.nav-hidden .fixed-bottom-bar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 10px;
+  padding: 2px 10px;
   border-radius: 10px;
   font-size: 11px;
   font-weight: 600;
@@ -1893,7 +1893,9 @@ body.nav-hidden .fixed-bottom-bar {
   line-height: 1.2;
   word-break: break-word;
 }
-
+.plan-item-category{
+  scale:0.8;
+}
 .point-time {
   font-size: 8px;
   color: var(--secondary-text);
@@ -1917,8 +1919,17 @@ font-size: 0.8rem;
   padding: 12px 16px;
   background: var(--app-foreground);
   border-bottom: 1px solid #f0ede5;
+  display: flex;
+  align-items:start;
+  justify-content: start;
+  gap: 5px;
 }
-
+.plan-delivery-info-right{
+ display: flex;
+ flex-direction: columnwh;
+ align-items:start;
+ justify-content: space-evenly;
+}
 .delivery-location-label {
   font-size: 10px;
   font-weight: 700;
