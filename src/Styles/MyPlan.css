@@ -1926,7 +1926,7 @@ font-size: 0.8rem;
 }
 .plan-delivery-info-right{
  display: flex;
- flex-direction: columnwh;
+ flex-direction: column;
  align-items:start;
  justify-content: space-evenly;
 }
