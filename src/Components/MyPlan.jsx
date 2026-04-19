@@ -7,7 +7,7 @@ import { Modal } from "react-bootstrap";
 import IsVeg from "./../assets/isVeg=yes.svg";
 import IsNonVeg from "./../assets/isVeg=no.svg";
 // import name from "./../assets/successGroup.png";
-// import myplanlocation from "./../assets/myplanlocation.png";
+import myplanlocation from "./../assets/myplanlocation.png";
 // import myplancalender from "./../assets/myplancalender.png";
 // import IsNonVeg from "./../assets/isVeg=no.svg";
 // import IsVeg from "./../assets/isVeg=yes.svg";
@@ -1616,9 +1616,7 @@ const MyPlan = () => {
 
                         {/* DELIVERY ADDRESS - BEFORE FRESHNESS JOURNEY */}
                         <div className="plan-delivery-info">
-                          <span className="plan-delivery-info-left">
-                            !
-                            </span>
+                            <img src={myplanlocation} className="plan-delivery-info-left"/>
                             <div className="plan-delivery-info-right">
                               <div className="delivery-location-label">
                             DELIVERING TO

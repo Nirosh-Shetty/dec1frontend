@@ -1808,19 +1808,28 @@ body.nav-hidden .fixed-bottom-bar {
 
 /* Freshness Journey */
 .plan-journey-section {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-evenly;
   padding: 12px 16px 16px 16px;
-  background: var(--app-foreground);
+  background: var(--warm-marble);
   border-bottom: 1px solid #f0ede5;
+  margin: 16px;
+  border-radius:10px;
+  gap:10px;
 }
 
 .journey-title {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--cuminBrown);
+  width:100%;
+  color: var(--secondary-text);
   letter-spacing: 0.4px;
   text-transform: uppercase;
   margin-bottom: 12px;
   line-height: 1;
+  margin-left:10px
 }
 
 .journey-track {
@@ -1829,6 +1838,7 @@ body.nav-hidden .fixed-bottom-bar {
   align-items: flex-start;
   position: relative;
   gap: 4px;
+  width:100%;
 }
 
 .journey-track::after {
@@ -1920,9 +1930,12 @@ font-size: 0.8rem;
   background: var(--app-foreground);
   border-bottom: 1px solid #f0ede5;
   display: flex;
-  align-items:start;
-  justify-content: start;
+  align-items:flex-start;
+  justify-content: flex-start;
   gap: 5px;
+}
+.plan-delivery-info-left{
+  scale:0.5;
 }
 .plan-delivery-info-right{
  display: flex;
@@ -2883,13 +2896,6 @@ font-size: 0.8rem;
     padding: 16px;
     background-color: #fafaf8;
     border-radius: 12px;
-  }
-
-  .journey-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #2c2c2c;
-    letter-spacing: -0.5px;
   }
 
   .journey-timeline {
