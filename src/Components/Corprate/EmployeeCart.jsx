@@ -30,7 +30,7 @@ const EmployeeCart = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:7013/api/cart/getCartBycompany/" + coprate._id,
+        "https://dd-backend-3nm0.onrender.com/api/cart/getCartBycompany/" + coprate._id,
       );
       setCarts(response.data.items || []);
     } catch (error) {

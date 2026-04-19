@@ -110,7 +110,7 @@ const LocationConfirmation = () => {
       }
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${user._id}/addresses`,
+        `https://dd-backend-3nm0.onrender.com/api/User/customers/${user._id}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -413,7 +413,7 @@ const LocationConfirmation = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "http://localhost:7013/api/Hub/validate-location",
+        "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -1249,7 +1249,7 @@ const LocationConfirmation = () => {
       // console.log("Submitting service request:", requestData);
 
       const response = await axios.post(
-        "http://localhost:7013/api/service-requests",
+        "https://dd-backend-3nm0.onrender.com/api/service-requests",
         requestData,
         {
           headers: {
@@ -1437,8 +1437,8 @@ const LocationConfirmation = () => {
   //     }
 
   //     const endpoint = location.state?.editingAddress?._id
-  //       ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-  //       : "http://localhost:7013/api/User/addresses";
+  //       ? `https://dd-backend-3nm0.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+  //       : "https://dd-backend-3nm0.onrender.com/api/User/addresses";
   //     const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
   //     const response = await fetch(endpoint, {
@@ -1558,8 +1558,8 @@ const LocationConfirmation = () => {
       }
 
       const endpoint = location.state?.editingAddress?._id
-        ? `http://localhost:7013/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
-        : "http://localhost:7013/api/User/addresses";
+        ? `https://dd-backend-3nm0.onrender.com/api/User/customers/${user._id}/addresses/${location.state.editingAddress._id}`
+        : "https://dd-backend-3nm0.onrender.com/api/User/addresses";
       const method = location.state?.editingAddress?._id ? "PUT" : "POST";
 
       const response = await fetch(endpoint, {
@@ -1624,7 +1624,7 @@ const LocationConfirmation = () => {
   const setAddressAsPrimary = async (customerId, addressId) => {
     try {
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressId}/primary`,
+        `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses/${addressId}/primary`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

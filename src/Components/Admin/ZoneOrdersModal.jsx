@@ -94,7 +94,7 @@ const ZoneOrdersModal = ({
       showInfo("Processing auto-assignment...", 2000);
 
       const response = await axios.post(
-        "http://localhost:7013/api/admin/auto-assign-zone-riders",
+        "https://dd-backend-3nm0.onrender.com/api/admin/auto-assign-zone-riders",
         {
           zoneId: currentZone.id || currentZone._id,
           session: "all",

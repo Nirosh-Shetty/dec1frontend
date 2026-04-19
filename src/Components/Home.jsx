@@ -306,7 +306,7 @@
 //   //     setloader(true);
 //   //     try {
 //   //       const res = await axios.get(
-//   //         "http://localhost:7013/api/user/get-hub-menu",
+//   //         "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
 //   //         {
 //   //           params: {
 //   //             hubId: address.hubId,
@@ -344,7 +344,7 @@
 //         // console.log("Fetching menu for hub:", address.hubId);
 
 //         const res = await axios.get(
-//           "http://localhost:7013/api/user/get-hub-menu",
+//           "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
 //           {
 //             params: {
 //               hubId: address.hubId,
@@ -652,7 +652,7 @@
 
 //     const addonedCarts = async () => {
 //       try {
-//         await axios.post("http://localhost:7013/api/cart/addCart", {
+//         await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
 //           userId: user?._id,
 //           items: storedCart,
 //           lastUpdated: Date.now,
@@ -1107,7 +1107,7 @@
 //       // });
 
 //       const res = await axios.post(
-//         "http://localhost:7013/api/user/plan/add-to-plan",
+//         "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 //         {
 //           userId: user._id,
 //           mobile: user.Mobile,
@@ -1168,7 +1168,7 @@
 
 //       if (user?._id && location) {
 //         const response = await axios.put(
-//           "http://localhost:7013/api/admin/getuseroffer",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/getuseroffer",
 //           {
 //             id: user._id,
 //             location,
@@ -1294,7 +1294,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 
 //         headers: { "content-type": "application/json" },
 //         data: {
@@ -1381,7 +1381,7 @@
 //       const config = {
 //         url: "User/mobileotpverification",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: {
 //           Mobile: Mobile,
@@ -3033,7 +3033,7 @@
 //         // console.log("Fetching menu for hub:", hubIdToUse);
 
 //         const res = await axios.get(
-//           "http://localhost:7013/api/user/get-hub-menu",
+//           "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
 //           {
 //             params: {
 //               hubId: hubIdToUse,
@@ -3364,7 +3364,7 @@
 
 //     const addonedCarts = async () => {
 //       try {
-//         await axios.post("http://localhost:7013/api/cart/addCart", {
+//         await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
 //           userId: user?._id,
 //           items: storedCart,
 //           lastUpdated: Date.now,
@@ -3752,7 +3752,7 @@
 
 //   const getDeliveryRates = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
 //       // console.log("Delivery rates:", res.data.data);
 //       setDeliveryCharge(res.data.data);
 //       setFilteredRates(res.data.data);
@@ -3860,7 +3860,7 @@
 //       // });
 
 //       const res = await axios.post(
-//         "http://localhost:7013/api/user/plan/add-to-plan",
+//         "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 //         {
 //           userId: user._id,
 //           mobile: user.Mobile,
@@ -3923,8 +3923,8 @@
 //       // if (user?._id && location) {
 //       // if (user?._id ) {
 //       const response = await axios.get(
-//         // "http://localhost:7013/api/admin/getuseroffer",
-//         "http://localhost:7013/api/admin/offers",
+//         // "https://dd-backend-3nm0.onrender.com/api/admin/getuseroffer",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/offers",
 //         // {
 //         //   id: user._id,
 //         //   location,
@@ -4054,7 +4054,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 
 //         headers: { "content-type": "application/json" },
 //         data: {
@@ -4140,7 +4140,7 @@
 //       const config = {
 //         url: "User/mobileotpverification",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: {
 //           Mobile: Mobile,
@@ -5642,7 +5642,7 @@
 //   const getAllOffer = async () => {
 //     try {
 //       const response = await axios.get(
-//         "http://localhost:7013/api/admin/offers",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/offers",
 //       );
 //       if (response.status === 200 && response.data?.data) {
 //         setAllOffer(response.data.data);
@@ -5733,7 +5733,7 @@
 //         // console.log("Status being sent:", status);
 
 //         const response = await axios.post(
-//           "http://localhost:7013/api/Hub/validate-order-timing",
+//           "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
 //           {
 //             hubId: hubId,
 //             session: session.toLowerCase(),
@@ -5773,7 +5773,7 @@
 //       try {
 //         const status = user?.status === "Employee" ? "Employee" : "Normal";
 //         const response = await axios.get(
-//           `http://localhost:7013/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
+//           `https://dd-backend-3nm0.onrender.com/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
 //         );
 
 //         if (response.status === 200) {
@@ -6047,7 +6047,7 @@
 //       setloader(true);
 //       try {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/user/get-hub-menu",
+//           "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
 //           {
 //             params: { hubId: hubIdToUse },
 //           },
@@ -6328,7 +6328,7 @@
 
 //     const addonedCarts = async () => {
 //       try {
-//         await axios.post("http://localhost:7013/api/cart/addCart", {
+//         await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
 //           userId: user?._id,
 //           items: storedCart,
 //           lastUpdated: Date.now,
@@ -6714,7 +6714,7 @@
 
 //   const getDeliveryRates = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
 //       setDeliveryCharge(res.data.data);
 //       setFilteredRates(res.data.data);
 //     } catch (error) {
@@ -6807,7 +6807,7 @@
 //       };
 
 //       const res = await axios.post(
-//         "http://localhost:7013/api/user/plan/add-to-plan",
+//         "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 //         {
 //           userId: user._id,
 //           mobile: user.Mobile,
@@ -6939,7 +6939,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "content-type": "application/json" },
 //         data: { Mobile: Mobile },
 //       };
@@ -7022,7 +7022,7 @@
 //       const config = {
 //         url: "User/mobileotpverification",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: { Mobile: Mobile, otp: OTP },
 //       };
@@ -8258,7 +8258,7 @@
 //   const getAllOffer = async () => {
 //     try {
 //       const response = await axios.get(
-//         "http://localhost:7013/api/admin/offers",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/offers",
 //       );
 //       if (response.status === 200 && response.data?.data) {
 //         setAllOffer(response.data.data);
@@ -8344,7 +8344,7 @@
 //         const status = user?.status === "Employee" ? "Employee" : "Normal";
 
 //         const response = await axios.post(
-//           "http://localhost:7013/api/Hub/validate-order-timing",
+//           "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
 //           {
 //             hubId: hubId,
 //             session: session.toLowerCase(),
@@ -8384,7 +8384,7 @@
 //       try {
 //         const status = user?.status === "Employee" ? "Employee" : "Normal";
 //         const response = await axios.get(
-//           `http://localhost:7013/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
+//           `https://dd-backend-3nm0.onrender.com/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
 //         );
 
 //         if (response.status === 200) {
@@ -8627,7 +8627,7 @@
 //       setloader(true);
 //       try {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/user/get-hub-menu",
+//           "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
 //           {
 //             params: { hubId: hubIdToUse },
 //           },
@@ -8971,7 +8971,7 @@
 
 //     const addonedCarts = async () => {
 //       try {
-//         await axios.post("http://localhost:7013/api/cart/addCart", {
+//         await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
 //           userId: user?._id,
 //           items: storedCart,
 //           lastUpdated: Date.now,
@@ -9228,7 +9228,7 @@
 
 //   const getDeliveryRates = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
 //       setDeliveryCharge(res.data.data);
 //       setFilteredRates(res.data.data);
 //     } catch (error) {
@@ -9320,7 +9320,7 @@
 //       };
 
 //       const res = await axios.post(
-//         "http://localhost:7013/api/user/plan/add-to-plan",
+//         "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 //         {
 //           userId: user._id,
 //           mobile: user.Mobile,
@@ -9452,7 +9452,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "content-type": "application/json" },
 //         data: { Mobile: Mobile },
 //       };
@@ -9535,7 +9535,7 @@
 //       const config = {
 //         url: "User/mobileotpverification",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: { Mobile: Mobile, otp: OTP },
 //       };
@@ -10778,7 +10778,7 @@
 //   const getAllOffer = async () => {
 //     try {
 //       const response = await axios.get(
-//         "http://localhost:7013/api/admin/offers",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/offers",
 //       );
 //       if (response.status === 200 && response.data?.data) {
 //         setAllOffer(response.data.data);
@@ -10793,7 +10793,7 @@
 //     const [totalOrder, setTotalOrder] = useState([]);
 //     const getTotalOrder = async () => {
 //       try {
-//         let res = await axios.get("http://localhost:7013/api/admin/getallorders");
+//         let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getallorders");
 //         if (res.status === 200) {
 //           setTotalOrder(res.data.order.reverse());
 //         }
@@ -10826,7 +10826,7 @@
 //         const status = user?.status === "Employee" ? "Employee" : "Normal";
 
 //         const response = await axios.post(
-//           "http://localhost:7013/api/Hub/validate-order-timing",
+//           "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
 //           {
 //             hubId: hubId,
 //             session: session.toLowerCase(),
@@ -10866,7 +10866,7 @@
 //       try {
 //         const status = user?.status === "Employee" ? "Employee" : "Normal";
 //         const response = await axios.get(
-//           `http://localhost:7013/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
+//           `https://dd-backend-3nm0.onrender.com/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
 //         );
 
 //         if (response.status === 200) {
@@ -11109,7 +11109,7 @@
 //       setloader(true);
 //       try {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/user/get-hub-menu",
+//           "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
 //           {
 //             params: { hubId: hubIdToUse },
 //           },
@@ -11453,7 +11453,7 @@
 
 //     const addonedCarts = async () => {
 //       try {
-//         await axios.post("http://localhost:7013/api/cart/addCart", {
+//         await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
 //           userId: user?._id,
 //           items: storedCart,
 //           lastUpdated: Date.now,
@@ -11710,7 +11710,7 @@
 
 //   const getDeliveryRates = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
 //       setDeliveryCharge(res.data.data);
 //       setFilteredRates(res.data.data);
 //     } catch (error) {
@@ -11802,7 +11802,7 @@
 // //       };
 
 // //       const res = await axios.post(
-// //         "http://localhost:7013/api/user/plan/add-to-plan",
+// //         "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 // //         {
 // //           userId: user._id,
 // //           mobile: user.Mobile,
@@ -11988,7 +11988,7 @@
 
 //     // 8. Make API call to add to plan
 //     const res = await axios.post(
-//       "http://localhost:7013/api/user/plan/add-to-plan",
+//       "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 //       {
 //         userId: user._id,
 //         mobile: user.Mobile,
@@ -12179,7 +12179,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "content-type": "application/json" },
 //         data: { Mobile: Mobile },
 //       };
@@ -12262,7 +12262,7 @@
 //       const config = {
 //         url: "User/mobileotpverification",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: { Mobile: Mobile, otp: OTP },
 //       };
@@ -13530,7 +13530,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [totalOrder, setTotalOrder] = useState([]);
   const getTotalOrder = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getallorders");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getallorders");
       if (res.status === 200) {
         setTotalOrder(res.data.order.reverse());
       }
@@ -13578,7 +13578,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const getAllOffer = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7013/api/admin/offers",
+        "https://dd-backend-3nm0.onrender.com/api/admin/offers",
       );
       if (response.status === 200 && response.data?.data) {
         let offers = response.data.data;
@@ -13631,7 +13631,7 @@ const validateCutoffTiming = useCallback(
       const status = user?.status === "Employee" ? "Employee" : "Normal";
 
       const response = await axios.post(
-        "http://localhost:7013/api/Hub/validate-order-timing",
+        "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
         {
           hubId: hubId,
           session: session.toLowerCase(),
@@ -13673,7 +13673,7 @@ const validateCutoffTiming = useCallback(
       try {
         const status = user?.status === "Employee" ? "Employee" : "Normal";
         const response = await axios.get(
-          `http://localhost:7013/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
+          `https://dd-backend-3nm0.onrender.com/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`,
         );
 
         if (response.status === 200) {
@@ -13916,7 +13916,7 @@ const validateCutoffTiming = useCallback(
       setloader(true);
       try {
         const res = await axios.get(
-          "http://localhost:7013/api/user/get-hub-menu",
+          "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
           {
             params: { hubId: hubIdToUse },
           },
@@ -14562,7 +14562,7 @@ const addCart1 = async (item, offerData, matchedLocation) => {
 
     const addonedCarts = async () => {
       try {
-        await axios.post("http://localhost:7013/api/cart/addCart", {
+        await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
           lastUpdated: Date.now,
@@ -15086,7 +15086,7 @@ const decreaseQuantity = (foodItemId, offerData, matchedLocation) => {
 
   const getDeliveryRates = async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
       setDeliveryCharge(res.data.data);
       setFilteredRates(res.data.data);
     } catch (error) {
@@ -15284,7 +15284,7 @@ const decreaseQuantity = (foodItemId, offerData, matchedLocation) => {
 
 //     // 8. Make API call to add to plan
 //     const res = await axios.post(
-//       "http://localhost:7013/api/user/plan/add-to-plan",
+//       "https://dd-backend-3nm0.onrender.com/api/user/plan/add-to-plan",
 //       {
 //         userId: user._id,
 //         mobile: user.Mobile,
@@ -15524,7 +15524,7 @@ const decreaseQuantity = (foodItemId, offerData, matchedLocation) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: { Mobile: Mobile },
       };
@@ -15607,7 +15607,7 @@ const decreaseQuantity = (foodItemId, offerData, matchedLocation) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         header: { "content-type": "application/json" },
         data: { Mobile: Mobile, otp: OTP },
       };
@@ -15901,7 +15901,7 @@ useEffect(() => {
       const status = user?.status === "Employee" ? "Employee" : "Normal";
       
       const response = await axios.post(
-        "http://localhost:7013/api/Hub/validate-order-timing",
+        "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
         {
           hubId: address.hubId,
           session: selectedSession.toLowerCase(),
@@ -17063,7 +17063,7 @@ export default Home;
 //   // ============ getAllOffer function - MOVED HERE before useEffect that uses it ============
 //   const getAllOffer = async () => {
 //     try {
-//       const response = await axios.get("http://localhost:7013/api/admin/offers");
+//       const response = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/offers");
 //       if (response.status === 200 && response.data?.data) {
 //         setAllOffer(response.data.data);
 //       }
@@ -17144,7 +17144,7 @@ export default Home;
 //     // console.log("Status being sent:", status);
     
 //     const response = await axios.post(
-//       "http://localhost:7013/api/Hub/validate-order-timing",
+//       "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
 //       {
 //         hubId: hubId,
 //         session: session.toLowerCase(),
@@ -17178,7 +17178,7 @@ export default Home;
 //   try {
 //     const status = user?.status === "Employee" ? "Employee" : "Normal";
 //     const response = await axios.get(
-//       `http://localhost:7013/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`
+//       `https://dd-backend-3nm0.onrender.com/api/Hub/next-available-time/${hubId}/${session.toLowerCase()}/${status}`
 //     );
     
 //     if (response.status === 200) {
@@ -17422,7 +17422,7 @@ export default Home;
 //     const fetchAllMenuData = async () => {
 //       setloader(true);
 //       try {
-//         const res = await axios.get("http://localhost:7013/api/user/get-hub-menu", {
+//         const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu", {
 //           params: { hubId: hubIdToUse },
 //         });
 
@@ -17585,7 +17585,7 @@ export default Home;
 
 //     const addonedCarts = async () => {
 //       try {
-//         await axios.post("http://localhost:7013/api/cart/addCart", {
+//         await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
 //           userId: user?._id,
 //           items: storedCart,
 //           lastUpdated: Date.now,
@@ -17689,7 +17689,7 @@ export default Home;
 
 //   const getDeliveryRates = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
 //       setDeliveryCharge(res.data.data);
 //       setFilteredRates(res.data.data);
 //     } catch (error) {
@@ -17842,7 +17842,7 @@ export default Home;
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "content-type": "application/json" },
 //         data: { Mobile: Mobile },
 //       };
@@ -17925,7 +17925,7 @@ export default Home;
 //       const config = {
 //         url: "User/mobileotpverification",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         header: { "content-type": "application/json" },
 //         data: { Mobile: Mobile, otp: OTP },
 //       };

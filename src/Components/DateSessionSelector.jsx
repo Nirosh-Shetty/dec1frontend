@@ -668,7 +668,7 @@
     
 //     try {
 //       setCutoffLoading(true);
-//       const response = await axios.get(`http://localhost:7013/api/Hub/get-cutoff-times/${hubId}`);
+//       const response = await axios.get(`https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubId}`);
       
 //       if (response.status === 200 && response.data.cutoffTimes) {
 //         const hubCutoff = response.data.cutoffTimes;

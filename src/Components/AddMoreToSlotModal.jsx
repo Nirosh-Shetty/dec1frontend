@@ -30,7 +30,7 @@ const AddMoreToSlotModal = ({
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:7013/api/user/plan/menu-items-for-slot/${planId}`,
+        `https://dd-backend-3nm0.onrender.com/api/user/plan/menu-items-for-slot/${planId}`,
       );
 
       if (response.data.success) {
@@ -71,7 +71,7 @@ const AddMoreToSlotModal = ({
       }));
 
       const response = await axios.post(
-        "http://localhost:7013/api/user/plan/batch-update-items",
+        "https://dd-backend-3nm0.onrender.com/api/user/plan/batch-update-items",
         {
           planId,
           userId,

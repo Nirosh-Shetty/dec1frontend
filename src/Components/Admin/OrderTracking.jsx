@@ -172,7 +172,7 @@
 //   // Fetch riders for filter dropdown
 //   const fetchRiders = async () => {
 //     try {
-//       const response = await axios.get("http://localhost:7013/api/admin/riders");
+//       const response = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/riders");
 //       console.log("Riders API response:", response.data);
 //       if (response.data && response.data.riders) {
 //         setRiders(response.data.riders);
@@ -203,7 +203,7 @@
 //       console.log("Fetching orders with params:", Object.fromEntries(params));
 
 //       const response = await axios.get(
-//         `http://localhost:7013/api/admin/all-orders?${params}`,
+//         `https://dd-backend-3nm0.onrender.com/api/admin/all-orders?${params}`,
 //       );
 //       if (response.data && response.data.orders) {
 //         setOrders(response.data.orders);
@@ -243,7 +243,7 @@
 //       });
 
 //       const response = await axios.get(
-//         `http://localhost:7013/api/admin/export-orders?${params}`,
+//         `https://dd-backend-3nm0.onrender.com/api/admin/export-orders?${params}`,
 //         {
 //           responseType: "blob",
 //         },
@@ -306,7 +306,7 @@
 //   const updateOrderStatus = async (orderId, newStatus) => {
 //     try {
 //       const response = await axios.put(
-//         `http://localhost:7013/api/admin/update-order-status/${orderId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/admin/update-order-status/${orderId}`,
 //         {
 //           status: newStatus,
 //         },
@@ -1018,7 +1018,7 @@ const OrderTracking = () => {
   const fetchRiders = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7013/api/admin/riders",
+        "https://dd-backend-3nm0.onrender.com/api/admin/riders",
       );
       console.log("Riders API response:", response.data);
       if (response.data && response.data.riders) {
@@ -1050,7 +1050,7 @@ const OrderTracking = () => {
       console.log("Fetching orders with params:", Object.fromEntries(params));
 
       const response = await axios.get(
-        `http://localhost:7013/api/admin/all-orders?${params}`,
+        `https://dd-backend-3nm0.onrender.com/api/admin/all-orders?${params}`,
       );
       if (response.data && response.data.orders) {
         setOrders(response.data.orders);
@@ -1092,7 +1092,7 @@ const OrderTracking = () => {
       });
 
       const response = await axios.get(
-        `http://localhost:7013/api/admin/export-orders?${params}`,
+        `https://dd-backend-3nm0.onrender.com/api/admin/export-orders?${params}`,
         {
           responseType: "blob",
         },
@@ -1155,7 +1155,7 @@ const OrderTracking = () => {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const response = await axios.put(
-        `http://localhost:7013/api/admin/update-order-status/${orderId}`,
+        `https://dd-backend-3nm0.onrender.com/api/admin/update-order-status/${orderId}`,
         {
           status: newStatus,
         },
@@ -1181,7 +1181,7 @@ const OrderTracking = () => {
     try {
       setAssigningRider(true);
       const response = await axios.post(
-        `http://localhost:7013/api/admin/assign-rider`,
+        `https://dd-backend-3nm0.onrender.com/api/admin/assign-rider`,
         {
           orderId: selectedOrder._id,
           riderId: selectedRider,

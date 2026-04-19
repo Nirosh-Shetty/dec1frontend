@@ -7,9 +7,9 @@
 // import axios from "axios";
 
 // // 2. Define ALL your API URLs
-// const SAVE_API_URL = "http://localhost:7013/api/admin/hub-menu"; // This is for SAVING (from our plan)
-// const HUBS_API = "http://localhost:7013/api/Hub/hubs"; // This is your live API
-// const PRODUCTS_API = "http://localhost:7013/api/admin/getFoodItems"; // This is your live API
+// const SAVE_API_URL = "https://dd-backend-3nm0.onrender.com/api/admin/hub-menu"; // This is for SAVING (from our plan)
+// const HUBS_API = "https://dd-backend-3nm0.onrender.com/api/Hub/hubs"; // This is your live API
+// const PRODUCTS_API = "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems"; // This is your live API
 
 // const MenuUpload = () => {
 //   const navigate = useNavigate();
@@ -590,9 +590,9 @@
 // import axios from "axios";
 
 // // 2. Define ALL your API URLs
-// const SAVE_API_URL = "http://localhost:7013/api/admin/hub-menu"; // This is for SAVING (from our plan)
-// const HUBS_API = "http://localhost:7013/api/Hub/hubs"; // This is your live API
-// const PRODUCTS_API = "http://localhost:7013/api/admin/getFoodItems"; // This is your live API
+// const SAVE_API_URL = "https://dd-backend-3nm0.onrender.com/api/admin/hub-menu"; // This is for SAVING (from our plan)
+// const HUBS_API = "https://dd-backend-3nm0.onrender.com/api/Hub/hubs"; // This is your live API
+// const PRODUCTS_API = "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems"; // This is your live API
 
 // const MenuUpload = () => {
 //   const navigate = useNavigate();
@@ -1198,9 +1198,9 @@ import { Box } from "@mui/material";
 import axios from "axios";
 
 // 2. Define ALL your API URLs
-const SAVE_API_URL = "http://localhost:7013/api/admin/hub-menu"; // This is for SAVING (from our plan)
-const HUBS_API = "http://localhost:7013/api/Hub/hubs"; // This is your live API
-const PRODUCTS_API = "http://localhost:7013/api/admin/getFoodItems"; // This is your live API
+const SAVE_API_URL = "https://dd-backend-3nm0.onrender.com/api/admin/hub-menu"; // This is for SAVING (from our plan)
+const HUBS_API = "https://dd-backend-3nm0.onrender.com/api/Hub/hubs"; // This is your live API
+const PRODUCTS_API = "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems"; // This is your live API
 
 const MenuUpload = () => {
   const navigate = useNavigate();
@@ -1806,9 +1806,9 @@ export default MenuUpload;
 // import { Box, Tabs, Tab, Chip } from "@mui/material";
 // import axios from "axios";
 
-// const SAVE_API_URL = "http://localhost:7013/api/admin/hub-menu";
-// const HUBS_API = "http://localhost:7013/api/Hub/hubs";
-// const PRODUCTS_API = "http://localhost:7013/api/admin/getFoodItems";
+// const SAVE_API_URL = "https://dd-backend-3nm0.onrender.com/api/admin/hub-menu";
+// const HUBS_API = "https://dd-backend-3nm0.onrender.com/api/Hub/hubs";
+// const PRODUCTS_API = "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems";
 
 // // Helper to check if date is in the future
 // const isFutureDate = (dateString) => {

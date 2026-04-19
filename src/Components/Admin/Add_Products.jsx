@@ -125,7 +125,7 @@
 //   const getAddproducts = async () => {
 //     try {
 //       setIsDataLoading(true);
-//       let res = await axios.get("http://localhost:7013/api/admin/getFoodItems");
+//       let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems");
 //       if (res.status === 200) {
 //         setAddproducts(res.data.data);
 //         setNoChangeData(res.data.data);
@@ -141,7 +141,7 @@
 //   const fetchCategories = async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getcategory",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getcategory",
 //       );
 //       setCategoryName(res.data.categories);
 //     } catch (error) {
@@ -152,7 +152,7 @@
 //   const fetchMenuCategories = async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/menuCategory/getmenucategory",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/menuCategory/getmenucategory",
 //       );
 //       setMenu(res.data.categories);
 //     } catch (error) {
@@ -164,7 +164,7 @@
 //   const getGst = async () => {
 //     try {
 //       setIsDataLoading(true);
-//       let res = await axios.get("http://localhost:7013/api/admin/getgst");
+//       let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getgst");
 //       if (res.status === 200) {
 //         setGstList(res.data.gst.reverse());
 //         setGST(res.data.gst.reverse()[0] || 0);
@@ -179,7 +179,7 @@
 //   // Get Tags
 //   const getTags = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/admin/food-tags");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/food-tags");
 //       if (res.status === 200) setTagsList(res.data.data || []);
 //     } catch (error) {
 //       console.error("Error fetching tags", error);
@@ -234,7 +234,7 @@
 //       const config = {
 //         url: "admin/addFoodItem",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "Content-Type": "multipart/form-data" },
 //         data: formdata,
 //       };
@@ -270,7 +270,7 @@
 //     try {
 //       setIsLoading(true);
 //       let res = await axios.delete(
-//         `http://localhost:7013/api/admin/deleteFoodItem/${delData._id}`,
+//         `https://dd-backend-3nm0.onrender.com/api/admin/deleteFoodItem/${delData._id}`,
 //       );
 //       if (res.status === 200) {
 //         alert("Product Deleted Successfully");
@@ -335,7 +335,7 @@
 //       const config = {
 //         url: `admin/updateFoodItem`,
 //         method: "put",
-//         baseURL: "http://localhost:7013/api/",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api/",
 //         headers: { "content-type": "multipart/form-data" },
 //         data: formdata,
 //       };
@@ -363,7 +363,7 @@
 //       const config = {
 //         url: `/admin/toggleFoodItemStatus/${items?._id}`,
 //         method: "put",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "Content-Type": "application/json" },
 //       };
 //       const res = await axios(config);
@@ -490,7 +490,7 @@
 //   const markAllSoldOut = async () => {
 //     try {
 //       setIsLoading(true);
-//       await axios.put(`http://localhost:7013/api/admin/makeSoldout`, {
+//       await axios.put(`https://dd-backend-3nm0.onrender.com/api/admin/makeSoldout`, {
 //         headers: { "Content-Type": "application/json" },
 //       });
 //       alert("All products marked as sold out");
@@ -1407,7 +1407,7 @@ const Add_Products = () => {
   const getAddproducts = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("http://localhost:7013/api/admin/getFoodItems");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems");
       if (res.status === 200) {
         setAddproducts(res.data.data);
         setNoChangeData(res.data.data);
@@ -1423,7 +1423,7 @@ const Add_Products = () => {
   const fetchCategories = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getcategory",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getcategory",
       );
       setCategoryName(res.data.categories);
     } catch (error) {
@@ -1434,7 +1434,7 @@ const Add_Products = () => {
   const fetchMenuCategories = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/menuCategory/getmenucategory",
+        "https://dd-backend-3nm0.onrender.com/api/admin/menuCategory/getmenucategory",
       );
       setMenu(res.data.categories);
     } catch (error) {
@@ -1446,7 +1446,7 @@ const Add_Products = () => {
   const getGst = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("http://localhost:7013/api/admin/getgst");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getgst");
       if (res.status === 200) {
         setGstList(res.data.gst.reverse());
         setGST(res.data.gst.reverse()[0] || 0);
@@ -1461,7 +1461,7 @@ const Add_Products = () => {
   // Get Tags
   const getTags = async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/admin/food-tags");
+      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/food-tags");
       if (res.status === 200) setTagsList(res.data.data || []);
     } catch (error) {
       console.error("Error fetching tags", error);
@@ -1516,7 +1516,7 @@ const Add_Products = () => {
       const config = {
         url: "admin/addFoodItem",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         headers: { "Content-Type": "multipart/form-data" },
         data: formdata,
       };
@@ -1552,7 +1552,7 @@ const Add_Products = () => {
     try {
       setIsLoading(true);
       let res = await axios.delete(
-        `http://localhost:7013/api/admin/deleteFoodItem/${delData._id}`,
+        `https://dd-backend-3nm0.onrender.com/api/admin/deleteFoodItem/${delData._id}`,
       );
       if (res.status === 200) {
         alert("Product Deleted Successfully");
@@ -1617,7 +1617,7 @@ const Add_Products = () => {
       const config = {
         url: `admin/updateFoodItem`,
         method: "put",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -1645,7 +1645,7 @@ const Add_Products = () => {
       const config = {
         url: `/admin/toggleFoodItemStatus/${items?._id}`,
         method: "put",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         headers: { "Content-Type": "application/json" },
       };
       const res = await axios(config);
@@ -1772,7 +1772,7 @@ const Add_Products = () => {
   const markAllSoldOut = async () => {
     try {
       setIsLoading(true);
-      await axios.put(`http://localhost:7013/api/admin/makeSoldout`, {
+      await axios.put(`https://dd-backend-3nm0.onrender.com/api/admin/makeSoldout`, {
         headers: { "Content-Type": "application/json" },
       });
       alert("All products marked as sold out");

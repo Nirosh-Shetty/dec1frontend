@@ -119,7 +119,7 @@
 //       };
 
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getallordersfilter",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getallordersfilter",
 //         { params }
 //       );
 
@@ -145,7 +145,7 @@
 //   // Fetch Hubs (from original)
 //   const getHubs = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Failed to fetch hubs:", error);
@@ -192,7 +192,7 @@
 //     try {
 //       setLoading(true);
 //       let res = await axios.delete(
-//         `http://localhost:7013/api/admin/deletefoodorder/${data}`
+//         `https://dd-backend-3nm0.onrender.com/api/admin/deletefoodorder/${data}`
 //       );
 //       if (res) {
 //         Swal.fire("Success", "Booking deleted", "success");
@@ -213,7 +213,7 @@
 //       const config = {
 //         url: "/admin/updateOrderStatus/" + item._id,
 //         method: "put",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "Content-Type": "application/json" },
 //         data: { newStatus: statusdata },
 //       };
@@ -250,7 +250,7 @@
 //       const config = {
 //         url: "/admin/updateMultipleOrderStatus",
 //         method: "put",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "Content-Type": "application/json" },
 //         data: {
 //           status: filters.status,
@@ -277,7 +277,7 @@
 //       };
 
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getallordersfilter",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getallordersfilter",
 //         { params }
 //       );
 
@@ -1367,7 +1367,7 @@ const CorporateBookings = () => {
       };
 
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getallordersfilter",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getallordersfilter",
         { params },
       );
 
@@ -1392,7 +1392,7 @@ const CorporateBookings = () => {
   // Fetch Hubs
   const getHubs = async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
       setHubs(res.data);
     } catch (error) {
       console.error("Failed to fetch hubs:", error);
@@ -1449,7 +1449,7 @@ const CorporateBookings = () => {
         try {
           setLoading(true);
           let res = await axios.delete(
-            `http://localhost:7013/api/admin/deletefoodorder/${data}`,
+            `https://dd-backend-3nm0.onrender.com/api/admin/deletefoodorder/${data}`,
           );
           if (res) {
             Swal.fire("Success", "Booking deleted", "success");
@@ -1471,7 +1471,7 @@ const CorporateBookings = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         headers: { "Content-Type": "application/json" },
         data: { newStatus: statusdata },
       };
@@ -1510,7 +1510,7 @@ const CorporateBookings = () => {
       };
 
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getallordersfilter",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getallordersfilter",
         { params },
       );
 
@@ -2811,7 +2811,7 @@ export default CorporateBookings;
 //       };
 
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getallordersfilter",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getallordersfilter",
 //         { params },
 //       );
 
@@ -2882,7 +2882,7 @@ export default CorporateBookings;
 //       const orderIds = nonDeliveredOrders.map((item) => item._id);
 
 //       const response = await axios.post(
-//         "http://localhost:7013/api/admin/bulkUpdateOrderStatus",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/bulkUpdateOrderStatus",
 //         {
 //           orderIds: orderIds,
 //           newStatus: "Delivered",
@@ -2915,7 +2915,7 @@ export default CorporateBookings;
 //   // Fetch Hubs
 //   const getHubs = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Failed to fetch hubs:", error);
@@ -2972,7 +2972,7 @@ export default CorporateBookings;
 //         try {
 //           setLoading(true);
 //           let res = await axios.delete(
-//             `http://localhost:7013/api/admin/deletefoodorder/${data}`,
+//             `https://dd-backend-3nm0.onrender.com/api/admin/deletefoodorder/${data}`,
 //           );
 //           if (res) {
 //             Swal.fire("Success", "Booking deleted", "success");
@@ -2994,7 +2994,7 @@ export default CorporateBookings;
 //       const config = {
 //         url: "/admin/updateOrderStatus/" + item._id,
 //         method: "put",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 //         headers: { "Content-Type": "application/json" },
 //         data: { newStatus: statusdata },
 //       };
@@ -3033,7 +3033,7 @@ export default CorporateBookings;
 //       };
 
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getallordersfilter",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getallordersfilter",
 //         { params },
 //       );
 

@@ -15,7 +15,7 @@ const Footer = () => {
   const [Addsocial, setAddsocial] = useState([]);
   const getAddsocial = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getsocial");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getsocial");
       if (res.status === 200) {
         setAddsocial(res.data.getsocial);
       }
@@ -104,12 +104,12 @@ const Footer = () => {
                           <a href={items.CLink}>
                             <img
 <<<<<<< HEAD
-                              src={`http://localhost:7013Socialmedia/${items?.CIcon}`}
+                              src={`https://dd-backend-3nm0.onrender.comSocialmedia/${items?.CIcon}`}
 =======
 <<<<<<< HEAD
-                              src={`http://localhost:7013Socialmedia/${items?.CIcon}`}
+                              src={`https://dd-backend-3nm0.onrender.comSocialmedia/${items?.CIcon}`}
 =======
-                              src={http://localhost:7013Socialmedia/${items?.CIcon}`}
+                              src={https://dd-backend-3nm0.onrender.comSocialmedia/${items?.CIcon}`}
 >>>>>>> fa6a4b781c4d232c73b640ae22091fa9def85f47
 >>>>>>> f38c3d35bd9284306dab024904fa816e65bee00d
                               alt="social-icon"

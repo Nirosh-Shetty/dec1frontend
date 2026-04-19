@@ -55,7 +55,7 @@
 
 //             try {
 //               const serviceabilityResponse = await fetch(
-//                 "http://localhost:7013/api/Hub/validate-location",
+//                 "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
 //                 {
 //                   method: "POST",
 //                   headers: {
@@ -512,7 +512,7 @@ const LocationDetection = ({ show = true, onEnableLocation, onClose }) => {
 
       try {
         const serviceabilityResponse = await fetch(
-          "http://localhost:7013/api/Hub/validate-location",
+          "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
           {
             method: "POST",
             headers: {

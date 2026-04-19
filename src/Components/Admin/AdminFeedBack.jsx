@@ -49,7 +49,7 @@ const AdminFeedBack = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:7013/api/admin/feedback-orders",
+        "https://dd-backend-3nm0.onrender.com/api/admin/feedback-orders",
       );
 
       if (response.data.success) {

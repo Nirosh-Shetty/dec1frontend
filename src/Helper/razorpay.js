@@ -15,7 +15,7 @@ export const loadRazorpayScript = () => {
 
 export const createRazorpayOrder = async (orderData) => {
   try {
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7013';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dd-backend-3nm0.onrender.com';
     const response = await fetch(`${API_BASE_URL}/api/user/razorpay/create-order`, {
       method: 'POST',
       headers: {
@@ -37,7 +37,7 @@ export const createRazorpayOrder = async (orderData) => {
 
 export const verifyRazorpayPayment = async (paymentData) => {
   try {
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7013';
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dd-backend-3nm0.onrender.com';
     const response = await fetch(`${API_BASE_URL}/api/user/razorpay/verify-payment`, {
       method: 'POST',
       headers: {
@@ -59,7 +59,7 @@ export const verifyRazorpayPayment = async (paymentData) => {
 
 // Poll payment status - checks if webhook has processed the payment
 export const pollPaymentStatus = async (transactionId, maxAttempts = 20, interval = 2000) => {
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:7013';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dd-backend-3nm0.onrender.com';
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {

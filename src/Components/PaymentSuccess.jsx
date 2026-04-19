@@ -151,7 +151,7 @@ const PaymentSuccess = () => {
 
         try {
           const API_BASE_URL =
-            process.env.REACT_APP_API_URL || "http://localhost:7013";
+            process.env.REACT_APP_API_URL || "https://dd-backend-3nm0.onrender.com";
           const response = await fetch(
             `${API_BASE_URL}/api/user/razorpay/check-payment/${transactionId}/${userId}`,
           );
@@ -260,7 +260,7 @@ const PaymentSuccess = () => {
         const verifyPaymentStatus = async () => {
           try {
             const API_BASE_URL =
-              process.env.REACT_APP_API_URL || "http://localhost:7013";
+              process.env.REACT_APP_API_URL || "https://dd-backend-3nm0.onrender.com";
             const response = await fetch(
               `${API_BASE_URL}/api/user/razorpay/check-payment/${transactionId}/${userId}`,
             );

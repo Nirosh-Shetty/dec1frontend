@@ -31,7 +31,7 @@ const AiSensyImage = () => {
       }
 
       const res = await axios.post(
-        "http://localhost:7013/api/admin/plan/send-reminders-to-all",
+        "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders-to-all",
         formData,
         {
           headers: {

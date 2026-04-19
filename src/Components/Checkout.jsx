@@ -88,7 +88,7 @@ const Checkout = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:7013/api/User/addStudentInformation",
+        "https://dd-backend-3nm0.onrender.com/api/User/addStudentInformation",
         {
           customerId: user._id,
           ...newInfo,
@@ -154,7 +154,7 @@ const Checkout = () => {
 
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getapartment");
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
         // console.log("apartmentdata", res.data);
@@ -167,7 +167,7 @@ const Checkout = () => {
   const [corporatedata, setcorporatedata] = useState([]);
   const getCorporatedata = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getcorporate");
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
         // console.log("corporatedata", res.data);
@@ -445,7 +445,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/applyCoupon",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           mobileNumber: user?.Mobile,
@@ -496,7 +496,7 @@ const Checkout = () => {
   useEffect(() => {
     const addonedCarts = async () => {
       try {
-        let res = await axios.post("http://localhost:7013/api/cart/addCart", {
+        let res = await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
           userId: user?._id,
           items: Carts,
           lastUpdated: Date.now(),
@@ -519,7 +519,7 @@ const Checkout = () => {
   const validateSlotAndCart = async () => {
     try {
       const cartResponse = await axios.get(
-        "http://localhost:7013/api/admin/getFoodItemsUnBlocks",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItemsUnBlocks",
         {
           cartItems: cartdata,
           slot: slotdata,
@@ -584,7 +584,7 @@ const Checkout = () => {
     location,
   ) => {
     try {
-      await axios.post("http://localhost:7013/api/admin/createreports", {
+      await axios.post("https://dd-backend-3nm0.onrender.com/api/admin/createreports", {
         customerName,
         phone,
         totalOrders,
@@ -840,7 +840,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/addfoodorder",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           orderGroups: orderGroups,
@@ -873,7 +873,7 @@ const Checkout = () => {
       const offerconfig = {
         url: "/admin/createreports",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           customerName: address?.name,
@@ -1235,7 +1235,7 @@ const Checkout = () => {
       const config = {
         url: "/admin/addfoodorder",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           orderGroups: orderGroups,
@@ -1269,7 +1269,7 @@ const Checkout = () => {
       const offerconfig = {
         url: "/admin/createreports",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           customerName: address?.name,
@@ -1285,7 +1285,7 @@ const Checkout = () => {
       const config1 = {
         url: "/user/addpaymentphonepay",
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
         data: {
           userId: user?._id,
@@ -1360,7 +1360,7 @@ const Checkout = () => {
     setApartmentname(id);
     try {
       let res = await axios.get(
-        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddressID/${user?._id}/${id}`,
+        `https://dd-backend-3nm0.onrender.com/api/user/getSelectedAddressByUserIDAddressID/${user?._id}/${id}`,
       );
       if (res.status === 200) {
         let am = res.data.getdata;
@@ -1378,7 +1378,7 @@ const Checkout = () => {
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      await axios.post(`http://localhost:7013/api/user/addressadd`, {
+      await axios.post(`https://dd-backend-3nm0.onrender.com/api/user/addressadd`, {
         Name: name,
         Number: mobilenumber,
         userId: user?._id,
@@ -1521,7 +1521,7 @@ const Checkout = () => {
   const getfooditems = async (shouldValidate = false) => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getFoodItemsUnBlocks",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItemsUnBlocks",
       );
       if (res.status === 200) {
         const foodItemData = res.data.data;
@@ -1578,7 +1578,7 @@ const Checkout = () => {
   const [gstlist, setGstList] = useState([]);
   const getGst = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getgst");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getgst");
       if (res.status === 200) {
         setGstList(res.data.gst);
       }

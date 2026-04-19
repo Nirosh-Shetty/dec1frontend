@@ -175,7 +175,7 @@ const CheckoutMultiple = () => {
 
       try {
         const res = await axios.get(
-          `http://localhost:7013/api/deliveryrate/hub/${encodeURIComponent(addressHubId)}`,
+          `https://dd-backend-3nm0.onrender.com/api/deliveryrate/hub/${encodeURIComponent(addressHubId)}`,
         );
         setDeliveryRates(Array.isArray(res.data?.data) ? res.data.data : []);
       } catch (error) {
@@ -441,7 +441,7 @@ console.log(enrichedCartItems,"cartitems.............")
 
       const confirmSkippedPaymentOrder = async (txnId) => {
         const verifyRes = await axios.post(
-          "http://localhost:7013/api/user/razorpay/verify-payment-and-create-plan",
+          "https://dd-backend-3nm0.onrender.com/api/user/razorpay/verify-payment-and-create-plan",
           {
             skipPayment: true,
             transactionId: txnId,
@@ -460,7 +460,7 @@ console.log(enrichedCartItems,"cartitems.............")
       };
 
       const res = await axios.post(
-        "http://localhost:7013/api/user/razorpay/create-order-from-cart",
+        "https://dd-backend-3nm0.onrender.com/api/user/razorpay/create-order-from-cart",
         {
           userId: user._id,
           cartItems: enrichedCartItems,
@@ -500,7 +500,7 @@ console.log(enrichedCartItems,"cartitems.............")
             handler: async (response) => {
               try {
                 const verifyRes = await axios.post(
-                  "http://localhost:7013/api/user/razorpay/verify-payment-and-create-plan",
+                  "https://dd-backend-3nm0.onrender.com/api/user/razorpay/verify-payment-and-create-plan",
                   {
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,

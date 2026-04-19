@@ -24,10 +24,10 @@
 // import { Link } from "react-router-dom";
 
 // // Constants
-// const API_BASE_URL = "http://localhost:7013/api/packer";
-// const ADMIN_ORDERS_URL = "http://localhost:7013/api/admin/getPackerOrders2";
+// const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api/packer";
+// const ADMIN_ORDERS_URL = "https://dd-backend-3nm0.onrender.com/api/admin/getPackerOrders2";
 // const PACKING_GROUPED_URL = `${API_BASE_URL}/packing/today/grouped`;
-// const HUBS_API_URL = "http://localhost:7013/api/Hub/hubs";
+// const HUBS_API_URL = "https://dd-backend-3nm0.onrender.com/api/Hub/hubs";
 // const SWR_KEY = "packer:combined";
 // const LOCAL_CACHE_KEY = "packer:combined:cache:v1";
 // const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -1527,7 +1527,7 @@
 // import { Link } from "react-router-dom";
 
 // // Constants - Updated to match backend
-// const API_BASE_URL = "http://localhost:7013/api";
+// const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api";
 // const ADMIN_ORDERS_URL = `${API_BASE_URL}/admin/getPackerOrders2`;
 // const PACKING_GROUPED_URL = `${API_BASE_URL}/packer/packing/today/grouped`;
 // const HUBS_API_URL = `${API_BASE_URL}/Hub/hubs`;
@@ -2799,7 +2799,7 @@
 // import axios from "axios";
 
 // // Constants
-// const API_BASE_URL = "http://localhost:7013/api";
+// const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api";
 // const ADMIN_ORDERS_URL = `${API_BASE_URL}/admin/getPackerOrders2`;
 // const PACKING_GROUPED_URL = `${API_BASE_URL}/packer/packing/today/grouped`;
 // const HUBS_API_URL = `${API_BASE_URL}/Hub/hubs`;
@@ -4311,7 +4311,7 @@
 // import axios from "axios";
 
 // // Constants
-// const API_BASE_URL = "http://localhost:7013/api";
+// const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api";
 // const ADMIN_ORDERS_URL = `${API_BASE_URL}/admin/getPackerOrders2`;
 // const PACKING_GROUPED_URL = `${API_BASE_URL}/packer/packing/today/grouped`;
 // const HUBS_API_URL = `${API_BASE_URL}/Hub/hubs`;
@@ -6016,7 +6016,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 // Constants
-const API_BASE_URL = "http://localhost:7013/api";
+const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api";
 const ADMIN_ORDERS_URL = `${API_BASE_URL}/admin/getPackerOrders2`;
 const PACKING_GROUPED_URL = `${API_BASE_URL}/packer/packing/today/grouped`;
 const HUBS_API_URL = `${API_BASE_URL}/Hub/hubs`;
@@ -7783,7 +7783,7 @@ export default PackerOrders;
 // import axios from "axios";
 
 // // Constants
-// const API_BASE_URL = "http://localhost:7013/api";
+// const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api";
 // const ADMIN_ORDERS_URL = `${API_BASE_URL}/admin/getPackerOrders2`;
 // const PACKING_GROUPED_URL = `${API_BASE_URL}/packer/packing/today/grouped`;
 // const HUBS_API_URL = `${API_BASE_URL}/Hub/hubs`;
@@ -9352,7 +9352,7 @@ export default PackerOrders;
 // import axios from "axios";
 
 // // Constants
-// const API_BASE_URL = "http://localhost:7013/api";
+// const API_BASE_URL = "https://dd-backend-3nm0.onrender.com/api";
 // const ADMIN_ORDERS_URL = `${API_BASE_URL}/admin/getPackerOrders2`;
 // const PACKING_GROUPED_URL = `${API_BASE_URL}/packer/packing/today/grouped`;
 // const HUBS_API_URL = `${API_BASE_URL}/Hub/hubs`;

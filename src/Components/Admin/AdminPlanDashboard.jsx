@@ -58,13 +58,13 @@
 
 // //       if (activeView === "sales") {
 // //         const res = await axios.get(
-// //           "http://localhost:7013/api/admin/plan/sales-tracker",
+// //           "https://dd-backend-3nm0.onrender.com/api/admin/plan/sales-tracker",
 // //           { params }
 // //         );
 // //         if (res.data.success) setSalesData(res.data.data);
 // //       } else {
 // //         const res = await axios.get(
-// //           "http://localhost:7013/api/admin/plan/orders-tracker",
+// //           "https://dd-backend-3nm0.onrender.com/api/admin/plan/orders-tracker",
 // //           { params }
 // //         );
 // //         if (res.data.success) setOrdersData(res.data.data);
@@ -77,7 +77,7 @@
 // //   };
 // //   const getHubs = async () => {
 // //     try {
-// //       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+// //       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
 // //       setHubs(res.data);
 // //     } catch (error) {
 // //       console.error("Failed to fetch hubs:", error);
@@ -110,7 +110,7 @@
 // //     try {
 // //       const dateStr = startDate.toISOString().split("T")[0];
 // //       const res = await axios.post(
-// //         "http://localhost:7013/api/admin/plan/send-reminders",
+// //         "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders",
 // //         {
 // //           date: dateStr,
 // //           session: selectedSession,
@@ -526,13 +526,13 @@
 
 //       if (activeView === "sales") {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/admin/plan/sales-tracker",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/plan/sales-tracker",
 //           { params },
 //         );
 //         if (res.data.success) setSalesData(res.data.data);
 //       } else {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/admin/plan/orders-tracker",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/plan/orders-tracker",
 //           { params },
 //         );
 //         if (res.data.success) setOrdersData(res.data.data);
@@ -546,7 +546,7 @@
 
 //   const getHubs = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Failed to fetch hubs:", error);
@@ -649,7 +649,7 @@
 //     try {
 //       const dateStr = moment(startDate).format("YYYY-MM-DD");
 //       const res = await axios.post(
-//         "http://localhost:7013/api/admin/plan/send-reminders",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders",
 //         {
 //           date: dateStr,
 //           session: selectedSession,
@@ -1079,13 +1079,13 @@
 
 //       if (activeView === "sales") {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/admin/plan/sales-tracker",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/plan/sales-tracker",
 //           { params },
 //         );
 //         if (res.data.success) setSalesData(res.data.data);
 //       } else {
 //         const res = await axios.get(
-//           "http://localhost:7013/api/admin/plan/orders-tracker",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/plan/orders-tracker",
 //           { params },
 //         );
 //         if (res.data.success) {
@@ -1102,7 +1102,7 @@
 
 //   const getHubs = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Failed to fetch hubs:", error);
@@ -1245,7 +1245,7 @@
 //     try {
 //       const dateStr = moment(startDate).format("YYYY-MM-DD");
 //       const res = await axios.post(
-//         "http://localhost:7013/api/admin/plan/send-reminders",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders",
 //         {
 //           date: dateStr,
 //           session: selectedSession,
@@ -1778,7 +1778,7 @@
 //       // Fetch sales data when in sales or quantity view
 //       if (activeView === "sales" || activeView === "quantity") {
 //         const salesRes = await axios.get(
-//           "http://localhost:7013/api/admin/plan/sales-tracker",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/plan/sales-tracker",
 //           { params },
 //         );
 //         if (salesRes.data.success) setSalesData(salesRes.data.data);
@@ -1787,7 +1787,7 @@
 //       // Fetch orders data when in orders view
 //       if (activeView === "orders") {
 //         const ordersRes = await axios.get(
-//           "http://localhost:7013/api/admin/plan/orders-tracker",
+//           "https://dd-backend-3nm0.onrender.com/api/admin/plan/orders-tracker",
 //           { params },
 //         );
 //         if (ordersRes.data.success) {
@@ -1804,7 +1804,7 @@
 
 //   const getHubs = useCallback(async () => {
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
 //       setHubs(res.data);
 //     } catch (error) {
 //       console.error("Failed to fetch hubs:", error);
@@ -2024,7 +2024,7 @@
 //     try {
 //       const dateStr = moment(startDate).format("YYYY-MM-DD");
 //       const res = await axios.post(
-//         "http://localhost:7013/api/admin/plan/send-reminders",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders",
 //         {
 //           date: dateStr,
 //           session: selectedSession,
@@ -2822,7 +2822,7 @@ const AdminPlanDashboard = () => {
       // Fetch sales data when in sales or quantity view
       if (activeView === "sales" || activeView === "quantity") {
         const salesRes = await axios.get(
-          "http://localhost:7013/api/admin/plan/sales-tracker",
+          "https://dd-backend-3nm0.onrender.com/api/admin/plan/sales-tracker",
           { params },
         );
         if (salesRes.data.success) setSalesData(salesRes.data.data);
@@ -2831,7 +2831,7 @@ const AdminPlanDashboard = () => {
       // Fetch orders data when in orders view
       if (activeView === "orders") {
         const ordersRes = await axios.get(
-          "http://localhost:7013/api/admin/plan/orders-tracker",
+          "https://dd-backend-3nm0.onrender.com/api/admin/plan/orders-tracker",
           { params },
         );
         if (ordersRes.data.success) {
@@ -2848,7 +2848,7 @@ const AdminPlanDashboard = () => {
 
   const getHubs = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
       setHubs(res.data);
     } catch (error) {
       console.error("Failed to fetch hubs:", error);
@@ -3068,7 +3068,7 @@ const AdminPlanDashboard = () => {
     try {
       const dateStr = moment(startDate).format("YYYY-MM-DD");
       const res = await axios.post(
-        "http://localhost:7013/api/admin/plan/send-reminders",
+        "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders",
         {
           date: dateStr,
           session: selectedSession,
@@ -3096,7 +3096,7 @@ const AdminPlanDashboard = () => {
     setDeleting(true);
     try {
       const response = await axios.post(
-        "http://localhost:7013/api/user/plan/delete-plan",
+        "https://dd-backend-3nm0.onrender.com/api/user/plan/delete-plan",
         {
           planId: planToDelete.id,
           userId: planToDelete.customerId,

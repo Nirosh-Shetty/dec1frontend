@@ -34,7 +34,7 @@ function DeliveryRate() {
     // Fetch hubs
     const getHubs = async () => {
         try {
-            const res = await axios.get("http://localhost:7013/api/Hub/hubs");
+            const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
             console.log("Hubs data:", res.data); // Debug log
             setHubs(res.data);
         } catch (error) {
@@ -45,7 +45,7 @@ function DeliveryRate() {
     // Fetch delivery rates
     const getDeliveryRates = async () => {
         try {
-            const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+            const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
             console.log("Delivery rates:", res.data.data); // Debug log
             setDeliveryRates(res.data.data);
             setFilteredRates(res.data.data);
@@ -62,7 +62,7 @@ function DeliveryRate() {
             const config = {
                 url: "deliveryrate/add",
                 method: "post",
-                baseURL: "http://localhost:7013/api",
+                baseURL: "https://dd-backend-3nm0.onrender.com/api",
                 headers: { "Content-Type": "application/json" },
                 data: {
                     hubId: hubId, // This will store the MongoDB _id
@@ -91,7 +91,7 @@ function DeliveryRate() {
             const config = {
                 url: `deliveryrate/update/${selectedRate._id}`,
                 method: "put",
-                baseURL: "http://localhost:7013/api",
+                baseURL: "https://dd-backend-3nm0.onrender.com/api",
                 headers: { "Content-Type": "application/json" },
                 data: {
                     deliveryRate: Number(deliveryRate),
@@ -116,7 +116,7 @@ function DeliveryRate() {
     const deleteDeliveryRate = async () => {
         try {
             const res = await axios.delete(
-                `http://localhost:7013/api/deliveryrate/delete/${selectedRate._id}`
+                `https://dd-backend-3nm0.onrender.com/api/deliveryrate/delete/${selectedRate._id}`
             );
 
             if (res.status === 200) {
