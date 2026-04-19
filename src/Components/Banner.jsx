@@ -231,7 +231,7 @@
 //   const getAccurateAddress = async (lat, lng) => {
 //     try {
 //       // Try method 2: Use Google Maps API if available
-//       const googleApiKey = import.meta.env.VITE_MAP_KEY;
+//       const googleApiKey = process.env.REACT_APP_MAP_KEY;
 //       if (googleApiKey) {
 //         try {
 //           const response = await fetch(
@@ -2499,7 +2499,7 @@
 //   const getAccurateAddress = async (lat, lng) => {
 //     try {
 //       // Try method 2: Use Google Maps API if available
-//       const googleApiKey = import.meta.env.VITE_MAP_KEY;
+//       const googleApiKey = process.env.REACT_APP_MAP_KEY;
 //       if (googleApiKey) {
 //         try {
 //           const response = await fetch(
@@ -4779,7 +4779,7 @@ const Banner = ({
 
   const getAccurateAddress = async (lat, lng) => {
     try {
-      const googleApiKey = import.meta.env.VITE_MAP_KEY;
+      const googleApiKey = process.env.REACT_APP_MAP_KEY;
       if (googleApiKey) {
         try {
           const response = await fetch(
@@ -6188,9 +6188,9 @@ const Banner = ({
               </div>
             </div>
           </div>
-          <div style={{ marginBottom: "-14px" }}>
+          {/* <div style={{ marginBottom: "-14px" }}>
             <CookingPromo />
-          </div>
+          </div> */}
         </div>
 
         {/* Hidden Cutoff Info - Available for parent components */}
@@ -6668,7 +6668,7 @@ const Banner = ({
         </Modal>
       </div>
 
-      <div className="ban-container2">
+      {/* <div className="ban-container2">
         <div className="mobile-banner" style={{ position: "relative" }}>
           <UserBanner />
         </div>
@@ -6691,7 +6691,7 @@ const Banner = ({
             ></div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <LocationModal2
         show={showLocationModal}

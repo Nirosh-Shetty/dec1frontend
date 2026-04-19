@@ -1,6 +1,438 @@
+// /**
+//  * Cart Helper Utilities
+//  * Manages cart operations with localStorage persistence and grouping logic
+//  */
+
+// const CART_KEY = "cart";
+
+// /**
+//  * Get current cart from localStorage
+//  * @returns {Array} Cart items array
+//  */
+// export const getCart = () => {
+//   try {
+//     const cart = localStorage.getItem(CART_KEY);
+//     return cart ? JSON.parse(cart) : [];
+//   } catch (error) {
+//     console.error("Error getting cart:", error);
+//     return [];
+//   }
+// };
+
+// /**
+//  * Save cart to localStorage
+//  * @param {Array} cartItems - Items to save
+//  */
+// const saveCart = (cartItems) => {
+//   try {
+//     localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+//   } catch (error) {
+//     console.error("Error saving cart:", error);
+//   }
+// };
+
+// /**
+//  * Add or update item in cart
+//  * @param {Object} item - Item with properties: _id, itemName, price, hubId, slot, etc.
+//  * @param {String|Date} date - Delivery date (YYYY-MM-DD format or Date object)
+//  * @param {String} session - "lunch" or "dinner"
+//  * @param {Number} qty - Quantity (default: 1)
+//  * @returns {Array} Updated cart
+//  */
+// export const addToCart = (item, date, session, qty = 1) => {
+//   const cart = getCart();
+  
+//   // Convert date to string format if it's a Date object
+//   let dateStr = date;
+//   if (date instanceof Date) {
+//     const year = date.getFullYear();
+//     const month = String(date.getMonth() + 1).padStart(2, "0");
+//     const day = String(date.getDate()).padStart(2, "0");
+//     dateStr = `${year}-${month}-${day}`;
+//   } else {
+//     // Ensure it's a string
+//     dateStr = String(date);
+//   }
+  
+//   // Create cart item with slot identifier
+//   const cartItem = {
+//     ...item,
+//     cartId: `${item._id}-${dateStr}-${session}`, // Unique ID for this cart entry
+//     deliveryDate: dateStr,
+//     session: String(session).toLowerCase(),
+//     slot: `${dateStr}|${String(session).toLowerCase()}`, // Format: "2025-04-07|lunch"
+//     quantity: qty,
+//     addedAt: new Date().toISOString(),
+//   };
+
+//   // Check if item already exists in cart
+//   const existingIndex = cart.findIndex(
+//     (c) => c.cartId === cartItem.cartId
+//   );
+
+//   if (existingIndex > -1) {
+//     // Update quantity if item exists
+//     cart[existingIndex].quantity += qty;
+//   } else {
+//     // Add new item
+//     cart.push(cartItem);
+//   }
+
+//   saveCart(cart);
+//   return cart;
+// };
+
+// /**
+//  * Remove item from cart by cartId
+//  * @param {String} cartId - Unique cart item ID
+//  * @returns {Array} Updated cart
+//  */
+// export const removeFromCart = (cartId) => {
+//   const cart = getCart();
+//   const updatedCart = cart.filter((item) => item.cartId !== cartId);
+//   saveCart(updatedCart);
+//   return updatedCart;
+// };
+
+// /**
+//  * Update item quantity in cart
+//  * @param {String} cartId - Unique cart item ID
+//  * @param {Number} newQty - New quantity
+//  * @returns {Array} Updated cart
+//  */
+// export const updateCartItemQty = (cartId, newQty) => {
+//   const cart = getCart();
+//   const item = cart.find((c) => c.cartId === cartId);
+  
+//   if (item) {
+//     if (newQty <= 0) {
+//       return removeFromCart(cartId);
+//     }
+//     item.quantity = newQty;
+//     saveCart(cart);
+//   }
+  
+//   return cart;
+// };
+
+// /**
+//  * Clear entire cart
+//  * @returns {Array} Empty array
+//  */
+// export const clearCart = () => {
+//   try {
+//     localStorage.removeItem(CART_KEY);
+//     return [];
+//   } catch (error) {
+//     console.error("Error clearing cart:", error);
+//     return [];
+//   }
+// };
+
+// /**
+//  * Group cart items by date and session
+//  * Returns object with format: { "2025-04-07|lunch": [...items], "2025-04-08|dinner": [...items] }
+//  * @returns {Object} Grouped cart
+//  */
+// export const getCartGroupedByDateSession = () => {
+//   const cart = getCart();
+//   const grouped = {};
+
+//   cart.forEach((item) => {
+//     const slot = item.slot || `${item.deliveryDate}|${item.session}`;
+//     if (!grouped[slot]) {
+//       grouped[slot] = [];
+//     }
+//     grouped[slot].push(item);
+//   });
+
+//   return grouped;
+// };
+
+// /**
+//  * Get cart items for a specific date
+//  * @param {String|Date} date - YYYY-MM-DD format or Date object
+//  * @returns {Array} Items for that date
+//  */
+// export const getCartByDate = (date) => {
+//   const cart = getCart();
+  
+//   // Convert date to string format if it's a Date object
+//   let dateStr = date;
+//   if (date instanceof Date) {
+//     const year = date.getFullYear();
+//     const month = String(date.getMonth() + 1).padStart(2, "0");
+//     const day = String(date.getDate()).padStart(2, "0");
+//     dateStr = `${year}-${month}-${day}`;
+//   } else {
+//     dateStr = String(date);
+//   }
+  
+//   return cart.filter((item) => {
+//     const itemDate = item.deliveryDate instanceof Date 
+//       ? `${item.deliveryDate.getFullYear()}-${String(item.deliveryDate.getMonth() + 1).padStart(2, "0")}-${String(item.deliveryDate.getDate()).padStart(2, "0")}`
+//       : String(item.deliveryDate);
+//     return itemDate === dateStr;
+//   });
+// };
+
+// /**
+//  * Get cart items for a specific slot (date + session)
+//  * @param {String|Date} date - YYYY-MM-DD format or Date object
+//  * @param {String} session - "lunch" or "dinner"
+//  * @returns {Array} Items for that slot
+//  */
+// export const getCartBySlot = (date, session) => {
+//   const cart = getCart();
+  
+//   // Convert date to string format if it's a Date object
+//   let dateStr = date;
+//   if (date instanceof Date) {
+//     const year = date.getFullYear();
+//     const month = String(date.getMonth() + 1).padStart(2, "0");
+//     const day = String(date.getDate()).padStart(2, "0");
+//     dateStr = `${year}-${month}-${day}`;
+//   } else {
+//     dateStr = String(date);
+//   }
+  
+//   const sessionLower = String(session).toLowerCase();
+  
+//   return cart.filter((item) => {
+//     const itemDate = item.deliveryDate instanceof Date 
+//       ? `${item.deliveryDate.getFullYear()}-${String(item.deliveryDate.getMonth() + 1).padStart(2, "0")}-${String(item.deliveryDate.getDate()).padStart(2, "0")}`
+//       : String(item.deliveryDate);
+//     const itemSession = String(item.session).toLowerCase();
+//     return itemDate === dateStr && itemSession === sessionLower;
+//   });
+// };
+
+// /**
+//  * Calculate cart totals
+//  * Returns object with subtotal per slot and grand total
+//  * @returns {Object} { bySlot: { "date|session": price, ... }, total: number, itemCount: number }
+//  */
+// export const calculateCartTotals = () => {
+//   const cart = getCart();
+//   const grouped = getCartGroupedByDateSession();
+//   const bySlot = {};
+//   let grandTotal = 0;
+//   let itemCount = 0;
+
+//   Object.entries(grouped).forEach(([slot, items]) => {
+//     const slotTotal = items.reduce((sum, item) => {
+//       return sum + (item.price * item.quantity);
+//     }, 0);
+//     bySlot[slot] = slotTotal;
+//     grandTotal += slotTotal;
+//   });
+
+//   itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+//   return {
+//     bySlot,
+//     total: grandTotal,
+//     itemCount,
+//   };
+// };
+
+// /**
+//  * Get cart summary text and dates
+//  * Returns: { summary: "3 meals · 2 days", dates: ["Tue", "Wed"], datesFull: ["2025-04-07", "2025-04-08"] }
+//  * @returns {Object} Summary info
+//  */
+// export const getCartSummary = () => {
+//   const grouped = getCartGroupedByDateSession();
+//   const slots = Object.keys(grouped);
+  
+//   if (slots.length === 0) {
+//     return {
+//       summary: "0 meals · 0 days",
+//       dates: [],
+//       datesFull: [],
+//       mealCount: 0,
+//       dayCount: 0,
+//     };
+//   }
+
+//   // Extract unique dates and safely parse them
+//   const uniqueDates = [...new Set(slots.map((slot) => slot.split("|")[0]))];
+//   const mealCount = slots.length; // Each slot is one meal entry
+//   const dayCount = uniqueDates.length;
+
+//   // Format dates for display (Tue, Wed, etc.)
+//   const dateFormatter = new Intl.DateTimeFormat("en-US", { weekday: "short" });
+//   const formattedDates = uniqueDates.map((dateStr) => {
+//     try {
+//       // Handle both string and Date object formats
+//       let date;
+//       if (typeof dateStr === "string") {
+//         date = new Date(dateStr + "T00:00:00");
+//       } else {
+//         date = new Date(dateStr);
+//       }
+      
+//       // Validate the date
+//       if (isNaN(date.getTime())) {
+//         return "Unknown";
+//       }
+//       return dateFormatter.format(date);
+//     } catch (e) {
+//       console.error("Error formatting date:", dateStr, e);
+//       return "Unknown";
+//     }
+//   });
+
+//   return {
+//     summary: `${mealCount} meals · ${dayCount} days confirmed tonight`,
+//     dates: formattedDates,
+//     datesFull: uniqueDates,
+//     mealCount,
+//     dayCount,
+//   };
+// };
+
+// /**
+//  * Check if item's cutoff time has passed
+//  * @param {String} deliveryDate - YYYY-MM-DD format
+//  * @param {String} session - "lunch" or "dinner"
+//  * @param {Object} cutoffData - { cutoffTime: "11:59:59", cutoffDate: "2025-04-06" }
+//  * @returns {Boolean} true if cutoff has passed
+//  */
+// export const isCutoffPassed = (deliveryDate, session, cutoffData) => {
+//   if (!cutoffData) return false;
+
+//   const now = new Date();
+//   const cutoffDateTime = new Date(`${cutoffData.cutoffDate}T${cutoffData.cutoffTime}`);
+  
+//   return now > cutoffDateTime;
+// };
+
+// /**
+//  * Filter out expired items from cart (items past cutoff)
+//  * @param {Array} expiredSlots - Array of slots to remove: ["2025-04-07|lunch", ...]
+//  * @returns {Array} Updated cart
+//  */
+// export const removeExpiredItems = (expiredSlots = []) => {
+//   const cart = getCart();
+//   const updatedCart = cart.filter((item) => {
+//     const itemSlot = item.slot || `${item.deliveryDate}|${item.session}`;
+//     return !expiredSlots.includes(itemSlot);
+//   });
+//   saveCart(updatedCart);
+//   return updatedCart;
+// };
+
+// /**
+//  * Get cart stats
+//  * @returns {Object} { totalItems, totalPrice, slotCount }
+//  */
+// export const getCartStats = () => {
+//   const cart = getCart();
+//   const totals = calculateCartTotals();
+//   const grouped = getCartGroupedByDateSession();
+
+//   return {
+//     totalItems: totals.itemCount,
+//     totalPrice: totals.total,
+//     slotCount: Object.keys(grouped).length,
+//     itemCount: cart.length,
+//   };
+// };
+
+// /**
+//  * Format slot string to readable format
+//  * Input: "2025-04-07|lunch" → Output: "Tue 7 Apr · Lunch"
+//  * @param {String} slot - Slot in format "date|session"
+//  * @returns {String} Formatted slot display
+//  */
+// export const formatSlot = (slot) => {
+//   try {
+//     const [dateStr, session] = slot.split("|");
+    
+//     // Handle both string and Date object formats
+//     let date;
+//     if (typeof dateStr === "string") {
+//       date = new Date(dateStr + "T00:00:00");
+//     } else {
+//       date = new Date(dateStr);
+//     }
+    
+//     // Validate the date
+//     if (isNaN(date.getTime())) {
+//       return `${session || "Unknown"} - Invalid date`;
+//     }
+    
+//     const dayFormatter = new Intl.DateTimeFormat("en-US", { weekday: "short" });
+//     const dateFormatter = new Intl.DateTimeFormat("en-US", { 
+//       day: "numeric", 
+//       month: "short" 
+//     });
+    
+//     const day = dayFormatter.format(date);
+//     const dateFormatted = dateFormatter.format(date);
+//     const sessionCapitalized = session ? session.charAt(0).toUpperCase() + session.slice(1) : "Unknown";
+    
+//     return `${day} ${dateFormatted} · ${sessionCapitalized}`;
+//   } catch (e) {
+//     console.error("Error formatting slot:", slot, e);
+//     return `${slot || "Unknown"}`;
+//   }
+// };
+
+// export default {
+//   getCart,
+//   addToCart,
+//   removeFromCart,
+//   updateCartItemQty,
+//   clearCart,
+//   getCartGroupedByDateSession,
+//   getCartByDate,
+//   getCartBySlot,
+//   calculateCartTotals,
+//   getCartSummary,
+//   isCutoffPassed,
+//   removeExpiredItems,
+//   getCartStats,
+//   formatSlot,
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Cart Helper Utilities
- * Manages cart operations with localStorage persistence and grouping logic
+ * Manages cart operations with localStorage persistence, grouping logic, and offer support
  */
 
 const CART_KEY = "cart";
@@ -32,14 +464,55 @@ const saveCart = (cartItems) => {
 };
 
 /**
- * Add or update item in cart
+ * Calculate total price for a product with offer logic
+ * @param {Object} item - Product item
+ * @param {Number} quantity - Quantity
+ * @returns {Object} { totalPrice, pricePerUnit, regularTotal, offerSavings }
+ */
+export const calculateProductPrice = (item, quantity) => {
+  const qty = quantity || 1;
+  const regularPrice = item.regularPrice || item.hubPrice || item.price || 0;
+  const offerPrice = item.offerPrice || null;
+  const hasOffer = item.offerProduct === true && offerPrice !== null;
+  
+  let totalPrice, pricePerUnit, offerApplied = false;
+  
+  if (hasOffer) {
+    // First item at offer price, rest at regular price
+    totalPrice = offerPrice + (regularPrice * (qty - 1));
+    pricePerUnit = regularPrice;
+    offerApplied = true;
+  } else {
+    // No offer - all at regular price
+    totalPrice = regularPrice * qty;
+    pricePerUnit = regularPrice;
+    offerApplied = false;
+  }
+  
+  const regularTotal = regularPrice * qty;
+  const offerSavings = regularTotal - totalPrice;
+  
+  return {
+    totalPrice,
+    pricePerUnit,
+    regularTotal,
+    offerSavings,
+    offerApplied,
+    regularPrice,
+    offerPrice: hasOffer ? offerPrice : null
+  };
+};
+
+/**
+ * Add or update item in cart with offer support
  * @param {Object} item - Item with properties: _id, itemName, price, hubId, slot, etc.
  * @param {String|Date} date - Delivery date (YYYY-MM-DD format or Date object)
  * @param {String} session - "lunch" or "dinner"
  * @param {Number} qty - Quantity (default: 1)
+ * @param {Object} offerInfo - Optional offer information { offerProduct, offerPrice, regularPrice }
  * @returns {Array} Updated cart
  */
-export const addToCart = (item, date, session, qty = 1) => {
+export const addToCart = (item, date, session, qty = 1, offerInfo = null) => {
   const cart = getCart();
   
   // Convert date to string format if it's a Date object
@@ -50,9 +523,25 @@ export const addToCart = (item, date, session, qty = 1) => {
     const day = String(date.getDate()).padStart(2, "0");
     dateStr = `${year}-${month}-${day}`;
   } else {
-    // Ensure it's a string
     dateStr = String(date);
   }
+  
+  // Determine offer information
+  const hasOffer = offerInfo?.offerProduct === true;
+  const regularPrice = offerInfo?.regularPrice || item.regularPrice || item.hubPrice || item.price || 0;
+  const offerPrice = offerInfo?.offerPrice || null;
+  
+  // Calculate price based on offer
+  const priceCalculation = calculateProductPrice(
+    { 
+      regularPrice, 
+      offerPrice, 
+      offerProduct: hasOffer,
+      hubPrice: item.hubPrice,
+      price: item.price 
+    }, 
+    qty
+  );
   
   // Create cart item with slot identifier
   const cartItem = {
@@ -63,6 +552,17 @@ export const addToCart = (item, date, session, qty = 1) => {
     slot: `${dateStr}|${String(session).toLowerCase()}`, // Format: "2025-04-07|lunch"
     quantity: qty,
     addedAt: new Date().toISOString(),
+    
+    // Price fields
+    price: priceCalculation.pricePerUnit,
+    totalPrice: priceCalculation.totalPrice,
+    regularPrice: regularPrice,
+    
+    // Offer fields
+    offerProduct: hasOffer,
+    offerApplied: priceCalculation.offerApplied,
+    offerPrice: offerPrice,
+    offerSavings: priceCalculation.offerSavings,
   };
 
   // Check if item already exists in cart
@@ -71,8 +571,22 @@ export const addToCart = (item, date, session, qty = 1) => {
   );
 
   if (existingIndex > -1) {
-    // Update quantity if item exists
-    cart[existingIndex].quantity += qty;
+    // Update quantity if item exists - recalculate with new quantity
+    const newQuantity = cart[existingIndex].quantity + qty;
+    const updatedPriceCalc = calculateProductPrice(
+      { 
+        regularPrice: cart[existingIndex].regularPrice,
+        offerPrice: cart[existingIndex].offerPrice,
+        offerProduct: cart[existingIndex].offerProduct
+      }, 
+      newQuantity
+    );
+    
+    cart[existingIndex].quantity = newQuantity;
+    cart[existingIndex].totalPrice = updatedPriceCalc.totalPrice;
+    cart[existingIndex].price = updatedPriceCalc.pricePerUnit;
+    cart[existingIndex].offerApplied = updatedPriceCalc.offerApplied;
+    cart[existingIndex].offerSavings = updatedPriceCalc.offerSavings;
   } else {
     // Add new item
     cart.push(cartItem);
@@ -95,20 +609,36 @@ export const removeFromCart = (cartId) => {
 };
 
 /**
- * Update item quantity in cart
+ * Update item quantity in cart with offer recalculation
  * @param {String} cartId - Unique cart item ID
  * @param {Number} newQty - New quantity
  * @returns {Array} Updated cart
  */
 export const updateCartItemQty = (cartId, newQty) => {
   const cart = getCart();
-  const item = cart.find((c) => c.cartId === cartId);
+  const itemIndex = cart.findIndex((c) => c.cartId === cartId);
   
-  if (item) {
+  if (itemIndex > -1) {
     if (newQty <= 0) {
       return removeFromCart(cartId);
     }
-    item.quantity = newQty;
+    
+    const item = cart[itemIndex];
+    const priceCalc = calculateProductPrice(
+      { 
+        regularPrice: item.regularPrice,
+        offerPrice: item.offerPrice,
+        offerProduct: item.offerProduct
+      }, 
+      newQty
+    );
+    
+    cart[itemIndex].quantity = newQty;
+    cart[itemIndex].totalPrice = priceCalc.totalPrice;
+    cart[itemIndex].price = priceCalc.pricePerUnit;
+    cart[itemIndex].offerApplied = priceCalc.offerApplied;
+    cart[itemIndex].offerSavings = priceCalc.offerSavings;
+    
     saveCart(cart);
   }
   
@@ -157,7 +687,6 @@ export const getCartGroupedByDateSession = () => {
 export const getCartByDate = (date) => {
   const cart = getCart();
   
-  // Convert date to string format if it's a Date object
   let dateStr = date;
   if (date instanceof Date) {
     const year = date.getFullYear();
@@ -185,7 +714,6 @@ export const getCartByDate = (date) => {
 export const getCartBySlot = (date, session) => {
   const cart = getCart();
   
-  // Convert date to string format if it's a Date object
   let dateStr = date;
   if (date instanceof Date) {
     const year = date.getFullYear();
@@ -208,25 +736,35 @@ export const getCartBySlot = (date, session) => {
 };
 
 /**
- * Calculate cart totals
+ * Calculate cart totals with offer savings
  * Returns object with subtotal per slot and grand total
- * @returns {Object} { bySlot: { "date|session": price, ... }, total: number, itemCount: number }
+ * @returns {Object} { bySlot: { "date|session": { subtotal, total, savings, hasOffer }, ... }, total: number, totalSavings: number, itemCount: number }
  */
 export const calculateCartTotals = () => {
   const cart = getCart();
   const grouped = getCartGroupedByDateSession();
   const bySlot = {};
   let grandTotal = 0;
+  let grandRegularTotal = 0;
+  let totalSavings = 0;
   let itemCount = 0;
 
   Object.entries(grouped).forEach(([slot, items]) => {
-    const slotTotal = items.reduce((sum, item) => {
-      // Use totalPrice if already calculated, otherwise use preOrderPrice * quantity
-      const itemTotal = item.totalPrice || (item.preOrderPrice * item.quantity);
-      return sum + itemTotal;
-    }, 0);
-    bySlot[slot] = slotTotal;
+    const slotTotal = items.reduce((sum, item) => sum + (item.totalPrice || (item.price * item.quantity)), 0);
+    const slotRegularTotal = items.reduce((sum, item) => sum + ((item.regularPrice || item.price) * item.quantity), 0);
+    const slotSavings = slotRegularTotal - slotTotal;
+    const hasOffer = items.some(item => item.offerApplied === true);
+    
+    bySlot[slot] = {
+      subtotal: slotRegularTotal,
+      total: slotTotal,
+      savings: slotSavings,
+      hasOffer: hasOffer
+    };
+    
     grandTotal += slotTotal;
+    grandRegularTotal += slotRegularTotal;
+    totalSavings += slotSavings;
   });
 
   itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -234,6 +772,8 @@ export const calculateCartTotals = () => {
   return {
     bySlot,
     total: grandTotal,
+    regularTotal: grandRegularTotal,
+    totalSavings: totalSavings,
     itemCount,
   };
 };
@@ -254,6 +794,7 @@ export const getCartSummary = () => {
       datesFull: [],
       mealCount: 0,
       dayCount: 0,
+      totalSavings: 0,
     };
   }
 
@@ -261,12 +802,14 @@ export const getCartSummary = () => {
   const uniqueDates = [...new Set(slots.map((slot) => slot.split("|")[0]))];
   const mealCount = slots.length; // Each slot is one meal entry
   const dayCount = uniqueDates.length;
+  
+  // Calculate total savings
+  const totals = calculateCartTotals();
 
   // Format dates for display (Tue, Wed, etc.)
   const dateFormatter = new Intl.DateTimeFormat("en-US", { weekday: "short" });
   const formattedDates = uniqueDates.map((dateStr) => {
     try {
-      // Handle both string and Date object formats
       let date;
       if (typeof dateStr === "string") {
         date = new Date(dateStr + "T00:00:00");
@@ -274,7 +817,6 @@ export const getCartSummary = () => {
         date = new Date(dateStr);
       }
       
-      // Validate the date
       if (isNaN(date.getTime())) {
         return "Unknown";
       }
@@ -286,11 +828,13 @@ export const getCartSummary = () => {
   });
 
   return {
-    summary: `${mealCount} meals · ${dayCount} days confirmed tonight`,
+    summary: `${mealCount} meals · ${dayCount} days`,
     dates: formattedDates,
     datesFull: uniqueDates,
     mealCount,
     dayCount,
+    totalSavings: totals.totalSavings,
+    hasOffer: totals.totalSavings > 0,
   };
 };
 
@@ -326,8 +870,8 @@ export const removeExpiredItems = (expiredSlots = []) => {
 };
 
 /**
- * Get cart stats
- * @returns {Object} { totalItems, totalPrice, slotCount }
+ * Get cart stats with offer information
+ * @returns {Object} { totalItems, totalPrice, regularTotal, totalSavings, slotCount, hasOffer }
  */
 export const getCartStats = () => {
   const cart = getCart();
@@ -337,8 +881,11 @@ export const getCartStats = () => {
   return {
     totalItems: totals.itemCount,
     totalPrice: totals.total,
+    regularTotal: totals.regularTotal,
+    totalSavings: totals.totalSavings,
     slotCount: Object.keys(grouped).length,
     itemCount: cart.length,
+    hasOffer: totals.totalSavings > 0,
   };
 };
 
@@ -352,7 +899,6 @@ export const formatSlot = (slot) => {
   try {
     const [dateStr, session] = slot.split("|");
     
-    // Handle both string and Date object formats
     let date;
     if (typeof dateStr === "string") {
       date = new Date(dateStr + "T00:00:00");
@@ -360,7 +906,6 @@ export const formatSlot = (slot) => {
       date = new Date(dateStr);
     }
     
-    // Validate the date
     if (isNaN(date.getTime())) {
       return `${session || "Unknown"} - Invalid date`;
     }
@@ -382,6 +927,78 @@ export const formatSlot = (slot) => {
   }
 };
 
+/**
+ * Get offer info for a product
+ * @param {Object} product - Product from API
+ * @param {Number} quantity - Quantity to calculate for
+ * @returns {Object} Offer information
+ */
+export const getProductOfferInfo = (product, quantity = 1) => {
+  const hasOffer = product.offerProduct === true;
+  const regularPrice = product.regularPrice || product.hubPrice || product.price || 0;
+  const offerPrice = product.offerPrice || null;
+  
+  if (!hasOffer || !offerPrice) {
+    return {
+      hasOffer: false,
+      regularPrice,
+      offerPrice: null,
+      savings: 0,
+      totalPrice: regularPrice * quantity,
+      pricePerUnit: regularPrice,
+      offerMessage: null
+    };
+  }
+  
+  const totalPrice = offerPrice + (regularPrice * (quantity - 1));
+  const savings = (regularPrice * quantity) - totalPrice;
+  
+  return {
+    hasOffer: true,
+    regularPrice,
+    offerPrice,
+    savings,
+    totalPrice,
+    pricePerUnit: regularPrice,
+    offerMessage: quantity === 1 
+      ? `Special offer: ₹${offerPrice} (Save ₹${regularPrice - offerPrice})`
+      : `First item at ₹${offerPrice}, next at ₹${regularPrice} (Save ₹${savings})`
+  };
+};
+
+/**
+ * Convert cart items to order format with offer data preserved
+ * @returns {Array} Formatted items ready for API
+ */
+export const getCartItemsForOrder = () => {
+  const cart = getCart();
+  
+  return cart.map(item => ({
+    _id: item._id,
+    foodItemId: item._id,
+    foodname: item.itemName,
+    name: item.itemName,
+    image: item.image,
+    foodcategory: item.foodcategory,
+    basePrice: item.basePrice,
+    hubPrice: item.hubPrice,
+    preOrderPrice: item.preOrderPrice,
+    price: item.price,
+    Quantity: item.quantity,
+    totalPrice: item.totalPrice,
+    deliveryDate: item.deliveryDate,
+    session: item.session,
+    hubId: item.hubId,
+    hubName: item.hubName,
+    
+    // Offer fields to preserve
+    offerProduct: item.offerProduct || false,
+    offerApplied: item.offerApplied || false,
+    offerPrice: item.offerPrice || null,
+    regularPrice: item.regularPrice || item.price,
+  }));
+};
+
 export default {
   getCart,
   addToCart,
@@ -397,4 +1014,7 @@ export default {
   removeExpiredItems,
   getCartStats,
   formatSlot,
+  calculateProductPrice,
+  getProductOfferInfo,
+  getCartItemsForOrder,
 };

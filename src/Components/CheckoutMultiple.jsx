@@ -1,3 +1,5 @@
+
+
 import { useContext, useEffect, useMemo, useState, useRef } from "react";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { MdRemoveShoppingCart } from "react-icons/md";
@@ -17,8 +19,11 @@ import cross from "../assets/cross.png";
 import LocationModal from "./LocationModal";
 import {
   getCart,
+  getCartGroupedByDateSession,
+  calculateCartTotals,
   getCartSummary,
   clearCart,
+  updateCartItemQty,
 } from "../Helper/cartHelper";
 
 const CheckoutMultiple = () => {
@@ -27,22 +32,43 @@ const CheckoutMultiple = () => {
   const location = useLocation();
   const data = location?.state;
   const addresstype = localStorage.getItem("addresstype");
-
+  
+  // State declarations
+  const [deliveryMethod, setDeliveryMethod] = useState("slot");
   const [address, setAddress] = useState(
     JSON.parse(localStorage.getItem("coporateaddress")) || {},
   );
-
   const [expandedSections, setExpandedSections] = useState({});
-
   const [showModal, setShowModal] = useState(false);
   const [childName, setChildName] = useState("");
   const [childClass, setChildClass] = useState("");
   const [childSection, setChildSection] = useState("");
   const storedInfo = JSON.parse(localStorage.getItem("studentInformation")) || {};
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [cartVersion, setCartVersion] = useState(0);
 
+  
   // Get cart data from helper
-  const cartItems = useMemo(() => getCart(), []);
+  const cartItems = useMemo(() => getCart(), [cartVersion]);
+  
+  const groupedCarts = useMemo(() => {
+    try {
+      return getCartGroupedByDateSession();
+    } catch (error) {
+      console.error("Error grouping cart items:", error);
+      return {};
+    }
+  }, [cartItems]);
+  
+  const totals = useMemo(() => {
+    try {
+      return calculateCartTotals();
+    } catch (error) {
+      console.error("Error calculating totals:", error);
+      return { bySlot: {}, total: 0, itemCount: 0, totalSavings: 0, regularTotal: 0 };
+    }
+  }, [cartItems]);
+  
   const summary = useMemo(() => {
     try {
       return getCartSummary();
@@ -54,12 +80,20 @@ const CheckoutMultiple = () => {
         datesFull: [],
         mealCount: 0,
         dayCount: 0,
+        totalSavings: 0,
       };
     }
   }, [cartItems]);
 
   const [cartdata, setCartData] = useState(cartItems);
   const lastCartRawRef = useRef(null);
+
+  // Force refresh cart data
+  const refreshCartData = () => {
+    const freshCart = getCart();
+    setCartData(freshCart);
+    setCartVersion(prev => prev + 1);
+  };
 
   // Sync cartdata with localStorage
   useEffect(() => {
@@ -70,6 +104,7 @@ const CheckoutMultiple = () => {
           lastCartRawRef.current = raw;
           const parsed = JSON.parse(raw);
           setCartData(Array.isArray(parsed) ? parsed : []);
+          setCartVersion(prev => prev + 1);
         }
       } catch (err) {
         console.error("Failed to parse cart from localStorage", err);
@@ -78,13 +113,24 @@ const CheckoutMultiple = () => {
 
     readCart();
     const intervalId = setInterval(readCart, 1000);
+    
     const onStorage = (e) => {
-      if (e.key === "cart") readCart();
+      if (e.key === "cart") {
+        readCart();
+      }
     };
+    
+    const onCartUpdated = () => {
+      readCart();
+    };
+    
     window.addEventListener("storage", onStorage);
+    window.addEventListener("cartUpdated", onCartUpdated);
+    
     return () => {
       clearInterval(intervalId);
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("cartUpdated", onCartUpdated);
     };
   }, []);
 
@@ -93,36 +139,8 @@ const CheckoutMultiple = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const [apartmentdata, setapartmentdata] = useState([]);
-  const [corporatedata, setcorporatedata] = useState([]);
-
-  const getapartmentd = async () => {
-    try {
-      let res = await axios.get("http://localhost:7013/api/admin/getapartment");
-      if (res.status === 200) {
-        setapartmentdata(res.data.corporatedata);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getCorporatedata = async () => {
-    try {
-      let res = await axios.get("http://localhost:7013/api/admin/getcorporate");
-      if (res.status === 200) {
-        setcorporatedata(res.data.corporatedata);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getapartmentd();
-    getCorporatedata();
-  }, []);
-
+ 
+  const [delivarychargetype, setdelivarychargetype] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
   const [Cutlery, setCutlery] = useState(0);
   const [name, setname] = useState("");
@@ -138,22 +156,13 @@ const CheckoutMultiple = () => {
   const [gstRate, setGstRate] = useState(5); // Default GST rate
   const [deliveryRates, setDeliveryRates] = useState([]);
 
-  // Fetch GST rate from backend
-  useEffect(() => {
-    const fetchGST = async () => {
-      try {
-        const res = await axios.get("http://localhost:7013/api/admin/gst/getall");
-        if (res.status === 200 && res.data?.data?.[0]) {
-          setGstRate(res.data.data[0].TotalGst || 5);
-        }
-      } catch (error) {
-        console.error("Error fetching GST:", error);
-      }
-    };
-    fetchGST();
-  }, []);
+  // // Use the calculated totals from cartHelper
+  // const subtotal = totals.total;
+  const totalSavings = totals.totalSavings;
+  const regularTotal = totals.regularTotal;
+  // const calculateTaxPrice = (5 / 100) * regularTotal;
 
-  const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress")) || {};
+    const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress")) || {};
   const defaultAddress = primaryAddress;
   const addressHubId = defaultAddress?.hubId || "";
 
@@ -251,54 +260,50 @@ const CheckoutMultiple = () => {
   const amountBeforeTax = subtotal / (1 + gstRate / 100);
   const calculateTaxPrice = subtotal - amountBeforeTax;
 
+
+
   const increaseQuantity = (itemdata) => {
-    const updatedCart = cartdata.map((item) => {
-      if (item.cartId === itemdata?.cartId) {
-        const currentQty = item.quantity || 1;
-        if (currentQty < (item.remainingstock || 99)) {
-          item.quantity = currentQty + 1;
-          item.totalPrice = Number(item.preOrderPrice) * item.quantity;
-        } else {
-          Swal2.fire({
-            toast: true,
-            position: "bottom",
-            icon: "error",
-            title: "Stock Alert",
-            text: "No more stock available!",
-            showConfirmButton: false,
-            timer: 3000,
-          });
-        }
-      }
-      return item;
-    });
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const currentQty = itemdata.quantity || 1;
+    if (currentQty >= (itemdata.remainingstock || 99)) {
+      Swal2.fire({
+        toast: true,
+        position: "bottom",
+        icon: "error",
+        title: "Stock Alert",
+        text: "No more stock available!",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      return;
+    }
+    
+    // Update cart using cartHelper
+    const updatedCart = updateCartItemQty(itemdata.cartId, currentQty + 1);
     setCartData(updatedCart);
-    // Trigger storage event to update other components
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
     window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("cartUpdated"));
+    refreshCartData();
   };
 
   const decreaseQuantity = (itemdata) => {
-    let updatedCart = cartdata
-      .map((item) => {
-        if (item.cartId === itemdata?.cartId) {
-          const currentQty = item.quantity || 1;
-          if (currentQty > 1) {
-            item.quantity = currentQty - 1;
-            item.totalPrice = Number(item.preOrderPrice) * item.quantity;
-            return item;
-          } else {
-            return null; // Mark for removal
-          }
-        }
-        return item;
-      })
-      .filter(item => item !== null);
-
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    setCartData(updatedCart);
-    // Trigger storage event to update other components
-    window.dispatchEvent(new Event("storage"));
+    const currentQty = itemdata.quantity || 1;
+    if (currentQty > 1) {
+      const updatedCart = updateCartItemQty(itemdata.cartId, currentQty - 1);
+      setCartData(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("cartUpdated"));
+      refreshCartData();
+    } else {
+      // Remove item if quantity becomes 0
+      const updatedCart = updateCartItemQty(itemdata.cartId, 0);
+      setCartData(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("cartUpdated"));
+      refreshCartData();
+    }
   };
 
   const debounce = (func, delay) => {
@@ -338,7 +343,7 @@ const CheckoutMultiple = () => {
       return;
     }
     if (e.target.checked) {
-      let maxUsableAmount = subtotal + Cutlery + totalDeliveryCharge - coupon;
+     let maxUsableAmount = subtotal + Cutlery + totalDeliveryCharge - coupon;
       let walletBalance = wallet?.balance || 0;
       let finalAmount = Math.min(walletBalance, Math.max(maxUsableAmount, 0));
       setDiscountWallet(finalAmount);
@@ -353,7 +358,9 @@ const CheckoutMultiple = () => {
 
   const [isBillingOpen, setIsBillingOpen] = useState(true);
 
-  const handleCheckout = async () => {
+
+
+ const handleCheckout = async () => {
     if (!user) {
       Swal2.fire({
         toast: true,
@@ -396,7 +403,7 @@ const CheckoutMultiple = () => {
     setLoading(true);
 
     try {
-      const payableAmount = totalPayable;
+     const payableAmount = totalPayable;
       const totalAmount = Math.round(payableAmount * 100) / 100;
       const enrichedCartItems = cartdata.map((item) => ({
         ...item,
@@ -408,7 +415,10 @@ const CheckoutMultiple = () => {
         hubName: defaultAddress?.hubName || "",
         address: defaultAddress?.fullAddress || "",
         customerType: user?.status || "User",
+        coordinates: defaultAddress?.location
       }));
+
+console.log(enrichedCartItems,"cartitems.............")
 
       const handleSuccessfulCheckout = () => {
         localStorage.removeItem("cart");
@@ -567,246 +577,198 @@ const CheckoutMultiple = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newInfo = {
-      studentName: childName.trim(),
-      studentClass: childClass.trim(),
-      studentSection: childSection.trim(),
-    };
-    try {
-      const res = await axios.post(
-        "http://localhost:7013/api/User/addStudentInformation",
-        {
-          customerId: user._id,
-          ...newInfo,
-        },
-      );
-      if (res.status === 200 && res.data.success) {
-        localStorage.setItem("studentInformation", JSON.stringify(newInfo));
-        setShowModal(false);
-      } else {
-        alert(res.data.message || "Failed to add student information.");
-      }
-    } catch (error) {
-      console.error("Error adding student info:", error);
-      alert("Something went wrong. Please try again.");
-    }
+
+
+  // Calculate item total price correctly with offer
+  const getItemTotalPrice = (item) => {
+    return item.totalPrice || (item.price * item.quantity);
   };
 
-  const Handeledata = () => {
-    if (!apartmentname) {
-      return alert("Please Select Apartment");
+  // Calculate item savings if offer applied
+  const getItemSavings = (item) => {
+    if (item.offerApplied && item.regularPrice) {
+      const regularTotal = item.regularPrice * item.quantity;
+      const actualTotal = getItemTotalPrice(item);
+      return regularTotal - actualTotal;
     }
-    if (!name) {
-      return alert("Please Enter Name!");
-    }
-    if (!mobilenumber) {
-      return alert("Please Enter Mobile Number!");
-    }
-    if (addresstype === "apartment" && !flat) {
-      return alert("Please Enter flat number");
-    }
-    if (addresstype === "apartment" && !towerName) {
-      return alert("Please Enter Tower Name");
-    }
-    const selectedLocationData = (
-      addresstype === "apartment" ? apartmentdata : corporatedata
-    )?.find((data) => data?.Apartmentname === apartmentname);
-    const Savedaddress = {
-      _id: (addresstype === "apartment" ? apartmentdata : corporatedata)?.find(
-        (data) => data?.Apartmentname === apartmentname,
-      )?._id,
-      apartmentname: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)?.Apartmentname,
-      doordelivarycharge: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)
-        ?.doordelivaryprice,
-      // sequentialDeliveryPrice: selectedLocationData?.sequentialDeliveryPrice,
-      // sequentialDeliveryTime: selectedLocationData?.sequentialDeliveryTime,
-      // expressDeliveryPrice: selectedLocationData?.expressDeliveryPrice,
-      // expressDeliveryTime: selectedLocationData?.expressDeliveryTime,
-      buildingaddress: buildingaddress,
-      flatno: flat,
-      name: name,
-      towerName: towerName,
-      mobilenumber: mobilenumber,
-      prefixcode: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)?.prefixcode,
-      lunchSlots: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)?.lunchSlots,
-      dinnerSlots: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)?.dinnerSlots,
-      deliverypoint: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)?.deliverypoint,
-      locationType: (addresstype === "apartment"
-        ? apartmentdata
-        : corporatedata
-      )?.find((data) => data?.Apartmentname === apartmentname)?.locationType,
-    };
-    addresstype === "apartment"
-      ? localStorage.setItem("address", JSON.stringify(Savedaddress))
-      : sessionStorage.setItem("coporateaddress", JSON.stringify(Savedaddress));
-    setAddress(Savedaddress);
-    sessionStorage.setItem("Savedaddress", JSON.stringify(Savedaddress));
-    handleClose();
+    return 0;
   };
 
-  // Render items grouped by session (Breakfast, Lunch, Dinner)
+  // Render items grouped by session
   const renderGroupedItems = () => {
-    // Group cart items by session
     const groupedBySession = {};
     
     cartdata.forEach((item) => {
       const session = item.session || "Lunch";
-      if (!groupedBySession[session]) {
-        groupedBySession[session] = [];
+      const sessionKey = session.charAt(0).toUpperCase() + session.slice(1);
+      if (!groupedBySession[sessionKey]) {
+        groupedBySession[sessionKey] = [];
       }
-      groupedBySession[session].push(item);
+      groupedBySession[sessionKey].push(item);
     });
 
-    return Object.entries(groupedBySession).map(([session, items]) => (
-      <div key={session} className="session-group">
-        <div className="session-header">
-          <h4 className="session-title">{session}</h4>
-        </div>
-        <div className="cart-container">
-          <div className="cart-section">
-            <div className="cart-content">
-              {items.map((item, i) => (
-                <div className="cart-item" key={item.cartId || i}>
-                  <div className="veg-indicator">
-                    {item?.foodcategory === "Veg" ? (
-                      <img src={IsVeg} alt="veg" className="indicator-icon" />
-                    ) : (
-                      <img src={IsNonVeg} alt="non-veg" className="indicator-icon" />
-                    )}
-                  </div>
-                  <div className="item-content">
-                    <div className="item-details">
-                      <div className="item-name">
-                        <div className="item-name-text">
-                          {item.offerProduct && <BiSolidOffer color="green" />}
-                          {item?.foodname || item?.itemName}
-                        </div>
+    return Object.entries(groupedBySession).map(([session, items]) => {
+      const sessionTotal = items.reduce((sum, item) => sum + getItemTotalPrice(item), 0);
+      const sessionSavings = items.reduce((sum, item) => sum + getItemSavings(item), 0);
+      
+      return (
+        <div key={session} className="session-group">
+          <div className="session-header">
+            <h4 className="session-title">{session}</h4>
+          </div>
+          <div className="cart-container">
+            <div className="cart-section">
+              <div className="cart-content">
+                {items.map((item, i) => {
+                  const itemTotal = getItemTotalPrice(item);
+                  const itemSavings = getItemSavings(item);
+                  const regularTotal = item.regularPrice ? item.regularPrice * item.quantity : itemTotal;
+                  
+                  return (
+                    <div className="cart-item" key={item.cartId || i}>
+                      <div className="veg-indicator">
+                        {item?.foodcategory === "Veg" ? (
+                          <img src={IsVeg} alt="veg" className="indicator-icon" />
+                        ) : (
+                          <img src={IsNonVeg} alt="non-veg" className="indicator-icon" />
+                        )}
                       </div>
-                      <div className="item-tags">
-                        <div className="portion-tag">
-                          <div className="portion-text">
-                            <div className="portion-label">
-                              {item?.quantity || 1} Portion{(item?.quantity || 1) > 1 ? "s" : ""}
+                      <div className="item-content">
+                        <div className="item-details">
+                          <div className="item-name">
+                            <div className="item-name-text">
+                              {item.offerApplied && <BiSolidOffer color="#6B8E23" className="me-1" />}
+                              {item?.foodname || item?.itemName}
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="item-controls">
-                      <div className="quantity-control">
-                        <div
-                          className="quantity-btn"
-                          onClick={() => debouncedDecreaseQuantity(item)}
-                        >
-                          <div className="btn-text">-</div>
-                        </div>
-                        <div className="quantity-display">
-                          <div className="quantity-text">
-                            {item?.quantity || 1}
+                          <div className="item-tags">
+                            <div className="portion-tag">
+                              <div className="portion-text">
+                                <div className="portion-label">
+                                  {item?.quantity || 1} Portion{(item?.quantity || 1) > 1 ? "s" : ""}
+                                </div>
+                              </div>
+                            </div>
+                            {item.offerApplied && item.offerPrice && (
+                              <div className="offer-tag">
+                                <div className="offer-text">
+                                  Offer: 1st at ₹{item.offerPrice}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <div
-                          className="quantity-btn"
-                          onClick={() => debouncedIncreaseQuantity(item)}
-                        >
-                          <div className="btn-text">+</div>
-                        </div>
-                      </div>
-                      <div className="price-container vertical">
-                        {item.originalPrice && item.originalPrice > item.preOrderPrice && (
-                          <div className="original-price">
-                            <div className="price-line"></div>
-                            <div className="original-price-content">
-                              <div className="original-currency">
-                                <div className="original-currency-text">₹</div>
+                        <div className="item-controls">
+                          <div className="quantity-control">
+                            <div
+                              className="quantity-btn"
+                              onClick={() => debouncedDecreaseQuantity(item)}
+                            >
+                              <div className="btn-text">-</div>
+                            </div>
+                            <div className="quantity-display">
+                              <div className="quantity-text">
+                                {item?.quantity || 1}
                               </div>
-                              <div className="original-amount">
-                                <div className="original-amount-text">
-                                  {item.originalPrice * (item.quantity || 1)}
+                            </div>
+                            <div
+                              className="quantity-btn"
+                              onClick={() => debouncedIncreaseQuantity(item)}
+                            >
+                              <div className="btn-text">+</div>
+                            </div>
+                          </div>
+                          <div className="price-container vertical">
+                            {itemSavings > 0 && (
+                              <div className="original-price">
+                                <div className="price-line"></div>
+                                <div className="original-price-content">
+                                  <div className="original-currency">
+                                    <div className="original-currency-text">₹</div>
+                                  </div>
+                                  <div className="original-amount">
+                                    <div className="original-amount-text">
+                                      {regularTotal}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            <div className="current-price">
+                              <div className="current-currency">
+                                <div className="current-currency-text">₹</div>
+                              </div>
+                              <div className="current-amount">
+                                <div className="current-amount-text">
+                                  {itemTotal}
                                 </div>
                               </div>
                             </div>
                           </div>
-                        )}
-                        <div className="current-price">
-                          <div className="current-currency">
-                            <div className="current-currency-text">₹</div>
-                          </div>
-                          <div className="current-amount">
-                            <div className="current-amount-text">
-                              {(item?.totalPrice || (item?.preOrderPrice || 0) * (item?.quantity || 1)) || 0}
-                            </div>
-                          </div>
                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="cart-footer">
+              <div className="add-more-section">
+                <div className="add-more-btn">
+                  <div className="add-more-content">
+                    <div className="add-more-text-container">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                      >
+                        <path
+                          d="M9 3C12.3082 3 15 5.69175 15 9C15 12.3082 12.3082 15 9 15C5.69175 15 3 12.3082 3 9C3 5.69175 5.69175 3 9 3ZM9 1.5C4.85775 1.5 1.5 4.85775 1.5 9C1.5 13.1423 4.85775 16.5 9 16.5C13.1423 16.5 16.5 13.1423 16.5 9C16.5 4.85775 13.1423 1.5 9 1.5ZM12.75 8.25H9.75V5.25H8.25V8.25H5.25V9.75H8.25V12.75H9.75V9.75H12.75V8.25Z"
+                          fill="black"
+                        />
+                      </svg>
+                      <div className="add-more-text">
+                        <Link to="/home" replace>
+                          <div className="add-more-label">Add More</div>
+                        </Link>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="cart-footer">
-
-            <div className="add-more-section">
-              <div className="add-more-btn">
-                <div className="add-more-content">
-                  <div className="add-more-text-container">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                    >
-                      <path
-                        d="M9 3C12.3082 3 15 5.69175 15 9C15 12.3082 12.3082 15 9 15C5.69175 15 3 12.3082 3 9C3 5.69175 5.69175 3 9 3ZM9 1.5C4.85775 1.5 1.5 4.85775 1.5 9C1.5 13.1423 4.85775 16.5 9 16.5C13.1423 16.5 16.5 13.1423 16.5 9C16.5 4.85775 13.1423 1.5 9 1.5ZM12.75 8.25H9.75V5.25H8.25V8.25H5.25V9.75H8.25V12.75H9.75V9.75H12.75V8.25Z"
-                        fill="black"
-                      />
-                    </svg>
-                    <div className="add-more-text">
-                      <Link to="/home" replace>
-                        <div className="add-more-label">Add More</div>
-                      </Link>
-                    </div>
-                  </div>
+              <div className="total-section">
+                <div className="total-label-container">
+                  <div className="total-label">Total</div>
                 </div>
-              </div>
-            </div>
-
-            <div className="total-section">
-              <div className="total-label-container">
-                <div className="total-label">Total</div>
-              </div>
-              <div className="total-price-section">
-                <div className="total-price-content d-flex align-items-center justify-content-center gap-4">
-                  <div className="total-current-price d-flex align-items-center">
-                    <div className="current-currency">
-                      <div className="current-currency-text">₹</div>
-                    </div>
-                    <div className="current-amount">
-                      <div className="current-amount-text">
-                        {items.reduce((sum, item) => sum + (item?.totalPrice || (item?.preOrderPrice || 0) * (item?.quantity || 1)), 0).toFixed(2)}
+                <div className="total-price-section">
+                  <div className="total-price-content d-flex align-items-center justify-content-center gap-4">
+                    {sessionSavings > 0 && (
+                      <div className="original-price me-2">
+                        <div className="price-line"></div>
+                        <div className="original-price-content">
+                          <div className="original-currency">
+                            <div className="original-currency-text">₹</div>
+                          </div>
+                          <div className="original-amount">
+                            <div className="original-amount-text">
+                              {items.reduce((sum, item) => sum + (item.regularPrice * item.quantity), 0)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div className="total-current-price d-flex align-items-center">
+                      <div className="current-currency">
+                        <div className="current-currency-text">₹</div>
+                      </div>
+                      <div className="current-amount">
+                        <div className="current-amount-text">
+                          {sessionTotal.toFixed(2)}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -815,8 +777,8 @@ const CheckoutMultiple = () => {
             </div>
           </div>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   return (
@@ -845,7 +807,6 @@ const CheckoutMultiple = () => {
         </div>
 
         <div className="mobile-checkout">
-          {/* Grouped Items by Session */}
           {cartdata.length > 0 ? (
             renderGroupedItems()
           ) : (
@@ -889,7 +850,7 @@ const CheckoutMultiple = () => {
                         </div>
                       </div>
                       <div className="center mt-1">
-                        {deliveryChargePerSlot > 0 ? (
+                         {deliveryChargePerSlot > 0 ? (
                           <b>₹ {deliveryChargePerSlot}</b>
                         ) : (
                           <b
@@ -915,7 +876,7 @@ const CheckoutMultiple = () => {
                       className={`rightcard ${
                         selectedOption === "Gate/Tower" ? "active" : ""
                       }`}
-                      onClick={() => setSelectedOption("Gate/Tower")}
+                        onClick={() => setSelectedOption("Gate/Tower")}
                     >
                       {selectedOption === "Gate/Tower" && (
                         <div className="top-right-icon">
@@ -928,7 +889,7 @@ const CheckoutMultiple = () => {
                         </div>
                       </div>
                       <div className="center mt-1">
-                        {deliveryChargePerSlot > 0 ? (
+                         {deliveryChargePerSlot > 0 ? (
                           <b>₹ {deliveryChargePerSlot}</b>
                         ) : (
                           <b
@@ -969,7 +930,7 @@ const CheckoutMultiple = () => {
                       </div>
                     </div>
                     <div className="center mt-1">
-                      {deliveryChargePerSlot > 0 ? (
+                       {deliveryChargePerSlot > 0 ? (
                         <b>₹ {deliveryChargePerSlot}</b>
                       ) : (
                         <b
@@ -1112,46 +1073,7 @@ const CheckoutMultiple = () => {
           <div>
             <h4 className="spply-s">Apply & Save</h4>
             <div className="promo-wallet-container">
-              <div className="promo-section">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="36"
-                  height="36"
-                  viewBox="0 0 36 36"
-                  fill="none"
-                >
-                  <path
-                    d="M28.5123 18L29.8387 15.7076C29.9982 15.4318 30.0415 15.104 29.9593 14.7962C29.877 14.4885 29.6759 14.226 29.4002 14.0665L27.1054 12.7401V10.0969C27.1054 9.77825 26.9789 9.47265 26.7535 9.24734C26.5282 9.02203 26.2226 8.89545 25.904 8.89545H23.262L21.9368 6.60189C21.7776 6.32596 21.5152 6.12457 21.2075 6.04202C21.0551 6.00117 20.8961 5.99076 20.7396 6.01137C20.5832 6.03199 20.4323 6.08323 20.2956 6.16216L18.0009 7.48856L15.7061 6.16096C15.4301 6.00165 15.1022 5.95847 14.7944 6.04094C14.4867 6.1234 14.2242 6.32475 14.0649 6.60069L12.7385 8.89545H10.0965C9.77788 8.89545 9.47229 9.02203 9.24697 9.24734C9.02166 9.47265 8.89508 9.77825 8.89508 10.0969V12.7389L6.60031 14.0653C6.46362 14.1442 6.34384 14.2494 6.24781 14.3747C6.15178 14.5 6.08139 14.643 6.04067 14.7956C5.99994 14.9481 5.98967 15.1071 6.01045 15.2636C6.03124 15.4201 6.08266 15.571 6.16178 15.7076L7.48818 18L6.16178 20.2923C6.00317 20.5684 5.96014 20.896 6.04207 21.2036C6.12399 21.5113 6.32422 21.7741 6.59911 21.9347L8.89388 23.2611V25.9031C8.89388 26.2217 9.02046 26.5273 9.24577 26.7526C9.47109 26.9779 9.77668 27.1045 10.0953 27.1045H12.7385L14.0649 29.3993C14.1713 29.5811 14.3231 29.7321 14.5056 29.8374C14.688 29.9428 14.8947 29.9988 15.1054 30C15.3144 30 15.5223 29.9447 15.7073 29.8378L17.9997 28.5114L20.2944 29.8378C20.5702 29.9972 20.8981 30.0406 21.2058 29.9583C21.5136 29.8761 21.7761 29.675 21.9356 29.3993L23.2608 27.1045H25.9028C26.2214 27.1045 26.527 26.9779 26.7523 26.7526C26.9777 26.5273 27.1042 26.2217 27.1042 25.9031V23.2611L29.399 21.9347C29.5357 21.8557 29.6555 21.7506 29.7515 21.6253C29.8475 21.4999 29.9179 21.3569 29.9587 21.2044C29.9994 21.0519 30.0096 20.8928 29.9889 20.7363C29.9681 20.5798 29.9167 20.429 29.8375 20.2923L28.5123 18ZM14.996 11.9808C15.4742 11.9809 15.9326 12.171 16.2706 12.5092C16.6086 12.8474 16.7984 13.306 16.7982 13.7841C16.798 14.2622 16.608 14.7207 16.2698 15.0587C15.9316 15.3967 15.473 15.5864 14.9948 15.5863C14.5167 15.5861 14.0582 15.396 13.7203 15.0578C13.3823 14.7196 13.1925 14.261 13.1927 13.7829C13.1928 13.3048 13.3829 12.8463 13.7211 12.5083C14.0593 12.1704 14.5179 11.9806 14.996 11.9808ZM15.3565 23.5146L13.4342 22.0741L20.6428 12.4625L22.5652 13.9031L15.3565 23.5146ZM21.0033 23.9952C20.7665 23.9951 20.5321 23.9484 20.3134 23.8577C20.0947 23.7671 19.8961 23.6342 19.7287 23.4667C19.5614 23.2993 19.4286 23.1005 19.3381 22.8818C19.2476 22.663 19.201 22.4286 19.2011 22.1918C19.2012 21.9551 19.2479 21.7207 19.3386 21.502C19.4292 21.2833 19.5621 21.0846 19.7296 20.9172C19.897 20.7499 20.0958 20.6172 20.3145 20.5267C20.5333 20.4361 20.7677 20.3896 21.0045 20.3897C21.4826 20.3898 21.9411 20.5799 22.2791 20.9181C22.617 21.2563 22.8068 21.7149 22.8067 22.193C22.8065 22.6711 22.6164 23.1296 22.2782 23.4676C21.94 23.8056 21.4814 23.9953 21.0033 23.9952Z"
-                    fill="#6B8E23"
-                  />
-                </svg>
-                <div className="input-container">
-                  <input
-                    type="text"
-                    placeholder="Enter your promo code"
-                    value={couponId}
-                    onChange={(e) => setCouponId(e.target.value)}
-                    className="promo-input"
-                  />
-                  <div className="search-icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M13.0667 14L8.86667 9.8C8.53333 10.0667 8.15 10.2778 7.71667 10.4333C7.28333 10.5889 6.82222 10.6667 6.33333 10.6667C5.12222 10.6667 4.09733 10.2471 3.25867 9.408C2.42 8.56889 2.00044 7.544 2 6.33333C1.99956 5.12267 2.41911 4.09778 3.25867 3.25867C4.09822 2.41956 5.12311 2 6.33333 2C7.54356 2 8.56867 2.41956 9.40867 3.25867C10.2487 4.09778 10.668 5.12267 10.6667 6.33333C10.6667 6.82222 10.5889 7.28333 10.4333 7.71667C10.2778 8.15 10.0667 8.53333 9.8 8.86667L14 13.0667L13.0667 14ZM6.33333 9.33333C7.16667 9.33333 7.87511 9.04178 8.45867 8.45867C9.04222 7.87556 9.33378 7.16711 9.33333 6.33333C9.33289 5.49956 9.04133 4.79133 8.45867 4.20867C7.876 3.626 7.16756 3.33422 6.33333 3.33333C5.49911 3.33244 4.79089 3.62422 4.20867 4.20867C3.62644 4.79311 3.33467 5.50133 3.33333 6.33333C3.332 7.16533 3.62378 7.87378 4.20867 8.45867C4.79356 9.04356 5.50178 9.33511 6.33333 9.33333Z"
-                        fill="#6B6B6B"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <button className="apply-btn" onClick={() => applycoupon()}>
-                  Apply
-                </button>
-              </div>
+              
               <div className="wallet-section">
                 <input
                   type="checkbox"
@@ -1186,21 +1108,11 @@ const CheckoutMultiple = () => {
                         Math.min(
                           walletSeting?.minCartValueForWallet || 0,
                           (walletSeting?.minCartValueForWallet || 0) -
-                            (Number(subtotal) +
+                             (Number(subtotal) +
                               Number(Cutlery) +
                               Number(totalDeliveryCharge) || 0),
                         ),
-                      )}
-                      {/* {Math.max(
-                        0,
-                        Math.min(
-                          walletSeting?.minCartValueForWallet || 0,
-                          (walletSeting?.minCartValueForWallet || 0) -
-                            (Number(calculateTaxPrice) +
-                              Number(subtotal) +
-                              Number(Cutlery) || 0),
-                        ),
-                      )} */}
+                      )}{" "}
                       more to use
                     </p>
                   )}
@@ -1210,7 +1122,7 @@ const CheckoutMultiple = () => {
           </div>
 
           <div className="belling-head">
-            <span className="billing">Billing Details</span>
+            <span className="billinf">Billing Details</span>
             <span onClick={toggleBillingDetails}>
               <span
                 onClick={toggleBillingDetails}
@@ -1231,24 +1143,24 @@ const CheckoutMultiple = () => {
             <div className="deliverycard">
               <div className="maincard2 p-3">
                 <div
-                  className="billdetail  w-100 flex-wrap "
+                  className="billdetail  w-100 flex-wrap"
                   style={{ gap: "20px" }}
                 >
                   <div className="label-column">
                     <div className="toatal-va">Total Order Value</div>
+                    {totalSavings > 0 && (
+                      <div className="toatal-va" style={{ color: "green" }}>
+                        Offer Savings
+                      </div>
+                    )}
                     <div className="toatal-va">Tax Breakdown ({gstRate}%)</div>
+                    <div className="toatal-va">Delivery Charge</div>
                     {Cutlery !== 0 && <div className="toatal-va">Cutlery</div>}
                     {coupon !== 0 && (
                       <div className="toatal-va">Coupon Discount</div>
                     )}
-                    {totalDeliveryCharge !== 0 && (
-                      <div className="toatal-va">
-                        {deliverySlotCount > 1
-                          ? `Delivery (${deliverySlotCount} slots)`
-                          : selectedOption
-                            ? `${selectedOption} Delivery`
-                            : "Delivery"}
-                      </div>
+                    {selectedOption && (
+                      <div className="toatal-va">{`${selectedOption} Delivery`}</div>
                     )}
                     {discountWallet !== 0 && (
                       <div className="toatal-va">Wallet Pay</div>
@@ -1258,30 +1170,48 @@ const CheckoutMultiple = () => {
                     </div>
                   </div>
                   <div className="value-column">
-                    <div className="tootal-va">₹ {subtotal?.toFixed(2) - calculateTaxPrice.toFixed(2) }</div>
-                    <div className="toatal-va" style={{ fontSize: "12px", color: "#999" }}>
+                    <div className="toatal-va">₹ {(regularTotal - calculateTaxPrice)?.toFixed(2)}</div>
+                    {totalSavings > 0 && (
+                      <div className="toatal-va" style={{ color: "green" }}>
+                        - ₹ {totalSavings.toFixed(2)}
+                      </div>
+                    )}
+                    <div className="toatal-va">
                       ₹ {calculateTaxPrice.toFixed(2)}
                     </div>
-                    {Cutlery !== 0 && (
+                     {/* <div className="toatal-va">
+                      ₹ {cartdata?.deliveryCharge || 0}
+                    </div> */}
+                    {/* {Cutlery !== 0 && (
                       <div className="toatal-va">₹ {Cutlery}</div>
-                    )}
-                    {coupon !== 0 && (
+                    )} */}
+                    {/* {coupon !== 0 && (
                       <div className="toatal-va" style={{ color: "green" }}>
                         - ₹ {coupon}
                       </div>
-                    )}
-                    {totalDeliveryCharge !== 0 && (
+                    )} */}
+                    
+                     {/* {totalDeliveryCharge !== 0 && (
+                      <div className="toatal-va">
+                        {deliverySlotCount > 1
+                          ? `Delivery (${deliverySlotCount} slots)`
+                          : selectedOption
+                            ? `${selectedOption} Delivery`
+                            : "Delivery"}
+                      </div>
+                    )} */}
+                     {totalDeliveryCharge !== 0 && (
                       <div className="toatal-va">₹ {totalDeliveryCharge}</div>
                     )}
                     {discountWallet !== 0 && (
                       <div className="toatal-va" style={{ color: "green" }}>
-                        - ₹ {discountWallet}
+                        - ₹ {discountWallet?.toFixed(2)}
                       </div>
                     )}
                     <div className="toatal-va">
                       <b>
                         ₹{" "}
-                        {totalPayable.toFixed(2)}
+                         {totalPayable.toFixed(2)}
                       </b>
                     </div>
                   </div>
@@ -1332,8 +1262,7 @@ const CheckoutMultiple = () => {
                 >
                   <div className="paybutton">Place Order | </div>
                   <p className="price-pay">
-                    ₹
-                    {totalPayable.toFixed(2)}
+                      {totalPayable.toFixed(2)}
                   </p>
                 </div>
               )}
