@@ -231,7 +231,7 @@
 //   const getAccurateAddress = async (lat, lng) => {
 //     try {
 //       // Try method 2: Use Google Maps API if available
-//       const googleApiKey = process.env.REACT_APP_MAP_KEY;
+//       const googleApiKey = import.meta.env.VITE_MAP_KEY;
 //       if (googleApiKey) {
 //         try {
 //           const response = await fetch(
@@ -2499,7 +2499,7 @@
 //   const getAccurateAddress = async (lat, lng) => {
 //     try {
 //       // Try method 2: Use Google Maps API if available
-//       const googleApiKey = process.env.REACT_APP_MAP_KEY;
+//       const googleApiKey = import.meta.env.VITE_MAP_KEY;
 //       if (googleApiKey) {
 //         try {
 //           const response = await fetch(
@@ -4779,7 +4779,7 @@ const Banner = ({
 
   const getAccurateAddress = async (lat, lng) => {
     try {
-      const googleApiKey = process.env.REACT_APP_MAP_KEY;
+      const googleApiKey = import.meta.env.VITE_MAP_KEY;
       if (googleApiKey) {
         try {
           const response = await fetch(
