@@ -545,7 +545,7 @@ const OfferForm = () => {
                   handleProductChange(index, "customerType", e.target.value)
                 }
                 placeholder="e.g., 1 for 1st-time customer"
-                min="1"
+                // min="1"
                 required
               />
             </div>

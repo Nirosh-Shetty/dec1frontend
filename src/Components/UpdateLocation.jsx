@@ -7322,7 +7322,7 @@ const UpdateLocation = () => {
       schoolName: schoolName,
       companyName: companyName,
       hubName: hubData?.hubName || "",
-      hubId: hubData?.hub || "",
+      hubId: hubData?._id || "",
       ...(addressType === "Home" && { landmark, floor }),
       ...(addressType === "PG" && { towerBlock, flat, floor }),
       ...(addressType === "School" && {

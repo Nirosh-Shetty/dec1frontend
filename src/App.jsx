@@ -246,6 +246,15 @@ function App() {
               </>
             }
           />
+            <Route
+            path="/checkout-multiple"
+            element={
+              <>
+                <CheckoutMultiple />
+                <Footer />
+              </>
+            }
+          />
           <Route
             path="/checkout-multiple"
             element={

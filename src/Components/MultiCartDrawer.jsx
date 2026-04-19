@@ -501,6 +501,1269 @@
 
 
 
+// import { useState } from "react";
+// import moment from "moment";
+// import { FaAngleUp, FaTimes } from "react-icons/fa";
+// import { useNavigate } from "react-router-dom";
+// import "../Styles/MultiCartDrawer.css";
+// import MyMeal from "../assets/mymeal.svg";
+// import Swal2 from "sweetalert2";
+// import arrow from "./../assets/material-symbols_arrow-back-rounded.png";
+// import checkCircle from "../assets/check_circle.png";
+
+// const MultiCartDrawer = ({
+//   proceedToPlan,
+//   groupedCarts,
+//   overallSubtotal,
+//   overallTotalItems,
+//   onJumpToSlot, // Function to set selectedDate/Session in Home.jsx
+// }) => {
+//   const user = JSON.parse(localStorage.getItem("user"));
+//   const address = JSON.parse(
+//     localStorage.getItem("primaryAddress")
+//     // localStorage.getItem("currentLocation")
+//   );
+//   const navigate = useNavigate();
+//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+//   const formatSlotDate = (date) => {
+//     const today = moment().startOf("day");
+//     const tomorrow = moment().add(1, "days").startOf("day");
+//     const dateMoment = moment(date).startOf("day");
+//     if (dateMoment.isSame(today)) return "Today";
+//     if (dateMoment.isSame(tomorrow)) return "Tomorrow";
+//     return moment(date).format("MMM D");
+//   };
+
+//   const handleSlotDetailClick = (slot) => {
+//     // console.log("Details clicked for slot:", slot);
+//     // console.log("Calling onJumpToSlot with:", slot.date, slot.session);
+//     onJumpToSlot(slot.date, slot.session);
+//     setIsDrawerOpen(false);
+//   };
+
+//   const handleCheckout = () => {
+//     setIsDrawerOpen(false);
+//     navigate("/checkout");
+//   };
+
+//   // Handle "My Meal" click for non-logged in users
+//   const handleMyMealClickForGuest = () => {
+//     // Navigate to login page without setting destination flag
+//     navigate("/login");
+//     setIsDrawerOpen(false); // Close drawer if open
+//   };
+
+//   // Handle "Move to My Plans" click for logged in users
+//   const handleMoveToMyPlans = () => {
+//     if (user && !address) {
+//       // If user doesn't have address, show toast message
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "info",
+//         title: `Please add your delivery address first!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     // Show success toast with custom HTML
+//     Swal2.fire({
+//       toast: true,
+//       position: "bottom",
+//       showConfirmButton: false,
+//       timer: 2500,
+//       timerProgressBar: true,
+//       html: `
+//         <div class="myplans-toast-content">
+//           <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+//           <div class="myplans-toast-text">
+//             <div class="myplans-toast-title">Great picks!</div>
+//             <div class="myplans-toast-subtitle">Moving them to MyPlans</div>
+//           </div>
+//         </div>
+//       `,
+//       customClass: {
+//         popup: "myplans-custom-toast",
+//         htmlContainer: "myplans-toast-html",
+//       },
+//       didOpen: () => {
+//         // Position above bottom nav
+//         const toast = document.querySelector(".myplans-custom-toast");
+//         if (toast) {
+//           toast.style.bottom = "90px"; // Position above bottom nav
+//           toast.style.left = "50%";
+//           toast.style.transform = "translateX(-50%)";
+//           toast.style.position = "fixed";
+//         }
+//       },
+//     });
+
+//     // Directly proceed to plan
+//     proceedToPlan();
+//   };
+
+//   if (overallTotalItems === 0) {
+//     return null;
+//   }
+
+//   return (
+//     <>
+//       {/* small "View All" bubble above closed bar */}
+//       {isDrawerOpen || (
+//         <>
+//           {groupedCarts.length > 1 && (
+//             <>
+//               <div
+//                 className="view-all-bubble"
+//                 onClick={() => setIsDrawerOpen(true)}
+//               >
+//                 View All
+//                 <img src="/Assets/arrowup.svg" />
+//               </div>
+//             </>
+//           )}
+
+//           <div className="cartbutton">
+//             <div
+//               className={`cartbtn ${
+//                 groupedCarts.length > 1 ? "multi-cart" : ""
+//               }`}
+//             >
+//               <div className="d-flex justify-content-between align-items-center flex-row">
+//                 <div className="d-flex gap-1 align-items-center flex-row">
+//                   <div className="cart-items-price">
+//                     {/* {overallTotalItems} items | ₹{overallSubtotal.toFixed(0)} */}
+//                     Picked : {groupedCarts.length} meals
+//                   </div>
+//                 </div>
+//                 {user && address ? (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={handleMoveToMyPlans}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Review My Plans
+//                     </div>
+//                   </div>
+//                 ) : user && !address ? (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={() => {
+//                       navigate("/location");
+//                     }}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Add location
+//                     </div>
+//                   </div>
+//                 ) : (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={handleMyMealClickForGuest}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Login to continue
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </>
+//       )}
+
+//       {/* Manual drawer implementation */}
+//       {isDrawerOpen && (
+//         <div className="manual-drawer-overlay">
+//           <div className="manual-drawer">
+//             <div className="multi-cart-drawer-content">
+//               {/* Close button at top center */}
+//               <div className="top-close-section">
+//                 <button
+//                   className="close-button-top"
+//                   onClick={() => setIsDrawerOpen(false)}
+//                 >
+//                   <FaTimes size={20} />
+//                 </button>
+//               </div>
+
+//               <div className="multi-cart-header">
+//                 <div
+//                   className="checkout-top"
+//                   onClick={() => {
+
+//                     user && address ? handleMoveToMyPlans() :user && !address ? navigate("/location") : handleMyMealClickForGuest();
+//                   }}
+//                 >
+//                   <img src={arrow} alt="arrow" className="header-arrow" />
+//                   {user && !address ? "Add location" : user && address? "Move to My Plans" : "Login to continue"}
+
+//                 </div>
+//               </div>
+
+//               <div className="slot-list-container">
+//                 {groupedCarts.map((slot, index) => (
+//                   <div className="cartbutton" key={index}>
+//                     <div className="mc-cartbtn">
+//                       <div className="d-flex justify-content-around align-items-center gap-2">
+//                         <div className="d-flex gap-1 align-items-center">
+//                           <div className="cart-items-price">
+//                             {slot.totalItems} items | ₹
+//                             {slot.subtotal.toFixed(0)}
+//                           </div>
+//                         </div>
+//                         <div className="slot-title-details">
+//                           <div className="slot-session-date">
+//                             <span className="session-name">{slot.session}</span>
+//                             <span className="date-name">
+//                               {formatSlotDate(slot.date)}
+//                             </span>
+//                           </div>
+//                         </div>
+//                         <button
+//                           onClick={() => handleSlotDetailClick(slot)}
+//                           style={{
+//                             background: "none",
+//                             border: "none",
+//                             color: "unset",
+//                             cursor: "pointer",
+//                             padding: 0,
+//                           }}
+//                         >
+//                           <div className="d-flex gap-1 align-content-center ">
+//                             <div className="my-meal-icon">
+//                               <img src={MyMeal} alt="" />
+//                             </div>
+//                             <div className="my-meal-text">Details</div>
+//                           </div>
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default MultiCartDrawer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { useState } from "react";
+// import moment from "moment";
+// import { FaAngleUp, FaTimes } from "react-icons/fa";
+// import { useNavigate } from "react-router-dom";
+// import "../Styles/MultiCartDrawer.css";
+// import MyMeal from "../assets/mymeal.svg";
+// import Swal2 from "sweetalert2";
+// import arrow from "./../assets/material-symbols_arrow-back-rounded.png";
+// import checkCircle from "../assets/check_circle.png";
+
+// const MultiCartDrawer = ({
+//   proceedToPlan,
+//   groupedCarts,
+//   overallSubtotal,
+//   overallTotalItems,
+//   onJumpToSlot, // Function to set selectedDate/Session in Home.jsx
+// }) => {
+//   const user = JSON.parse(localStorage.getItem("user"));
+//   const address = JSON.parse(
+//     localStorage.getItem("primaryAddress")
+//     // localStorage.getItem("currentLocation")
+//   );
+//   const navigate = useNavigate();
+//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+//   const [expandedSlot, setExpandedSlot] = useState(null);
+
+//   // Helper function to get cart item display price with breakdown
+//   const getCartItemDisplayPrice = (item) => {
+//     // If offer is applied and we have offer price and regular price
+//     if (item.offerApplied && item.offerPrice && item.regularPrice) {
+//       if (item.Quantity > 1) {
+//         return {
+//           label: `1 × ₹${item.offerPrice} + ${item.Quantity - 1} × ₹${item.regularPrice}`,
+//           total: item.totalPrice,
+//         };
+//       } else {
+//         return {
+//           label: `₹${item.offerPrice}`,
+//           total: item.offerPrice,
+//         };
+//       }
+//     } 
+//     // If offer is applied but no regular price stored (fallback)
+//     else if (item.offerApplied && item.offerPrice) {
+//       if (item.Quantity > 1) {
+//         return {
+//           label: `${item.Quantity} × ₹${item.offerPrice}`,
+//           total: item.offerPrice * item.Quantity,
+//         };
+//       } else {
+//         return {
+//           label: `₹${item.offerPrice}`,
+//           total: item.offerPrice,
+//         };
+//       }
+//     }
+//     // No offer applied - use regular price
+//     else {
+//       // Use totalPrice if available, otherwise calculate
+//       const total = item.totalPrice || (item.price * item.Quantity);
+//       if (item.Quantity > 1) {
+//         return {
+//           label: `${item.Quantity} × ₹${item.price}`,
+//           total: total,
+//         };
+//       } else {
+//         return {
+//           label: `₹${item.price}`,
+//           total: total,
+//         };
+//       }
+//     }
+//   };
+
+//   const formatSlotDate = (date) => {
+//     const today = moment().startOf("day");
+//     const tomorrow = moment().add(1, "days").startOf("day");
+//     const dateMoment = moment(date).startOf("day");
+//     if (dateMoment.isSame(today)) return "Today";
+//     if (dateMoment.isSame(tomorrow)) return "Tomorrow";
+//     return moment(date).format("MMM D");
+//   };
+
+//   const handleSlotDetailClick = (slot) => {
+//     // Toggle expansion for this slot
+//     setExpandedSlot(expandedSlot === slot.date?.toString() + slot.session ? null : slot.date?.toString() + slot.session);
+//   };
+
+//   const handleJumpToSlot = (slot) => {
+//     onJumpToSlot(slot.date, slot.session);
+//     setIsDrawerOpen(false);
+//   };
+
+//   const handleCheckout = () => {
+//     setIsDrawerOpen(false);
+//     navigate("/checkout");
+//   };
+
+//   // Handle "My Meal" click for non-logged in users
+//   const handleMyMealClickForGuest = () => {
+//     // Navigate to login page without setting destination flag
+//     navigate("/login");
+//     setIsDrawerOpen(false); // Close drawer if open
+//   };
+
+//   // Handle "Move to My Plans" click for logged in users
+//   const handleMoveToMyPlans = () => {
+//     if (user && !address) {
+//       // If user doesn't have address, show toast message
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "info",
+//         title: `Please add your delivery address first!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     // Show success toast with custom HTML
+//     Swal2.fire({
+//       toast: true,
+//       position: "bottom",
+//       showConfirmButton: false,
+//       timer: 2500,
+//       timerProgressBar: true,
+//       html: `
+//         <div class="myplans-toast-content">
+//           <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+//           <div class="myplans-toast-text">
+//             <div class="myplans-toast-title">Great picks!</div>
+//             <div class="myplans-toast-subtitle">Moving them to MyPlans</div>
+//           </div>
+//         </div>
+//       `,
+//       customClass: {
+//         popup: "myplans-custom-toast",
+//         htmlContainer: "myplans-toast-html",
+//       },
+//       didOpen: () => {
+//         // Position above bottom nav
+//         const toast = document.querySelector(".myplans-custom-toast");
+//         if (toast) {
+//           toast.style.bottom = "90px"; // Position above bottom nav
+//           toast.style.left = "50%";
+//           toast.style.transform = "translateX(-50%)";
+//           toast.style.position = "fixed";
+//         }
+//       },
+//     });
+
+//     // Directly proceed to plan
+//     proceedToPlan();
+//   };
+
+//   if (overallTotalItems === 0) {
+//     return null;
+//   }
+
+//   return (
+//     <>
+//       {/* small "View All" bubble above closed bar */}
+//       {isDrawerOpen || (
+//         <>
+//           {groupedCarts.length > 1 && (
+//             <>
+//               <div
+//                 className="view-all-bubble"
+//                 onClick={() => setIsDrawerOpen(true)}
+//               >
+//                 View All
+//                 <img src="/Assets/arrowup.svg" alt="arrow up" />
+//               </div>
+//             </>
+//           )}
+
+//           <div className="cartbutton">
+//             <div
+//               className={`cartbtn ${
+//                 groupedCarts.length > 1 ? "multi-cart" : ""
+//               }`}
+//             >
+//               <div className="d-flex justify-content-between align-items-center flex-row">
+//                 <div className="d-flex gap-1 align-items-center flex-row">
+//                   <div className="cart-items-price">
+//                     {/* {overallTotalItems} items | ₹{overallSubtotal.toFixed(0)} */}
+//                     Picked : {groupedCarts.length} meals
+//                   </div>
+//                 </div>
+//                 {user && address ? (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={handleMoveToMyPlans}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Review My Plans
+//                     </div>
+//                   </div>
+//                 ) : user && !address ? (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={() => {
+//                       navigate("/location");
+//                     }}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Add location
+//                     </div>
+//                   </div>
+//                 ) : (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={handleMyMealClickForGuest}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Login to continue
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </>
+//       )}
+
+//       {/* Manual drawer implementation */}
+//       {isDrawerOpen && (
+//         <div className="manual-drawer-overlay">
+//           <div className="manual-drawer">
+//             <div className="multi-cart-drawer-content">
+//               {/* Close button at top center */}
+//               <div className="top-close-section">
+//                 <button
+//                   className="close-button-top"
+//                   onClick={() => setIsDrawerOpen(false)}
+//                 >
+//                   <FaTimes size={20} />
+//                 </button>
+//               </div>
+
+//               <div className="multi-cart-header">
+//                 <div
+//                   className="checkout-top"
+//                   onClick={() => {
+//                     user && address ? handleMoveToMyPlans() : user && !address ? navigate("/location") : handleMyMealClickForGuest();
+//                   }}
+//                 >
+//                   <img src={arrow} alt="arrow" className="header-arrow" />
+//                   {user && !address ? "Add location" : user && address ? "Move to My Plans" : "Login to continue"}
+//                 </div>
+//               </div>
+
+//               <div className="slot-list-container">
+//                 {groupedCarts.map((slot, index) => (
+//                   <div className="cartbutton" key={index}>
+//                     <div className="mc-cartbtn">
+//                       <div className="d-flex justify-content-around align-items-center gap-2">
+//                         <div className="d-flex gap-1 align-items-center">
+//                           <div className="cart-items-price">
+//                             {slot.totalItems} items | ₹
+//                             {slot.subtotal.toFixed(0)}
+//                           </div>
+//                         </div>
+//                         <div className="slot-title-details">
+//                           <div className="slot-session-date">
+//                             <span className="session-name">{slot.session}</span>
+//                             <span className="date-name">
+//                               {formatSlotDate(slot.date)}
+//                             </span>
+//                           </div>
+//                         </div>
+//                         <button
+//                           onClick={() => handleSlotDetailClick(slot)}
+//                           style={{
+//                             background: "none",
+//                             border: "none",
+//                             color: "unset",
+//                             cursor: "pointer",
+//                             padding: 0,
+//                           }}
+//                         >
+//                           <div className="d-flex gap-1 align-content-center ">
+//                             <div className="my-meal-icon">
+//                               <img src={MyMeal} alt="" />
+//                             </div>
+//                             <div className="my-meal-text">Details</div>
+//                           </div>
+//                         </button>
+//                       </div>
+//                     </div>
+                    
+//                     {/* Expanded items list */}
+//                     {expandedSlot === slot.date?.toString() + slot.session && (
+//                       <div className="expanded-items-list">
+//                         {slot.items.map((item, itemIndex) => {
+//                           const priceDisplay = getCartItemDisplayPrice(item);
+//                           return (
+//                             <div key={itemIndex} className="expanded-cart-item">
+//                               <div className="expanded-item-info">
+//                                 <div className="expanded-item-name">
+//                                   {item.foodname}
+//                                   {item.offerApplied && (
+//                                     <span className="offer-badge-expanded">
+//                                       Offer Applied
+//                                     </span>
+//                                   )}
+//                                 </div>
+//                                 <div className="expanded-item-price-breakdown">
+//                                   {priceDisplay.label}
+//                                 </div>
+//                               </div>
+//                               <div className="expanded-item-total">
+//                                 ₹{priceDisplay.total}
+//                               </div>
+//                             </div>
+//                           );
+//                         })}
+                        
+//                         {/* Jump to slot button */}
+//                         <button 
+//                           className="jump-to-slot-btn-expanded"
+//                           onClick={() => handleJumpToSlot(slot)}
+//                         >
+//                           Jump to this slot
+//                         </button>
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       <style jsx>{`
+//         .expanded-items-list {
+//           padding: 12px 16px;
+//           background-color: #f9f8f6;
+//           border-radius: 8px;
+//           margin-top: 8px;
+//         }
+        
+//         .expanded-cart-item {
+//           display: flex;
+//           justify-content: space-between;
+//           align-items: center;
+//           padding: 8px 0;
+//           border-bottom: 1px solid #e8e8e8;
+//         }
+        
+//         .expanded-cart-item:last-child {
+//           border-bottom: none;
+//         }
+        
+//         .expanded-item-info {
+//           flex: 1;
+//         }
+        
+//         .expanded-item-name {
+//           font-weight: 500;
+//           color: #2c2c2c;
+//           margin-bottom: 4px;
+//           display: flex;
+//           align-items: center;
+//           gap: 8px;
+//           flex-wrap: wrap;
+//         }
+        
+//         .offer-badge-expanded {
+//           background-color: #4caf50;
+//           color: white;
+//           font-size: 10px;
+//           padding: 2px 6px;
+//           border-radius: 12px;
+//           font-weight: normal;
+//         }
+        
+//         .expanded-item-price-breakdown {
+//           font-size: 11px;
+//           color: #999;
+//         }
+        
+//         .expanded-item-total {
+//           font-weight: 600;
+//           color: #6B8E23;
+//           font-size: 14px;
+//         }
+        
+//         .jump-to-slot-btn-expanded {
+//           width: 100%;
+//           background: none;
+//           border: 1px solid #6B8E23;
+//           color: #6B8E23;
+//           padding: 8px;
+//           border-radius: 8px;
+//           font-size: 12px;
+//           cursor: pointer;
+//           margin-top: 12px;
+//           transition: all 0.3s ease;
+//         }
+        
+//         .jump-to-slot-btn-expanded:hover {
+//           background-color: #6B8E23;
+//           color: white;
+//         }
+        
+//         .slot-title-details {
+//           cursor: pointer;
+//         }
+        
+//         .my-meal-icon img {
+//           width: 20px;
+//           height: 20px;
+//         }
+        
+//         .my-meal-text {
+//           font-size: 12px;
+//           font-weight: 500;
+//         }
+        
+//         .button-arrow {
+//           width: 16px;
+//           height: 16px;
+//           transform: rotate(180deg);
+//         }
+        
+//         .header-arrow {
+//           width: 16px;
+//           height: 16px;
+//           transform: rotate(180deg);
+//           margin-right: 8px;
+//         }
+        
+//         .session-name {
+//           font-weight: 600;
+//           color: #6B8E23;
+//           margin-right: 8px;
+//         }
+        
+//         .date-name {
+//           font-size: 12px;
+//           color: #666;
+//         }
+//       `}</style>
+//     </>
+//   );
+// };
+
+// export default MultiCartDrawer;
+
+
+
+
+
+
+
+// import { useState } from "react";
+// import moment from "moment";
+// import { FaAngleUp, FaTimes } from "react-icons/fa";
+// import { useNavigate } from "react-router-dom";
+// import "../Styles/MultiCartDrawer.css";
+// import MyMeal from "../assets/mymeal.svg";
+// import Swal2 from "sweetalert2";
+// import arrow from "./../assets/material-symbols_arrow-back-rounded.png";
+// import checkCircle from "../assets/check_circle.png";
+
+// const MultiCartDrawer = ({
+//   proceedToPlan,
+//   groupedCarts,
+//   overallSubtotal,
+//   overallTotalItems,
+//   onJumpToSlot, // Function to set selectedDate/Session in Home.jsx
+// }) => {
+//   const user = JSON.parse(localStorage.getItem("user"));
+//   const address = JSON.parse(
+//     localStorage.getItem("primaryAddress")
+//     // localStorage.getItem("currentLocation")
+//   );
+//   const navigate = useNavigate();
+//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+//   const [expandedSlot, setExpandedSlot] = useState(null);
+
+//   // Helper function to get cart item display price with breakdown
+//   const getCartItemDisplayPrice = (item) => {
+//     // If offer is applied and totalPrice is available
+//     if (item.offerApplied && item.totalPrice && item.price) {
+//       if (item.Quantity > 1) {
+//         // Show breakdown: 1 × offer price + remaining × regular price
+//         const offerPrice = item.price; // First item gets offer price
+//         const regularPrice = item.price; // Remaining items at regular price
+//         return {
+//           label: `1 × ₹${offerPrice} + ${item.Quantity - 1} × ₹${regularPrice}`,
+//           total: Math.round(item.totalPrice),
+//         };
+//       } else {
+//         return {
+//           label: `₹${item.price}`,
+//           total: Math.round(item.totalPrice),
+//         };
+//       }
+//     } 
+//     // No offer applied - use regular price
+//     else {
+//       // Use totalPrice if available, otherwise calculate
+//       const total = item.totalPrice || (item.price * item.Quantity);
+//       if (item.Quantity > 1) {
+//         return {
+//           label: `${item.Quantity} × ₹${item.price}`,
+//           total: Math.round(total),
+//         };
+//       } else {
+//         return {
+//           label: `₹${item.price}`,
+//           total: Math.round(total),
+//         };
+//       }
+//     }
+//   };
+
+//   const formatSlotDate = (date) => {
+//     const today = moment().startOf("day");
+//     const tomorrow = moment().add(1, "days").startOf("day");
+//     const dateMoment = moment(date).startOf("day");
+//     if (dateMoment.isSame(today)) return "Today";
+//     if (dateMoment.isSame(tomorrow)) return "Tomorrow";
+//     return moment(date).format("MMM D");
+//   };
+
+//   const handleSlotDetailClick = (slot) => {
+//     // Toggle expansion for this slot
+//     setExpandedSlot(expandedSlot === slot.date?.toString() + slot.session ? null : slot.date?.toString() + slot.session);
+//   };
+
+//   const handleJumpToSlot = (slot) => {
+//     onJumpToSlot(slot.date, slot.session);
+//     setIsDrawerOpen(false);
+//   };
+
+//   const handleCheckout = () => {
+//     setIsDrawerOpen(false);
+//     navigate("/checkout");
+//   };
+
+//   // Handle "My Meal" click for non-logged in users
+//   const handleMyMealClickForGuest = () => {
+//     // Navigate to login page without setting destination flag
+//     navigate("/login");
+//     setIsDrawerOpen(false); // Close drawer if open
+//   };
+
+//   // Handle "Move to My Plans" click for logged in users
+//   const handleMoveToMyPlans = () => {
+//     if (user && !address) {
+//       // If user doesn't have address, show toast message
+//       Swal2.fire({
+//         toast: true,
+//         position: "bottom",
+//         icon: "info",
+//         title: `Please add your delivery address first!`,
+//         showConfirmButton: false,
+//         timer: 3000,
+//         timerProgressBar: true,
+//         customClass: {
+//           popup: "me-small-toast",
+//           title: "me-small-toast-title",
+//         },
+//       });
+//       return;
+//     }
+
+//     // Show success toast with custom HTML
+//     Swal2.fire({
+//       toast: true,
+//       position: "bottom",
+//       showConfirmButton: false,
+//       timer: 2500,
+//       timerProgressBar: true,
+//       html: `
+//         <div class="myplans-toast-content">
+//           <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+//           <div class="myplans-toast-text">
+//             <div class="myplans-toast-title">Great picks!</div>
+//             <div class="myplans-toast-subtitle">Moving them to MyPlans</div>
+//           </div>
+//         </div>
+//       `,
+//       customClass: {
+//         popup: "myplans-custom-toast",
+//         htmlContainer: "myplans-toast-html",
+//       },
+//       didOpen: () => {
+//         // Position above bottom nav
+//         const toast = document.querySelector(".myplans-custom-toast");
+//         if (toast) {
+//           toast.style.bottom = "90px"; // Position above bottom nav
+//           toast.style.left = "50%";
+//           toast.style.transform = "translateX(-50%)";
+//           toast.style.position = "fixed";
+//         }
+//       },
+//     });
+
+//     // Directly proceed to plan
+//     proceedToPlan();
+//   };
+
+//   if (overallTotalItems === 0) {
+//     return null;
+//   }
+
+//   return (
+//     <>
+//       {/* small "View All" bubble above closed bar */}
+//       {isDrawerOpen || (
+//         <>
+//           {groupedCarts.length > 1 && (
+//             <>
+//               <div
+//                 className="view-all-bubble"
+//                 onClick={() => setIsDrawerOpen(true)}
+//               >
+//                 View All
+//                 <img src="/Assets/arrowup.svg" alt="arrow up" />
+//               </div>
+//             </>
+//           )}
+
+//           <div className="cartbutton">
+//             <div
+//               className={`cartbtn ${
+//                 groupedCarts.length > 1 ? "multi-cart" : ""
+//               }`}
+//             >
+//               <div className="d-flex justify-content-between align-items-center flex-row">
+//                 <div className="d-flex gap-1 align-items-center flex-row">
+//                   <div className="cart-items-price">
+//                     {/* {overallTotalItems} items | ₹{overallSubtotal.toFixed(0)} */}
+//                     Picked : {groupedCarts.length} meals
+//                   </div>
+//                 </div>
+//                 {user && address ? (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={handleMoveToMyPlans}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Review My Plans
+//                     </div>
+//                   </div>
+//                 ) : user && !address ? (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={() => {
+//                       navigate("/location");
+//                     }}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Add location
+//                     </div>
+//                   </div>
+//                 ) : (
+//                   <div
+//                     className="d-flex gap-2 viewcartbtn align-items-center"
+//                     onClick={handleMyMealClickForGuest}
+//                   >
+//                     <div className="my-meal-text">
+//                       <img src={arrow} alt="Arrow" className="button-arrow" />
+//                       Login to continue
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </>
+//       )}
+
+//       {/* Manual drawer implementation */}
+//       {isDrawerOpen && (
+//         <div className="manual-drawer-overlay">
+//           <div className="manual-drawer">
+//             <div className="multi-cart-drawer-content">
+//               {/* Close button at top center */}
+//               <div className="top-close-section">
+//                 <button
+//                   className="close-button-top"
+//                   onClick={() => setIsDrawerOpen(false)}
+//                 >
+//                   <FaTimes size={20} />
+//                 </button>
+//               </div>
+
+//               <div className="multi-cart-header">
+//                 <div
+//                   className="checkout-top"
+//                   onClick={() => {
+//                     user && address ? handleMoveToMyPlans() : user && !address ? navigate("/location") : handleMyMealClickForGuest();
+//                   }}
+//                 >
+//                   <img src={arrow} alt="arrow" className="header-arrow" />
+//                   {user && !address ? "Add location" : user && address ? "Move to My Plans" : "Login to continue"}
+//                 </div>
+//               </div>
+
+//               <div className="slot-list-container">
+//                 {groupedCarts.map((slot, index) => (
+//                   <div className="cartbutton" key={index}>
+//                     <div className="mc-cartbtn">
+//                       <div className="d-flex justify-content-around align-items-center gap-2">
+//                         <div className="d-flex gap-1 align-items-center">
+//                           <div className="cart-items-price">
+//                             {slot.totalItems} items | ₹
+//                             {slot.subtotal.toFixed(0)}
+//                           </div>
+//                         </div>
+//                         <div className="slot-title-details">
+//                           <div className="slot-session-date">
+//                             <span className="session-name">{slot.session}</span>
+//                             <span className="date-name">
+//                               {formatSlotDate(slot.date)}
+//                             </span>
+//                           </div>
+//                         </div>
+//                         <button
+//                           onClick={() => handleSlotDetailClick(slot)}
+//                           style={{
+//                             background: "none",
+//                             border: "none",
+//                             color: "unset",
+//                             cursor: "pointer",
+//                             padding: 0,
+//                           }}
+//                         >
+//                           <div className="d-flex gap-1 align-content-center ">
+//                             <div className="my-meal-icon">
+//                               <img src={MyMeal} alt="" />
+//                             </div>
+//                             <div className="my-meal-text">Details</div>
+//                           </div>
+//                         </button>
+//                       </div>
+//                     </div>
+                    
+//                     {/* Expanded items list */}
+//                     {expandedSlot === slot.date?.toString() + slot.session && (
+//                       <div className="expanded-items-list">
+//                         {slot.items.map((item, itemIndex) => {
+//                           const priceDisplay = getCartItemDisplayPrice(item);
+//                           return (
+//                             <div key={itemIndex} className="expanded-cart-item">
+//                               <div className="expanded-item-info">
+//                                 <div className="expanded-item-name">
+//                                   {item.foodname}
+//                                   {item.offerApplied && (
+//                                     <span className="offer-badge-expanded">
+//                                       Offer Applied
+//                                     </span>
+//                                   )}
+//                                 </div>
+//                                 <div className="expanded-item-price-breakdown">
+//                                   {priceDisplay.label}
+//                                 </div>
+//                               </div>
+//                               <div className="expanded-item-total">
+//                                 ₹{priceDisplay.total}
+//                               </div>
+//                             </div>
+//                           );
+//                         })}
+                        
+//                         {/* Jump to slot button */}
+//                         <button 
+//                           className="jump-to-slot-btn-expanded"
+//                           onClick={() => handleJumpToSlot(slot)}
+//                         >
+//                           Jump to this slot
+//                         </button>
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       <style jsx>{`
+//         .expanded-items-list {
+//           padding: 12px 16px;
+//           background-color: #f9f8f6;
+//           border-radius: 8px;
+//           margin-top: 8px;
+//         }
+        
+//         .expanded-cart-item {
+//           display: flex;
+//           justify-content: space-between;
+//           align-items: center;
+//           padding: 8px 0;
+//           border-bottom: 1px solid #e8e8e8;
+//         }
+        
+//         .expanded-cart-item:last-child {
+//           border-bottom: none;
+//         }
+        
+//         .expanded-item-info {
+//           flex: 1;
+//         }
+        
+//         .expanded-item-name {
+//           font-weight: 500;
+//           color: #2c2c2c;
+//           margin-bottom: 4px;
+//           display: flex;
+//           align-items: center;
+//           gap: 8px;
+//           flex-wrap: wrap;
+//         }
+        
+//         .offer-badge-expanded {
+//           background-color: #4caf50;
+//           color: white;
+//           font-size: 10px;
+//           padding: 2px 6px;
+//           border-radius: 12px;
+//           font-weight: normal;
+//         }
+        
+//         .expanded-item-price-breakdown {
+//           font-size: 11px;
+//           color: #999;
+//         }
+        
+//         .expanded-item-total {
+//           font-weight: 600;
+//           color: #6B8E23;
+//           font-size: 14px;
+//         }
+        
+//         .jump-to-slot-btn-expanded {
+//           width: 100%;
+//           background: none;
+//           border: 1px solid #6B8E23;
+//           color: #6B8E23;
+//           padding: 8px;
+//           border-radius: 8px;
+//           font-size: 12px;
+//           cursor: pointer;
+//           margin-top: 12px;
+//           transition: all 0.3s ease;
+//         }
+        
+//         .jump-to-slot-btn-expanded:hover {
+//           background-color: #6B8E23;
+//           color: white;
+//         }
+        
+//         .slot-title-details {
+//           cursor: pointer;
+//         }
+        
+//         .my-meal-icon img {
+//           width: 20px;
+//           height: 20px;
+//         }
+        
+//         .my-meal-text {
+//           font-size: 12px;
+//           font-weight: 500;
+//         }
+        
+//         .button-arrow {
+//           width: 16px;
+//           height: 16px;
+//           transform: rotate(180deg);
+//         }
+        
+//         .header-arrow {
+//           width: 16px;
+//           height: 16px;
+//           transform: rotate(180deg);
+//           margin-right: 8px;
+//         }
+        
+//         .session-name {
+//           font-weight: 600;
+//           color: #6B8E23;
+//           margin-right: 8px;
+//         }
+        
+//         .date-name {
+//           font-size: 12px;
+//           color: #666;
+//         }
+//       `}</style>
+//     </>
+//   );
+// };
+
+// export default MultiCartDrawer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { useState } from "react";
 import moment from "moment";
 import { FaAngleUp, FaTimes } from "react-icons/fa";
@@ -651,7 +1914,7 @@ const MultiCartDrawer = ({
                   >
                     <div className="my-meal-text">
                       <img src={arrow} alt="Arrow" className="button-arrow" />
-                      Review My Plan
+                      Review My Plans
                     </div>
                   </div>
                 ) : user && !address ? (
