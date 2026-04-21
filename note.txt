@@ -8,3 +8,4 @@ https://dd-merge-backend-2.onrender.com
 https://api.dailydish.in
 https://dailydish.in
 http://localhost:7013
+https://dd-backend-3nm0.onrender.com

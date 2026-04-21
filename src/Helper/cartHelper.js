@@ -999,6 +999,72 @@ export const getCartItemsForOrder = () => {
   }));
 };
 
+/**
+ * Get expired items from cart (items where deliveryDate < today)
+ * @returns {Array} Items with passed delivery dates
+ */
+export const getExpiredItems = () => {
+  const cart = getCart();
+  
+  // Get today's date at 00:00:00
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  return cart.filter(item => {
+    // Parse delivery date - handle both string and ISO formats
+    let itemDate;
+    const dateValue = item.deliveryDate;
+    
+    if (typeof dateValue === 'string') {
+      // Handle ISO format (2026-04-20T...) and regular format (2026-04-20)
+      const dateOnly = dateValue.split('T')[0]; // Extract date part only
+      itemDate = new Date(dateOnly + 'T00:00:00');
+    } else if (dateValue instanceof Date) {
+      itemDate = new Date(dateValue);
+      itemDate.setHours(0, 0, 0, 0);
+    } else {
+      return false; // Invalid date, keep item
+    }
+    
+    // Check if item date is before today
+    return itemDate < today;
+  });
+};
+
+/**
+ * Clear expired items from cart
+ * @returns {Object|null} { removedCount, removedItems } or null if no items were removed
+ */
+export const clearExpiredItems = () => {
+  const expiredItems = getExpiredItems();
+  
+  if (expiredItems.length === 0) {
+    return null; // No expired items to remove
+  }
+  
+  // Get current cart
+  const cart = getCart();
+  
+  // Create set of expired cartIds for efficient removal
+  const expiredCartIds = new Set(expiredItems.map(item => item.cartId));
+  
+  // Filter out expired items
+  const updatedCart = cart.filter(item => !expiredCartIds.has(item.cartId));
+  
+  // Save updated cart
+  saveCart(updatedCart);
+  
+  return {
+    removedCount: expiredItems.length,
+    removedItems: expiredItems.map(item => ({
+      foodname: item.foodname || item.itemName || 'Unknown Item',
+      deliveryDate: item.deliveryDate,
+      session: item.session,
+      quantity: item.quantity
+    }))
+  };
+};
+
 export default {
   getCart,
   addToCart,
@@ -1017,4 +1083,6 @@ export default {
   calculateProductPrice,
   getProductOfferInfo,
   getCartItemsForOrder,
+  getExpiredItems,
+  clearExpiredItems,
 };

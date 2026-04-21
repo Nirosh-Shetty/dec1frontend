@@ -1628,44 +1628,54 @@ const MyPlan = () => {
                           
                         </div>
 
-                        {/* FRESHNESS JOURNEY - Only for confirmed orders */}
-                        {plan.status === "Confirmed" && (
+                        {/* FRESHNESS JOURNEY - Only for confirmed and beyond statuses */}
+                        {(plan.status === "Confirmed" || plan.status === "Cooking" || plan.status === "Packing" || plan.status === "Packed" || plan.status === "ontheway" || plan.status === "On the way" || plan.status === "Delivered") && (
                           <div className="plan-journey-section">
-                            <div className="journey-title">Freshness Journey</div>
+                            <div className="journey-title">Order Tracker</div>
                             <div className="journey-track">
-                              {/* Order placed */}
+                              {/* Step 1: Order placed */}
                               <div className="journey-point">
-                                <div className="point-circle done">✓</div>
+                                <div className={`point-circle ${["Confirmed", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "done" : "pending"}`}>
+                                  {["Confirmed", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "✓" : "○"}
+                                </div>
                                 <div className="point-label">Order<br/>placed</div>
-                                <div className="point-time">Yesterday</div>
+                                <div className="point-time">{new Date(plan.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>
                               </div>
 
-                              {/* Sourced */}
+                              {/* Step 2: Cooking */}
                               <div className="journey-point">
-                                <div className="point-circle done">✓</div>
-                                <div className="point-label">Sourced<br/>fresh</div>
-                                <div className="point-time">5:02 AM</div>
-                              </div>
-
-                              {/* Cooking (Current) */}
-                              <div className="journey-point">
-                                <div className="point-circle active">●</div>
+                                <div className={`point-circle ${["Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Cooking" ? "active" : "done") : "pending"}`}>
+                                  {["Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Cooking" ? "●" : "✓") : "○"}
+                                </div>
                                 <div className="point-label">Cooking</div>
-                                <div className="point-time">now</div>
+                                <div className="point-time">{plan.status === "Cooking" ? "now" : ""}</div>
                               </div>
 
-                              {/* Packed */}
+                              {/* Step 3: Packed and out */}
                               <div className="journey-point">
-                                <div className="point-circle pending">○</div>
+                                <div className={`point-circle ${["Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Packed" || plan.status === "Packing" ? "active" : "done") : "pending"}`}>
+                                  {["Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Packed" || plan.status === "Packing" ? "●" : "✓") : "○"}
+                                </div>
                                 <div className="point-label">Packed &<br/>out</div>
-                                <div className="point-time">~11:45</div>
+                                <div className="point-time">{plan.status === "Packed" || plan.status === "Packing" ? "now" : ""}</div>
                               </div>
 
-                              {/* Delivery */}
+                              {/* Step 4: On the way */}
                               <div className="journey-point">
-                                <div className="point-circle pending">○</div>
+                                <div className={`point-circle ${["ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "ontheway" || plan.status === "On the way" ? "active" : "done") : "pending"}`}>
+                                  {["ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "ontheway" || plan.status === "On the way" ? "●" : "✓") : "○"}
+                                </div>
                                 <div className="point-label">On the<br/>way</div>
-                                <div className="point-time">~12:30</div>
+                                <div className="point-time">{plan.status === "ontheway" || plan.status === "On the way" ? "now" : ""}</div>
+                              </div>
+
+                              {/* Step 5: At your door */}
+                              <div className="journey-point">
+                                <div className={`point-circle ${plan.status === "Delivered" ? "done" : "pending"}`}>
+                                  {plan.status === "Delivered" ? "✓" : "○"}
+                                </div>
+                                <div className="point-label">At your<br/>door</div>
+                                <div className="point-time">{plan.status === "Delivered" ? "delivered" : ""}</div>
                               </div>
                             </div>
                           </div>

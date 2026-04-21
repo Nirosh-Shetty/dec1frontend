@@ -9,11 +9,11 @@ import { PiWarningCircleBold } from "react-icons/pi";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import { WalletContext } from "../WalletContext";
-import { BiSolidOffer } from "react-icons/bi";
 import Swal2 from "sweetalert2";
 import IsVeg from "../assets/isVeg=yes.svg";
 import IsNonVeg from "../assets/isVeg=no.svg";
 import "../Styles/Normal.css";
+import "../Styles/CheckoutMultiple.css";
 import { CircleCheck, ShieldAlert } from "lucide-react";
 import cross from "../assets/cross.png";
 import LocationModal from "./LocationModal";
@@ -580,24 +580,60 @@ console.log(enrichedCartItems,"cartitems.............")
 
 
   // Calculate item total price correctly with offer
+  const getItemQuantity = (item) => {
+    const quantity = Number(item?.quantity ?? item?.Quantity ?? 1);
+    return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+  };
+
   const getItemTotalPrice = (item) => {
-    return item.totalPrice || (item.price * item.quantity);
+    const explicitTotal = Number(item?.totalPrice);
+    if (Number.isFinite(explicitTotal)) {
+      return explicitTotal;
+    }
+
+    const unitPrice = Number(
+      item?.preOrderPrice ?? item?.price ?? item?.hubPrice ?? 0,
+    );
+    return unitPrice * getItemQuantity(item);
   };
 
   // Calculate item savings if offer applied
   const getItemSavings = (item) => {
-    if (item.offerApplied && item.regularPrice) {
-      const regularTotal = item.regularPrice * item.quantity;
+    const regularPrice = Number(item?.regularPrice);
+
+    if (item?.offerApplied && Number.isFinite(regularPrice) && regularPrice > 0) {
+      const regularTotal = regularPrice * getItemQuantity(item);
       const actualTotal = getItemTotalPrice(item);
       return regularTotal - actualTotal;
     }
     return 0;
   };
 
-  // Render items grouped by session
-  const renderGroupedItems = () => {
+  const getItemRegularTotal = (item) => {
+    const regularPrice = Number(item?.regularPrice);
+
+    if (Number.isFinite(regularPrice) && regularPrice > 0) {
+      return regularPrice * getItemQuantity(item);
+    }
+
+    return getItemTotalPrice(item);
+  };
+
+  const formatCartPrice = (amount) => {
+    const value = Number(amount || 0);
+    if (!Number.isFinite(value)) return "0";
+
+    return value
+      .toFixed(2)
+      .replace(/\.00$/, "")
+      .replace(/(\.\d*[1-9])0$/, "$1");
+  };
+  const renderReferenceCartItems = () => {
     const groupedBySession = {};
-    
+    const sessionOrder = ["Breakfast", "Lunch", "Dinner"];
+    const rupeeSymbol = "\u20B9";
+    const addMoreArrow = "\u2190";
+
     cartdata.forEach((item) => {
       const session = item.session || "Lunch";
       const sessionKey = session.charAt(0).toUpperCase() + session.slice(1);
@@ -607,178 +643,137 @@ console.log(enrichedCartItems,"cartitems.............")
       groupedBySession[sessionKey].push(item);
     });
 
-    return Object.entries(groupedBySession).map(([session, items]) => {
-      const sessionTotal = items.reduce((sum, item) => sum + getItemTotalPrice(item), 0);
-      const sessionSavings = items.reduce((sum, item) => sum + getItemSavings(item), 0);
-      
-      return (
-        <div key={session} className="session-group">
-          <div className="session-header">
-            <h4 className="session-title">{session}</h4>
-          </div>
-          <div className="cart-container">
-            <div className="cart-section">
-              <div className="cart-content">
-                {items.map((item, i) => {
-                  const itemTotal = getItemTotalPrice(item);
-                  const itemSavings = getItemSavings(item);
-                  const regularTotal = item.regularPrice ? item.regularPrice * item.quantity : itemTotal;
-                  
-                  return (
-                    <div className="cart-item" key={item.cartId || i}>
-                      <div className="veg-indicator">
-                        {item?.foodcategory === "Veg" ? (
-                          <img src={IsVeg} alt="veg" className="indicator-icon" />
-                        ) : (
-                          <img src={IsNonVeg} alt="non-veg" className="indicator-icon" />
-                        )}
-                      </div>
-                      <div className="item-content">
-                        <div className="item-details">
-                          <div className="item-name">
-                            <div className="item-name-text">
-                              {item.offerApplied && <BiSolidOffer color="#6B8E23" className="me-1" />}
-                              {item?.foodname || item?.itemName}
-                            </div>
-                          </div>
-                          <div className="item-tags">
-                            <div className="portion-tag">
-                              <div className="portion-text">
-                                <div className="portion-label">
-                                  {item?.quantity || 1} Portion{(item?.quantity || 1) > 1 ? "s" : ""}
-                                </div>
-                              </div>
-                            </div>
-                            {item.offerApplied && item.offerPrice && (
-                              <div className="offer-tag">
-                                <div className="offer-text">
-                                  Offer: 1st at ₹{item.offerPrice}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="item-controls">
-                          <div className="quantity-control">
-                            <div
-                              className="quantity-btn"
-                              onClick={() => debouncedDecreaseQuantity(item)}
-                            >
-                              <div className="btn-text">-</div>
-                            </div>
-                            <div className="quantity-display">
-                              <div className="quantity-text">
-                                {item?.quantity || 1}
-                              </div>
-                            </div>
-                            <div
-                              className="quantity-btn"
-                              onClick={() => debouncedIncreaseQuantity(item)}
-                            >
-                              <div className="btn-text">+</div>
-                            </div>
-                          </div>
-                          <div className="price-container vertical">
-                            {itemSavings > 0 && (
-                              <div className="original-price">
-                                <div className="price-line"></div>
-                                <div className="original-price-content">
-                                  <div className="original-currency">
-                                    <div className="original-currency-text">₹</div>
-                                  </div>
-                                  <div className="original-amount">
-                                    <div className="original-amount-text">
-                                      {regularTotal}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            <div className="current-price">
-                              <div className="current-currency">
-                                <div className="current-currency-text">₹</div>
-                              </div>
-                              <div className="current-amount">
-                                <div className="current-amount-text">
-                                  {itemTotal}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+    const sortedSessions = Object.entries(groupedBySession).sort(
+      ([sessionA], [sessionB]) => {
+        const indexA = sessionOrder.indexOf(sessionA);
+        const indexB = sessionOrder.indexOf(sessionB);
 
-            <div className="cart-footer">
-              <div className="add-more-section">
-                <div className="add-more-btn">
-                  <div className="add-more-content">
-                    <div className="add-more-text-container">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
+        if (indexA === -1 && indexB === -1) return sessionA.localeCompare(sessionB);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      },
+    );
+
+    return (
+      <div className="cm-cart-shell">
+        <div className="cm-cart-panel">
+          {sortedSessions.map(([session, items]) => {
+            const sessionTotal = items.reduce(
+              (sum, item) => sum + getItemTotalPrice(item),
+              0,
+            );
+            const sessionSavings = items.reduce(
+              (sum, item) => sum + getItemSavings(item),
+              0,
+            );
+            const sessionOriginalTotal = items.reduce(
+              (sum, item) => sum + getItemRegularTotal(item),
+              0,
+            );
+
+            return (
+              <section key={session} className="cm-session-block">
+                <h4 className="cm-session-title">{session}</h4>
+
+                <div className="cm-session-items">
+                  {items.map((item, index) => {
+                    const itemTotal = getItemTotalPrice(item);
+                    const itemSavings = getItemSavings(item);
+                    const regularTotal = getItemRegularTotal(item);
+                    const itemName =
+                      item?.foodname || item?.itemName || item?.name || "Item";
+                    const itemQuantity = getItemQuantity(item);
+
+                    return (
+                      <div
+                        key={item.cartId || index}
+                        className={`cm-item-row ${
+                          index < items.length - 1 ? "cm-item-row--divided" : ""
+                        }`}
                       >
-                        <path
-                          d="M9 3C12.3082 3 15 5.69175 15 9C15 12.3082 12.3082 15 9 15C5.69175 15 3 12.3082 3 9C3 5.69175 5.69175 3 9 3ZM9 1.5C4.85775 1.5 1.5 4.85775 1.5 9C1.5 13.1423 4.85775 16.5 9 16.5C13.1423 16.5 16.5 13.1423 16.5 9C16.5 4.85775 13.1423 1.5 9 1.5ZM12.75 8.25H9.75V5.25H8.25V8.25H5.25V9.75H8.25V12.75H9.75V9.75H12.75V8.25Z"
-                          fill="black"
-                        />
-                      </svg>
-                      <div className="add-more-text">
-                        <Link to="/home" replace>
-                          <div className="add-more-label">Add More</div>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="total-section">
-                <div className="total-label-container">
-                  <div className="total-label">Total</div>
-                </div>
-                <div className="total-price-section">
-                  <div className="total-price-content d-flex align-items-center justify-content-center gap-4">
-                    {sessionSavings > 0 && (
-                      <div className="original-price me-2">
-                        <div className="price-line"></div>
-                        <div className="original-price-content">
-                          <div className="original-currency">
-                            <div className="original-currency-text">₹</div>
+                        <div className="cm-item-main">
+                          {item?.foodcategory === "Veg" ? (
+                            <img src={IsVeg} alt="veg" className="cm-item-indicator" />
+                          ) : (
+                            <img
+                              src={IsNonVeg}
+                              alt="non-veg"
+                              className="cm-item-indicator"
+                            />
+                          )}
+                          <div className="cm-item-name" title={itemName}>
+                            {itemName}
                           </div>
-                          <div className="original-amount">
-                            <div className="original-amount-text">
-                              {items.reduce((sum, item) => sum + (item.regularPrice * item.quantity), 0)}
+                        </div>
+
+                        <div className="cm-item-side">
+                          <div className="cm-qty-pill">
+                            <button
+                              type="button"
+                              className="cm-qty-btn"
+                              onClick={() => debouncedDecreaseQuantity(item)}
+                              aria-label={`Decrease quantity for ${itemName}`}
+                            >
+                              -
+                            </button>
+                            <div className="cm-qty-value">{itemQuantity}</div>
+                            <button
+                              type="button"
+                              className="cm-qty-btn"
+                              onClick={() => debouncedIncreaseQuantity(item)}
+                              aria-label={`Increase quantity for ${itemName}`}
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <div className="cm-price-stack">
+                            {itemSavings > 0 && (
+                              <div className="cm-price-old">
+                                {rupeeSymbol}
+                                {formatCartPrice(regularTotal)}
+                              </div>
+                            )}
+                            <div className="cm-price-current">
+                              {rupeeSymbol}
+                              {formatCartPrice(itemTotal)}
                             </div>
                           </div>
                         </div>
                       </div>
-                    )}
-                    <div className="total-current-price d-flex align-items-center">
-                      <div className="current-currency">
-                        <div className="current-currency-text">₹</div>
-                      </div>
-                      <div className="current-amount">
-                        <div className="current-amount-text">
-                          {sessionTotal.toFixed(2)}
+                    );
+                  })}
+                </div>
+
+                <div className="cm-session-footer">
+                  <Link to="/home" replace className="cm-add-more-link">
+                    <span className="cm-add-more-arrow">{addMoreArrow}</span>
+                    <span className="cm-add-more-text">Add More</span>
+                  </Link>
+
+                  <div className="cm-total-chip">
+                    <div className="cm-total-label">Total</div>
+                    <div className="cm-total-price">
+                      {sessionSavings > 0 && (
+                        <div className="cm-total-old">
+                          {rupeeSymbol}
+                          {formatCartPrice(sessionOriginalTotal)}
                         </div>
+                      )}
+                      <div className="cm-total-current">
+                        {rupeeSymbol}
+                        {formatCartPrice(sessionTotal)}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              </section>
+            );
+          })}
         </div>
-      );
-    });
+      </div>
+    );
   };
 
   return (
@@ -808,7 +803,7 @@ console.log(enrichedCartItems,"cartitems.............")
 
         <div className="mobile-checkout">
           {cartdata.length > 0 ? (
-            renderGroupedItems()
+            renderReferenceCartItems()
           ) : (
             <div className="cart-container">
               <div className="cart-section">
@@ -823,7 +818,7 @@ console.log(enrichedCartItems,"cartitems.............")
           )}
 
           <div>
-            <h4 className="delivery-details mt-3">Delivery Details</h4>
+            <h4 className="delivery-details mt-3 mb-2">Delivery Details</h4>
           </div>
           {addresstype !== "corporate" && (
             <div className="deliverycard">
@@ -1280,3 +1275,4 @@ console.log(enrichedCartItems,"cartitems.............")
 };
 
 export default CheckoutMultiple;
+
