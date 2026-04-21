@@ -2047,7 +2047,6 @@ const CorporateBookings = () => {
                               ₹
                               {(
                                 summary.amountBeforeDiscounts +
-                                summary.tax +
                                 (items?.deliveryCharge || 0) -
                                 summary.preorderDiscount -
                                 summary.couponDiscount

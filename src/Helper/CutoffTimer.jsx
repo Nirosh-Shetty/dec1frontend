@@ -1,271 +1,22 @@
-// 'use client';
+"use client";
 
-// import { useEffect, useState, useRef, useCallback } from 'react';
-// import { Clock } from 'lucide-react';
-// import icon from "./../assets/Icon-1.png"
+import { useEffect, useState, useRef, useCallback } from "react";
+import { Clock } from "lucide-react";
+import icon from "./../assets/Icon-1.png";
 
-
-// export default function CutoffStatusCard({ cutoffValidation, userType = 'customer' }) {
-//   const [timeLeft, setTimeLeft] = useState('');
-//   const [displayInfo, setDisplayInfo] = useState(null);
-//   const intervalRef = useRef(null);
-//   const prevValidationRef = useRef(null);
-
-//   const isEmployee = userType === 'employee';
-
-//   const formatTimeLeft = useCallback((milliseconds) => {
-//     if (milliseconds <= 0) return 'Cutoff passed';
-
-//     const totalSeconds = Math.floor(milliseconds / 1000);
-//     const hours = Math.floor(totalSeconds / 3600);
-//     const minutes = Math.floor((totalSeconds % 3600) / 60);
-//     const seconds = totalSeconds % 60;
-
-//     if (hours > 0) {
-//       return `${hours}h ${minutes}m left`;
-//     } else if (minutes > 0) {
-//       return `${minutes}m ${seconds}s left`;
-//     } else {
-//       return `${seconds}s left`;
-//     }
-//   }, []);
-
-//   const calculateDisplayInfo = useCallback(() => {
-//     if (!cutoffValidation?.cutoffDateTime) return null;
-
-//     const cutoffDate = new Date(cutoffValidation.cutoffDateTime);
-//     const now = new Date();
-
-//     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-//     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-//     let displayDate;
-//     let displayDay;
-//     let orderingText;
-
-//     if (isEmployee) {
-//       displayDate = cutoffDate;
-//       displayDay = days[displayDate.getDay()];
-//       orderingText = "You're ordering for today";
-//     } else {
-//       // For customers, show tomorrow
-//       const tomorrow = new Date(now);
-//       tomorrow.setDate(tomorrow.getDate() + 1);
-//       displayDate = tomorrow;
-//       displayDay = days[displayDate.getDay()];
-//       orderingText = "You're ordering for tomorrow";
-//     }
-
-//     const dateStr = `${displayDate.getDate()} ${months[displayDate.getMonth()]}`;
-
-//     return {
-//       orderingText,
-//       dateStr,
-//       displayDay,
-//       cutoffDate
-//     };
-//   }, [isEmployee, cutoffValidation]);
-
-//   // Update display info when cutoffValidation changes
-//   useEffect(() => {
-//     if (cutoffValidation !== prevValidationRef.current) {
-//       prevValidationRef.current = cutoffValidation;
-//       const newDisplayInfo = calculateDisplayInfo();
-//       setDisplayInfo(newDisplayInfo);
-//     }
-//   }, [cutoffValidation, calculateDisplayInfo]);
-
-//   // Update countdown timer
-//   useEffect(() => {
-//     if (!displayInfo?.cutoffDate) return;
-
-//     const updateTimer = () => {
-//       const now = new Date();
-//       const msLeft = displayInfo.cutoffDate - now;
-//       setTimeLeft(formatTimeLeft(msLeft));
-//     };
-
-//     // Initial update
-//     updateTimer();
-
-//     // Update every second for smooth countdown (changed from 30s for better UX)
-//     intervalRef.current = setInterval(updateTimer, 1000);
-
-//     return () => {
-//       if (intervalRef.current) clearInterval(intervalRef.current);
-//     };
-//   }, [displayInfo, formatTimeLeft]);
-
-//   if (!displayInfo) return null;
-
-//   return (
-//     <div className="cutoff-status-main-card" style={{ marginBottom: "-14px" }}>
-//       <div className="cutoff-status-card">
-//         <div className="cutoff-inner">
-//           {/* Left group: Icon + descriptive text */}
-//           <div className="cutoff-info-group">
-//             <div className="clock-icon">
-//               <Clock size={20} />
-//             </div>
-//             <span className="cutoff-message">
-//               {displayInfo.orderingText} • {displayInfo.displayDay} {displayInfo.dateStr}
-//             </span>
-//           </div>
-
-//           {/* Right side: Time left pill */}
-//           <div className="time-left-pill">
-//             {timeLeft || 'Loading...'}
-//           </div>
-//         </div>
-
-//         <style jsx>{`
-//         .cutoff-status-main-card {
-//          display: flex;
-//          align-items: center;
-//          justify-content: center;
-//          font-family: "Inter", sans-serif;
-//         //  margin-bottom: 20px;
-//         //  padding: 0 16px;
-//         }
-//           .cutoff-status-card {
-//             max-width: 613px;
-//             width: 100%;
-//             background: #E6B800;
-//             // border-radius: 20px;
-//             border-top-left-radius: 0;
-//             border-top-right-radius: 0;
-//             border-bottom-left-radius: 0;
-//             border-bottom-right-radius: 0;
-//             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-//             overflow: hidden;
-//             margin-top:"20px"
-//           }
-  
-//           .cutoff-inner {
-//             display: flex;
-//             align-items: center;
-//             justify-content: space-between;
-//             padding: 12px 20px;
-//             width: 100%;
-//             gap: 16px;
-//           }
-  
-//           .cutoff-info-group {
-//             display: flex;
-//             align-items: center;
-//             gap: 12px;
-//             flex: 1;
-//             min-width: 0;
-//           }
-  
-//           .clock-icon {
-//             flex-shrink: 0;
-//             display: inline-flex;
-//             align-items: center;
-//             justify-content: center;
-//             color: #8B4513;
-//           }
-  
-//           .cutoff-message {
-//             font-size: 14px;
-//             font-weight: 500;
-//             color: #8B4513;
-//             line-height: 1.4;
-//             white-space: nowrap;
-//             overflow: hidden;
-//             text-overflow: ellipsis;
-//             letter-spacing: -0.2px;
-//           }
-  
-//           .time-left-pill {
-//             background: rgba(139, 69, 19, 0.15);
-//             border-radius: 40px;
-//             padding: 6px 16px;
-//             font-weight: 600;
-//             font-size: 14px;
-//             color: #4a2a0c;
-//             background-color: #FDF2D0;
-//             white-space: nowrap;
-//             flex-shrink: 0;
-//             box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.05);
-//           }
-  
-//           /* Mobile responsive: stack if screen too narrow */
-//           @media (max-width: 480px) {
-//             .cutoff-inner {
-//               flex-wrap: wrap;
-//               padding: 12px 16px;
-//               gap: 10px;
-//             }
-            
-//             .cutoff-info-group {
-//               min-width: calc(100% - 80px);
-//             }
-            
-//             .cutoff-message {
-//               white-space: normal;
-//               font-size: 13px;
-//             }
-            
-//             .time-left-pill {
-//               font-size: 12px;
-//               padding: 4px 12px;
-//             }
-//           }
-//         `}</style>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'use client';
-
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { Clock } from 'lucide-react';
-import icon from "./../assets/Icon-1.png"
-
-export default function CutoffStatusCard({ cutoffValidation, userType = 'customer' }) {
-  const [timeLeft, setTimeLeft] = useState('');
+export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
+  const [timeLeft, setTimeLeft] = useState("");
   const [displayInfo, setDisplayInfo] = useState(null);
   const intervalRef = useRef(null);
   const prevValidationRef = useRef(null);
 
-  const isEmployee = userType === 'employee';
+  const isEmployee = userStatus === "Employee";
+
+  // Get order mode from cutoffValidation
+  const orderMode = cutoffValidation?.orderMode || "preorder";
 
   const formatTimeLeft = useCallback((milliseconds) => {
-    if (milliseconds <= 0) return 'Cutoff passed';
+    if (milliseconds <= 0) return "Cutoff passed";
 
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -287,42 +38,95 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
     const cutoffDate = new Date(cutoffValidation.cutoffDateTime);
     const now = new Date();
 
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
     let displayDate;
     let displayDay;
     let orderingText;
+    let orderModeText = "";
+    let freshTitle = "";
+    let freshDescription = "";
 
     if (isEmployee) {
-      displayDate = cutoffDate;
+      // Employee: Always show today's date
+      displayDate = new Date();
       displayDay = days[displayDate.getDay()];
       orderingText = "You're ordering for today";
+      freshTitle = "⚡ Fresh ingredients sourced today";
+      freshDescription = "Same-day ordering available for employees.";
     } else {
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      displayDate = tomorrow;
-      displayDay = days[displayDate.getDay()];
-      orderingText = "You're ordering for tomorrow";
+      // Normal User: Depends on orderMode
+      if (orderMode === "instant") {
+        // Instant mode: Show today's date
+        displayDate = new Date();
+        displayDay = days[displayDate.getDay()];
+        orderingText = "You're ordering for today";
+        orderModeText = "⚡ Instant";
+        freshTitle = "⚡ Fresh ingredients sourced today";
+        freshDescription =
+          "We prepare your meal with fresh ingredients for same-day delivery.";
+      } else {
+        // Preorder mode: Show tomorrow's date
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        displayDate = tomorrow;
+        displayDay = days[displayDate.getDay()];
+        orderingText = "You're ordering for tomorrow";
+        orderModeText = "📋 Preorder";
+        freshTitle = "Sourced fresh at 5 AM tomorrow";
+        freshDescription =
+          "We buy ingredients only after you order — nothing sits in storage overnight.";
+      }
     }
 
     const dateStr = `${displayDate.getDate()} ${months[displayDate.getMonth()]}`;
+
+    // Determine if allowed
+    const allowed = cutoffValidation?.allowed;
 
     return {
       orderingText,
       dateStr,
       displayDay,
-      cutoffDate
+      cutoffDate,
+      orderMode,
+      orderModeText,
+      isEmployee,
+      allowed,
+      freshTitle,
+      freshDescription,
     };
-  }, [isEmployee, cutoffValidation]);
+  }, [isEmployee, cutoffValidation, orderMode]);
 
   useEffect(() => {
     if (cutoffValidation !== prevValidationRef.current) {
       prevValidationRef.current = cutoffValidation;
       const newDisplayInfo = calculateDisplayInfo();
       setDisplayInfo(newDisplayInfo);
+
+      // Debug log
+      console.log("CutoffStatusCard updated:", {
+        isEmployee,
+        orderMode,
+        allowed: cutoffValidation?.allowed,
+        displayInfo: newDisplayInfo,
+      });
     }
-  }, [cutoffValidation, calculateDisplayInfo]);
+  }, [cutoffValidation, calculateDisplayInfo, isEmployee, orderMode]);
 
   useEffect(() => {
     if (!displayInfo?.cutoffDate) return;
@@ -341,7 +145,55 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
     };
   }, [displayInfo, formatTimeLeft]);
 
-  if (!displayInfo) return null;
+  if (!displayInfo) {
+    // Only show loading if cutoffValidation hasn't arrived yet
+    if (cutoffValidation === null || cutoffValidation === undefined) {
+      return (
+        <div className="cutoff-status-main-card">
+          <div className="cutoff-status-card">
+            <div className="cutoff-inner">
+              <div className="cutoff-info-group">
+                <div className="clock-icon">
+                  <Clock size={20} />
+                </div>
+                <span
+                  className="cutoff-message text-center"
+                  style={{ color: "#6b8e23" }}
+                >
+                  Loading availability...
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    // No menu or no cutoff data — render nothing
+    return null;
+  }
+
+  const {
+    orderingText,
+    dateStr,
+    displayDay,
+    orderModeText,
+    isEmployee: isEmp,
+    allowed,
+    freshTitle,
+    freshDescription,
+  } = displayInfo;
+
+  // Determine display message based on allowed status
+  const displayMessage = !allowed ? (
+    <>❌ Orders closed</>
+  ) : (
+    <>
+      {orderingText} • {displayDay} {dateStr}
+      {/* {!isEmp && orderModeText && (
+        <span className="order-mode-badge">{orderModeText}</span>
+      )} */}
+    </>
+  );
 
   return (
     <div className="cutoff-status-main-card">
@@ -351,53 +203,45 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             <div className="clock-icon">
               <Clock size={20} />
             </div>
-            <span className="cutoff-message">
-              {displayInfo.orderingText} • {displayInfo.displayDay} {displayInfo.dateStr}
-            </span>
+            <span className="cutoff-message">{displayMessage}</span>
           </div>
 
           <div className="time-left-pill">
-            {timeLeft || 'Loading...'}
+            {!allowed ? "Cutoff passed" : timeLeft || "Loading..."}
           </div>
         </div>
 
         {/* Fresh ingredients section - Centered with fixed height */}
-        <div className="fresh-ingredients-section">
+        {/* <div className="fresh-ingredients-section">
           <div className="fresh-ingredients-content">
             <div className="fresh-icon-wrapper">
-              <img 
-                src={icon} 
-                alt="Fresh icon" 
-                className="fresh-icon"
-              />
+              <img src={icon} alt="Fresh icon" className="fresh-icon" />
             </div>
             <div className="fresh-text">
-              <span className="fresh-title">Sourced fresh at 5 AM tomorrow</span>
-              <span className="fresh-description">
-                We buy ingredients only after you order — nothing sits in storage overnight.
-              </span>
+              <span className="fresh-title">{freshTitle}</span>
+              <span className="fresh-description">{freshDescription}</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
-          <style jsx>{`
+        <style jsx>{`
           .cutoff-status-main-card {
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: "Inter", sans-serif;
           }
-          
+
           .cutoff-status-card {
             max-width: 613px;
             width: 100%;
-            background: #E6B800;
+            background: #e6b800;
             border-top-left-radius: 0;
             border-top-right-radius: 0;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             overflow: hidden;
           }
-  
+
           .cutoff-inner {
             display: flex;
             align-items: center;
@@ -406,7 +250,7 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             width: 100%;
             gap: 16px;
           }
-  
+
           .cutoff-info-group {
             display: flex;
             align-items: center;
@@ -414,26 +258,33 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             flex: 1;
             min-width: 0;
           }
-  
+
           .clock-icon {
             flex-shrink: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: #8B4513;
+            color: #8b4513;
           }
-  
+
           .cutoff-message {
             font-size: 14px;
             font-weight: 500;
-            color: #8B4513;
+            color: #8b4513;
             line-height: 1.4;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             letter-spacing: -0.2px;
           }
-  
+
+          .order-mode-badge {
+            margin-left: 8px;
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+          }
+
           .time-left-pill {
             background: rgba(139, 69, 19, 0.15);
             border-radius: 40px;
@@ -441,15 +292,17 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             font-weight: 600;
             font-size: 14px;
             color: #4a2a0c;
-            background-color: #FDF2D0;
+            background-color: #fdf2d0;
             white-space: nowrap;
             flex-shrink: 0;
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow:
+              inset 0 1px 1px rgba(255, 255, 255, 0.3),
+              0 1px 2px rgba(0, 0, 0, 0.05);
           }
 
           /* Fresh ingredients section - Fixed height 147.5px */
           .fresh-ingredients-section {
-            background-color: #3D6701;
+            background-color: #3d6701;
             padding: 16px 20px;
             display: flex;
             justify-content: center;
@@ -469,7 +322,7 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
           .fresh-icon-wrapper {
             width: 50px;
             height: 50px;
-            background-color: #54811F;
+            background-color: #54811f;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -494,7 +347,7 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
           .fresh-title {
             font-size: 18px;
             font-weight: 600;
-            color: #FFFFFF;
+            color: #ffffff;
             letter-spacing: -0.2px;
             line-height: 1.3;
           }
@@ -506,7 +359,7 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             line-height: 1.4;
             letter-spacing: -0.1px;
           }
-  
+
           /* Mobile responsive */
           @media (max-width: 480px) {
             .cutoff-inner {
@@ -514,16 +367,16 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
               padding: 12px 16px;
               gap: 10px;
             }
-            
+
             .cutoff-info-group {
               min-width: calc(100% - 80px);
             }
-            
+
             .cutoff-message {
               white-space: normal;
               font-size: 13px;
             }
-            
+
             .time-left-pill {
               font-size: 12px;
               padding: 4px 12px;
@@ -550,7 +403,7 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             }
 
             .fresh-title {
-              font-size: 32px;
+              font-size: 16px;
             }
 
             .fresh-description {
@@ -576,13 +429,13 @@ export default function CutoffStatusCard({ cutoffValidation, userType = 'custome
             .fresh-text {
               gap: 2px;
             }
-            
+
             .fresh-title {
-              font-size: 12px;
+              font-size: 14px;
             }
-            
+
             .fresh-description {
-              font-size: 10px;
+              font-size: 11px;
             }
           }
         `}</style>

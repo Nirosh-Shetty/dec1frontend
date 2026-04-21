@@ -573,10 +573,14 @@ const LocationModal2 = ({
           );
         }
 
+        // Dispatch events immediately after localStorage update — don't wait for API
+        window.dispatchEvent(new Event("addressUpdated"));
+        window.dispatchEvent(new Event("locationUpdated"));
+
         // Close modal first
         onClose();
 
-        // API call
+        // API call (fire-and-forget, UI already updated)
         const response = await fetch(
           `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
@@ -585,14 +589,8 @@ const LocationModal2 = ({
           },
         );
 
-        if (response.ok) {
-          // Trigger refresh everywhere
-          window.dispatchEvent(new Event("addressUpdated"));
-
-          // Reload after a short delay
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
+        if (!response.ok) {
+          console.error("Failed to update primary address on server");
         }
       } catch (error) {
         console.error("Error setting primary address:", error);

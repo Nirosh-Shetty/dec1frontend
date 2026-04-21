@@ -6,14 +6,10 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-multi-carousel/lib/styles.css";
-import "react-toastify/dist/ReactToastify.css";
-
-import { clearExpiredItems } from "./Helper/cartHelper";
 
 import Navbar1 from "./Components/Navbar1";
 import Home from "./Components/Home";
@@ -161,7 +157,6 @@ function App() {
   const address = localStorage.getItem("address");
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
   let [Carts, setCarts] = useState([]);
-  
   useEffect(() => {
     if (address) {
       setSelectArea(address);
@@ -170,37 +165,9 @@ function App() {
       setCarts(cart);
     }
   }, []);
-
-  // Clear expired cart items on app load
-  useEffect(() => {
-    const expiredResult = clearExpiredItems();
-    
-    if (expiredResult && expiredResult.removedCount > 0) {
-      // Update cart state to reflect removed items
-      const updatedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      setCarts(updatedCart);
-      
-      // Show notification to user
-      toast.info(
-        `${expiredResult.removedCount} expired item${expiredResult.removedCount !== 1 ? 's' : ''} removed from cart`,
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        }
-      );
-      
-      // Log removed items for debugging
-      console.log("Removed expired items from cart:", expiredResult.removedItems);
-    }
-  }, []);
   return (
     <div className="App no-select">
       <Router>
-        <ToastContainer />
         <ThemeColorHandler />
         <Routes>
           {/* <Route path="/" element={<LandingPage />} /> */}

@@ -437,11 +437,11 @@ function MultipleInvoice() {
                         Item Total (Excl. Tax):
                       </td>
                       <td style={{ textAlign: "right", padding: "2px 0" }}>
-                        ₹{item?.subTotal?.toFixed(2)}
-                        {/* {item?.amountBeforeTax
+                        {/* ₹{item?.subTotal?.toFixed(2)} */}
+                        {item?.amountBeforeTax
                       ? Number(item.amountBeforeTax).toFixed(2)
                       : // Fallback for old orders: (Inclusive SubTotal - Tax)
-                        ((item?.subTotal || 0) - (item?.tax || 0)).toFixed(2)} */}
+                        ((item?.subTotal || 0) - (item?.tax || 0)).toFixed(2)}
                       </td>
                     </tr>
 
@@ -487,7 +487,7 @@ function MultipleInvoice() {
                           fontWeight: "bold",
                         }}
                       >
-                        ₹{((item?.subTotal || 0) + (item?.tax || 0) + (item?.deliveryCharge || 0)).toFixed(2)}
+                        ₹{((item?.subTotal || 0)  + (item?.deliveryCharge || 0)).toFixed(2)}
                       </td>
                     </tr>
 

@@ -456,7 +456,11 @@ function ThermalInvoice() {
                     Item Total (Excl. Tax):
                   </td>
                   <td style={{ textAlign: "right", padding: "2px 0" }}>
-                    ₹{subtotal.toFixed(2)}
+                    {/* ₹{subtotal.toFixed(2)} */}
+                     {item?.amountBeforeTax
+                      ? Number(item.amountBeforeTax).toFixed(2)
+                      : // Fallback for old orders: (Inclusive SubTotal - Tax)
+                        ((subtotal || 0) - (item?.tax || 0)).toFixed(2)}
                   </td>
                 </tr>
 
@@ -508,7 +512,6 @@ function ThermalInvoice() {
                     ₹
                     {(
                       subtotal +
-                      (item?.tax || 0) +
                       (item?.deliveryCharge || 0)
                     ).toFixed(2)}
                   </td>

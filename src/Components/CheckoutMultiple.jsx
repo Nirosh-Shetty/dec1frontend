@@ -1,5 +1,3 @@
-
-
 import { useContext, useEffect, useMemo, useState, useRef } from "react";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { MdRemoveShoppingCart } from "react-icons/md";
@@ -32,7 +30,7 @@ const CheckoutMultiple = () => {
   const location = useLocation();
   const data = location?.state;
   const addresstype = localStorage.getItem("addresstype");
-  
+
   // State declarations
   const [deliveryMethod, setDeliveryMethod] = useState("slot");
   const [address, setAddress] = useState(
@@ -43,14 +41,14 @@ const CheckoutMultiple = () => {
   const [childName, setChildName] = useState("");
   const [childClass, setChildClass] = useState("");
   const [childSection, setChildSection] = useState("");
-  const storedInfo = JSON.parse(localStorage.getItem("studentInformation")) || {};
+  const storedInfo =
+    JSON.parse(localStorage.getItem("studentInformation")) || {};
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [cartVersion, setCartVersion] = useState(0);
 
-  
   // Get cart data from helper
   const cartItems = useMemo(() => getCart(), [cartVersion]);
-  
+
   const groupedCarts = useMemo(() => {
     try {
       return getCartGroupedByDateSession();
@@ -59,16 +57,22 @@ const CheckoutMultiple = () => {
       return {};
     }
   }, [cartItems]);
-  
+
   const totals = useMemo(() => {
     try {
       return calculateCartTotals();
     } catch (error) {
       console.error("Error calculating totals:", error);
-      return { bySlot: {}, total: 0, itemCount: 0, totalSavings: 0, regularTotal: 0 };
+      return {
+        bySlot: {},
+        total: 0,
+        itemCount: 0,
+        totalSavings: 0,
+        regularTotal: 0,
+      };
     }
   }, [cartItems]);
-  
+
   const summary = useMemo(() => {
     try {
       return getCartSummary();
@@ -92,7 +96,7 @@ const CheckoutMultiple = () => {
   const refreshCartData = () => {
     const freshCart = getCart();
     setCartData(freshCart);
-    setCartVersion(prev => prev + 1);
+    setCartVersion((prev) => prev + 1);
   };
 
   // Sync cartdata with localStorage
@@ -104,7 +108,7 @@ const CheckoutMultiple = () => {
           lastCartRawRef.current = raw;
           const parsed = JSON.parse(raw);
           setCartData(Array.isArray(parsed) ? parsed : []);
-          setCartVersion(prev => prev + 1);
+          setCartVersion((prev) => prev + 1);
         }
       } catch (err) {
         console.error("Failed to parse cart from localStorage", err);
@@ -113,20 +117,20 @@ const CheckoutMultiple = () => {
 
     readCart();
     const intervalId = setInterval(readCart, 1000);
-    
+
     const onStorage = (e) => {
       if (e.key === "cart") {
         readCart();
       }
     };
-    
+
     const onCartUpdated = () => {
       readCart();
     };
-    
+
     window.addEventListener("storage", onStorage);
     window.addEventListener("cartUpdated", onCartUpdated);
-    
+
     return () => {
       clearInterval(intervalId);
       window.removeEventListener("storage", onStorage);
@@ -139,7 +143,6 @@ const CheckoutMultiple = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
- 
   const [delivarychargetype, setdelivarychargetype] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
   const [Cutlery, setCutlery] = useState(0);
@@ -162,7 +165,8 @@ const CheckoutMultiple = () => {
   const regularTotal = totals.regularTotal;
   // const calculateTaxPrice = (5 / 100) * regularTotal;
 
-    const primaryAddress = JSON.parse(localStorage.getItem("primaryAddress")) || {};
+  const primaryAddress =
+    JSON.parse(localStorage.getItem("primaryAddress")) || {};
   const defaultAddress = primaryAddress;
   const addressHubId = defaultAddress?.hubId || "";
 
@@ -195,7 +199,7 @@ const CheckoutMultiple = () => {
         const quantity = Number(item.quantity || item.Quantity || 1);
         const itemTotal = Number(
           item.totalPrice ??
-            ((item.preOrderPrice ?? item.price ?? item.hubPrice ?? 0) * quantity),
+            (item.preOrderPrice ?? item.price ?? item.hubPrice ?? 0) * quantity,
         );
         return sum + (Number.isFinite(itemTotal) ? itemTotal : 0);
       }, 0),
@@ -235,7 +239,8 @@ const CheckoutMultiple = () => {
     return matchedRate ? Number(matchedRate.deliveryRate || 0) : null;
   };
 
-  const userDeliveryStatus = user?.status === "Employee" ? "Employee" : "Normal";
+  const userDeliveryStatus =
+    user?.status === "Employee" ? "Employee" : "Normal";
   const userAcquisitionChannel = user?.acquisition_channel || "organic";
   const fallbackDeliveryRate = Number(
     defaultAddress?.Delivarycharge ?? address?.Delivarycharge ?? 0,
@@ -248,9 +253,14 @@ const CheckoutMultiple = () => {
       userDeliveryStatus,
     ) ?? fallbackDeliveryRate,
   );
-  const totalDeliveryCharge = roundAmount(deliveryChargePerSlot * deliverySlotCount);
+  const totalDeliveryCharge = roundAmount(
+    deliveryChargePerSlot * deliverySlotCount,
+  );
   const totalPayable = roundAmount(
-    Math.max(subtotal + Cutlery + totalDeliveryCharge - discountWallet - coupon, 0),
+    Math.max(
+      subtotal + Cutlery + totalDeliveryCharge - discountWallet - coupon,
+      0,
+    ),
   );
 
   // For TAX-INCLUSIVE products: break down the tax that's already in the price
@@ -259,8 +269,6 @@ const CheckoutMultiple = () => {
   //   taxAmount = 105 - 100 = 5
   const amountBeforeTax = subtotal / (1 + gstRate / 100);
   const calculateTaxPrice = subtotal - amountBeforeTax;
-
-
 
   const increaseQuantity = (itemdata) => {
     const currentQty = itemdata.quantity || 1;
@@ -276,7 +284,7 @@ const CheckoutMultiple = () => {
       });
       return;
     }
-    
+
     // Update cart using cartHelper
     const updatedCart = updateCartItemQty(itemdata.cartId, currentQty + 1);
     setCartData(updatedCart);
@@ -343,7 +351,7 @@ const CheckoutMultiple = () => {
       return;
     }
     if (e.target.checked) {
-     let maxUsableAmount = subtotal + Cutlery + totalDeliveryCharge - coupon;
+      let maxUsableAmount = subtotal + Cutlery + totalDeliveryCharge - coupon;
       let walletBalance = wallet?.balance || 0;
       let finalAmount = Math.min(walletBalance, Math.max(maxUsableAmount, 0));
       setDiscountWallet(finalAmount);
@@ -358,9 +366,7 @@ const CheckoutMultiple = () => {
 
   const [isBillingOpen, setIsBillingOpen] = useState(true);
 
-
-
- const handleCheckout = async () => {
+  const handleCheckout = async () => {
     if (!user) {
       Swal2.fire({
         toast: true,
@@ -403,7 +409,7 @@ const CheckoutMultiple = () => {
     setLoading(true);
 
     try {
-     const payableAmount = totalPayable;
+      const payableAmount = totalPayable;
       const totalAmount = Math.round(payableAmount * 100) / 100;
       const enrichedCartItems = cartdata.map((item) => ({
         ...item,
@@ -415,10 +421,10 @@ const CheckoutMultiple = () => {
         hubName: defaultAddress?.hubName || "",
         address: defaultAddress?.fullAddress || "",
         customerType: user?.status || "User",
-        coordinates: defaultAddress?.location
+        coordinates: defaultAddress?.location,
       }));
 
-console.log(enrichedCartItems,"cartitems.............")
+      console.log(enrichedCartItems, "cartitems.............");
 
       const handleSuccessfulCheckout = () => {
         localStorage.removeItem("cart");
@@ -448,7 +454,7 @@ console.log(enrichedCartItems,"cartitems.............")
             userId: user._id,
             cartItems: enrichedCartItems,
             addressId: defaultAddress?._id,
-          }
+          },
         );
 
         if (verifyRes.status === 200 && verifyRes.data?.success) {
@@ -471,7 +477,7 @@ console.log(enrichedCartItems,"cartitems.............")
             username: user.Fname,
             mobile: user.Mobile,
           },
-        }
+        },
       );
 
       if (res.status === 200 && res.data?.paymentSkipped) {
@@ -509,13 +515,15 @@ console.log(enrichedCartItems,"cartitems.............")
                     userId: user._id,
                     cartItems: enrichedCartItems,
                     addressId: defaultAddress?._id,
-                  }
+                  },
                 );
 
                 if (verifyRes.status === 200 && verifyRes.data?.success) {
                   handleSuccessfulCheckout();
                 } else {
-                  throw new Error(verifyRes.data?.error || "Order creation failed");
+                  throw new Error(
+                    verifyRes.data?.error || "Order creation failed",
+                  );
                 }
               } catch (error) {
                 console.error("Payment verification error:", error);
@@ -524,7 +532,10 @@ console.log(enrichedCartItems,"cartitems.............")
                   position: "bottom",
                   icon: "error",
                   title: "Payment Failed",
-                  text: error.response?.data?.error || error.message || "Payment verification failed",
+                  text:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Payment verification failed",
                   showConfirmButton: false,
                   timer: 3000,
                 });
@@ -576,8 +587,6 @@ console.log(enrichedCartItems,"cartitems.............")
       setLoading(false);
     }
   };
-
-
 
   // Calculate item total price correctly with offer
   const getItemQuantity = (item) => {
@@ -845,7 +854,7 @@ console.log(enrichedCartItems,"cartitems.............")
                         </div>
                       </div>
                       <div className="center mt-1">
-                         {deliveryChargePerSlot > 0 ? (
+                        {deliveryChargePerSlot > 0 ? (
                           <b>₹ {deliveryChargePerSlot}</b>
                         ) : (
                           <b
@@ -871,7 +880,7 @@ console.log(enrichedCartItems,"cartitems.............")
                       className={`rightcard ${
                         selectedOption === "Gate/Tower" ? "active" : ""
                       }`}
-                        onClick={() => setSelectedOption("Gate/Tower")}
+                      onClick={() => setSelectedOption("Gate/Tower")}
                     >
                       {selectedOption === "Gate/Tower" && (
                         <div className="top-right-icon">
@@ -884,7 +893,7 @@ console.log(enrichedCartItems,"cartitems.............")
                         </div>
                       </div>
                       <div className="center mt-1">
-                         {deliveryChargePerSlot > 0 ? (
+                        {deliveryChargePerSlot > 0 ? (
                           <b>₹ {deliveryChargePerSlot}</b>
                         ) : (
                           <b
@@ -925,7 +934,7 @@ console.log(enrichedCartItems,"cartitems.............")
                       </div>
                     </div>
                     <div className="center mt-1">
-                       {deliveryChargePerSlot > 0 ? (
+                      {deliveryChargePerSlot > 0 ? (
                         <b>₹ {deliveryChargePerSlot}</b>
                       ) : (
                         <b
@@ -1068,7 +1077,6 @@ console.log(enrichedCartItems,"cartitems.............")
           <div>
             <h4 className="spply-s">Apply & Save</h4>
             <div className="promo-wallet-container">
-              
               <div className="wallet-section">
                 <input
                   type="checkbox"
@@ -1103,7 +1111,7 @@ console.log(enrichedCartItems,"cartitems.............")
                         Math.min(
                           walletSeting?.minCartValueForWallet || 0,
                           (walletSeting?.minCartValueForWallet || 0) -
-                             (Number(subtotal) +
+                            (Number(subtotal) +
                               Number(Cutlery) +
                               Number(totalDeliveryCharge) || 0),
                         ),
@@ -1165,7 +1173,9 @@ console.log(enrichedCartItems,"cartitems.............")
                     </div>
                   </div>
                   <div className="value-column">
-                    <div className="toatal-va">₹ {(regularTotal - calculateTaxPrice)?.toFixed(2)}</div>
+                    <div className="toatal-va">
+                      ₹ {(regularTotal - calculateTaxPrice)?.toFixed(2)}
+                    </div>
                     {totalSavings > 0 && (
                       <div className="toatal-va" style={{ color: "green" }}>
                         - ₹ {totalSavings.toFixed(2)}
@@ -1174,7 +1184,7 @@ console.log(enrichedCartItems,"cartitems.............")
                     <div className="toatal-va">
                       ₹ {calculateTaxPrice.toFixed(2)}
                     </div>
-                     {/* <div className="toatal-va">
+                    {/* <div className="toatal-va">
                       ₹ {cartdata?.deliveryCharge || 0}
                     </div> */}
                     {/* {Cutlery !== 0 && (
@@ -1185,8 +1195,8 @@ console.log(enrichedCartItems,"cartitems.............")
                         - ₹ {coupon}
                       </div>
                     )} */}
-                    
-                     {/* {totalDeliveryCharge !== 0 && (
+
+                    {/* {totalDeliveryCharge !== 0 && (
                       <div className="toatal-va">
                         {deliverySlotCount > 1
                           ? `Delivery (${deliverySlotCount} slots)`
@@ -1195,7 +1205,7 @@ console.log(enrichedCartItems,"cartitems.............")
                             : "Delivery"}
                       </div>
                     )} */}
-                     {totalDeliveryCharge !== 0 && (
+                    {totalDeliveryCharge !== 0 && (
                       <div className="toatal-va">₹ {totalDeliveryCharge}</div>
                     )}
                     {discountWallet !== 0 && (
@@ -1204,10 +1214,7 @@ console.log(enrichedCartItems,"cartitems.............")
                       </div>
                     )}
                     <div className="toatal-va">
-                      <b>
-                        ₹{" "}
-                         {totalPayable.toFixed(2)}
-                      </b>
+                      <b>₹ {totalPayable.toFixed(2)}</b>
                     </div>
                   </div>
                 </div>
@@ -1279,4 +1286,3 @@ console.log(enrichedCartItems,"cartitems.............")
 };
 
 export default CheckoutMultiple;
-

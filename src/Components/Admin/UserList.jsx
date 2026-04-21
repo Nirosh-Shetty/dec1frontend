@@ -940,28 +940,6 @@
 
 // export default UserList;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
