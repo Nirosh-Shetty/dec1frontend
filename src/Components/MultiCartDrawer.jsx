@@ -1838,36 +1838,36 @@ const MultiCartDrawer = ({
     }
 
     // Show success toast with custom HTML
-    Swal2.fire({
-      toast: true,
-      position: "bottom",
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-      html: `
-        <div class="myplans-toast-content">
-          <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
-          <div class="myplans-toast-text">
-            <div class="myplans-toast-title">Great picks!</div>
-            <div class="myplans-toast-subtitle">Moving them to MyPlans</div>
-          </div>
-        </div>
-      `,
-      customClass: {
-        popup: "myplans-custom-toast",
-        htmlContainer: "myplans-toast-html",
-      },
-      didOpen: () => {
-        // Position above bottom nav
-        const toast = document.querySelector(".myplans-custom-toast");
-        if (toast) {
-          toast.style.bottom = "90px"; // Position above bottom nav
-          toast.style.left = "50%";
-          toast.style.transform = "translateX(-50%)";
-          toast.style.position = "fixed";
-        }
-      },
-    });
+    // Swal2.fire({
+    //   toast: true,
+    //   position: "bottom",
+    //   showConfirmButton: false,
+    //   timer: 2500,
+    //   timerProgressBar: true,
+    //   html: `
+    //     <div class="myplans-toast-content">
+    //       <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+    //       <div class="myplans-toast-text">
+    //         <div class="myplans-toast-title">Great picks!</div>
+    //         <div class="myplans-toast-subtitle">Moving them to MyPlans</div>
+    //       </div>
+    //     </div>
+    //   `,
+    //   customClass: {
+    //     popup: "myplans-custom-toast",
+    //     htmlContainer: "myplans-toast-html",
+    //   },
+    //   didOpen: () => {
+    //     // Position above bottom nav
+    //     const toast = document.querySelector(".myplans-custom-toast");
+    //     if (toast) {
+    //       toast.style.bottom = "90px"; // Position above bottom nav
+    //       toast.style.left = "50%";
+    //       toast.style.transform = "translateX(-50%)";
+    //       toast.style.position = "fixed";
+    //     }
+    //   },
+    // });
 
     // Directly proceed to plan
     proceedToPlan();
