@@ -1593,8 +1593,8 @@ const MyPlan = () => {
                               {plan.session === "Lunch" ? "12:00–1:00 PM" : plan.session === "Breakfast" ? "7:00–8:00 AM" : "7:00–8:00 PM"}
                             </div>
                           </div>
-                          <div className={`plan-status-badge ${plan.status === 'Confirmed' ? 'confirmed' : plan.status === 'Pending Payment' ? 'pending' : 'cooking'}`} >
-                            {plan.status === 'Confirmed' ? 'Cooking now' : plan.status === 'Pending Payment' ? 'Pending' : 'Skipped'}
+                          <div className={`plan-status-badge ${plan.status === 'Confirmed' ? 'confirmed' : plan.status === 'Pending Payment' ? 'pending' : plan.status === 'Cooking' ? 'cooking' : plan.status === 'Packed' || plan.status === 'Packing' ? 'packed' : plan.status === 'ontheway' || plan.status === 'On the way' ? 'ontheway' : plan.status === 'Delivered' ? 'delivered' : 'cancelled'}`} >
+                            {plan.status === 'Confirmed' ? '⏳ Confirmed' : plan.status === 'Pending Payment' ? '💳 Payment Pending' : plan.status === 'Cooking' ? '👨‍🍳 Being Prepared' : plan.status === 'Packing' ? '📦 Packing' : plan.status === 'Packed' ? '✓ Ready' : plan.status === 'ontheway' || plan.status === 'On the way' ? '🚚 On the Way' : plan.status === 'Delivered' ? '✓ Delivered' : plan.status === 'Cancelled' ? '✗ Cancelled' : '⊘ Skipped'}
                           </div>
                         </div>
 
@@ -1628,8 +1628,8 @@ const MyPlan = () => {
                           
                         </div>
 
-                        {/* FRESHNESS JOURNEY - Only for confirmed and beyond statuses */}
-                        {(plan.status === "Confirmed" || plan.status === "Cooking" || plan.status === "Packing" || plan.status === "Packed" || plan.status === "ontheway" || plan.status === "On the way" || plan.status === "Delivered") && (
+                        {/* FRESHNESS JOURNEY - Only show for active orders (hide when Delivered, Cancelled, Skipped) */}
+                        {!(plan.status === "Delivered" || plan.status === "Cancelled" || plan.status === "Skipped") && (plan.status === "Confirmed" || plan.status === "Cooking" || plan.status === "Packing" || plan.status === "Packed" || plan.status === "ontheway" || plan.status === "On the way" || plan.status === "Pending Payment") && (
                           <div className="plan-journey-section">
                             <div className="journey-title">Order Tracker</div>
                             <div className="journey-track">

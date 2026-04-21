@@ -1730,6 +1730,28 @@ body.nav-hidden .fixed-bottom-bar {
   color: #b45309;
 }
 
+.plan-status-badge.packed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.plan-status-badge.ontheway {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.plan-status-badge.delivered {
+  background: #d1fae5;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.plan-status-badge.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+}
+
 /* Items List */
 .plan-items-list {
   padding: 12px 16px;
@@ -2114,7 +2136,7 @@ font-size: 0.8rem;
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    padding: 12px;
+    padding: 6px;
     background: var(--cream-walls);
     border: 2px solid var(--warm-beige);
     border-bottom-left-radius: 18px;

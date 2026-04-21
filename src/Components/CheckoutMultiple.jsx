@@ -1215,54 +1215,58 @@ console.log(enrichedCartItems,"cartitems.............")
             </div>
           )}
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Button
-              variant=""
+          <div className="checkout-button-sticky-wrapper">
+            <div
               style={{
-                width: "100%",
-                borderRadius: "12px",
-                border: "1px solid var(--steel_light, #E8E8E8)",
-                background: " var(--success-green, #6B8E23)",
                 display: "flex",
-                height: "48px",
-                padding: "8px",
-                justifyContent: "center",
                 alignItems: "center",
-                gap: "8px",
-                marginTop: "8px",
+                justifyContent: "center",
               }}
-              className="placeorder-bill"
-              disabled={loading}
-              onClick={handleCheckout}
             >
-              {loading ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" />
-                  Processing...
-                </>
-              ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <div className="paybutton">Place Order | </div>
-                  <p className="price-pay">
-                      {totalPayable.toFixed(2)}
-                  </p>
-                </div>
-              )}
-            </Button>
+              <Button
+                variant=""
+                style={{
+                  width: "100%",
+                  borderRadius: "12px",
+                  border: "1px solid var(--steel_light, #E8E8E8)",
+                  background: " var(--success-green, #6B8E23)",
+                  display: "flex",
+                  height: "48px",
+                  padding: "8px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+                className="placeorder-bill"
+                disabled={loading}
+                onClick={handleCheckout}
+              >
+                {loading ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Processing...
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <div className="paybutton">Place Order | </div>
+                    <p className="price-pay">
+                        {totalPayable.toFixed(2)}
+                    </p>
+                  </div>
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Add bottom padding to prevent content from hiding behind sticky button */}
+          <div style={{ height: "80px" }}></div>
         </div>
       </div>
 
