@@ -26,7 +26,7 @@ import {
 
 const CheckoutMultiple = () => {
   const navigate = useNavigate();
-  const { wallet, walletSeting } = useContext(WalletContext);
+  const { wallet, walletSeting, fetchWalletData } = useContext(WalletContext);
   const location = useLocation();
   const data = location?.state;
   const addresstype = localStorage.getItem("addresstype");
@@ -426,23 +426,37 @@ const CheckoutMultiple = () => {
 
       console.log(enrichedCartItems, "cartitems.............");
 
-      const handleSuccessfulCheckout = () => {
+      const handleSuccessfulCheckout = async (txnId, paymentMethod = "razorpay") => {
         localStorage.removeItem("cart");
         clearCart();
+        
+        // Refresh wallet balance from backend if wallet was used
+        if (discountWallet && discountWallet > 0) {
+          await fetchWalletData();
+        }
 
-        Swal2.fire({
-          toast: true,
-          position: "bottom",
-          icon: "success",
-          title: "Order",
-          text: "Order Successfully Done",
-          showConfirmButton: false,
-          timer: 3000,
+        // Get first delivery slot info for params
+        const firstItem = enrichedCartItems?.[0] || {};
+        const firstDeliveryDate = firstItem.deliveryDate || new Date().toISOString();
+        const firstSession = firstItem.session || "Lunch";
+
+        // Navigate to success page with transaction details
+        const successParams = new URLSearchParams({
+          transactionId: txnId || "completed",
+          userId: user._id,
+          session: firstSession,
+          deliveryDate: firstDeliveryDate,
+          username: user.Fname || "User",
+          amount: totalPayable,
+          orderId: txnId || "pending",
+          hubName: defaultAddress?.hubName || "",
+          delivarylocation: defaultAddress?.fullAddress || "",
+          status: "COMPLETED",
+          paymentMethod: paymentMethod,
+          deliveryCharge: deliveryChargePerSlot,
         });
 
-        setTimeout(() => {
-          navigate("/my-plan", { replace: true });
-        }, 600);
+        navigate("/payment-success?" + successParams.toString(), { replace: true });
       };
 
       const confirmSkippedPaymentOrder = async (txnId) => {
@@ -458,7 +472,7 @@ const CheckoutMultiple = () => {
         );
 
         if (verifyRes.status === 200 && verifyRes.data?.success) {
-          handleSuccessfulCheckout();
+          await handleSuccessfulCheckout(txnId, "wallet");
           return;
         }
 
@@ -519,7 +533,7 @@ const CheckoutMultiple = () => {
                 );
 
                 if (verifyRes.status === 200 && verifyRes.data?.success) {
-                  handleSuccessfulCheckout();
+                  await handleSuccessfulCheckout(txnId, "razorpay");
                 } else {
                   throw new Error(
                     verifyRes.data?.error || "Order creation failed",
@@ -527,18 +541,17 @@ const CheckoutMultiple = () => {
                 }
               } catch (error) {
                 console.error("Payment verification error:", error);
-                Swal2.fire({
-                  toast: true,
-                  position: "bottom",
-                  icon: "error",
-                  title: "Payment Failed",
-                  text:
-                    error.response?.data?.error ||
-                    error.message ||
-                    "Payment verification failed",
-                  showConfirmButton: false,
-                  timer: 3000,
+                
+                // Navigate to failure page
+                const failureParams = new URLSearchParams({
+                  transactionId: txnId || "",
+                  userId: user._id,
+                  status: "FAILED",
+                  paymentMethod: "razorpay",
+                  error: error.response?.data?.error || error.message || "Payment could not be processed",
                 });
+                
+                navigate("/payment-success?" + failureParams.toString(), { replace: true });
               }
             },
             prefill: {
@@ -555,15 +568,14 @@ const CheckoutMultiple = () => {
           rzp.open();
         };
         script.onerror = () => {
-          Swal2.fire({
-            toast: true,
-            position: "bottom",
-            icon: "error",
-            title: "Payment Failed",
-            text: "Failed to load payment gateway",
-            showConfirmButton: false,
-            timer: 3000,
+          const failureParams = new URLSearchParams({
+            transactionId: "",
+            userId: user._id,
+            status: "FAILED",
+            paymentMethod: "razorpay",
+            error: "Failed to load payment gateway",
           });
+          navigate("/payment-success?" + failureParams.toString(), { replace: true });
         };
         document.body.appendChild(script);
       } else {
@@ -571,18 +583,17 @@ const CheckoutMultiple = () => {
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: "Warning",
-        text:
-          error.response?.data?.error ||
-          error.response?.data?.message ||
-          "Failed to process checkout",
-        showConfirmButton: false,
-        timer: 3000,
+      
+      // Navigate to failure page with error details
+      const failureParams = new URLSearchParams({
+        transactionId: "",
+        userId: user._id,
+        status: "FAILED",
+        paymentMethod: "razorpay",
+        error: error.response?.data?.error || error.response?.data?.message || error.message || "Failed to process checkout",
       });
+      
+      navigate("/payment-success?" + failureParams.toString(), { replace: true });
     } finally {
       setLoading(false);
     }

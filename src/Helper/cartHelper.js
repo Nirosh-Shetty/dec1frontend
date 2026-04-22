@@ -1000,8 +1000,10 @@ export const getCartItemsForOrder = () => {
 };
 
 /**
- * Get expired items from cart (items where deliveryDate < today)
- * @returns {Array} Items with passed delivery dates
+ * Get expired items from cart (items where deliveryDate <= today)
+ * Note: Since system is preorder-only, today's orders cannot be placed today
+ * Orders for today must be placed on the previous day
+ * @returns {Array} Items with delivery dates today or before
  */
 export const getExpiredItems = () => {
   const cart = getCart();
@@ -1026,8 +1028,8 @@ export const getExpiredItems = () => {
       return false; // Invalid date, keep item
     }
     
-    // Check if item date is before today
-    return itemDate < today;
+    // Check if item date is today or before (preorder constraint)
+    return itemDate <= today;
   });
 };
 
