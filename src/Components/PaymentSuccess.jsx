@@ -65,7 +65,7 @@ const PaymentSuccess = () => {
   };
 
   const handleFailureRedirect = () => {
-    navigate("/my-plan", { replace: true }); // Go back to plan to retry
+    navigate("/checkout-multiple", { replace: true }); // Go back to plan to retry
   };
 
   const checkPaymentStatus = async () => {
@@ -106,7 +106,7 @@ const PaymentSuccess = () => {
       );
       setPaymentStatus("FAILED");
       setTimeout(() => {
-        navigate("/my-plan", { replace: true });
+        navigate("/checkout-multiple", { replace: true });
       }, 8000);
       return;
     }
