@@ -8,6 +8,34 @@ import { Modal, Button } from "react-bootstrap";
 import "../Styles/OrderHistory.css";
 
 function OrderHistory() {
+  const normalizeOrderStatus = (status) => {
+    const rawStatus = String(status || "").trim().toLowerCase();
+
+    if (rawStatus === "delivered") return "Delivered";
+    if (rawStatus === "cancelled" || rawStatus === "canceled") {
+      return "Cancelled";
+    }
+    if (rawStatus === "ontheway" || rawStatus === "on the way") {
+      return "On the way";
+    }
+
+    return status || "";
+  };
+
+  const getDisplayStatus = (status) => {
+    const normalizedStatus = normalizeOrderStatus(status);
+
+    if (normalizedStatus === "Delivered") return "Delivered";
+    if (normalizedStatus === "Cancelled") return "Cancelled";
+    return "Ongoing";
+  };
+
+  const toAmount = (value) => {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : 0;
+  };
+
+
   // --- State for fetched orders and navigation ---
   const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]); // Store all orders
@@ -36,27 +64,38 @@ function OrderHistory() {
       );
       if (res.status === 200 && res.data.order) {
         const formattedOrders = res.data.order
-          .map((order) => ({
-            id: order._id,
-            orderId: order.orderid,
-            rawStatus: order.status,
-            date: order.updatedAt,
-            status: order.status === "Delivered" ? "Delivered" : "Ongoing",
-            statusColor:
-              order.status === "Delivered" ? "#6B8E23" : Colors.warningOrange,
-            items: order.allProduct.map((product) => ({
-              name: product.foodItemId?.foodname || "N/A",
-              type: product.foodItemId?.foodcategory?.toLowerCase() || "veg",
-              quantity: product.quantity,
-            })),
-            packerName: order.packername || "DailyDish Employee",
-            ratingOnOrder: order.ratings?.order?.rating || 0,
-            ratingOnDelivery: order.ratings?.delivery?.rating || 0,
-            commentOnOrder: order.ratings?.order?.comment || "",
-            commentOnDelivery: order.ratings?.delivery?.comment || "",
-            total: order.allTotal,
-            eta: order.slot,
-          }))
+          .map((order) => {
+            const rawStatus = normalizeOrderStatus(
+              order.status || order.orderstatus,
+            );
+            const status = getDisplayStatus(rawStatus);
+
+            return {
+              id: order._id,
+              orderId: order.orderid,
+              rawStatus,
+              date: order.updatedAt,
+              status,
+              statusColor:
+                status === "Delivered"
+                  ? "#6B8E23"
+                  : status === "Cancelled"
+                    ? "#CC4125"
+                    : Colors.warningOrange,
+              items: order.allProduct.map((product) => ({
+                name: product.foodItemId?.foodname || "N/A",
+                type: product.foodItemId?.foodcategory?.toLowerCase() || "veg",
+                quantity: product.quantity,
+              })),
+              packerName: order.packername || "DailyDish Employee",
+              ratingOnOrder: order.ratings?.order?.rating || 0,
+              ratingOnDelivery: order.ratings?.delivery?.rating || 0,
+              commentOnOrder: order.ratings?.order?.comment || "",
+              commentOnDelivery: order.ratings?.delivery?.comment || "",
+              total: order.allTotal + order.discountWallet,
+              eta: order.slot,
+            };
+          })
           .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         // ADD THIS BLOCK TO SET THE INITIAL RATINGS
@@ -186,7 +225,7 @@ function OrderHistory() {
           <div className="headerRight">
             <div className="statusContainer">
               <div className="statusBadge">
-                {order.status !== "Ongoing" ? (
+                {order.status === "Delivered" ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="17"
@@ -220,7 +259,7 @@ function OrderHistory() {
                 {order.status}
               </div>
             </div>
-            {order.status === "Ongoing" ? (
+            {order.status === "Ongoing" && (
               <button
                 className="trackingOrder"
                 onClick={() => {
@@ -230,15 +269,6 @@ function OrderHistory() {
               >
                 Track Order
               </button>
-            ) : (
-              <>
-                <div className="dilvered">
-                  {moment(order.date).format("DD MMM YYYY")}
-                </div>
-                <div className="dilvered">
-                  {moment(order.date).format("hh:mm A")}
-                </div>
-              </>
             )}
           </div>
         </div>
