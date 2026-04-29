@@ -70,7 +70,9 @@ const Category = () => {
   const [AddCategory, setAddCategory] = useState([]);
   const getAddCategory = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getcategory");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getcategory",
+      );
       if (res.status === 200) {
         setAddCategory(res.data.getcategory);
         setNoChangeData(res.data.getcategory);

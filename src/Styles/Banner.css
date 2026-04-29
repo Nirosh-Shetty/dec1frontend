@@ -1,13 +1,13 @@
 .mobile-banner {
   display: block;
-  width: 30%;
+  width: 32%;
 }
 .mobile-banner-updated {
   display: block;
   position: sticky;
   top: 0;
   z-index: 100;
-  width: 30%;
+  width: 32%;
 }
 
 .ban-container {
@@ -147,10 +147,10 @@
 
 .select-location-text {
   font-family: Inter;
-  font-size: 20px; /* Mobile font size applied to desktop */
+  font-size: 20px;
   font-style: normal;
   font-weight: 500;
-  line-height: 25px; /* 125% */
+  line-height: 25px;
   letter-spacing: -0.8px;
   color: #f8f6f0;
   margin: 0;
@@ -159,7 +159,6 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  max-width: 250px;
 }
 
 .select-location-text-small {
@@ -619,7 +618,8 @@ input[type="number"] {
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
     gap: 12px;
     /* margin-bottom: 10px; */
-    height: 70px;
+    height: auto;
+    min-height: 60px;
   }
 
   .mobile-user-screen2 {
@@ -885,19 +885,18 @@ input[type="number"] {
   /* Additional responsive adjustments for very small screens */
   @media screen and (max-width: 480px) {
     .screen-2 {
-      /* padding: 8px 12px 16px 12px; */
-      gap: 24px;
+      gap: 8px;
+    }
+
+    .screen-3 {
+      padding: 0 12px 8px 12px !important;
+      gap: 0px;
     }
 
     .clock-text {
       font-size: 15px;
       color: #fafafa;
       margin-top: 4px;
-    }
-    .screen-3 {
-      /* padding: 8px 12px 16px 12px; */
-      gap: 0px;
-      /* margin-bottom: 10px; */
     }
     .profile-icon-container {
       min-width: 40px;
@@ -915,15 +914,13 @@ input[type="number"] {
     }
 
     .select-location-text {
-      font-size: 16px;
-      /* max-width: 100px !important; */
+      font-size: 15px;
     }
     .locationselector {
       height: 40px;
       display: flex;
       padding: 8px 12px;
       align-items: center;
-      /* gap: 4px; */
       flex-shrink: 1;
       min-width: 0;
       width: 95%;
@@ -1166,16 +1163,13 @@ input[type="number"] {
     text-overflow: ellipsis;
     white-space: nowrap;
     display: block;
+    max-width: 100%;
+    font-size: 14px !important;
   }
 
-  /* LOGIN button present */
-  .select-location-text.with-login-btn {
-    max-width: 145px;
-  }
-
-  /* User icon present */
-  .select-location-text.with-user-icon {
-    max-width: 195px;
+  .banner-address-line {
+    font-size: 18px !important;
+    line-height: 20px !important;
   }
 }
 
@@ -1266,8 +1260,8 @@ input[type="number"] {
 }
 
 @media screen and (max-width: 360px) {
-  .select-location-text.with-login-btn {
-    max-width: 118px;
+  .select-location-text {
+    font-size: 13px !important;
   }
 }
 
@@ -1632,8 +1626,8 @@ input[type="number"] {
     height: 20px !important;
   }
 
-  .referbtn img {
+  /* .referbtn img {
     width: 50px;
     height: 50px;
-  }
+  } */
 }

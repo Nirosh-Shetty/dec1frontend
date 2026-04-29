@@ -242,7 +242,6 @@ function App() {
             element={
               <>
                 <MyPlan />
-                <Footer />
               </>
             }
           />
@@ -251,7 +250,6 @@ function App() {
             element={
               <>
                 <CheckoutMultiple />
-                <Footer />
               </>
             }
           />

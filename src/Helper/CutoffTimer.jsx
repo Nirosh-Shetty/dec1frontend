@@ -1,43 +1,75 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Clock } from "lucide-react";
-import icon from "./../assets/Icon-1.png";
 
-export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
+export default function CutoffStatusCard({
+  cutoffValidation,
+  userStatus,
+  currentSelectedDate,
+  cutoffLoading,
+}) {
   const [timeLeft, setTimeLeft] = useState("");
-  const [displayInfo, setDisplayInfo] = useState(null);
   const intervalRef = useRef(null);
-  const prevValidationRef = useRef(null);
 
   const isEmployee = userStatus === "Employee";
-
-  // Get order mode from cutoffValidation
   const orderMode = cutoffValidation?.orderMode || "preorder";
 
   const formatTimeLeft = useCallback((milliseconds) => {
     if (milliseconds <= 0) return "Cutoff passed";
-
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m left`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds}s left`;
-    } else {
-      return `${seconds}s left`;
-    }
+    if (hours > 0) return `${hours}h ${minutes}m left`;
+    if (minutes > 0) return `${minutes}m ${seconds}s left`;
+    return `${seconds}s left`;
   }, []);
 
-  const calculateDisplayInfo = useCallback(() => {
+  // Stable cutoff timestamp — only changes when the actual cutoff time value changes
+  const cutoffTimestamp = cutoffValidation?.cutoffDateTime
+    ? new Date(cutoffValidation.cutoffDateTime).getTime()
+    : null;
+
+  // Derive allowed from the cutoffDateTime directly so stale API `allowed` flags
+  // don't bleed across session switches (e.g. Breakfast closed ≠ Dinner closed).
+  const isActuallyAllowed = useMemo(() => {
+    if (!cutoffValidation?.cutoffDateTime)
+      return cutoffValidation?.allowed ?? true;
+    const now = new Date();
+    const cutoff = new Date(cutoffValidation.cutoffDateTime);
+
+    const calculated = now < cutoff;
+
+    console.log("[CutoffTimer] Checking cutoff:", {
+      now: now.toISOString(),
+      cutoff: cutoff.toISOString(),
+      nowTime: now.getTime(),
+      cutoffTime: cutoff.getTime(),
+      diff: cutoff.getTime() - now.getTime(),
+      diffMinutes: (cutoff.getTime() - now.getTime()) / (1000 * 60),
+      calculated,
+      apiAllowed: cutoffValidation?.allowed,
+    });
+
+    // If API says allowed but our calculation says not allowed, trust the API
+    // (this handles cases where the backend has special logic we don't know about)
+    if (cutoffValidation.allowed === true && !calculated) {
+      console.warn(
+        "[CutoffTimer] API says allowed but cutoff passed — trusting API",
+      );
+      return true;
+    }
+
+    // If cutoff is in the future → allowed; if in the past → not allowed
+    return calculated;
+  }, [cutoffTimestamp, cutoffValidation?.allowed]);
+
+  // Memoize display info so it only recalculates when cutoff time or selected date actually changes
+  const displayInfo = useMemo(() => {
     if (!cutoffValidation?.cutoffDateTime) return null;
 
     const cutoffDate = new Date(cutoffValidation.cutoffDateTime);
-    const now = new Date();
-
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const months = [
       "Jan",
@@ -54,145 +86,205 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
       "Dec",
     ];
 
+    const getDeliveryDateLabel = () => {
+      if (!currentSelectedDate) {
+        if (isEmployee || orderMode === "instant") return { isToday: true };
+        return { isToday: false };
+      }
+      const todayLocal = new Date();
+      const todayStr = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, "0")}-${String(todayLocal.getDate()).padStart(2, "0")}`;
+      const selStr =
+        typeof currentSelectedDate === "string"
+          ? currentSelectedDate.slice(0, 10)
+          : `${new Date(currentSelectedDate).getFullYear()}-${String(new Date(currentSelectedDate).getMonth() + 1).padStart(2, "0")}-${String(new Date(currentSelectedDate).getDate()).padStart(2, "0")}`;
+      const [y, m, d] = selStr.split("-").map(Number);
+      const selDate = new Date(y, m - 1, d);
+      return { isToday: todayStr === selStr, date: selDate };
+    };
+
+    const { isToday, date: deliveryDateObj } = getDeliveryDateLabel();
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const isSameDay = (a, b) =>
+      a.getDate() === b.getDate() &&
+      a.getMonth() === b.getMonth() &&
+      a.getFullYear() === b.getFullYear();
+
+    const getRelativeLabel = (date) => {
+      const dateLabel = `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
+      if (isSameDay(date, today)) return `Today, ${dateLabel}`;
+      if (isSameDay(date, tomorrow)) return `Tomorrow, ${dateLabel}`;
+      return dateLabel;
+    };
+
+    // Use locally-derived allowed so stale API flags don't cause wrong display
+    const allowed = isActuallyAllowed;
+    const effectiveDeliveryDateObj =
+      !allowed && isToday ? tomorrow : deliveryDateObj;
+
     let displayDate;
-    let displayDay;
     let orderingText;
-    let orderModeText = "";
-    let freshTitle = "";
-    let freshDescription = "";
 
     if (isEmployee) {
-      // Employee: Always show today's date
-      displayDate = new Date();
-      displayDay = days[displayDate.getDay()];
-      orderingText = "You're ordering for today";
-      freshTitle = "⚡ Fresh ingredients sourced today";
-      freshDescription = "Same-day ordering available for employees.";
+      displayDate = effectiveDeliveryDateObj || today;
+      orderingText = `You're ordering for ${getRelativeLabel(displayDate)}`;
+    } else if (orderMode === "instant") {
+      displayDate = effectiveDeliveryDateObj || today;
+      orderingText = `You're ordering for ${getRelativeLabel(displayDate)}`;
     } else {
-      // Normal User: Depends on orderMode
-      if (orderMode === "instant") {
-        // Instant mode: Show today's date
-        displayDate = new Date();
-        displayDay = days[displayDate.getDay()];
-        orderingText = "You're ordering for today";
-        orderModeText = "⚡ Instant";
-        freshTitle = "⚡ Fresh ingredients sourced today";
-        freshDescription =
-          "We prepare your meal with fresh ingredients for same-day delivery.";
-      } else {
-        // Preorder mode: Show tomorrow's date
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        displayDate = tomorrow;
-        displayDay = days[displayDate.getDay()];
-        orderingText = "You're ordering for tomorrow";
-        orderModeText = "📋 Preorder";
-        freshTitle = "Sourced fresh at 5 AM tomorrow";
-        freshDescription =
-          "We buy ingredients only after you order — nothing sits in storage overnight.";
-      }
+      displayDate = effectiveDeliveryDateObj || tomorrow;
+      orderingText = `You're ordering for ${getRelativeLabel(displayDate)}`;
     }
 
-    const dateStr = `${displayDate.getDate()} ${months[displayDate.getMonth()]}`;
+    return { orderingText, cutoffDate, allowed };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    cutoffTimestamp,
+    isActuallyAllowed,
+    isEmployee,
+    orderMode,
+    currentSelectedDate,
+  ]);
 
-    // Determine if allowed
-    const allowed = cutoffValidation?.allowed;
-
-    return {
-      orderingText,
-      dateStr,
-      displayDay,
-      cutoffDate,
-      orderMode,
-      orderModeText,
-      isEmployee,
-      allowed,
-      freshTitle,
-      freshDescription,
-    };
-  }, [isEmployee, cutoffValidation, orderMode]);
-
-  useEffect(() => {
-    if (cutoffValidation !== prevValidationRef.current) {
-      prevValidationRef.current = cutoffValidation;
-      const newDisplayInfo = calculateDisplayInfo();
-      setDisplayInfo(newDisplayInfo);
-
-      // Debug log
-      console.log("CutoffStatusCard updated:", {
-        isEmployee,
-        orderMode,
-        allowed: cutoffValidation?.allowed,
-        displayInfo: newDisplayInfo,
-      });
-    }
-  }, [cutoffValidation, calculateDisplayInfo, isEmployee, orderMode]);
-
+  // Countdown interval — restarts when cutoff time changes
   useEffect(() => {
     if (!displayInfo?.cutoffDate) return;
-
     const updateTimer = () => {
       const now = new Date();
       const msLeft = displayInfo.cutoffDate - now;
       setTimeLeft(formatTimeLeft(msLeft));
     };
-
     updateTimer();
     intervalRef.current = setInterval(updateTimer, 1000);
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [displayInfo, formatTimeLeft]);
+  }, [displayInfo?.cutoffDate, formatTimeLeft]);
 
-  if (!displayInfo) {
-    // Only show loading if cutoffValidation hasn't arrived yet
-    if (cutoffValidation === null || cutoffValidation === undefined) {
-      return (
-        <div className="cutoff-status-main-card">
-          <div className="cutoff-status-card">
-            <div className="cutoff-inner">
-              <div className="cutoff-info-group">
-                <div className="clock-icon">
-                  <Clock size={20} />
-                </div>
-                <span
-                  className="cutoff-message text-center"
-                  style={{ color: "#6b8e23" }}
-                >
-                  Loading availability...
-                </span>
-              </div>
+  // Show skeleton while loading or before first data arrives
+  const showSkeleton =
+    cutoffLoading ||
+    (!displayInfo &&
+      (cutoffValidation === null || cutoffValidation === undefined));
+
+  if (showSkeleton) {
+    return (
+      <div className="cutoff-status-main-card">
+        <div className="cutoff-status-card cutoff-skeleton">
+          <div className="cutoff-inner">
+            <div className="cutoff-info-group">
+              <div className="skeleton-circle" />
+              <div className="skeleton-bar skeleton-bar-long" />
             </div>
+            <div className="skeleton-pill" />
           </div>
+          <style jsx>{`
+            .cutoff-status-main-card {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: "Inter", sans-serif;
+            }
+            .cutoff-status-card {
+              max-width: 655px;
+              width: 100%;
+              background: #e6b800;
+              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+              overflow: hidden;
+            }
+            .cutoff-inner {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 12px 20px;
+              width: 100%;
+              gap: 16px;
+            }
+            .cutoff-info-group {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              flex: 1;
+            }
+            @keyframes shimmer {
+              0% {
+                background-position: -400px 0;
+              }
+              100% {
+                background-position: 400px 0;
+              }
+            }
+            .skeleton-circle {
+              width: 22px;
+              height: 22px;
+              border-radius: 50%;
+              background: linear-gradient(
+                90deg,
+                rgba(139, 69, 19, 0.15) 25%,
+                rgba(139, 69, 19, 0.3) 50%,
+                rgba(139, 69, 19, 0.15) 75%
+              );
+              background-size: 400px 100%;
+              animation: shimmer 1.4s infinite linear;
+              flex-shrink: 0;
+            }
+            .skeleton-bar {
+              height: 14px;
+              border-radius: 6px;
+              background: linear-gradient(
+                90deg,
+                rgba(139, 69, 19, 0.15) 25%,
+                rgba(139, 69, 19, 0.3) 50%,
+                rgba(139, 69, 19, 0.15) 75%
+              );
+              background-size: 400px 100%;
+              animation: shimmer 1.4s infinite linear;
+            }
+            .skeleton-bar-long {
+              width: 180px;
+            }
+            .skeleton-pill {
+              width: 90px;
+              height: 32px;
+              border-radius: 40px;
+              background: linear-gradient(
+                90deg,
+                rgba(253, 242, 208, 0.6) 25%,
+                rgba(253, 242, 208, 1) 50%,
+                rgba(253, 242, 208, 0.6) 75%
+              );
+              background-size: 400px 100%;
+              animation: shimmer 1.4s infinite linear;
+              flex-shrink: 0;
+            }
+            @media (max-width: 480px) {
+              .cutoff-inner {
+                padding: 12px 30px;
+              }
+              .skeleton-bar-long {
+                width: 130px;
+              }
+              .skeleton-pill {
+                width: 72px;
+                height: 28px;
+              }
+            }
+          `}</style>
         </div>
-      );
-    }
-    // No menu or no cutoff data — render nothing
-    return null;
+      </div>
+    );
   }
 
-  const {
-    orderingText,
-    dateStr,
-    displayDay,
-    orderModeText,
-    isEmployee: isEmp,
-    allowed,
-    freshTitle,
-    freshDescription,
-  } = displayInfo;
+  if (!displayInfo) return null;
 
-  // Determine display message based on allowed status
-  const displayMessage = !allowed ? (
+  const { orderingText, allowed } = displayInfo;
+  const isCutoffPassed = !allowed || timeLeft === "Cutoff passed";
+  const displayMessage = isCutoffPassed ? (
     <>❌ Orders closed</>
   ) : (
-    <>
-      {orderingText} • {displayDay} {dateStr}
-      {/* {!isEmp && orderModeText && (
-        <span className="order-mode-badge">{orderModeText}</span>
-      )} */}
-    </>
+    <>{orderingText}</>
   );
 
   return (
@@ -203,26 +295,14 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             <div className="clock-icon">
               <Clock size={20} />
             </div>
-            <span className="cutoff-message">{displayMessage}</span>
+            <div className="cutoff-text-group">
+              <span className="cutoff-message">{displayMessage}</span>
+            </div>
           </div>
-
           <div className="time-left-pill">
-            {!allowed ? "Cutoff passed" : timeLeft || "Loading..."}
+            {isCutoffPassed ? "Cutoff passed" : timeLeft || "..."}
           </div>
         </div>
-
-        {/* Fresh ingredients section - Centered with fixed height */}
-        {/* <div className="fresh-ingredients-section">
-          <div className="fresh-ingredients-content">
-            <div className="fresh-icon-wrapper">
-              <img src={icon} alt="Fresh icon" className="fresh-icon" />
-            </div>
-            <div className="fresh-text">
-              <span className="fresh-title">{freshTitle}</span>
-              <span className="fresh-description">{freshDescription}</span>
-            </div>
-          </div>
-        </div> */}
 
         <style jsx>{`
           .cutoff-status-main-card {
@@ -231,9 +311,8 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             justify-content: center;
             font-family: "Inter", sans-serif;
           }
-
           .cutoff-status-card {
-            max-width: 613px;
+            max-width: 655px;
             width: 100%;
             background: #e6b800;
             border-top-left-radius: 0;
@@ -241,7 +320,6 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             overflow: hidden;
           }
-
           .cutoff-inner {
             display: flex;
             align-items: center;
@@ -250,7 +328,6 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             width: 100%;
             gap: 16px;
           }
-
           .cutoff-info-group {
             display: flex;
             align-items: center;
@@ -258,7 +335,6 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             flex: 1;
             min-width: 0;
           }
-
           .clock-icon {
             flex-shrink: 0;
             display: inline-flex;
@@ -266,7 +342,6 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             justify-content: center;
             color: #8b4513;
           }
-
           .cutoff-message {
             font-size: 14px;
             font-weight: 500;
@@ -277,16 +352,13 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
             text-overflow: ellipsis;
             letter-spacing: -0.2px;
           }
-
-          .order-mode-badge {
-            margin-left: 8px;
-            font-size: 12px;
-            opacity: 0.9;
-            font-weight: 500;
+          .cutoff-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
           }
-
           .time-left-pill {
-            background: rgba(139, 69, 19, 0.15);
             border-radius: 40px;
             padding: 6px 16px;
             font-weight: 600;
@@ -299,143 +371,21 @@ export default function CutoffStatusCard({ cutoffValidation, userStatus }) {
               inset 0 1px 1px rgba(255, 255, 255, 0.3),
               0 1px 2px rgba(0, 0, 0, 0.05);
           }
-
-          /* Fresh ingredients section - Fixed height 147.5px */
-          .fresh-ingredients-section {
-            background-color: #3d6701;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 147.5px;
-          }
-
-          .fresh-ingredients-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            max-width: 100%;
-          }
-
-          /* Icon wrapper matching Figma design */
-          .fresh-icon-wrapper {
-            width: 50px;
-            height: 50px;
-            background-color: #54811f;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-          }
-
-          .fresh-icon {
-            width: 34px;
-            height: 36px;
-            object-fit: contain;
-            display: block;
-          }
-
-          .fresh-text {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-          }
-
-          .fresh-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffffff;
-            letter-spacing: -0.2px;
-            line-height: 1.3;
-          }
-
-          .fresh-description {
-            font-size: 14px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.4;
-            letter-spacing: -0.1px;
-          }
-
-          /* Mobile responsive */
           @media (max-width: 480px) {
             .cutoff-inner {
-              flex-wrap: wrap;
-              padding: 12px 16px;
+              padding: 12px 30px;
               gap: 10px;
             }
-
             .cutoff-info-group {
               min-width: calc(100% - 80px);
             }
-
             .cutoff-message {
               white-space: normal;
               font-size: 13px;
             }
-
             .time-left-pill {
               font-size: 12px;
               padding: 4px 12px;
-            }
-
-            .fresh-ingredients-section {
-              padding: 14px 16px;
-              height: auto;
-              min-height: 147.5px;
-            }
-
-            .fresh-ingredients-content {
-              gap: 12px;
-            }
-
-            .fresh-icon-wrapper {
-              width: 44px;
-              height: 44px;
-            }
-
-            .fresh-icon {
-              width: 30px;
-              height: 32px;
-            }
-
-            .fresh-title {
-              font-size: 16px;
-            }
-
-            .fresh-description {
-              font-size: 13px;
-            }
-          }
-
-          @media (max-width: 380px) {
-            .fresh-ingredients-content {
-              gap: 10px;
-            }
-
-            .fresh-icon-wrapper {
-              width: 40px;
-              height: 40px;
-            }
-
-            .fresh-icon {
-              width: 26px;
-              height: 28px;
-            }
-
-            .fresh-text {
-              gap: 2px;
-            }
-
-            .fresh-title {
-              font-size: 14px;
-            }
-
-            .fresh-description {
-              font-size: 11px;
             }
           }
         `}</style>

@@ -154,7 +154,9 @@ const Checkout = () => {
 
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getapartment");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
+      );
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
         // console.log("apartmentdata", res.data);
@@ -167,7 +169,9 @@ const Checkout = () => {
   const [corporatedata, setcorporatedata] = useState([]);
   const getCorporatedata = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getcorporate");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
+      );
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
         // console.log("corporatedata", res.data);
@@ -496,14 +500,17 @@ const Checkout = () => {
   useEffect(() => {
     const addonedCarts = async () => {
       try {
-        let res = await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
-          userId: user?._id,
-          items: Carts,
-          lastUpdated: Date.now(),
-          username: address?.name,
-          mobile: user?.Mobile,
-          companId: user?.companyId,
-        });
+        let res = await axios.post(
+          "https://dd-backend-3nm0.onrender.com/api/cart/addCart",
+          {
+            userId: user?._id,
+            items: Carts,
+            lastUpdated: Date.now(),
+            username: address?.name,
+            mobile: user?.Mobile,
+            companId: user?.companyId,
+          },
+        );
         if (res.status === 200) {
           setAdCartId(res.data);
         }
@@ -584,15 +591,18 @@ const Checkout = () => {
     location,
   ) => {
     try {
-      await axios.post("https://dd-backend-3nm0.onrender.com/api/admin/createreports", {
-        customerName,
-        phone,
-        totalOrders,
-        product,
-        cartValue,
-        offerPrice,
-        location,
-      });
+      await axios.post(
+        "https://dd-backend-3nm0.onrender.com/api/admin/createreports",
+        {
+          customerName,
+          phone,
+          totalOrders,
+          product,
+          cartValue,
+          offerPrice,
+          location,
+        },
+      );
     } catch (error) {
       console.log(error);
     }
@@ -1378,16 +1388,19 @@ const Checkout = () => {
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      await axios.post(`https://dd-backend-3nm0.onrender.com/api/user/addressadd`, {
-        Name: name,
-        Number: mobilenumber,
-        userId: user?._id,
-        ApartmentName: data?.apartmentname,
-        addresstype: addresstype,
-        addressid: data?._id,
-        fletNumber: flat,
-        towerName: towerName,
-      });
+      await axios.post(
+        `https://dd-backend-3nm0.onrender.com/api/user/addressadd`,
+        {
+          Name: name,
+          Number: mobilenumber,
+          userId: user?._id,
+          ApartmentName: data?.apartmentname,
+          addresstype: addresstype,
+          addressid: data?._id,
+          fletNumber: flat,
+          towerName: towerName,
+        },
+      );
     } catch (error) {
       console.log(error);
     }
@@ -1578,7 +1591,9 @@ const Checkout = () => {
   const [gstlist, setGstList] = useState([]);
   const getGst = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getgst");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getgst",
+      );
       if (res.status === 200) {
         setGstList(res.data.gst);
       }

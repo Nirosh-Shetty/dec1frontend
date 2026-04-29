@@ -1200,7 +1200,8 @@ import axios from "axios";
 // 2. Define ALL your API URLs
 const SAVE_API_URL = "https://dd-backend-3nm0.onrender.com/api/admin/hub-menu"; // This is for SAVING (from our plan)
 const HUBS_API = "https://dd-backend-3nm0.onrender.com/api/Hub/hubs"; // This is your live API
-const PRODUCTS_API = "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems"; // This is your live API
+const PRODUCTS_API =
+  "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems"; // This is your live API
 
 const MenuUpload = () => {
   const navigate = useNavigate();

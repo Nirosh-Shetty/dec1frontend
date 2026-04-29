@@ -2848,7 +2848,9 @@ const AdminPlanDashboard = () => {
 
   const getHubs = useCallback(async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
+      );
       setHubs(res.data);
     } catch (error) {
       console.error("Failed to fetch hubs:", error);

@@ -131,7 +131,9 @@ const AdminOrderAssignment = () => {
   const fetchRiders = useCallback(async () => {
     try {
       setIsRidersLoading(true);
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/riders");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/riders",
+      );
       if (Array.isArray(res.data?.riders)) {
         setAvailableRiders(res.data.riders);
       } else {
@@ -152,7 +154,9 @@ const AdminOrderAssignment = () => {
   // POLYGON FUNCTIONS - NEW
   const loadZones = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getZones");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getZones",
+      );
       if (Array.isArray(res.data)) {
         // Map backend zones to frontend format (ensure id field exists)
         const formattedZones = res.data.map((zone) => ({

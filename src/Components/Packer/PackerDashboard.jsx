@@ -6534,7 +6534,9 @@ const DashboardPage = () => {
   const [ApartmentOrder, setApartmentOrder] = useState([]);
   const getApartmentOrder = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getallorders");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getallorders",
+      );
       if (res.status === 200) {
         setApartmentOrder(res.data.order.reverse());
       }
@@ -6636,7 +6638,9 @@ const DashboardPage = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
+      );
       const allHubs = res.data;
 
       // Filter hubs based on packer's assigned hubs
@@ -6833,7 +6837,9 @@ const DashboardPage = () => {
 
   const getBegs = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getbags");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getbags",
+      );
       if (res.status == 200) {
         setAllBags(res.data.bags);
       }

@@ -40,7 +40,9 @@ const WebStory = () => {
   const getAddWebstory = async () => {
     try {
       setIsDataLoading(true);
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getstories");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getstories",
+      );
       if (res.status === 200) {
         setAddWebstory(res.data.getbanner.reverse());
       }

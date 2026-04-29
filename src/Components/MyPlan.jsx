@@ -98,7 +98,9 @@ const MyPlan = () => {
 
   const getDeliveryRates = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/deliveryrate/all",
+      );
       console.log("Delivery rates:", res.data.data);
       setDeliveryCharge(res.data.data);
       setFilteredRates(res.data.data);
@@ -152,7 +154,54 @@ const MyPlan = () => {
       .toLocaleString("en-US", { weekday: "short" })
       .toUpperCase();
   };
+    const [loading, setLoading] = useState(false);
 
+ const handleSkipOrCancel = async (planId, userId) => {
+      try {
+        setLoading(true);
+        await axios.post("https://dd-backend-3nm0.onrender.com/api/user/plan/skip-cancel", {
+          planId,
+          userId,
+        });
+
+        Swal2.fire({
+          toast: true,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          html: `
+            <div class="myplans-toast-content">
+              <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+              <div class="myplans-toast-text">
+                <div class="myplans-toast-title">Plan skipped.</div>
+                <div class="myplans-toast-subtitle">Removing from your upcoming list</div>
+              </div>
+            </div>
+          `,
+          customClass: {
+            popup: "myplans-custom-toast",
+            htmlContainer: "myplans-toast-html",
+          },
+          didOpen: () => {
+            const toast = document.querySelector(".myplans-custom-toast");
+            if (toast) {
+              toast.style.bottom = "90px";
+              toast.style.left = "50%";
+              toast.style.transform = "translateX(-50%)";
+              toast.style.position = "fixed";
+            }
+          },
+        });
+
+        onPlanUpdated && onPlanUpdated();
+        onClose();
+      } catch (err) {
+        alert(err?.response?.data?.error || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
   // const ViewPlanModal = ({
   //   isOpen,
   //   onClose,
@@ -1214,8 +1263,6 @@ const MyPlan = () => {
     window.scrollTo(0, 0);
   }, []);
 
-
-
   const handleViewPlan = (plan) => {
     setSelectedPlan(plan);
     setIsModalOpen(true);
@@ -1426,15 +1473,16 @@ const MyPlan = () => {
         <div className="mobile-banner-updated">
           <div
             className="screen-checkout mb-2 checkout-header d-flex align-items-center justify-content-between"
-            style={{ gap: "24px",flexDirection:"row" }}
+            style={{ gap: "24px", flexDirection: "row" }}
           >
-            <div 
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              justifyContent: "center",
-            }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                justifyContent: "center",
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="36"
@@ -1449,7 +1497,7 @@ const MyPlan = () => {
                   fill="#FAFAFA"
                 />
               </svg>
-            {/* <div
+              {/* <div
               className=""
               style={{ display: "flex", alignItems: "center", gap: 3 }}
             > */}
@@ -1466,7 +1514,7 @@ const MyPlan = () => {
                   cursor: "pointer",
                 }}
               /> */}
-            {/* </div> */}
+              {/* </div> */}
             </div>
             <div
               onClick={() => navigate("/orders")}
@@ -1563,128 +1611,292 @@ const MyPlan = () => {
                   return (
                     <div key={plan._id} className="plan-card-section">
                       <div className="plan-card-container">
-                        
                         {/* HEADER: Badge, Date, Price */}
                         <div className="plan-card-header">
                           <div className="plan-header-left">
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "0" }}>
-                              <span className={`plan-badge ${plan.deliveryDate && new Date(plan.deliveryDate).toDateString() === new Date().toDateString() ? 'today' : 'tomorrow'}`}>
-                                {plan.deliveryDate && new Date(plan.deliveryDate).toDateString() === new Date().toDateString() ? 'TODAY' : new Date(plan.deliveryDate) < new Date(Date.now() + 86400000) ? 'TOMORROW' : 'UPCOMING'}
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginBottom: "0",
+                              }}
+                            >
+                              <span
+                                className={`plan-badge ${plan.deliveryDate && new Date(plan.deliveryDate).toDateString() === new Date().toDateString() ? "today" : "tomorrow"}`}
+                              >
+                                {plan.deliveryDate &&
+                                new Date(plan.deliveryDate).toDateString() ===
+                                  new Date().toDateString()
+                                  ? "TODAY"
+                                  : new Date(plan.deliveryDate) <
+                                      new Date(Date.now() + 86400000)
+                                    ? "TOMORROW"
+                                    : "UPCOMING"}
                               </span>
                               <div className="plan-date-time">
-                                {new Date(plan.deliveryDate).toLocaleDateString("en-US", {
-                                  weekday: "short",
-                                  day: "numeric",
-                                  month: "short"
-                                })}
+                                {new Date(plan.deliveryDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    weekday: "short",
+                                    day: "numeric",
+                                    month: "short",
+                                  },
+                                )}
                               </div>
                             </div>
                           </div>
                           <div className="plan-header-right">
-                            <div className="plan-total-price">₹{plan.slotTotalAmount}</div>
+                            <div className="plan-total-price">
+                              ₹{plan.slotTotalAmount}
+                            </div>
                           </div>
                         </div>
 
                         {/* SESSION & TIME Row */}
                         <div className="plan-session-row">
                           <div className="plan-session-left">
-                            <div className="plan-session-title">{plan.session}</div>
+                            <div className="plan-session-title">
+                              {plan.session}
+                            </div>
                             <div className="plan-session-time">
-                              {plan.session === "Lunch" ? "12:00–1:00 PM" : plan.session === "Breakfast" ? "7:00–8:00 AM" : "7:00–8:00 PM"}
+                              {plan.session === "Lunch"
+                                ? "12:00–1:00 PM"
+                                : plan.session === "Breakfast"
+                                  ? "7:00–8:00 AM"
+                                  : "7:00–8:00 PM"}
                             </div>
                           </div>
-                          <div className={`plan-status-badge ${plan.status === 'Confirmed' ? 'confirmed' : plan.status === 'Pending Payment' ? 'pending' : plan.status === 'Cooking' ? 'cooking' : plan.status === 'Packed' || plan.status === 'Packing' ? 'packed' : plan.status === 'ontheway' || plan.status === 'On the way' ? 'ontheway' : plan.status === 'Delivered' ? 'delivered' : 'cancelled'}`} >
-                            {plan.status === 'Confirmed' ? '⏳ Confirmed' : plan.status === 'Pending Payment' ? '💳 Payment Pending' : plan.status === 'Cooking' ? '👨‍🍳 Being Prepared' : plan.status === 'Packing' ? '📦 Packing' : plan.status === 'Packed' ? '✓ Ready' : plan.status === 'ontheway' || plan.status === 'On the way' ? '🚚 On the Way' : plan.status === 'Delivered' ? '✓ Delivered' : plan.status === 'Cancelled' ? '✗ Cancelled' : '⊘ Skipped'}
+                          <div
+                            className={`plan-status-badge ${plan.status === "Confirmed" ? "confirmed" : plan.status === "Pending Payment" ? "pending" : plan.status === "Cooking" ? "cooking" : plan.status === "Packed" || plan.status === "Packing" ? "packed" : plan.status === "ontheway" || plan.status === "On the way" ? "ontheway" : plan.status === "Delivered" ? "delivered" : "cancelled"}`}
+                          >
+                            {plan.status === "Confirmed"
+                              ? "⏳ Confirmed"
+                              : plan.status === "Pending Payment"
+                                ? "💳 Payment Pending"
+                                : plan.status === "Cooking"
+                                  ? "👨‍🍳 Being Prepared"
+                                  : plan.status === "Packing"
+                                    ? "📦 Packing"
+                                    : plan.status === "Packed"
+                                      ? "✓ Ready"
+                                      : plan.status === "ontheway" ||
+                                          plan.status === "On the way"
+                                        ? "🚚 On the Way"
+                                        : plan.status === "Delivered"
+                                          ? "✓ Delivered"
+                                          : plan.status === "Cancelled"
+                                            ? "✗ Cancelled"
+                                            : "⊘ Skipped"}
                           </div>
                         </div>
 
                         {/* ITEMS LIST */}
                         <div className="plan-items-list">
                           {(plan.products || []).map((product, idx) => (
-                            <div key={product._id || idx} className="plan-item-line">
+                            <div
+                              key={product._id || idx}
+                              className="plan-item-line"
+                            >
                               <div className="plan-item-info">
-                                <img src={product.foodCategory==="Veg" ? IsVeg : IsNonVeg} className="plan-item-category" />
+                                <img
+                                  src={
+                                    product.foodCategory === "Veg"
+                                      ? IsVeg
+                                      : IsNonVeg
+                                  }
+                                  className="plan-item-category"
+                                />
                                 <span className="plan-item-food-name">
                                   {product.foodName}
-                                  {product.quantity > 1 && <span style={{ marginLeft: '4px' }}>×{product.quantity}</span>}
+                                  {product.quantity > 1 && (
+                                    <span style={{ marginLeft: "4px" }}>
+                                      ×{product.quantity}
+                                    </span>
+                                  )}
                                 </span>
                               </div>
-                              <div className="plan-item-cost">₹{product.totalPrice?.toFixed(0)}</div>
+                              <div className="plan-item-cost">
+                                ₹{product.totalPrice?.toFixed(0)}
+                              </div>
                             </div>
                           ))}
                         </div>
 
                         {/* DELIVERY ADDRESS - BEFORE FRESHNESS JOURNEY */}
                         <div className="plan-delivery-info">
-                            <img src={myplanlocation} className="plan-delivery-info-left"/>
-                            <div className="plan-delivery-info-right">
-                              <div className="delivery-location-label">
-                            DELIVERING TO
-                          </div>
-                          <div className="delivery-address-main">
-                            {plan.delivarylocation || ""}
-                          </div>
+                          <img
+                            src={myplanlocation}
+                            className="plan-delivery-info-left"
+                          />
+                          <div className="plan-delivery-info-right">
+                            <div className="delivery-location-label">
+                              DELIVERING TO
                             </div>
-                          
+                            <div className="delivery-address-main">
+                              {plan.delivarylocation || ""}
+                            </div>
+                          </div>
                         </div>
-
+<button onClick={()=>{
+  handleSkipOrCancel(plan._id, userId)
+}}>cancel</button>
                         {/* FRESHNESS JOURNEY - Only show for active orders (hide when Delivered, Cancelled, Skipped) */}
-                        {!(plan.status === "Delivered" || plan.status === "Cancelled" || plan.status === "Skipped") && (plan.status === "Confirmed" || plan.status === "Cooking" || plan.status === "Packing" || plan.status === "Packed" || plan.status === "ontheway" || plan.status === "On the way" || plan.status === "Pending Payment") && (
-                          <div className="plan-journey-section">
-                            <div className="journey-title">Order Tracker</div>
-                            <div className="journey-track">
-                              {/* Step 1: Order placed */}
-                              <div className="journey-point">
-                                <div className={`point-circle ${["Confirmed", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "done" : "pending"}`}>
-                                  {["Confirmed", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "✓" : "○"}
+                        {!(
+                          plan.status === "Delivered" ||
+                          plan.status === "Cancelled" ||
+                          plan.status === "Skipped"
+                        ) &&
+                          (plan.status === "Confirmed" ||
+                            plan.status === "Cooking" ||
+                            plan.status === "Packing" ||
+                            plan.status === "Packed" ||
+                            plan.status === "ontheway" ||
+                            plan.status === "On the way" ||
+                            plan.status === "Pending Payment") && (
+                            <div className="plan-journey-section">
+                              <div className="journey-title">Order Tracker</div>
+                              <div className="journey-track">
+                                {/* Step 1: Order placed */}
+                                <div className="journey-point">
+                                  <div
+                                    className={`point-circle ${["Confirmed", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "done" : "pending"}`}
+                                  >
+                                    {[
+                                      "Confirmed",
+                                      "Cooking",
+                                      "Packing",
+                                      "Packed",
+                                      "ontheway",
+                                      "On the way",
+                                      "Delivered",
+                                    ].includes(plan.status)
+                                      ? "✓"
+                                      : "○"}
+                                  </div>
+                                  <div className="point-label">
+                                    Order
+                                    <br />
+                                    placed
+                                  </div>
+                                  <div className="point-time">
+                                    {new Date(
+                                      plan.createdAt,
+                                    ).toLocaleTimeString("en-IN", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </div>
                                 </div>
-                                <div className="point-label">Order<br/>placed</div>
-                                <div className="point-time">{new Date(plan.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>
-                              </div>
 
-                              {/* Step 2: Cooking */}
-                              <div className="journey-point">
-                                <div className={`point-circle ${["Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Cooking" ? "active" : "done") : "pending"}`}>
-                                  {["Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Cooking" ? "●" : "✓") : "○"}
+                                {/* Step 2: Cooking */}
+                                <div className="journey-point">
+                                  <div
+                                    className={`point-circle ${["Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Cooking" ? "active" : "done") : "pending"}`}
+                                  >
+                                    {[
+                                      "Cooking",
+                                      "Packing",
+                                      "Packed",
+                                      "ontheway",
+                                      "On the way",
+                                      "Delivered",
+                                    ].includes(plan.status)
+                                      ? plan.status === "Cooking"
+                                        ? "●"
+                                        : "✓"
+                                      : "○"}
+                                  </div>
+                                  <div className="point-label">Cooking</div>
+                                  <div className="point-time">
+                                    {plan.status === "Cooking" ? "now" : ""}
+                                  </div>
                                 </div>
-                                <div className="point-label">Cooking</div>
-                                <div className="point-time">{plan.status === "Cooking" ? "now" : ""}</div>
-                              </div>
 
-                              {/* Step 3: Packed and out */}
-                              <div className="journey-point">
-                                <div className={`point-circle ${["Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Packed" || plan.status === "Packing" ? "active" : "done") : "pending"}`}>
-                                  {["Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Packed" || plan.status === "Packing" ? "●" : "✓") : "○"}
+                                {/* Step 3: Packed and out */}
+                                <div className="journey-point">
+                                  <div
+                                    className={`point-circle ${["Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Packed" || plan.status === "Packing" ? "active" : "done") : "pending"}`}
+                                  >
+                                    {[
+                                      "Packed",
+                                      "ontheway",
+                                      "On the way",
+                                      "Delivered",
+                                    ].includes(plan.status)
+                                      ? plan.status === "Packed" ||
+                                        plan.status === "Packing"
+                                        ? "●"
+                                        : "✓"
+                                      : "○"}
+                                  </div>
+                                  <div className="point-label">
+                                    Packed &<br />
+                                    out
+                                  </div>
+                                  <div className="point-time">
+                                    {plan.status === "Packed" ||
+                                    plan.status === "Packing"
+                                      ? "now"
+                                      : ""}
+                                  </div>
                                 </div>
-                                <div className="point-label">Packed &<br/>out</div>
-                                <div className="point-time">{plan.status === "Packed" || plan.status === "Packing" ? "now" : ""}</div>
-                              </div>
 
-                              {/* Step 4: On the way */}
-                              <div className="journey-point">
-                                <div className={`point-circle ${["ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "ontheway" || plan.status === "On the way" ? "active" : "done") : "pending"}`}>
-                                  {["ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "ontheway" || plan.status === "On the way" ? "●" : "✓") : "○"}
+                                {/* Step 4: On the way */}
+                                <div className="journey-point">
+                                  <div
+                                    className={`point-circle ${["ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "ontheway" || plan.status === "On the way" ? "active" : "done") : "pending"}`}
+                                  >
+                                    {[
+                                      "ontheway",
+                                      "On the way",
+                                      "Delivered",
+                                    ].includes(plan.status)
+                                      ? plan.status === "ontheway" ||
+                                        plan.status === "On the way"
+                                        ? "●"
+                                        : "✓"
+                                      : "○"}
+                                  </div>
+                                  <div className="point-label">
+                                    On the
+                                    <br />
+                                    way
+                                  </div>
+                                  <div className="point-time">
+                                    {plan.status === "ontheway" ||
+                                    plan.status === "On the way"
+                                      ? "now"
+                                      : ""}
+                                  </div>
                                 </div>
-                                <div className="point-label">On the<br/>way</div>
-                                <div className="point-time">{plan.status === "ontheway" || plan.status === "On the way" ? "now" : ""}</div>
-                              </div>
 
-                              {/* Step 5: At your door */}
-                              <div className="journey-point">
-                                <div className={`point-circle ${plan.status === "Delivered" ? "done" : "pending"}`}>
-                                  {plan.status === "Delivered" ? "✓" : "○"}
+                                {/* Step 5: At your door */}
+                                <div className="journey-point">
+                                  <div
+                                    className={`point-circle ${plan.status === "Delivered" ? "done" : "pending"}`}
+                                  >
+                                    {plan.status === "Delivered" ? "✓" : "○"}
+                                  </div>
+                                  <div className="point-label">
+                                    At your
+                                    <br />
+                                    door
+                                  </div>
+                                  <div className="point-time">
+                                    {plan.status === "Delivered"
+                                      ? "delivered"
+                                      : ""}
+                                  </div>
                                 </div>
-                                <div className="point-label">At your<br/>door</div>
-                                <div className="point-time">{plan.status === "Delivered" ? "delivered" : ""}</div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {/* ACTION BUTTONS - Only for pending plans */}
-                        {plan.status === 'Pending Payment' && (
+                        {plan.status === "Pending Payment" && (
                           <div className="plan-actions">
-                            <button 
+                            <button
                               className="plan-btn primary"
                               onClick={() => {
                                 setProcessingPlanId(plan._id);
@@ -1692,7 +1904,9 @@ const MyPlan = () => {
                               }}
                               disabled={processingPlanId === plan._id}
                             >
-                              {processingPlanId === plan._id ? 'Processing...' : 'Confirm & Pay'}
+                              {processingPlanId === plan._id
+                                ? "Processing..."
+                                : "Confirm & Pay"}
                             </button>
                           </div>
                         )}
@@ -1704,7 +1918,7 @@ const MyPlan = () => {
           </div>
         </div>
       </div>
-{/* 
+      {/* 
       <Modal
         show={showQuickAnswers}
         onHide={() => setShowQuickAnswers(false)}

@@ -102,7 +102,9 @@ const OfferForm = () => {
 
   const getOffers = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/offers");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/offers",
+      );
       if (res.status === 200) {
         setOffers(res.data.data);
       }
@@ -113,7 +115,9 @@ const OfferForm = () => {
 
   const getHubs = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
+      );
       if (res.status === 200) {
         setHubsData(res.data);
       }
@@ -272,15 +276,18 @@ const OfferForm = () => {
         getOffers();
         setEditingOffer(null);
       } else {
-        response = await axios.post("https://dd-backend-3nm0.onrender.com/api/admin/offers", {
-          products: formattedProducts,
-          startDate,
-          endDate,
-          hubId: selectedHubId,
-          hubName: selectedHub?.hubName,
-          session: session,
-          acquisition_channel,
-        });
+        response = await axios.post(
+          "https://dd-backend-3nm0.onrender.com/api/admin/offers",
+          {
+            products: formattedProducts,
+            startDate,
+            endDate,
+            hubId: selectedHubId,
+            hubName: selectedHub?.hubName,
+            session: session,
+            acquisition_channel,
+          },
+        );
         getOffers();
       }
       Swal.fire({
@@ -347,7 +354,9 @@ const OfferForm = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`https://dd-backend-3nm0.onrender.com/api/admin/offers/${offerId}`);
+        await axios.delete(
+          `https://dd-backend-3nm0.onrender.com/api/admin/offers/${offerId}`,
+        );
         getOffers();
         Swal.fire({
           title: "Deleted!",
@@ -505,6 +514,7 @@ const OfferForm = () => {
                   required
                 >
                   <option value="">Select Session</option>
+                  <option value="Breakfast">Breakfast</option>
                   <option value="Lunch">Lunch</option>
                   <option value="Dinner">Dinner</option>
                 </select>
@@ -806,7 +816,9 @@ const BannerForm = () => {
   const [viewingBanner, setViewingBanner] = useState(null);
   const getBanners = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/banners");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/banners",
+      );
       if (res.status === 200) {
         setExistingBanners(res.data.getbanner);
       }
@@ -893,9 +905,13 @@ const BannerForm = () => {
       } else {
         responses = await Promise.all(
           formDataArray.map((formData) =>
-            axios.post("https://dd-backend-3nm0.onrender.com/api/admin/banners", formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            }),
+            axios.post(
+              "https://dd-backend-3nm0.onrender.com/api/admin/banners",
+              formData,
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+              },
+            ),
           ),
         );
         getBanners();
@@ -1251,7 +1267,8 @@ const Reports = () => {
 
   const handleExport = async () => {
     try {
-      window.location.href = "https://dd-backend-3nm0.onrender.com/api/admin/reports/export";
+      window.location.href =
+        "https://dd-backend-3nm0.onrender.com/api/admin/reports/export";
       Swal.fire({
         title: "Success",
         text: "Exporting data as CSV...",

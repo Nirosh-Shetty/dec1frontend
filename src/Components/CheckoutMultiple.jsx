@@ -13,6 +13,7 @@ import IsNonVeg from "../assets/isVeg=no.svg";
 import "../Styles/Normal.css";
 import "../Styles/CheckoutMultiple.css";
 import { CircleCheck, ShieldAlert } from "lucide-react";
+import checkCircle from "../assets/check_circle.png";
 import cross from "../assets/cross.png";
 import LocationModal from "./LocationModal";
 import {
@@ -22,7 +23,32 @@ import {
   getCartSummary,
   clearCart,
   updateCartItemQty,
+  isSlotPastCutoff,
 } from "../Helper/cartHelper";
+
+const fireToast = ({ title, subtitle, icon = checkCircle }) => {
+  Swal2.fire({
+    toast: true,
+    position: "bottom",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    html: `<div class="myplans-toast-content"><img src="${icon}" alt="" class="myplans-toast-check" /><div class="myplans-toast-text"><div class="myplans-toast-title">${title}</div>${subtitle ? `<div class="myplans-toast-subtitle">${subtitle}</div>` : ""}</div></div>`,
+    customClass: {
+      popup: "myplans-custom-toast",
+      htmlContainer: "myplans-toast-html",
+    },
+    didOpen: () => {
+      const toast = document.querySelector(".myplans-custom-toast");
+      if (toast) {
+        toast.style.bottom = "60px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.position = "fixed";
+      }
+    },
+  });
+};
 
 const CheckoutMultiple = () => {
   const navigate = useNavigate();
@@ -158,6 +184,7 @@ const CheckoutMultiple = () => {
   const [loading, setLoading] = useState(false);
   const [gstRate, setGstRate] = useState(5); // Default GST rate
   const [deliveryRates, setDeliveryRates] = useState([]);
+  const [hubCutoffTimes, setHubCutoffTimes] = useState(null);
 
   // // Use the calculated totals from cartHelper
   // const subtotal = totals.total;
@@ -181,7 +208,9 @@ const CheckoutMultiple = () => {
         const res = await axios.get(
           `https://dd-backend-3nm0.onrender.com/api/deliveryrate/hub/${encodeURIComponent(addressHubId)}`,
         );
-        setDeliveryRates(Array.isArray(res.data?.data) ? res.data.data : []);
+        const rates = Array.isArray(res.data?.data) ? res.data.data : [];
+        setDeliveryRates(rates);
+        console.log("Delivery rates fetched:", rates);
       } catch (error) {
         console.error("Error fetching delivery rates by hub:", error);
         setDeliveryRates([]);
@@ -189,6 +218,25 @@ const CheckoutMultiple = () => {
     };
 
     fetchDeliveryRatesByHub();
+  }, [addressHubId]);
+
+  // Fetch hub cutoff times for checkout validation
+  useEffect(() => {
+    if (!addressHubId) return;
+    const fetchCutoffTimes = async () => {
+      try {
+        const res = await fetch(
+          `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${encodeURIComponent(addressHubId)}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setHubCutoffTimes(data.cutoffTimes || null);
+        }
+      } catch {
+        // silently fail — cutoff validation will be skipped if unavailable
+      }
+    };
+    fetchCutoffTimes();
   }, [addressHubId]);
 
   const roundAmount = (value) => Math.round((Number(value) || 0) * 100) / 100;
@@ -245,14 +293,37 @@ const CheckoutMultiple = () => {
   const fallbackDeliveryRate = Number(
     defaultAddress?.Delivarycharge ?? address?.Delivarycharge ?? 0,
   );
-  const deliveryChargePerSlot = roundAmount(
-    findDeliveryRate(
+
+  // Calculate delivery charge per slot - use delivery rate if available, otherwise use fallback or default 15
+  const deliveryChargePerSlot = useMemo(() => {
+    const rateFromApi = findDeliveryRate(
       deliveryRates,
       addressHubId,
       userAcquisitionChannel,
       userDeliveryStatus,
-    ) ?? fallbackDeliveryRate,
-  );
+    );
+
+    console.log("Calculating delivery charge:", {
+      rateFromApi,
+      fallbackDeliveryRate,
+      addressHubId,
+      deliveryRatesLength: deliveryRates.length,
+    });
+
+    // If we have a rate from API, use it
+    if (rateFromApi !== null) {
+      return roundAmount(rateFromApi);
+    }
+
+    // Otherwise use fallback from address or default to 15
+    return roundAmount(fallbackDeliveryRate || 15);
+  }, [
+    deliveryRates,
+    addressHubId,
+    userAcquisitionChannel,
+    userDeliveryStatus,
+    fallbackDeliveryRate,
+  ]);
   const totalDeliveryCharge = roundAmount(
     deliveryChargePerSlot * deliverySlotCount,
   );
@@ -273,15 +344,7 @@ const CheckoutMultiple = () => {
   const increaseQuantity = (itemdata) => {
     const currentQty = itemdata.quantity || 1;
     if (currentQty >= (itemdata.remainingstock || 99)) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: "Stock Alert",
-        text: "No more stock available!",
-        showConfirmButton: false,
-        timer: 3000,
-      });
+      fireToast({ title: "No more stock available!", icon: cross });
       return;
     }
 
@@ -326,27 +389,12 @@ const CheckoutMultiple = () => {
   const debouncedDecreaseQuantity = debounce(decreaseQuantity, 300);
 
   const applycoupon = async () => {
-    Swal2.fire({
-      toast: true,
-      position: "bottom",
-      icon: "info",
-      title: "Coming Soon",
-      text: "Coupon feature coming soon",
-      showConfirmButton: false,
-      timer: 3000,
-    });
+    fireToast({ title: "Coupon feature coming soon" });
   };
 
   const handleApplyWallet = (e) => {
     if (wallet?.balance === 0) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        text: "Wallet balance is 0",
-        showConfirmButton: false,
-        timer: 3000,
-      });
+      fireToast({ title: "Wallet balance is 0", icon: cross });
       e.target.checked = false;
       return;
     }
@@ -368,49 +416,104 @@ const CheckoutMultiple = () => {
 
   const handleCheckout = async () => {
     if (!user) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "error",
-        title: "Login Required",
-        text: "Please login first",
-        showConfirmButton: false,
-        timer: 3000,
-      });
+      fireToast({ title: "Please login first", icon: cross });
       return;
     }
 
     if (cartdata.length === 0) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: "Cart Alert",
-        text: "Please add items to cart",
-        showConfirmButton: false,
-        timer: 3000,
-      });
+      fireToast({ title: "Please add items to cart", icon: cross });
       return;
     }
 
     if (!defaultAddress) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: "Address Alert",
-        text: "Please add address",
-        showConfirmButton: false,
-        timer: 3000,
-      });
+      fireToast({ title: "Please add an address", icon: cross });
       return;
     }
 
     setLoading(true);
 
     try {
-      const payableAmount = totalPayable;
+      // Refresh wallet balance before checkout to avoid stale data causing "Insufficient wallet balance"
+      let effectiveWalletDiscount = discountWallet;
+      if (discountWallet > 0) {
+        try {
+          const freshWalletRes = await axios.get(
+            `https://dd-backend-3nm0.onrender.com/api/user/wallet/${user._id}`,
+          );
+          const freshBalance = freshWalletRes?.data?.data?.wallet?.balance || 0;
+          // Clamp to actual available balance
+          effectiveWalletDiscount = Math.min(discountWallet, freshBalance);
+          if (effectiveWalletDiscount !== discountWallet) {
+            setDiscountWallet(effectiveWalletDiscount);
+          }
+        } catch {
+          // If wallet fetch fails, proceed with existing value
+        }
+      }
+
+      const subtotalForPayable =
+        subtotal + Cutlery + totalDeliveryCharge - coupon;
+      const payableAmount = roundAmount(
+        Math.max(subtotalForPayable - effectiveWalletDiscount, 0),
+      );
       const totalAmount = Math.round(payableAmount * 100) / 100;
+
+      // Cutoff validation — check every cart slot before proceeding to payment
+      // Uses a 2:30 min grace window so users already mid-payment aren't blocked
+      if (hubCutoffTimes) {
+        const hubCutoffData = { cutoffTimes: hubCutoffTimes };
+        const GRACE_MS = 2.5 * 60 * 1000;
+        const nowWithGrace = new Date(Date.now() - GRACE_MS); // shift "now" back by 2:30
+        const expiredSlots = cartdata
+          .filter((item) => {
+            const dateStr =
+              typeof item.deliveryDate === "string"
+                ? item.deliveryDate.split("T")[0]
+                : item.deliveryDate instanceof Date
+                  ? `${item.deliveryDate.getFullYear()}-${String(item.deliveryDate.getMonth() + 1).padStart(2, "0")}-${String(item.deliveryDate.getDate()).padStart(2, "0")}`
+                  : null;
+            if (!dateStr || !item.session) return false;
+            return isSlotPastCutoff(
+              dateStr,
+              item.session,
+              hubCutoffData,
+              user?.status,
+              nowWithGrace,
+            );
+          })
+          .map((item) => ({
+            session: item.session,
+            deliveryDate:
+              typeof item.deliveryDate === "string"
+                ? item.deliveryDate.split("T")[0]
+                : item.deliveryDate,
+          }));
+
+        if (expiredSlots.length > 0) {
+          const slotList = [
+            ...new Map(
+              expiredSlots.map((s) => [`${s.deliveryDate}|${s.session}`, s]),
+            ).values(),
+          ];
+          const slotText = slotList
+            .map(
+              (s) =>
+                `• ${s.session.charAt(0).toUpperCase() + s.session.slice(1)} on ${s.deliveryDate}`,
+            )
+            .join("\n");
+
+          setLoading(false);
+          await Swal2.fire({
+            icon: "error",
+            title: "Ordering cutoff passed",
+            html: `<p style="margin-bottom:8px">You can no longer order for:</p><pre style="text-align:left;font-size:13px;background:#f8f8f8;padding:10px;border-radius:8px">${slotText}</pre><p style="font-size:13px;color:#666;margin-top:8px">Please remove these items from your cart and try again.</p>`,
+            confirmButtonText: "Go back to cart",
+            confirmButtonColor: "#6B8E23",
+          });
+          navigate(-1);
+          return;
+        }
+      }
       const enrichedCartItems = cartdata.map((item) => ({
         ...item,
         deliveryCharge: deliveryChargePerSlot,
@@ -425,29 +528,37 @@ const CheckoutMultiple = () => {
       }));
 
       console.log(enrichedCartItems, "cartitems.............");
-
-      const handleSuccessfulCheckout = async (txnId, paymentMethod = "razorpay") => {
+      console.log(payableAmount, "payable...............");
+      console.log("Delivery Charge Per Slot:", deliveryChargePerSlot);
+      console.log("Total Delivery Charge:", totalDeliveryCharge);
+      console.log("Delivery Slot Count:", deliverySlotCount);
+      console.log("Total Amount being sent to backend:", totalAmount);
+      const handleSuccessfulCheckout = async (
+        txnId,
+        paymentMethod = "razorpay",
+      ) => {
         localStorage.removeItem("cart");
         clearCart();
-        
-        // Refresh wallet balance from backend if wallet was used
+
+        // Fire wallet refresh in background — don't block navigation
         if (discountWallet && discountWallet > 0) {
-          await fetchWalletData();
+          fetchWalletData();
         }
 
         // Get first delivery slot info for params
         const firstItem = enrichedCartItems?.[0] || {};
-        const firstDeliveryDate = firstItem.deliveryDate || new Date().toISOString();
+        const firstDeliveryDate =
+          firstItem.deliveryDate || new Date().toISOString();
         const firstSession = firstItem.session || "Lunch";
 
-        // Navigate to success page with transaction details
+        // Navigate immediately to success page
         const successParams = new URLSearchParams({
           transactionId: txnId || "completed",
           userId: user._id,
           session: firstSession,
           deliveryDate: firstDeliveryDate,
           username: user.Fname || "User",
-          amount: totalPayable,
+          amount: payableAmount,
           orderId: txnId || "pending",
           hubName: defaultAddress?.hubName || "",
           delivarylocation: defaultAddress?.fullAddress || "",
@@ -456,7 +567,9 @@ const CheckoutMultiple = () => {
           deliveryCharge: deliveryChargePerSlot,
         });
 
-        navigate("/payment-success?" + successParams.toString(), { replace: true });
+        navigate("/payment-success?" + successParams.toString(), {
+          replace: true,
+        });
       };
 
       const confirmSkippedPaymentOrder = async (txnId) => {
@@ -485,7 +598,10 @@ const CheckoutMultiple = () => {
           userId: user._id,
           cartItems: enrichedCartItems,
           totalAmount,
-          discountWallet: Number(discountWallet || 0),
+          totalDeliveryCharge: Number(totalDeliveryCharge || 0),
+          deliveryChargePerSlot: Number(deliveryChargePerSlot || 0),
+          deliverySlotCount: Number(deliverySlotCount || 0),
+          discountWallet: Number(effectiveWalletDiscount || 0),
           addressId: defaultAddress._id,
           notes: {
             username: user.Fname,
@@ -507,6 +623,50 @@ const CheckoutMultiple = () => {
           amount: razorpayAmount,
         } = res.data;
 
+        console.log("Razorpay Amount from backend:", razorpayAmount);
+        console.log("Expected Total Amount:", totalAmount);
+        console.log("Difference:", razorpayAmount - totalAmount * 100);
+
+        // Validate that backend calculated the correct amount
+        const expectedRazorpayAmount = Math.round(totalAmount * 100);
+        if (Math.abs(razorpayAmount - expectedRazorpayAmount) > 1) {
+          console.error("⚠️ AMOUNT MISMATCH DETECTED!");
+          console.error(
+            "Expected:",
+            expectedRazorpayAmount,
+            "paise (₹" + totalAmount + ")",
+          );
+          console.error(
+            "Received:",
+            razorpayAmount,
+            "paise (₹" + razorpayAmount / 100 + ")",
+          );
+          console.error(
+            "Delivery charge may not be included in backend calculation!",
+          );
+
+          // Show warning to user
+          await Swal2.fire({
+            icon: "warning",
+            title: "Amount Mismatch",
+            html: `
+              <p>Expected amount: ₹${totalAmount.toFixed(2)}</p>
+              <p>Razorpay amount: ₹${(razorpayAmount / 100).toFixed(2)}</p>
+              <p>Difference: ₹${Math.abs(razorpayAmount / 100 - totalAmount).toFixed(2)}</p>
+              <p><strong>The backend may not be including delivery charges correctly.</strong></p>
+            `,
+            confirmButtonText: "Proceed Anyway",
+            showCancelButton: true,
+            cancelButtonText: "Cancel",
+          }).then((result) => {
+            if (!result.isConfirmed) {
+              throw new Error(
+                "Payment cancelled by user due to amount mismatch",
+              );
+            }
+          });
+        }
+
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.onload = () => {
@@ -518,6 +678,9 @@ const CheckoutMultiple = () => {
             name: "Dailydish",
             description: `${summary.mealCount || cartdata.length} items`,
             handler: async (response) => {
+              // Set loading state immediately to show processing UI
+              setLoading(true);
+
               try {
                 const verifyRes = await axios.post(
                   "https://dd-backend-3nm0.onrender.com/api/user/razorpay/verify-payment-and-create-plan",
@@ -529,11 +692,12 @@ const CheckoutMultiple = () => {
                     userId: user._id,
                     cartItems: enrichedCartItems,
                     addressId: defaultAddress?._id,
+                    discountWallet: Number(effectiveWalletDiscount || 0),
                   },
                 );
 
                 if (verifyRes.status === 200 && verifyRes.data?.success) {
-                  await handleSuccessfulCheckout(txnId, "razorpay");
+                  handleSuccessfulCheckout(txnId, "razorpay");
                 } else {
                   throw new Error(
                     verifyRes.data?.error || "Order creation failed",
@@ -541,17 +705,22 @@ const CheckoutMultiple = () => {
                 }
               } catch (error) {
                 console.error("Payment verification error:", error);
-                
+
                 // Navigate to failure page
                 const failureParams = new URLSearchParams({
                   transactionId: txnId || "",
                   userId: user._id,
                   status: "FAILED",
                   paymentMethod: "razorpay",
-                  error: error.response?.data?.error || error.message || "Payment could not be processed",
+                  error:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Payment could not be processed",
                 });
-                
-                navigate("/payment-success?" + failureParams.toString(), { replace: true });
+
+                navigate("/payment-success?" + failureParams.toString(), {
+                  replace: true,
+                });
               }
             },
             prefill: {
@@ -575,7 +744,9 @@ const CheckoutMultiple = () => {
             paymentMethod: "razorpay",
             error: "Failed to load payment gateway",
           });
-          navigate("/payment-success?" + failureParams.toString(), { replace: true });
+          navigate("/payment-success?" + failureParams.toString(), {
+            replace: true,
+          });
         };
         document.body.appendChild(script);
       } else {
@@ -583,17 +754,23 @@ const CheckoutMultiple = () => {
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      
+
       // Navigate to failure page with error details
       const failureParams = new URLSearchParams({
         transactionId: "",
         userId: user._id,
         status: "FAILED",
         paymentMethod: "razorpay",
-        error: error.response?.data?.error || error.response?.data?.message || error.message || "Failed to process checkout",
+        error:
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to process checkout",
       });
-      
-      navigate("/payment-success?" + failureParams.toString(), { replace: true });
+
+      navigate("/payment-success?" + failureParams.toString(), {
+        replace: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -621,7 +798,11 @@ const CheckoutMultiple = () => {
   const getItemSavings = (item) => {
     const regularPrice = Number(item?.regularPrice);
 
-    if (item?.offerApplied && Number.isFinite(regularPrice) && regularPrice > 0) {
+    if (
+      item?.offerApplied &&
+      Number.isFinite(regularPrice) &&
+      regularPrice > 0
+    ) {
       const regularTotal = regularPrice * getItemQuantity(item);
       const actualTotal = getItemTotalPrice(item);
       return regularTotal - actualTotal;
@@ -668,7 +849,8 @@ const CheckoutMultiple = () => {
         const indexA = sessionOrder.indexOf(sessionA);
         const indexB = sessionOrder.indexOf(sessionB);
 
-        if (indexA === -1 && indexB === -1) return sessionA.localeCompare(sessionB);
+        if (indexA === -1 && indexB === -1)
+          return sessionA.localeCompare(sessionB);
         if (indexA === -1) return 1;
         if (indexB === -1) return -1;
         return indexA - indexB;
@@ -714,7 +896,11 @@ const CheckoutMultiple = () => {
                       >
                         <div className="cm-item-main">
                           {item?.foodcategory === "Veg" ? (
-                            <img src={IsVeg} alt="veg" className="cm-item-indicator" />
+                            <img
+                              src={IsVeg}
+                              alt="veg"
+                              className="cm-item-indicator"
+                            />
                           ) : (
                             <img
                               src={IsNonVeg}
@@ -798,6 +984,29 @@ const CheckoutMultiple = () => {
 
   return (
     <div className="mainbg">
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background: "rgba(255,255,255,0.85)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "16px",
+          }}
+        >
+          <Spinner
+            animation="border"
+            style={{ color: "#6B8E23", width: "48px", height: "48px" }}
+          />
+          <p style={{ fontWeight: 600, fontSize: "16px", color: "#333" }}>
+            Processing your payment...
+          </p>
+        </div>
+      )}
       <div className="checkoutcontainer">
         <div className="mobile-banner-updated">
           <div className="screen-checkout mb-2">
@@ -1216,9 +1425,9 @@ const CheckoutMultiple = () => {
                             : "Delivery"}
                       </div>
                     )} */}
-                    {totalDeliveryCharge !== 0 && (
-                      <div className="toatal-va">₹ {totalDeliveryCharge}</div>
-                    )}
+                    {/* {totalDeliveryCharge !== 0 && ( */}
+                    <div className="toatal-va">₹ {totalDeliveryCharge}</div>
+                    {/* )} */}
                     {discountWallet !== 0 && (
                       <div className="toatal-va" style={{ color: "green" }}>
                         - ₹ {discountWallet?.toFixed(2)}
@@ -1274,9 +1483,7 @@ const CheckoutMultiple = () => {
                     }}
                   >
                     <div className="paybutton">Place Order | </div>
-                    <p className="price-pay">
-                        {totalPayable.toFixed(2)}
-                    </p>
+                    <p className="price-pay">{totalPayable.toFixed(2)}</p>
                   </div>
                 )}
               </Button>

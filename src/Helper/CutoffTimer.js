@@ -4,32 +4,32 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Clock } from 'lucide-react';
 import icon from "./../assets/Icon-1.png"
 
-export default function CutoffStatusCard({ 
-  cutoffValidation, 
-  userStatus, 
-  selectedDate, 
-  selectedSession, 
-  cutoffLoading 
+export default function CutoffStatusCard({
+  cutoffValidation,
+  userStatus,
+  selectedDate,
+  selectedSession,
+  cutoffLoading
 }) {
   const [timeLeft, setTimeLeft] = useState('');
   const [displayInfo, setDisplayInfo] = useState(null);
   const intervalRef = useRef(null);
-  
+
   // Check if user is Employee
   const isEmployee = userStatus && userStatus.includes('Employee');
-  
+
   // Get order mode from cutoffValidation
   const orderMode = cutoffValidation?.orderMode || 'preorder';
 
   // Debug log
-  console.log('CutoffStatusCard:', { 
-    isEmployee, 
-    orderMode, 
-    cutoffValidation,
-    userStatus,
-    selectedDate: selectedDate?.toLocaleDateString(),
-    selectedSession 
-  });
+  // console.log('CutoffStatusCard:', {
+  //   isEmployee,
+  //   orderMode,
+  //   cutoffValidation,
+  //   userStatus,
+  //   selectedDate: selectedDate?.toLocaleDateString(),
+  //   selectedSession
+  // });
 
   const formatTimeLeft = useCallback((milliseconds) => {
     if (milliseconds <= 0) return 'Cutoff passed';
@@ -51,10 +51,10 @@ export default function CutoffStatusCard({
   const calculateDisplayInfo = useCallback(() => {
     if (!cutoffValidation?.cutoffDateTime) return null;
 
-    const cutoffDate = new Date(cutoffValidation.cutoffDateTime);
-    const now = new Date();
-
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    // cutoffValidation.cutoffDateTime is already a corrected Date (IST offset applied in Home.jsx)
+    const cutoffDate = cutoffValidation.cutoffDateTime instanceof Date
+      ? cutoffValidation.cutoffDateTime
+      : new Date(cutoffValidation.cutoffDateTime);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     let displayDate;
@@ -88,14 +88,14 @@ export default function CutoffStatusCard({
 
     const dateStr = `${displayDate.getDate()} ${months[displayDate.getMonth()]}`;
 
-    console.log('DisplayInfo calculated:', {
-      orderingText,
-      dateStr,
-      displayDay,
-      orderMode,
-      orderModeText,
-      allowed: cutoffValidation?.allowed
-    });
+    // console.log('DisplayInfo calculated:', {
+    //   orderingText,
+    //   dateStr,
+    //   displayDay,
+    //   orderMode,
+    //   orderModeText,
+    //   allowed: cutoffValidation?.allowed
+    // });
 
     return {
       orderingText,
@@ -135,15 +135,15 @@ export default function CutoffStatusCard({
   // Get background color based on order mode and allowed status
   const getCardBackground = () => {
     if (!displayInfo) return '#E6B800';
-    
+
     if (!displayInfo.allowed) {
       return '#ffcccc';
     }
-    
+
     if (orderMode === 'instant') {
       return '#667eea';
     }
-    
+
     return '#E6B800';
   };
 
@@ -179,12 +179,12 @@ export default function CutoffStatusCard({
     return (
       <div className="cutoff-status-main-card">
         <div className="cutoff-status-card">
-          <div className="cutoff-inner" style={{background: '#ffcccc'}}>
+          <div className="cutoff-inner" style={{ background: '#ffcccc' }}>
             <div className="cutoff-info-group">
               <div className="clock-icon">
                 <Clock size={20} />
               </div>
-              <span className="cutoff-message" style={{color: 'red'}}>
+              <span className="cutoff-message" style={{ color: 'red' }}>
                 {cutoffLoading ? 'Checking availability...' : `Loading... (orderMode: ${orderMode})`}
               </span>
             </div>
@@ -224,11 +224,11 @@ export default function CutoffStatusCard({
             </span>
           </div>
 
-          <div 
-            className="time-left-pill" 
-            style={{ 
-              background: pillBackground, 
-              color: pillTextColor 
+          <div
+            className="time-left-pill"
+            style={{
+              background: pillBackground,
+              color: pillTextColor
             }}
           >
             {!displayInfo.allowed ? (

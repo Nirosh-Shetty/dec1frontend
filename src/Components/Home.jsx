@@ -28,14 +28,49 @@ import MultiCartDrawer from "./MultiCartDrawer";
 import DateSessionSelector from "./DateSessionSelector";
 import chef from "./../assets/chef_3.png";
 import { Colors } from "../Helper/themes";
+import checkCircle from "./../assets/check_circle.png";
 import BottomNav from "./BottomNav";
 import availabity from "./../assets/weui_done2-filled.png";
-import { addToCart } from "../Helper/cartHelper";
+import { addToCart, removeCutoffExpiredItems } from "../Helper/cartHelper";
 import Footer from "./Footer";
 import CutoffStatusCard from "./../Helper/CutoffTimer.jsx";
 import { RiInformationLine } from "react-icons/ri";
 import { MdDeliveryDining, MdOutlineTimer } from "react-icons/md";
 import FreshIngredientsCarousel from "./FreshIngredientsCarousel.jsx";
+import confetti from "canvas-confetti";
+import cross from "../assets/cross.png";
+
+const fireToast = ({ title, subtitle, icon = checkCircle }) => {
+  Swal2.fire({
+    toast: true,
+    position: "bottom",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    html: `
+      <div class="myplans-toast-content">
+        <img src="${icon}" alt="" class="myplans-toast-check" />
+        <div class="myplans-toast-text">
+          <div class="myplans-toast-title">${title}</div>
+          ${subtitle ? `<div class="myplans-toast-subtitle">${subtitle}</div>` : ""}
+        </div>
+      </div>
+    `,
+    customClass: {
+      popup: "myplans-custom-toast",
+      htmlContainer: "myplans-toast-html",
+    },
+    didOpen: () => {
+      const toast = document.querySelector(".myplans-custom-toast");
+      if (toast) {
+        toast.style.bottom = "60px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.position = "fixed";
+      }
+    },
+  });
+};
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [user, setUser] = useState(() => {
@@ -90,10 +125,23 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   });
   const [cutoffLoading, setCutoffLoading] = useState(false);
   const [hubOrderMode, setHubOrderMode] = useState("preorder");
+  const [hubLocalCutoffData, setHubLocalCutoffData] = useState(null); // local cutoff times for instant checks
   const [gifUrl, setGifUrl] = useState("");
   const [message, setMessage] = useState("");
   const [AllOffer, setAllOffer] = useState([]);
   const [totalOrder, setTotalOrder] = useState([]);
+
+  // Auto-switch tracking refs
+  const autoSwitchInProgressRef = useRef(null); // stores last switched "date|session" key to prevent re-firing
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update current time every second for precise cutoff checking
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const getTotalOrder = async () => {
     try {
@@ -117,29 +165,32 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       .length;
   };
 
-  const hasUserUsedOffer = () => {
+  const hasUserUsedOffer = (session = selectedSession) => {
     const customerId = user?._id;
     if (!customerId) return false;
 
-    // Check if user used any offer on the currently selected delivery date
     const selectedDateStr =
       selectedDate instanceof Date
         ? selectedDate.toISOString().split("T")[0]
         : new Date(selectedDate).toISOString().split("T")[0];
 
+    const sessionLower = session?.toLowerCase();
+
     return totalOrder.some((order) => {
       if (order?.customerId !== customerId) return false;
 
-      // Match order by top-level deliveryDate field
       const orderDeliveryDate = order?.deliveryDate
         ? new Date(order.deliveryDate).toISOString().split("T")[0]
         : null;
       if (orderDeliveryDate !== selectedDateStr) return false;
 
-      // Check if any item in this order had an offer applied
       const orderItems =
         order?.allProduct || order?.items || order?.cartItems || [];
-      return orderItems.some((item) => item?.offerApplied === true);
+      return orderItems.some(
+        (item) =>
+          item?.offerApplied === true &&
+          item?.session?.toLowerCase() === sessionLower,
+      );
     });
   };
 
@@ -207,12 +258,64 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
   };
 
+  // Convert backend UTC time to IST display time
+  const convertUTCToISTDisplay = (utcDateString) => {
+    if (!utcDateString) return null;
+
+    const utcDate = new Date(utcDateString);
+    let utcHours = utcDate.getUTCHours();
+    let utcMinutes = utcDate.getUTCMinutes();
+
+    let displayUTCHours = utcHours - 5;
+    let displayUTCMinutes = utcMinutes - 30;
+
+    if (displayUTCMinutes < 0) {
+      displayUTCHours -= 1;
+      displayUTCMinutes += 60;
+    }
+
+    if (displayUTCHours < 0) {
+      displayUTCHours += 24;
+    }
+
+    const correctedDate = new Date(utcDate);
+    correctedDate.setUTCHours(displayUTCHours, displayUTCMinutes, 0, 0);
+
+    return correctedDate;
+  };
+
+  const formatTime12Hour = (date) => {
+    if (!date) return null;
+
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${hours}:${minutesStr} ${ampm}`;
+  };
+
   const validateCutoffTiming = useCallback(
     async (hubId, session, deliveryDate) => {
       if (!hubId || !session) return true;
       try {
         setCutoffLoading(true);
         const status = user?.status === "Employee" ? "Employee" : "Normal";
+
+        console.log("[validateCutoffTiming] Request:", {
+          hubId,
+          session: session.toLowerCase(),
+          status,
+          deliveryDate:
+            deliveryDate instanceof Date
+              ? deliveryDate.toISOString()
+              : deliveryDate,
+        });
+
         const response = await axios.post(
           "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
           {
@@ -225,14 +328,46 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                 : deliveryDate,
           },
         );
+
         if (response.status === 200) {
-          setCutoffValidation({
+          console.log(
+            "[validateCutoffTiming] Raw API response:",
+            response.data,
+          );
+
+          const rawCutoff = response.data.cutoffDateTime
+            ? new Date(response.data.cutoffDateTime)
+            : null;
+          const rawNext = response.data.nextAvailableDateTime
+            ? new Date(response.data.nextAvailableDateTime)
+            : null;
+
+          // Backend runs on Render/AWS (UTC) and adds IST offset when calculating cutoff
+          // We need to subtract 5:30 hours (19800000 ms) to get the correct local time
+          const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000; // 19800000 ms
+          const correctedCutoff = rawCutoff
+            ? new Date(rawCutoff.getTime() - IST_OFFSET_MS)
+            : null;
+          const correctedNext = rawNext
+            ? new Date(rawNext.getTime() - IST_OFFSET_MS)
+            : null;
+
+          console.log("[validateCutoffTiming] Corrected times:", {
+            rawCutoff: rawCutoff?.toISOString(),
+            correctedCutoff: correctedCutoff?.toISOString(),
+            now: new Date().toISOString(),
+            allowed: response.data.allowed,
+          });
+
+          const validationData = {
             allowed: response.data.allowed,
             message: response.data.message,
-            cutoffDateTime: response.data.cutoffDateTime,
-            nextAvailableDateTime: response.data.nextAvailableDateTime,
+            cutoffDateTime: correctedCutoff,
+            nextAvailableDateTime: correctedNext,
             orderMode: response.data.orderMode || "preorder",
-          });
+          };
+
+          setCutoffValidation(validationData);
           setHubOrderMode(response.data.orderMode || "preorder");
           return response.data.allowed;
         }
@@ -246,6 +381,147 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     },
     [user?.status],
   );
+
+  const getNormalizedToday = () => {
+    const now = new Date();
+    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  };
+
+  // Fetch hub cutoff times locally so we can do instant (no-API) cutoff checks
+  // NOTE: This is now handled inside the combined hub+menu fetch below.
+
+  // Pure local check — no API, instant
+  const isSessionPastCutoffLocal = useCallback(
+    (session, checkTime = new Date()) => {
+      if (!hubLocalCutoffData?.cutoffTimes) return false;
+      const key = session.toLowerCase();
+      const times = hubLocalCutoffData.cutoffTimes[key];
+      if (!times) return false;
+      const cutoffStr =
+        user?.status === "Employee"
+          ? times.employeeCutoff
+          : times.defaultCutoff;
+      if (!cutoffStr) return false;
+      const [h, m] = cutoffStr.split(":").map(Number);
+      const cutoff = new Date(checkTime);
+      cutoff.setHours(h, m, 0, 0);
+      return checkTime >= cutoff;
+    },
+    [hubLocalCutoffData, user?.status],
+  );
+
+  const [selectedDate, setSelectedDate] = useState(() => {
+    if (location.state?.targetDate) return new Date(location.state.targetDate);
+    return getNormalizedToday();
+  });
+
+  const [selectedSession, setSelectedSession] = useState(() => {
+    if (location.state?.targetSession) return location.state.targetSession;
+    return "Lunch";
+  });
+
+  // Auto-switch session when cutoff is reached - defined AFTER state variables
+  const checkAndAutoSwitchSession = useCallback(() => {
+    if (!selectedDate || !selectedSession || !hubLocalCutoffData) return;
+
+    const now = new Date();
+
+    // Build UTC date key for today and selected date
+    const todayUTCKey = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+    const selUTCKey = `${selectedDate.getUTCFullYear()}-${String(selectedDate.getUTCMonth() + 1).padStart(2, "0")}-${String(selectedDate.getUTCDate()).padStart(2, "0")}`;
+
+    // Only auto-switch when viewing today
+    if (todayUTCKey !== selUTCKey) return;
+
+    // Use local cutoff check — instant, no API
+    const isPastCutoff = isSessionPastCutoffLocal(selectedSession, now);
+    if (!isPastCutoff) return;
+
+    const sessionOrder = ["Breakfast", "Lunch", "Dinner"];
+    const currentIndex = sessionOrder.indexOf(selectedSession);
+
+    // Build available sessions for today from menu data
+    const availableSessions = new Set();
+    allHubMenuData.forEach((item) => {
+      if (!item.deliveryDate || !item.session) return;
+      const d = new Date(item.deliveryDate);
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+      if (key === todayUTCKey) availableSessions.add(item.session);
+    });
+
+    // Find next session today that hasn't passed cutoff
+    let nextSession = null;
+    for (let i = currentIndex + 1; i < sessionOrder.length; i++) {
+      const s = sessionOrder[i];
+      if (availableSessions.has(s) && !isSessionPastCutoffLocal(s, now)) {
+        nextSession = s;
+        break;
+      }
+    }
+
+    if (nextSession) {
+      const switchKey = `${selUTCKey}|${selectedSession}->${nextSession}`;
+      if (autoSwitchInProgressRef.current === switchKey) return;
+      autoSwitchInProgressRef.current = switchKey;
+
+      setSelectedSession(nextSession);
+      setSelectedCategory("");
+      window.scrollTo(0, 0);
+      if (address?.hubId) {
+        validateCutoffTiming(address.hubId, nextSession, selectedDate);
+      }
+    } else {
+      // All today's sessions are past cutoff — find next available date+session
+      // No one-shot guard here: we keep trying every tick until state actually updates
+      const dateSessionMap = {};
+      allHubMenuData.forEach((item) => {
+        if (!item.deliveryDate || !item.session) return;
+        const d = new Date(item.deliveryDate);
+        const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+        if (!dateSessionMap[key]) dateSessionMap[key] = new Set();
+        dateSessionMap[key].add(item.session);
+      });
+
+      for (let i = 1; i <= 14; i++) {
+        const futureDate = new Date(
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() + i,
+          ),
+        );
+        const futureDateKey = `${futureDate.getUTCFullYear()}-${String(futureDate.getUTCMonth() + 1).padStart(2, "0")}-${String(futureDate.getUTCDate()).padStart(2, "0")}`;
+        const futureSessions = dateSessionMap[futureDateKey];
+
+        if (futureSessions && futureSessions.size > 0) {
+          const firstSession = sessionOrder.find((s) => futureSessions.has(s));
+          if (firstSession) {
+            // Guard: only switch once per target date+session to avoid thrashing
+            const switchKey = `${futureDateKey}|${firstSession}`;
+            if (autoSwitchInProgressRef.current === switchKey) return;
+            autoSwitchInProgressRef.current = switchKey;
+
+            setSelectedDate(futureDate);
+            setSelectedSession(firstSession);
+            setSelectedCategory("");
+            window.scrollTo(0, 0);
+            if (address?.hubId) {
+              validateCutoffTiming(address.hubId, firstSession, futureDate);
+            }
+            break;
+          }
+        }
+      }
+    }
+  }, [
+    selectedDate,
+    selectedSession,
+    allHubMenuData,
+    hubLocalCutoffData,
+    isSessionPastCutoffLocal,
+    address?.hubId,
+    validateCutoffTiming,
+  ]);
 
   const isOfferAlreadyAppliedInCart = (slotKey = null) => {
     if (!Carts || Carts.length === 0) return false;
@@ -281,23 +557,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     });
   };
 
-  const getNormalizedToday = () => {
-    const now = new Date();
-    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  };
-
-  const [selectedDate, setSelectedDate] = useState(() => {
-    if (location.state?.targetDate) return new Date(location.state.targetDate);
-    return getNormalizedToday();
-  });
-
-  const [selectedSession, setSelectedSession] = useState(() => {
-    if (location.state?.targetSession) return location.state.targetSession;
-    return "Lunch";
-  });
-
   useEffect(() => {
     const checkCutoff = async () => {
+      // Don't validate until hub data is loaded and auto-jump has settled.
+      // This prevents the initial today+Lunch (cutoff passed) flash on refresh.
+      if (!hubLocalCutoffData) return;
+      if (autoJumpedHubRef.current !== address?.hubId) return;
+
       const currentAddress =
         address ||
         (() => {
@@ -322,7 +588,162 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       }
     };
     checkCutoff();
-  }, [address, selectedDate, selectedSession, validateCutoffTiming]);
+  }, [
+    address,
+    selectedDate,
+    selectedSession,
+    validateCutoffTiming,
+    hubLocalCutoffData,
+  ]);
+
+  // Every second: local cutoff check — fires within 1s of cutoff, zero API calls
+  useEffect(() => {
+    checkAndAutoSwitchSession();
+  }, [currentTime, checkAndAutoSwitchSession]);
+
+  // Auto-remove cart items whose slot cutoff has passed
+  useEffect(() => {
+    if (!hubLocalCutoffData) return;
+    const result = removeCutoffExpiredItems(hubLocalCutoffData, user?.status);
+    if (result && result.removedCount > 0) {
+      const updatedCart = result.updatedCart;
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setCarts(updatedCart);
+
+      // Group removed items by slot for a clear message
+      const slotMap = {};
+      result.removedItems.forEach(({ session, deliveryDate }) => {
+        const key = `${deliveryDate}|${session}`;
+        if (!slotMap[key]) slotMap[key] = { session, deliveryDate };
+      });
+      const slotLabels = Object.values(slotMap).map(
+        ({ session, deliveryDate }) => {
+          const d = new Date(deliveryDate + "T00:00:00");
+          const day = d.toLocaleDateString("en-US", {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+          });
+          return `${session.charAt(0).toUpperCase() + session.slice(1)}, ${day}`;
+        },
+      );
+
+      fireToast({
+        icon: cross,
+        title: `${result.removedCount} item${result.removedCount > 1 ? "s" : ""} removed — ordering cutoff passed`,
+        subtitle: slotLabels.join(" · "),
+      });
+    }
+  }, [currentTime, hubLocalCutoffData, user?.status]);
+
+  // When menu data loads, immediately jump to the next available date/session.
+  // Only jumps if the current selection has no valid menu (e.g. no menu for tomorrow,
+  // but menu exists for day-after-tomorrow). Does NOT override user's manual selection.
+  const selectedDateRef = useRef(selectedDate);
+  const selectedSessionRef = useRef(selectedSession);
+  // Tracks the last key we auto-jumped to — prevents re-firing when deps change but result is the same
+  const autoJumpedToRef = useRef(null);
+  // Tracks which hub the last auto-jump was for — forces re-jump on hub change
+  const autoJumpedHubRef = useRef(null);
+  useEffect(() => {
+    selectedDateRef.current = selectedDate;
+  }, [selectedDate]);
+  useEffect(() => {
+    selectedSessionRef.current = selectedSession;
+  }, [selectedSession]);
+
+  useEffect(() => {
+    if (!allHubMenuData?.length) return;
+    // Wait for hub cutoff data before auto-jumping — without it we don't know
+    // the orderMode, which determines whether today is a valid start date.
+    // This prevents the today→tomorrow→today flicker on instant-mode hubs.
+    if (!hubLocalCutoffData) return;
+
+    const now = new Date();
+    const sessionOrder = ["Breakfast", "Lunch", "Dinner"];
+
+    // Build UTC date-key -> sessions map
+    const dateSessionMap = {};
+    allHubMenuData.forEach((item) => {
+      if (!item.deliveryDate || !item.session) return;
+      const d = new Date(item.deliveryDate);
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+      if (!dateSessionMap[key]) dateSessionMap[key] = new Set();
+      dateSessionMap[key].add(item.session);
+    });
+
+    console.log("[Home] Menu dates available:", Object.keys(dateSessionMap));
+
+    // Check if current selection is already valid — if so, don't override
+    // BUT always re-jump if the hub changed (different orderMode may apply)
+    const hubChanged = autoJumpedHubRef.current !== address?.hubId;
+    const curDate = selectedDateRef.current;
+    const curSession = selectedSessionRef.current;
+    if (!hubChanged && curDate && curSession) {
+      const curKey = `${curDate.getUTCFullYear()}-${String(curDate.getUTCMonth() + 1).padStart(2, "0")}-${String(curDate.getUTCDate()).padStart(2, "0")}`;
+      const curSessions = dateSessionMap[curKey];
+      if (curSessions?.has(curSession)) {
+        const todayKey = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+        const isToday = curKey === todayKey;
+        const orderMode = hubLocalCutoffData?.orderMode || "preorder";
+        const isEmployee = user?.status === "Employee";
+        // In preorder mode, today is never a valid selection
+        if (isToday && orderMode === "preorder" && !isEmployee) {
+          // fall through to auto-jump
+        } else if (!isToday || !isSessionPastCutoffLocal(curSession, now)) {
+          return; // Valid selection, leave it alone
+        }
+      }
+    }
+
+    // Current selection is invalid — find the earliest valid date+session
+    // For preorder mode: start from tomorrow (i=1), skip today
+    const orderMode = hubLocalCutoffData?.orderMode || "preorder";
+    const startOffset =
+      orderMode === "preorder" && user?.status !== "Employee" ? 1 : 0;
+
+    for (let i = startOffset; i <= 14; i++) {
+      const checkDate = new Date(
+        Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + i),
+      );
+      const dateKey = `${checkDate.getUTCFullYear()}-${String(checkDate.getUTCMonth() + 1).padStart(2, "0")}-${String(checkDate.getUTCDate()).padStart(2, "0")}`;
+      const sessions = dateSessionMap[dateKey];
+      if (!sessions || sessions.size === 0) continue;
+
+      const validSessions =
+        i === 0
+          ? [...sessions].filter((s) => !isSessionPastCutoffLocal(s, now))
+          : [...sessions];
+
+      if (validSessions.length === 0) continue;
+
+      const firstSession = sessionOrder.find((s) => validSessions.includes(s));
+      if (!firstSession) continue;
+
+      console.log("[Home] Auto-jumping to:", dateKey, firstSession);
+      const jumpKey = `${dateKey}|${firstSession}`;
+      if (autoJumpedToRef.current === jumpKey && !hubChanged) return; // already jumped here for this hub
+      autoJumpedToRef.current = jumpKey;
+      autoJumpedHubRef.current = address?.hubId;
+      setSelectedDate(checkDate);
+      setSelectedSession(firstSession);
+      setSelectedCategory("");
+      if (address?.hubId) {
+        validateCutoffTiming(address.hubId, firstSession, checkDate);
+      }
+      return;
+    }
+  }, [
+    allHubMenuData,
+    hubLocalCutoffData,
+    isSessionPastCutoffLocal,
+    address?.hubId,
+    validateCutoffTiming,
+  ]);
+
+  // NOTE: cutoff re-validation on a timer is intentionally removed.
+  // validateCutoffTiming is already called whenever selectedDate/selectedSession changes,
+  // and CutoffTimer manages its own countdown internally.
 
   const refreshAddress = useCallback(() => {
     try {
@@ -377,7 +798,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
   }, [user]);
 
-  // FIXED: Menu fetch with proper dependencies
+  // Combined hub data + menu fetch — runs once per hub change, sets both atomically
+  // so the auto-jump logic always has both pieces of data at the same time (no flicker).
   useEffect(() => {
     const hubIdToUse =
       address?.hubId ||
@@ -385,33 +807,82 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     if (!hubIdToUse) {
       setAllHubMenuData([]);
+      setHubLocalCutoffData(null);
       setloader(false);
       return;
     }
 
-    const fetchAllMenuData = async () => {
+    // Reset auto-jump guard so the new hub gets a fresh auto-jump
+    autoJumpedToRef.current = null;
+    autoJumpedHubRef.current = null;
+    // Clear stale cutoff data immediately so the auto-jump gate waits for fresh data
+    setHubLocalCutoffData(null);
+    // Clear stale cutoffValidation so CutoffStatusCard stays hidden until new data arrives
+    setCutoffValidation({
+      allowed: true,
+      message: "",
+      cutoffDateTime: null,
+      nextAvailableDateTime: null,
+      orderMode: "preorder",
+    });
+
+    const fetchHubDataAndMenu = async () => {
       setloader(true);
       try {
-        const res = await axios.get(
-          "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
-          {
+        const token = localStorage.getItem("authToken");
+
+        // Fetch both in parallel
+        const [menuRes, cutoffRes] = await Promise.allSettled([
+          axios.get("https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu", {
             params: { hubId: hubIdToUse },
-          },
-        );
-        if (res.status === 200) {
-          setAllHubMenuData(res.data.menu);
+          }),
+          fetch(
+            `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubIdToUse}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+        ]);
+
+        // Process menu
+        if (menuRes.status === "fulfilled" && menuRes.value.status === 200) {
+          setAllHubMenuData(menuRes.value.data.menu);
         } else {
           setAllHubMenuData([]);
         }
+
+        // Process cutoff data
+        if (cutoffRes.status === "fulfilled" && cutoffRes.value.ok) {
+          const data = await cutoffRes.value.json();
+          const cutoffTimes = data.cutoffTimes || {};
+          const orderMode = data.orderMode || "preorder";
+          ["breakfast", "lunch", "dinner"].forEach((s) => {
+            if (!cutoffTimes[s]) cutoffTimes[s] = {};
+            if (!cutoffTimes[s].defaultCutoff)
+              cutoffTimes[s].defaultCutoff =
+                orderMode === "instant" ? "20:00" : "23:59";
+            if (!cutoffTimes[s].employeeCutoff)
+              cutoffTimes[s].employeeCutoff = "10:00";
+          });
+          // Set both in the same tick so auto-jump fires once with complete data
+          setHubLocalCutoffData({ orderMode, cutoffTimes });
+        } else {
+          setHubLocalCutoffData({
+            orderMode: "preorder",
+            cutoffTimes: {
+              breakfast: { defaultCutoff: "23:59", employeeCutoff: "10:00" },
+              lunch: { defaultCutoff: "23:59", employeeCutoff: "10:00" },
+              dinner: { defaultCutoff: "23:59", employeeCutoff: "10:00" },
+            },
+          });
+        }
       } catch (error) {
-        console.error("Error fetching menu:", error);
+        console.error("Error fetching hub data:", error);
         setAllHubMenuData([]);
       } finally {
         setloader(false);
       }
     };
 
-    fetchAllMenuData();
+    fetchHubDataAndMenu();
   }, [address?.hubId, shouldLoadDefaultMenu, user]);
 
   // Listen for location updates
@@ -453,6 +924,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setSelectedSession(session1);
     setSelectedCategory("");
     window.scrollTo(0, 0);
+
+    // Immediately validate cutoff for the new selection
+    if (address?.hubId && date1 && session1) {
+      validateCutoffTiming(address.hubId, session1, date1);
+    }
   };
 
   const handleLocationDetected = useCallback((newLocation) => {
@@ -466,13 +942,30 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   const currentSlotItems = useMemo(() => {
     if (!allHubMenuData?.length) return [];
-    const selectedDateISO = selectedDate.toISOString();
-    return allHubMenuData.filter(
-      (item) =>
-        item.deliveryDate === selectedDateISO &&
-        item.session === selectedSession,
-    );
-  }, [allHubMenuData, selectedDate, selectedSession]);
+
+    // Only block items if cutoff is not allowed AND we're viewing today's date
+    // For future dates, always show the menu
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+    const selKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
+    const isViewingToday = todayKey === selKey;
+
+    if (!cutoffValidation.allowed && isViewingToday) {
+      return [];
+    }
+
+    // Match using UTC date comparison to handle timezone differences
+    const selUTCKey = `${selectedDate.getUTCFullYear()}-${String(selectedDate.getUTCMonth() + 1).padStart(2, "0")}-${String(selectedDate.getUTCDate()).padStart(2, "0")}`;
+    return allHubMenuData.filter((item) => {
+      if (!item.deliveryDate) return false;
+      // Case-insensitive session match to handle "Lunch" vs "lunch"
+      if (item.session?.toLowerCase() !== selectedSession?.toLowerCase())
+        return false;
+      const d = new Date(item.deliveryDate);
+      const itemKey = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+      return itemKey === selUTCKey;
+    });
+  }, [allHubMenuData, selectedDate, selectedSession, cutoffValidation.allowed]);
 
   const vegFilteredItems = useMemo(() => {
     if (isVegOnly) {
@@ -501,11 +994,19 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   }, [dynamicTabs, selectedCategory]);
 
   const finalDisplayItems = useMemo(() => {
-    if (!selectedCategory) return [];
+    if (!vegFilteredItems.length) return [];
+    // If selectedCategory is not in the current tabs (e.g. just switched session),
+    // fall back to the first available category so we never flash "no items"
+    const effectiveCategory =
+      selectedCategory &&
+      vegFilteredItems.some((item) => item.menuCategory === selectedCategory)
+        ? selectedCategory
+        : dynamicTabs[0];
+    if (!effectiveCategory) return [];
     return vegFilteredItems.filter(
-      (item) => item.menuCategory === selectedCategory,
+      (item) => item.menuCategory === effectiveCategory,
     );
-  }, [vegFilteredItems, selectedCategory]);
+  }, [vegFilteredItems, selectedCategory, dynamicTabs]);
 
   const getEffectivePrice = (item, matchedLocation, session) => {
     const hubPrice =
@@ -594,7 +1095,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
               matchingProduct.customerType,
             );
             if (!customerQualifies) return null;
-            // Check if user already used any offer in a past order
             if (hasUserUsedOffer()) return null;
             if (hasOfferInCart) return { ...matchingProduct, isBlocked: true };
             return matchingProduct;
@@ -645,34 +1145,54 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     userStatus,
   );
 
+  const triggerConfetti = () => {
+    const duration = 2000;
+    const animationEnd = Date.now() + duration;
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 60,
+      zIndex: 99999,
+    };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(function () {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      });
+    }, 250);
+  };
+
   const addCart1 = async (item, offerData, matchedLocation) => {
     if (!cutoffValidation.allowed) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
+      fireToast({
         title:
           cutoffValidation.message ||
           `Cannot add to cart. Orders are closed for ${selectedSession}.`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
       });
       return;
     }
 
     if (!matchedLocation || matchedLocation?.Remainingstock === 0) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Product is out of stock`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
-      });
+      fireToast({ title: `Product is out of stock` });
       return;
     }
 
@@ -687,19 +1207,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           offerData.customerType === 0
             ? `This offer is only for first-time customers! You have already placed ${customerOrderCount} order(s).`
             : `This offer is for customers with ${offerData.customerType} or fewer orders. You have placed ${customerOrderCount} order(s).`;
-        Swal2.fire({
-          toast: true,
-          position: "bottom",
-          icon: "info",
-          title: message,
-          showConfirmButton: false,
-          timer: 4000,
-          timerProgressBar: true,
-          customClass: {
-            popup: "me-small-toast",
-            title: "me-small-toast-title",
-          },
-        });
+        fireToast({ title: message });
         return;
       }
     }
@@ -737,34 +1245,14 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         } else if (hasUserUsedOffer()) {
           appliedPrice = regularPrice;
           isOfferApplied = false;
-          Swal2.fire({
-            toast: true,
-            position: "bottom",
-            icon: "info",
-            title: `You've already used this offer in a previous order.`,
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-              popup: "me-small-toast",
-              title: "me-small-toast-title",
-            },
+          fireToast({
+            title: `You've already used this offer for ${selectedSession} today.`,
           });
         } else {
           appliedPrice = regularPrice;
           isOfferApplied = false;
-          Swal2.fire({
-            toast: true,
-            position: "bottom",
-            icon: "info",
+          fireToast({
             title: `Only one offer per slot allowed! ${appliedOffer?.foodname} already has the offer.`,
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-              popup: "me-small-toast",
-              title: "me-small-toast-title",
-            },
           });
         }
       } else {
@@ -805,16 +1293,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const exists = cart.some((c) => c.cartId === cartId);
 
     if (exists) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Item is already in this slot's cart`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
-      });
+      fireToast({ title: `Item is already in this slot's cart` });
       return;
     }
 
@@ -830,15 +1309,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     handleShow();
 
     if (isOfferApplied) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "success",
-        title: `Added with offer! ₹${finalOfferPrice} instead of ₹${regularPrice}`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
+      triggerConfetti();
+      fireToast({
+        title: `🎉 Yay! Special offer applied!`,
+        subtitle: `You saved ₹${regularPrice - finalOfferPrice}! Now at just ₹${finalOfferPrice}`,
       });
     }
   };
@@ -892,32 +1366,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const newQuantity = currentQuantity + 1;
 
     if (!cutoffValidation.allowed) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
+      fireToast({
         title:
           cutoffValidation.message ||
           `Cannot increase quantity. Orders are closed for ${selectedSession}.`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
       });
       return;
     }
 
     if (newQuantity > maxStock) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `No more stock available! Only ${maxStock} left.`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
-      });
+      fireToast({ title: `No more stock available! Only ${maxStock} left.` });
       return;
     }
 
@@ -978,16 +1436,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     updateCartData(updatedCart);
 
     if (gotOfferPrice && currentQuantity === 1 && newQuantity === 2) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Second item added at ₹${regularPrice}`,
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
-      });
+      fireToast({ title: `Second item added at ₹${regularPrice}` });
     }
   };
 
@@ -1013,17 +1462,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const newQuantity = currentQuantity - 1;
 
     if (!cutoffValidation.allowed) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
+      fireToast({
         title:
           cutoffValidation.message ||
           `Cannot decrease quantity. Orders are closed for ${selectedSession}.`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
       });
       return;
     }
@@ -1108,17 +1550,22 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const groups = Carts.reduce((acc, item) => {
       const key = `${item.deliveryDate}|${item.session}`;
       if (!item.deliveryDate || !item.session) return acc;
+      // Normalize session to title case for consistent display and jumping
+      const normalizedSession =
+        item.session.charAt(0).toUpperCase() +
+        item.session.slice(1).toLowerCase();
       if (!acc[key]) {
         acc[key] = {
-          session: item.session,
+          session: normalizedSession,
           date: new Date(item.deliveryDate),
           totalItems: 0,
           subtotal: 0,
           items: [],
         };
       }
-      acc[key].totalItems += item.Quantity;
-      acc[key].subtotal += item.price * item.Quantity;
+      acc[key].totalItems += item.quantity || item.Quantity || 0;
+      acc[key].subtotal +=
+        (item.price || 0) * (item.quantity || item.Quantity || 0);
       acc[key].items.push(item);
       return acc;
     }, {});
@@ -1136,30 +1583,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   const proceedToCheckout = () => {
     if (!user) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Please Login!`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
-      });
+      fireToast({ title: `Please Login!` });
       return;
     }
     if (Carts.length === 0) return;
     if (!address) {
-      Swal2.fire({
-        toast: true,
-        position: "bottom",
-        icon: "info",
-        title: `Please Select Address!`,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: { popup: "me-small-toast", title: "me-small-toast-title" },
-      });
+      fireToast({ title: `Please Select Address!` });
       return;
     }
     navigate("/checkout-multiple");
@@ -1232,6 +1661,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     sessionStorage.removeItem("justAddedAddress");
   }, []);
 
+  // Rest of the return statement remains the same...
   return (
     <div>
       <ToastContainer />
@@ -1245,17 +1675,32 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         />
       </div>
 
-      {address?.hubId && selectedDate && selectedSession && (
-        <CutoffStatusCard
-          selectedDate={selectedDate}
-          selectedSession={selectedSession}
-          userStatus={user?.status}
-          cutoffValidation={cutoffValidation}
-          cutoffLoading={cutoffLoading}
-        />
-      )}
+      {address?.hubId &&
+        selectedDate &&
+        selectedSession &&
+        (hubLocalCutoffData &&
+        cutoffValidation?.cutoffDateTime &&
+        autoJumpedHubRef.current === address?.hubId ? (
+          <CutoffStatusCard
+            selectedDate={selectedDate}
+            selectedSession={selectedSession}
+            userStatus={user?.status}
+            cutoffValidation={cutoffValidation}
+            cutoffLoading={false}
+            currentSelectedDate={selectedDate}
+          />
+        ) : (
+          <CutoffStatusCard
+            selectedDate={selectedDate}
+            selectedSession={selectedSession}
+            userStatus={user?.status}
+            cutoffValidation={null}
+            cutoffLoading={true}
+            currentSelectedDate={selectedDate}
+          />
+        ))}
 
-      <FreshIngredientsCarousel/>
+      <FreshIngredientsCarousel />
 
       {wallet?.balance > 0 && show && (
         <div style={{ position: "relative" }}>
@@ -1275,6 +1720,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
           currentDate={selectedDate}
           currentSession={selectedSession}
           menuData={allHubMenuData}
+          hubCutoffData={hubLocalCutoffData}
         />
       </div>
 
@@ -1381,7 +1827,24 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                     className="col-6 col-md-6 mb-2 d-flex justify-content-center"
                   >
                     <div className="mobl-product-card">
-                      <div className="productborder">
+                      <div
+                        className="productborder"
+                        style={{ position: "relative" }}
+                      >
+                        {showOfferPrice && (
+                          <div className="premium-offer-badge">
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              style={{ marginRight: "6px" }}
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <span>SPECIAL OFFER</span>
+                          </div>
+                        )}
                         <div className="prduct-box rounded-1 cardbx">
                           <div
                             onClick={() => showDrawer(item)}
@@ -1435,77 +1898,70 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                         </div>
                         <div
                           className="d-flex align-items-center mb-3"
-                          style={{ gap: "8px", flexWrap: "nowrap" }}
+                          style={{
+                            gap: "8px",
+                            flexWrap: "wrap",
+                            paddingLeft: "6px",
+                          }}
                         >
-                          {offerPrice && (
+                          <div
+                            className="d-flex align-items-center"
+                            style={{ gap: "8px" }}
+                          >
+                            {offerPrice && (
+                              <div
+                                className="align-items-start"
+                                style={{
+                                  textDecoration: "line-through",
+                                  color: "#6b6b6b",
+                                  fontSize: "15px",
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
+                                  display: "flex",
+                                  gap: "2px",
+                                }}
+                              >
+                                <span className="fw-normal">₹</span>
+                                <span>{offerPrice}</span>
+                              </div>
+                            )}
                             <div
                               className="align-items-start"
                               style={{
-                                textDecoration: "line-through",
-                                color: "#6b6b6b",
-                                fontSize: "15px",
+                                color: "#2c2c2c",
+                                fontFamily: "Inter",
+                                fontSize: "20px",
+                                fontWeight: "500",
+                                lineHeight: "25px",
+                                letterSpacing: "-0.8px",
                                 whiteSpace: "nowrap",
                                 flexShrink: 0,
                                 display: "flex",
                                 gap: "2px",
-                                marginLeft: "7px",
                               }}
                             >
-                              <span className="fw-normal">₹</span>
-                              <span>{offerPrice}</span>
-                            </div>
-                          )}
-                          <div
-                            className="align-items-start"
-                            style={{
-                              color: "#2c2c2c",
-                              fontFamily: "Inter",
-                              fontSize: "20px",
-                              fontWeight: "500",
-                              lineHeight: "25px",
-                              letterSpacing: "-0.8px",
-                              whiteSpace: "nowrap",
-                              flexShrink: 0,
-                              display: "flex",
-                              gap: "2px",
-                            }}
-                          >
-                            <div
-                              className="align-items-start"
-                              style={{
-                                display: "flex",
-                                gap: "1px",
-                                marginLeft: "6px",
-                              }}
-                            >
-                              <span className="fw-bold">₹</span>
-                              <span>{displayPrice}</span>
-                            </div>
-                          </div>
-                        </div>
-                        {/* {productOffer &&
-                          productOffer.customerType !== undefined &&
-                          !cartItem && (
-                            <div
-                              style={{ marginBottom: "8px", marginLeft: "6px" }}
-                            >
-                              <span
+                              <div
+                                className="align-items-start"
                                 style={{
-                                  fontSize: "10px",
-                                  backgroundColor: "#f0f0f0",
-                                  padding: "2px 6px",
-                                  borderRadius: "4px",
-                                  color: "#666",
+                                  display: "flex",
+                                  gap: "1px",
                                 }}
                               >
-                                {productOffer.customerType === 0
-                                  ? "🎁 First Order Only"
-                                  : productOffer.customerType === 1
-                                    ? "🎉 Up to 1 Order"
-                                    : `✨ Up to ${productOffer.customerType} orders`}
-                              </span>
+                                <span className="fw-bold">₹</span>
+                                <span>{displayPrice}</span>
+                              </div>
                             </div>
-                          )} */}
+                          </div>
+                          {showOfferPrice && offerPrice && (
+                            <div className="offer-percentage-badge">
+                              {Math.round(
+                                ((offerPrice - displayPrice) / offerPrice) *
+                                  100,
+                              )}
+                              % OFF
+                            </div>
+                          )}
+                        </div>
                         <div>
                           <div className="guaranteed-label">
                             <img
@@ -1553,9 +2009,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                               >
                                 <div className="pick-btn-text">
                                   <span className="pick-btn-text1">ADD</span>
-                                  {/* <span className="pick-btn-text2">
-                                    Confirm Later
-                                  </span> */}
                                 </div>
                                 <span className="add-to-cart-btn-icon">
                                   <FaPlus />
@@ -1653,6 +2106,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
               })}
 
               {!loader &&
+                !cutoffLoading &&
                 finalDisplayItems.length === 0 &&
                 cutoffValidation.allowed && (
                   <div className="col-12 text-center my-5">
@@ -1789,7 +2243,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                           </span>
                         )}
                       </div>
-                      <div className="availability-banner">
+                      {/* <div className="availability-banner">
                         {stockCount > 0 ? (
                           <>
                             {showOfferPrice && (
@@ -1817,9 +2271,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                         ) : (
                           "Sold Out"
                         )}
-                      </div>
+                      </div> */}
                     </div>
-                    {getCartQuantity(foodData?._id) > 0 ? (
+                    {/* {getCartQuantity(foodData?._id) > 0 ? (
                       <div className="increaseBtn">
                         <div
                           className="faplus"
@@ -1914,7 +2368,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                               : "Sold Out"}
                         </span>
                       </button>
-                    )}
+                    )} */}
                   </>
                 );
               })()}
@@ -1923,9 +2377,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         </div>
       </Drawer>
 
-      <div style={{ marginBottom: "80px" }}>
+      {/* <div style={{ marginBottom: "80px" }}>
         <Footer />
-      </div>
+      </div> */}
       <BottomNav />
     </div>
   );

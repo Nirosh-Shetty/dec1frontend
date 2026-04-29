@@ -382,7 +382,9 @@ const UserBanner = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/banners");
+        const res = await axios.get(
+          "https://dd-backend-3nm0.onrender.com/api/admin/banners",
+        );
         if (res.status === 200) {
           const bannerData = res.data.getbanner || [];
           setBanners(

@@ -484,23 +484,6 @@
 
 // export default MultiCartDrawer;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // import { useState } from "react";
 // import moment from "moment";
 // import { FaAngleUp, FaTimes } from "react-icons/fa";
@@ -763,53 +746,6 @@
 
 // export default MultiCartDrawer;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // import { useState } from "react";
 // import moment from "moment";
 // import { FaAngleUp, FaTimes } from "react-icons/fa";
@@ -851,7 +787,7 @@
 //           total: item.offerPrice,
 //         };
 //       }
-//     } 
+//     }
 //     // If offer is applied but no regular price stored (fallback)
 //     else if (item.offerApplied && item.offerPrice) {
 //       if (item.Quantity > 1) {
@@ -1109,7 +1045,7 @@
 //                         </button>
 //                       </div>
 //                     </div>
-                    
+
 //                     {/* Expanded items list */}
 //                     {expandedSlot === slot.date?.toString() + slot.session && (
 //                       <div className="expanded-items-list">
@@ -1136,9 +1072,9 @@
 //                             </div>
 //                           );
 //                         })}
-                        
+
 //                         {/* Jump to slot button */}
-//                         <button 
+//                         <button
 //                           className="jump-to-slot-btn-expanded"
 //                           onClick={() => handleJumpToSlot(slot)}
 //                         >
@@ -1161,7 +1097,7 @@
 //           border-radius: 8px;
 //           margin-top: 8px;
 //         }
-        
+
 //         .expanded-cart-item {
 //           display: flex;
 //           justify-content: space-between;
@@ -1169,15 +1105,15 @@
 //           padding: 8px 0;
 //           border-bottom: 1px solid #e8e8e8;
 //         }
-        
+
 //         .expanded-cart-item:last-child {
 //           border-bottom: none;
 //         }
-        
+
 //         .expanded-item-info {
 //           flex: 1;
 //         }
-        
+
 //         .expanded-item-name {
 //           font-weight: 500;
 //           color: #2c2c2c;
@@ -1187,7 +1123,7 @@
 //           gap: 8px;
 //           flex-wrap: wrap;
 //         }
-        
+
 //         .offer-badge-expanded {
 //           background-color: #4caf50;
 //           color: white;
@@ -1196,18 +1132,18 @@
 //           border-radius: 12px;
 //           font-weight: normal;
 //         }
-        
+
 //         .expanded-item-price-breakdown {
 //           font-size: 11px;
 //           color: #999;
 //         }
-        
+
 //         .expanded-item-total {
 //           font-weight: 600;
 //           color: #6B8E23;
 //           font-size: 14px;
 //         }
-        
+
 //         .jump-to-slot-btn-expanded {
 //           width: 100%;
 //           background: none;
@@ -1220,45 +1156,45 @@
 //           margin-top: 12px;
 //           transition: all 0.3s ease;
 //         }
-        
+
 //         .jump-to-slot-btn-expanded:hover {
 //           background-color: #6B8E23;
 //           color: white;
 //         }
-        
+
 //         .slot-title-details {
 //           cursor: pointer;
 //         }
-        
+
 //         .my-meal-icon img {
 //           width: 20px;
 //           height: 20px;
 //         }
-        
+
 //         .my-meal-text {
 //           font-size: 12px;
 //           font-weight: 500;
 //         }
-        
+
 //         .button-arrow {
 //           width: 16px;
 //           height: 16px;
 //           transform: rotate(180deg);
 //         }
-        
+
 //         .header-arrow {
 //           width: 16px;
 //           height: 16px;
 //           transform: rotate(180deg);
 //           margin-right: 8px;
 //         }
-        
+
 //         .session-name {
 //           font-weight: 600;
 //           color: #6B8E23;
 //           margin-right: 8px;
 //         }
-        
+
 //         .date-name {
 //           font-size: 12px;
 //           color: #666;
@@ -1269,12 +1205,6 @@
 // };
 
 // export default MultiCartDrawer;
-
-
-
-
-
-
 
 // import { useState } from "react";
 // import moment from "moment";
@@ -1320,7 +1250,7 @@
 //           total: Math.round(item.totalPrice),
 //         };
 //       }
-//     } 
+//     }
 //     // No offer applied - use regular price
 //     else {
 //       // Use totalPrice if available, otherwise calculate
@@ -1564,7 +1494,7 @@
 //                         </button>
 //                       </div>
 //                     </div>
-                    
+
 //                     {/* Expanded items list */}
 //                     {expandedSlot === slot.date?.toString() + slot.session && (
 //                       <div className="expanded-items-list">
@@ -1591,9 +1521,9 @@
 //                             </div>
 //                           );
 //                         })}
-                        
+
 //                         {/* Jump to slot button */}
-//                         <button 
+//                         <button
 //                           className="jump-to-slot-btn-expanded"
 //                           onClick={() => handleJumpToSlot(slot)}
 //                         >
@@ -1616,7 +1546,7 @@
 //           border-radius: 8px;
 //           margin-top: 8px;
 //         }
-        
+
 //         .expanded-cart-item {
 //           display: flex;
 //           justify-content: space-between;
@@ -1624,15 +1554,15 @@
 //           padding: 8px 0;
 //           border-bottom: 1px solid #e8e8e8;
 //         }
-        
+
 //         .expanded-cart-item:last-child {
 //           border-bottom: none;
 //         }
-        
+
 //         .expanded-item-info {
 //           flex: 1;
 //         }
-        
+
 //         .expanded-item-name {
 //           font-weight: 500;
 //           color: #2c2c2c;
@@ -1642,7 +1572,7 @@
 //           gap: 8px;
 //           flex-wrap: wrap;
 //         }
-        
+
 //         .offer-badge-expanded {
 //           background-color: #4caf50;
 //           color: white;
@@ -1651,18 +1581,18 @@
 //           border-radius: 12px;
 //           font-weight: normal;
 //         }
-        
+
 //         .expanded-item-price-breakdown {
 //           font-size: 11px;
 //           color: #999;
 //         }
-        
+
 //         .expanded-item-total {
 //           font-weight: 600;
 //           color: #6B8E23;
 //           font-size: 14px;
 //         }
-        
+
 //         .jump-to-slot-btn-expanded {
 //           width: 100%;
 //           background: none;
@@ -1675,45 +1605,45 @@
 //           margin-top: 12px;
 //           transition: all 0.3s ease;
 //         }
-        
+
 //         .jump-to-slot-btn-expanded:hover {
 //           background-color: #6B8E23;
 //           color: white;
 //         }
-        
+
 //         .slot-title-details {
 //           cursor: pointer;
 //         }
-        
+
 //         .my-meal-icon img {
 //           width: 20px;
 //           height: 20px;
 //         }
-        
+
 //         .my-meal-text {
 //           font-size: 12px;
 //           font-weight: 500;
 //         }
-        
+
 //         .button-arrow {
 //           width: 16px;
 //           height: 16px;
 //           transform: rotate(180deg);
 //         }
-        
+
 //         .header-arrow {
 //           width: 16px;
 //           height: 16px;
 //           transform: rotate(180deg);
 //           margin-right: 8px;
 //         }
-        
+
 //         .session-name {
 //           font-weight: 600;
 //           color: #6B8E23;
 //           margin-right: 8px;
 //         }
-        
+
 //         .date-name {
 //           font-size: 12px;
 //           color: #666;
@@ -1724,45 +1654,6 @@
 // };
 
 // export default MultiCartDrawer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import { useState } from "react";
 import moment from "moment";
@@ -1783,7 +1674,7 @@ const MultiCartDrawer = ({
 }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const address = JSON.parse(
-    localStorage.getItem("primaryAddress")
+    localStorage.getItem("primaryAddress"),
     // localStorage.getItem("currentLocation")
   );
   const navigate = useNavigate();
@@ -1799,9 +1690,11 @@ const MultiCartDrawer = ({
   };
 
   const handleSlotDetailClick = (slot) => {
-    // console.log("Details clicked for slot:", slot);
-    // console.log("Calling onJumpToSlot with:", slot.date, slot.session);
-    onJumpToSlot(slot.date, slot.session);
+    // Normalize session to title case (e.g. "lunch" -> "Lunch")
+    const normalizedSession =
+      slot.session.charAt(0).toUpperCase() +
+      slot.session.slice(1).toLowerCase();
+    onJumpToSlot(slot.date, normalizedSession);
     setIsDrawerOpen(false);
   };
 
@@ -1965,13 +1858,19 @@ const MultiCartDrawer = ({
                 <div
                   className="checkout-top"
                   onClick={() => {
-
-                    user && address ? handleMoveToMyPlans() :user && !address ? navigate("/location") : handleMyMealClickForGuest();
+                    user && address
+                      ? handleMoveToMyPlans()
+                      : user && !address
+                        ? navigate("/location")
+                        : handleMyMealClickForGuest();
                   }}
                 >
                   <img src={arrow} alt="arrow" className="header-arrow" />
-                  {user && !address ? "Add location" : user && address? "Move to My Plans" : "Login to continue"}
-
+                  {user && !address
+                    ? "Add location"
+                    : user && address
+                      ? "Move to My Plans"
+                      : "Login to continue"}
                 </div>
               </div>
 

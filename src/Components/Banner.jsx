@@ -62,6 +62,7 @@ const Banner = ({
   const width = useWindowWidth();
   const isSmall = width <= 768;
   const isVerySmall = width <= 360;
+  const isMobile = width <= 480;
   const addresstype = localStorage.getItem("addresstype");
   const corporateaddress = JSON.parse(localStorage.getItem("coporateaddress"));
   const [user, setUser] = useState(() => {
@@ -1025,7 +1026,9 @@ const Banner = ({
   const [apartmentdata, setapartmentdata] = useState([]);
   const getapartmentd = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getapartment");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
+      );
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
       }
@@ -1041,7 +1044,9 @@ const Banner = ({
   const [corporatedata, setcorporatedata] = useState([]);
   const getcorporate = async () => {
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getcorporate");
+      let res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
+      );
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
       }
@@ -1059,7 +1064,9 @@ const Banner = ({
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getstories");
+        let res = await axios.get(
+          "https://dd-backend-3nm0.onrender.com/api/admin/getstories",
+        );
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
         }
@@ -1228,14 +1235,17 @@ const Banner = ({
   const saveSelectedAddress = async (data) => {
     try {
       if (!user) return;
-      let res = await axios.post(`https://dd-backend-3nm0.onrender.com/api/user/addressadd`, {
-        Name: user?.Fname,
-        Number: user?.Mobile,
-        userId: user?._id,
-        ApartmentName: data?.Apartmentname,
-        addresstype: addresstype,
-        addressid: data?._id,
-      });
+      let res = await axios.post(
+        `https://dd-backend-3nm0.onrender.com/api/user/addressadd`,
+        {
+          Name: user?.Fname,
+          Number: user?.Mobile,
+          userId: user?._id,
+          ApartmentName: data?.Apartmentname,
+          addresstype: addresstype,
+          addressid: data?._id,
+        },
+      );
     } catch (error) {
       // console.log(error);
     }
@@ -1337,6 +1347,16 @@ const Banner = ({
         }
       } else {
         setPrimaryAddress(null);
+      }
+
+      // Also sync currentLocation so getDisplayAddress re-renders with new hub name
+      const savedLoc = localStorage.getItem("currentLocation");
+      if (savedLoc && savedLoc !== "null") {
+        try {
+          setCurrentLocation(JSON.parse(savedLoc));
+        } catch (e) {
+          // ignore
+        }
       }
     };
 
@@ -1542,28 +1562,57 @@ const Banner = ({
     <div>
       <div className="ban-container">
         <div className="mobile-banner-updated">
-          <div className="screen-3" style={{ padding: "0 24px 8px 24px" }}>
+          <div
+            className="screen-3"
+            style={{
+              padding: isVerySmall
+                ? "0 10px 8px 10px"
+                : isMobile
+                  ? "0 10px 8px 10px"
+                  : isSmall
+                    ? "0 12px 8px 12px"
+                    : "0 24px 8px 24px",
+            }}
+          >
             <div
               className="screen-2 mb-3 mt-2 d-flex align-items-center"
-              style={{ width: "100%", justifyContent: "space-between" }}
+              style={{
+                width: "100%",
+                justifyContent: "space-between",
+                gap: isMobile ? "4px" : isSmall ? "6px" : "16px",
+              }}
             >
               {user && (
                 <div
-                  className="d-flex align-items-center gap-2"
+                  className="d-flex align-items-center"
                   onClick={
                     isLocationEnabled
                       ? handleLocationClick
                       : handleLocationDisabledClick
                   }
-                  style={{ cursor: "pointer", flex: 1, minWidth: 0 }}
+                  style={{
+                    cursor: "pointer",
+                    flex: 1,
+                    minWidth: 0,
+                    gap: isVerySmall ? "4px" : isMobile ? "6px" : "8px",
+                  }}
                 >
                   {isLocating ? (
                     <FaSpinner
                       className="fa-spin"
                       style={{
-                        width: "32px",
-                        height: "32px",
+                        width: isVerySmall
+                          ? "22px"
+                          : isMobile
+                            ? "24px"
+                            : "32px",
+                        height: isVerySmall
+                          ? "22px"
+                          : isMobile
+                            ? "24px"
+                            : "32px",
                         color: "#6B8E23",
+                        flexShrink: 0,
                       }}
                     />
                   ) : (
@@ -1572,21 +1621,49 @@ const Banner = ({
                       alt="select-location"
                       className="flex-shrink-0"
                       style={{
-                        width: "32px",
-                        height: "32px",
+                        width: isVerySmall
+                          ? "22px"
+                          : isMobile
+                            ? "24px"
+                            : "32px",
+                        height: isVerySmall
+                          ? "22px"
+                          : isMobile
+                            ? "24px"
+                            : "32px",
                         opacity: isLocationEnabled ? 1 : 0.5,
                       }}
                     />
                   )}
 
-                  <div className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center">
-                    <div className="d-flex align-items-center">
+                  <div
+                    className="d-flex flex-column cursor-pointer flex-grow-1 aligen-center"
+                    style={{ minWidth: 0 }}
+                  >
+                    <div
+                      className="d-flex align-items-center"
+                      style={{ minWidth: 0 }}
+                    >
                       <p
-                        className={`select-location-text fw-semibold text-truncate mb-0 banner-address-line ${
+                        className={`select-location-text fw-semibold mb-0 banner-address-line ${
                           user ? "with-user-icon" : "with-login-btn"
                         }`}
                         title={getAddressTooltip()}
-                        style={{ opacity: isLocationEnabled ? 1 : 0.7 }}
+                        style={{
+                          opacity: isLocationEnabled ? 1 : 0.7,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          flex: 1,
+                          minWidth: 0,
+                          fontSize: isVerySmall
+                            ? "13px"
+                            : isMobile
+                              ? "14px"
+                              : isSmall
+                                ? "15px"
+                                : undefined,
+                        }}
                       >
                         {getDisplayAddress()}
                       </p>
@@ -1653,8 +1730,13 @@ const Banner = ({
               )}
 
               <div
-                className="d-flex gap-1 justify-content-end align-items-center referbtn"
-                style={{ marginLeft: "auto", flexShrink: 0 }}
+                className=" justify-content-end align-items-center referbtn"
+                style={{
+                  marginLeft: "auto",
+                  flexShrink: 0,
+                  display: "flex",
+                  gap: "5px",
+                }}
               >
                 {user ? (
                   <img
@@ -1662,6 +1744,10 @@ const Banner = ({
                     alt="user-icon"
                     onClick={handleShow8}
                     className="p-2"
+                    style={{
+                      width: isVerySmall ? "36px" : isMobile ? "44px" : "44px",
+                      height: isVerySmall ? "36px" : isMobile ? "44px" : "44px",
+                    }}
                   />
                 ) : (
                   <button
@@ -1671,11 +1757,11 @@ const Banner = ({
                       border: "2px solid #F5DEB3",
                       color: "#2c2c2c",
                       cursor: "pointer",
-                      fontSize: "16px",
+                      fontSize: isMobile ? "14px" : "16px",
                       fontFamily: "Inter",
                       fontWeight: "600",
-                      width: "106px",
-                      height: "44px",
+                      width: isMobile ? "90px" : "106px",
+                      height: isMobile ? "38px" : "44px",
                       borderRadius: "18px",
                     }}
                     onClick={() => {

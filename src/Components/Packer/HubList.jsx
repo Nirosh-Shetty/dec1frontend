@@ -1006,18 +1006,7 @@
 
 // export default HubList;
 
-
-
-
-
-
 // =====================================================================
-
-
-
-
-
-
 
 // import React, { useState, useEffect, useCallback } from "react";
 // import axios from "axios";
@@ -2332,19 +2321,7 @@
 
 // export default HubList;
 
-
-
-
-
-
-
-
-
 // ============================================================
-
-
-
-
 
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
@@ -2536,7 +2513,7 @@ const HubList = () => {
   const getDefaultCutoffTimes = (orderMode) => {
     const defaultCutoff = orderMode === "preorder" ? "00:00" : "10:00";
     const employeeCutoff = "10:00";
-    
+
     return {
       breakfast: { defaultCutoff, employeeCutoff },
       lunch: { defaultCutoff, employeeCutoff },
@@ -2664,9 +2641,9 @@ const HubList = () => {
       if (res.status === 200) {
         showToast(
           `Order mode updated to ${selectedHubForOrderMode.orderMode}. ` +
-          `${res.data.propagationStats?.customers || 0} customer addresses, ` +
-          `${res.data.propagationStats?.orders || 0} orders, and ` +
-          `${res.data.propagationStats?.mealPlans || 0} meal plans updated.`
+            `${res.data.propagationStats?.customers || 0} customer addresses, ` +
+            `${res.data.propagationStats?.orders || 0} orders, and ` +
+            `${res.data.propagationStats?.mealPlans || 0} meal plans updated.`,
         );
         setShowOrderModeModal(false);
         getHubs();
@@ -2826,9 +2803,7 @@ const HubList = () => {
         📋 Preorder
       </Badge>
     ) : (
-      <Badge bg="success">
-        ⚡ Instant
-      </Badge>
+      <Badge bg="success">⚡ Instant</Badge>
     );
   };
 
@@ -2843,8 +2818,12 @@ const HubList = () => {
             id="preorder-mode"
             label={
               <span>
-                <Badge bg="warning" text="dark" className="me-2">📋 Preorder</Badge>
-                <span className="text-muted">(Default cutoff: Previous day midnight)</span>
+                <Badge bg="warning" text="dark" className="me-2">
+                  📋 Preorder
+                </Badge>
+                <span className="text-muted">
+                  (Default cutoff: Previous day midnight)
+                </span>
               </span>
             }
             name="orderMode"
@@ -2858,8 +2837,12 @@ const HubList = () => {
             id="instant-mode"
             label={
               <span>
-                <Badge bg="success" className="me-2">⚡ Instant</Badge>
-                <span className="text-muted">(Default cutoff: Same day 10:00 AM)</span>
+                <Badge bg="success" className="me-2">
+                  ⚡ Instant
+                </Badge>
+                <span className="text-muted">
+                  (Default cutoff: Same day 10:00 AM)
+                </span>
               </span>
             }
             name="orderMode"
@@ -2870,17 +2853,22 @@ const HubList = () => {
           />
         </div>
         <Form.Text className="text-muted">
-          {orderMode === "preorder" 
+          {orderMode === "preorder"
             ? "Preorder mode: Customers must order by previous day midnight. Employees can order same day until 10:00 AM."
-            : "Instant mode: Both customers and employees can order same day until cutoff time (default 10:00 AM)."
-          }
+            : "Instant mode: Both customers and employees can order same day until cutoff time (default 10:00 AM)."}
         </Form.Text>
       </div>
     );
   };
 
   // Cutoff Time Input Component
-  const CutoffTimeInput = ({ label, session, cutoffTimes, onChange, orderMode }) => {
+  const CutoffTimeInput = ({
+    label,
+    session,
+    cutoffTimes,
+    onChange,
+    orderMode,
+  }) => {
     return (
       <div className="mb-3 p-3 border rounded">
         <h6 className="mb-3">{label}</h6>
@@ -2893,7 +2881,9 @@ const HubList = () => {
                 </Badge>
                 Cutoff Time
                 {orderMode === "preorder" && (
-                  <Badge bg="info" className="ms-1">Previous Day</Badge>
+                  <Badge bg="info" className="ms-1">
+                    Previous Day
+                  </Badge>
                 )}
               </Form.Label>
               <Form.Control
@@ -2905,10 +2895,9 @@ const HubList = () => {
                 step="60"
               />
               <Form.Text className="text-muted small">
-                {orderMode === "preorder" 
+                {orderMode === "preorder"
                   ? "Orders must be placed by this time on the previous day"
-                  : "Orders must be placed by this time on the same day"
-                }
+                  : "Orders must be placed by this time on the same day"}
               </Form.Text>
             </Form.Group>
           </Col>
@@ -3230,7 +3219,11 @@ const HubList = () => {
                                   locations: hub.locations || [],
                                   geometry: hub.geometry || null,
                                   orderMode: hub.orderMode || "preorder",
-                                  cutoffTimes: hub.cutoffTimes || getDefaultCutoffTimes(hub.orderMode || "preorder"),
+                                  cutoffTimes:
+                                    hub.cutoffTimes ||
+                                    getDefaultCutoffTimes(
+                                      hub.orderMode || "preorder",
+                                    ),
                                 });
                                 setShowEditHub(true);
                               }}
@@ -3421,17 +3414,29 @@ const HubList = () => {
 
             <Tab eventKey="cutoff" title="Cutoff Times">
               <div className="p-3">
-                <Alert variant={newHub.orderMode === "preorder" ? "warning" : "success"}>
-                  <strong>Current Order Mode: {newHub.orderMode === "preorder" ? "📋 Preorder" : "⚡ Instant"}</strong>
+                <Alert
+                  variant={
+                    newHub.orderMode === "preorder" ? "warning" : "success"
+                  }
+                >
+                  <strong>
+                    Current Order Mode:{" "}
+                    {newHub.orderMode === "preorder"
+                      ? "📋 Preorder"
+                      : "⚡ Instant"}
+                  </strong>
                   <br />
                   {newHub.orderMode === "preorder" ? (
                     <>
-                      • <strong>Regular Customers:</strong> Must order by cutoff time on the <strong>PREVIOUS day</strong>
-                      <br />• <strong>Employees:</strong> Can order on the <strong>SAME day</strong> until cutoff time
+                      • <strong>Regular Customers:</strong> Must order by cutoff
+                      time on the <strong>PREVIOUS day</strong>
+                      <br />• <strong>Employees:</strong> Can order on the{" "}
+                      <strong>SAME day</strong> until cutoff time
                     </>
                   ) : (
                     <>
-                      • <strong>Both Regular Customers & Employees:</strong> Can order on the <strong>SAME day</strong> until cutoff time
+                      • <strong>Both Regular Customers & Employees:</strong> Can
+                      order on the <strong>SAME day</strong> until cutoff time
                     </>
                   )}
                 </Alert>
@@ -3664,8 +3669,12 @@ const HubList = () => {
                     id="modal-preorder"
                     label={
                       <span>
-                        <Badge bg="warning" text="dark" className="me-2">📋 Preorder</Badge>
-                        <span className="text-muted">(Previous day cutoff)</span>
+                        <Badge bg="warning" text="dark" className="me-2">
+                          📋 Preorder
+                        </Badge>
+                        <span className="text-muted">
+                          (Previous day cutoff)
+                        </span>
                       </span>
                     }
                     name="modalOrderMode"
@@ -3683,7 +3692,9 @@ const HubList = () => {
                     id="modal-instant"
                     label={
                       <span>
-                        <Badge bg="success" className="me-2">⚡ Instant</Badge>
+                        <Badge bg="success" className="me-2">
+                          ⚡ Instant
+                        </Badge>
                         <span className="text-muted">(Same day cutoff)</span>
                       </span>
                     }
@@ -3701,7 +3712,8 @@ const HubList = () => {
               </Form.Group>
 
               <Alert variant="warning">
-                <strong>Note:</strong> This change will affect all customers, orders, and meal plans associated with this hub.
+                <strong>Note:</strong> This change will affect all customers,
+                orders, and meal plans associated with this hub.
               </Alert>
             </>
           )}
@@ -3746,13 +3758,25 @@ const HubList = () => {
           <Modal.Title>
             Cutoff Time Settings - {selectedHubForCutoff?.hubName}
             <span className="ms-2">
-              {selectedHubForCutoff && getOrderModeBadge(selectedHubForCutoff.orderMode)}
+              {selectedHubForCutoff &&
+                getOrderModeBadge(selectedHubForCutoff.orderMode)}
             </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Alert variant={selectedHubForCutoff?.orderMode === "preorder" ? "warning" : "success"}>
-            <strong>Current Order Mode: {selectedHubForCutoff?.orderMode === "preorder" ? "📋 Preorder" : "⚡ Instant"}</strong>
+          <Alert
+            variant={
+              selectedHubForCutoff?.orderMode === "preorder"
+                ? "warning"
+                : "success"
+            }
+          >
+            <strong>
+              Current Order Mode:{" "}
+              {selectedHubForCutoff?.orderMode === "preorder"
+                ? "📋 Preorder"
+                : "⚡ Instant"}
+            </strong>
             <ul className="mt-2 mb-0">
               {selectedHubForCutoff?.orderMode === "preorder" ? (
                 <>
@@ -3768,8 +3792,9 @@ const HubList = () => {
               ) : (
                 <>
                   <li>
-                    <strong>Both Regular Customers & Employees:</strong> Can place orders on the{" "}
-                    <strong>same day</strong> until the cutoff time
+                    <strong>Both Regular Customers & Employees:</strong> Can
+                    place orders on the <strong>same day</strong> until the
+                    cutoff time
                   </li>
                 </>
               )}
@@ -3881,7 +3906,8 @@ const HubList = () => {
               <br />
               <strong>Hub ID:</strong> {selectedHub?.hubId}
               <br />
-              <strong>Order Mode:</strong> {selectedHub?.orderMode || "preorder"}
+              <strong>Order Mode:</strong>{" "}
+              {selectedHub?.orderMode || "preorder"}
               <br />
               <strong>Locations:</strong> {selectedHub?.locations?.length || 0}
             </div>
@@ -3958,108 +3984,6 @@ const HubList = () => {
 };
 
 export default HubList;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import React, { useState, useEffect, useCallback } from "react";
 // import axios from "axios";
@@ -4141,7 +4065,7 @@ export default HubList;
 //       }
 //     }
 //   });
-  
+
 //   const [selectedHub, setSelectedHub] = useState(null);
 //   const [selectedHubForCutoff, setSelectedHubForCutoff] = useState(null);
 //   const [addHubLoading, setAddHubLoading] = useState(false);
@@ -4360,7 +4284,7 @@ export default HubList;
 //   // Update Cutoff Times
 //   const handleUpdateCutoffTimes = async () => {
 //     if (!selectedHubForCutoff) return;
-    
+
 //     setCutoffLoading(true);
 //     try {
 //       const res = await axios.put(
@@ -4370,7 +4294,7 @@ export default HubList;
 //         },
 //         { headers: { Authorization: `Bearer ${token}` } }
 //       );
-      
+
 //       if (res.status === 200) {
 //         showToast("Cutoff times updated successfully");
 //         setShowCutoffSettings(false);
@@ -4714,8 +4638,8 @@ export default HubList;
 //                         <td className="align-middle">
 //                           <strong>{hub.hubName || "N/A"}</strong>
 //                           {hub.allowInstantForAll && (
-//                             <Badge 
-//                               bg="success" 
+//                             <Badge
+//                               bg="success"
 //                               className="ms-2"
 //                               style={{ fontSize: "0.7rem" }}
 //                             >
@@ -4743,7 +4667,7 @@ export default HubList;
 //                           )}
 //                         </td>
 //                         <td className="align-middle">
-//                           <Badge 
+//                           <Badge
 //                             bg={hub.allowInstantForAll ? "success" : "info"}
 //                             className="p-2"
 //                           >
@@ -4946,9 +4870,9 @@ export default HubList;
 //                       id="allow-instant-for-all"
 //                       label="Allow Instant Orders for All Users"
 //                       checked={newHub.allowInstantForAll}
-//                       onChange={(e) => setNewHub({ 
-//                         ...newHub, 
-//                         allowInstantForAll: e.target.checked 
+//                       onChange={(e) => setNewHub({
+//                         ...newHub,
+//                         allowInstantForAll: e.target.checked
 //                       })}
 //                       className="mb-2"
 //                     />
@@ -4956,14 +4880,14 @@ export default HubList;
 //                       {newHub.allowInstantForAll ? (
 //                         <>
 //                           <Badge bg="success" className="me-1">⚡ Instant Mode</Badge>
-//                           When enabled: <strong>ALL users</strong> (both employees and regular customers) 
-//                           will be able to place <strong>instant/same-day orders</strong> using the 
+//                           When enabled: <strong>ALL users</strong> (both employees and regular customers)
+//                           will be able to place <strong>instant/same-day orders</strong> using the
 //                           employee cutoff times.
 //                         </>
 //                       ) : (
 //                         <>
 //                           <Badge bg="info" className="me-1">📅 Mixed Mode</Badge>
-//                           When disabled: Employees can place instant orders (same day cutoff), 
+//                           When disabled: Employees can place instant orders (same day cutoff),
 //                           while regular customers must place preorders (previous day cutoff).
 //                         </>
 //                       )}
@@ -4991,7 +4915,7 @@ export default HubList;
 //                 </Form.Group>
 //               </Form>
 //             </Tab>
-            
+
 //             <Tab eventKey="cutoff" title="Cutoff Times">
 //               <div className="p-3">
 //                 <Alert variant="info">
@@ -5001,10 +4925,10 @@ export default HubList;
 //                   • Default cutoff for regular customers is 00:00 (midnight previous day)<br />
 //                   • Default cutoff for employees is 10:00 AM (same day)<br />
 //                   <hr />
-//                   <strong>⚡ Instant Mode:</strong> If "Allow Instant Orders for All Users" is enabled, 
+//                   <strong>⚡ Instant Mode:</strong> If "Allow Instant Orders for All Users" is enabled,
 //                   ALL users will use the employee cutoff times.
 //                 </Alert>
-                
+
 //                 <CutoffTimeInput
 //                   label="Breakfast Session"
 //                   session="breakfast"
@@ -5022,7 +4946,7 @@ export default HubList;
 //                     });
 //                   }}
 //                 />
-                
+
 //                 <CutoffTimeInput
 //                   label="Lunch Session"
 //                   session="lunch"
@@ -5040,7 +4964,7 @@ export default HubList;
 //                     });
 //                   }}
 //                 />
-                
+
 //                 <CutoffTimeInput
 //                   label="Dinner Session"
 //                   session="dinner"
@@ -5146,9 +5070,9 @@ export default HubList;
 //                   id="edit-allow-instant-for-all"
 //                   label="Allow Instant Orders for All Users"
 //                   checked={editHub.allowInstantForAll}
-//                   onChange={(e) => setEditHub({ 
-//                     ...editHub, 
-//                     allowInstantForAll: e.target.checked 
+//                   onChange={(e) => setEditHub({
+//                     ...editHub,
+//                     allowInstantForAll: e.target.checked
 //                   })}
 //                   className="mb-2"
 //                 />
@@ -5167,7 +5091,7 @@ export default HubList;
 //                 </Form.Text>
 //               </div>
 //             </Form.Group>
-            
+
 //             <Form.Group className="mb-3">
 //               <Form.Label className="fw-bold">
 //                 Service Area (Polygon)
@@ -5239,7 +5163,7 @@ export default HubList;
 //               <li className="mt-2"><strong>Note:</strong> If "Allow Instant Orders for All Users" is enabled for this hub, all users will use the employee cutoff times.</li>
 //             </ul>
 //           </Alert>
-          
+
 //           {selectedHubForCutoff && (
 //             <>
 //               <CutoffTimeInput
@@ -5259,7 +5183,7 @@ export default HubList;
 //                   });
 //                 }}
 //               />
-              
+
 //               <CutoffTimeInput
 //                 label="Lunch Session"
 //                 session="lunch"
@@ -5277,7 +5201,7 @@ export default HubList;
 //                   });
 //                 }}
 //               />
-              
+
 //               <CutoffTimeInput
 //                 label="Dinner Session"
 //                 session="dinner"

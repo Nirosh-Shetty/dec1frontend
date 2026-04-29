@@ -4,7 +4,7 @@
   border-radius: 12px;
   font-family: "Inter", sans-serif;
   color: #333;
-  width: 30%;
+  width: 34%;
   margin: auto;
 }
 .info-box {
@@ -668,8 +668,8 @@
     display: flex;
     justify-content: space-between;
     padding: 0px;
-    border-radius: 22px;
-    box-shadow: 0 6px 10px 1px rgba(55, 55, 55, 0.25);
+    /* border-radius: 22px; */
+    /* box-shadow: 0 6px 10px 1px rgba(55, 55, 55, 0.25); */
   }
 
   .date-session-wrapper .session-container {
@@ -824,7 +824,7 @@
   border-radius: 12px;
   font-family: "Inter", sans-serif;
   color: #333;
-  width: 30%;
+  width: 32%;
   margin: auto;
   padding: 20px;
 }
@@ -1115,7 +1115,7 @@
 /* Tablet styles */
 @media screen and (min-width: 800px) and (max-width: 1024px) {
   .date-session-wrapper {
-    width: 80%;
+    width: 100%;
   }
 }
 

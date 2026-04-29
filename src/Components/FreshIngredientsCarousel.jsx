@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { Carousel } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -108,9 +108,38 @@ const FreshSourcedIcon = () => (
   </svg>
 );
 
+const carouselData = [
+  {
+    title: "Cooked like home, every time",
+    description:
+      "Made fresh by our kitchen team. No reheating. No preservatives. Just real food.",
+    icon: <HomeCookedIcon />,
+  },
+  {
+    title: "On your doorstep, on the dot",
+    description:
+      "Breakfast 7 AM · Lunch 12 PM · Dinner 7 PM — free delivery, always.",
+    icon: <DoorstepIcon />,
+  },
+  {
+    title: "Sourced fresh at 5 AM tomorrow",
+    description:
+      "We buy ingredients only after you order — nothing sits in storage overnight.",
+    icon: <FreshSourcedIcon />,
+  },
+];
+
 const FreshIngredientsCarousel = () => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % carouselData.length);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, [paused]);
 
   const handleSelect = (selectedIndex) => {
     setIndex(selectedIndex);
@@ -120,39 +149,23 @@ const FreshIngredientsCarousel = () => {
     setPaused((p) => !p);
   };
 
-  const carouselData = [
-    {
-      title: "Cooked like home, every time",
-      description:
-        "Made fresh by our kitchen team. No reheating. No preservatives. Just real food.",
-      icon: <HomeCookedIcon />,
-    },
-    {
-      title: "On your doorstep, on the dot",
-      description:
-        "Breakfast 7 AM · Lunch 12 PM · Dinner 7 PM — free delivery, always.",
-      icon: <DoorstepIcon />,
-    },
-    {
-      title: "Sourced fresh at 5 AM tomorrow",
-      description:
-        "We buy ingredients only after you order — nothing sits in storage overnight.",
-      icon: <FreshSourcedIcon />,
-    },
-  ];
-
   return (
     <div className="fresh-carousel-wrapper">
       <style jsx>{`
         .fresh-carousel-wrapper {
-          max-width: 613px;
+          max-width: 665px;
           width: 100%;
           margin: 0 auto;
+         
         }
 
         .fresh-carousel-card {
           background: transparent;
           overflow: hidden;
+          max-width: 655px;
+          width: 100%;
+          margin: 0 auto;
+          border-radius:"20px"
         }
 
         /* Original fresh-ingredients-section style */
@@ -166,6 +179,9 @@ const FreshIngredientsCarousel = () => {
           min-height: 147.5px;
           width: 100%;
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+          border-radius:40px;
+          border-top-left-radius:0;
+          border-top-right-radius:0;
         }
 
         .fresh-ingredients-content {
@@ -376,8 +392,8 @@ const FreshIngredientsCarousel = () => {
         <Carousel
           activeIndex={index}
           onSelect={handleSelect}
-          interval={paused ? null : 5000}
-          pause="hover"
+          interval={null}
+          pause={false}
           className="custom-carousel"
           indicators={false}
           controls={false}
@@ -402,7 +418,7 @@ const FreshIngredientsCarousel = () => {
         </Carousel>
 
         {/* Custom indicator row */}
-        <div className="carousel-indicator-row">
+        {/* <div className="carousel-indicator-row">
           <button
             className="carousel-pause-btn"
             onClick={togglePause}
@@ -425,7 +441,7 @@ const FreshIngredientsCarousel = () => {
               aria-label={`Slide ${idx + 1}`}
             />
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

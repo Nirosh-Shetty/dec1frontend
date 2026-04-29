@@ -17,7 +17,9 @@ const Statusbar = () => {
   useEffect(() => {
     const getAddWebstory = async () => {
       try {
-        let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getstories");
+        let res = await axios.get(
+          "https://dd-backend-3nm0.onrender.com/api/admin/getstories",
+        );
         if (res.status === 200) {
           const stories = res.data.getbanner.reverse(); // Adjust order if needed
           setAddWebstory(stories);

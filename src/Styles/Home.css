@@ -1074,7 +1074,7 @@ body.nav-hidden .cartbtn {
 }
 .isVegIcon {
   position: absolute;
-  top: 5px;
+  top: 22px;
   left: 5px;
   width: 30px;
   height: 30px;
@@ -2612,7 +2612,7 @@ body.drawer-open .ant-drawer.description-product {
 
   .isVegIcon {
     position: absolute;
-    top: 6px;
+    top: 27px;
     left: 6px;
     width: 34px;
     height: 34px;
@@ -2879,5 +2879,83 @@ body.drawer-open .ant-drawer.description-product {
     justify-items: center;
     width: 100px;
     height: 15px;
+  }
+}
+
+/* Premium Offer Badge - Golden badge at top */
+.premium-offer-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, #f5c842 0%, #e6a800 100%);
+  color: #2c2c2c;
+  padding: 6px 12px;
+  border-radius: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(230, 168, 0, 0.3);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+/* Offer Percentage Badge - Green badge next to price */
+.offer-percentage-badge {
+  /* background: linear-gradient(135deg, #10b981 0%, #059669 100%); */
+  background: linear-gradient(135deg, #6b8e23 0%, #6b8e23 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+  white-space: nowrap;
+  animation: offerBadgeSlide 0.4s ease-out;
+}
+
+@keyframes offerBadgeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile responsive adjustments */
+@media screen and (max-width: 799px) {
+  .premium-offer-badge {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .premium-offer-badge svg {
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+  }
+
+  .offer-percentage-badge {
+    font-size: 11px;
+    padding: 3px 8px;
   }
 }
