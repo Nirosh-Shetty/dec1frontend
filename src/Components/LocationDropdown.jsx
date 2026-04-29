@@ -12,7 +12,7 @@ const LocationDropdown = ({ onClose, onLocationSelect }) => {
   const autocompleteServiceRef = useRef(null);
   const placesServiceRef = useRef(null);
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   // Initialize Google Maps services
   useEffect(() => {

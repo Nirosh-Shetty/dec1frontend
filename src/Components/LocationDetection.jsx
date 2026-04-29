@@ -17,7 +17,7 @@
 //           try {
 //             // Get actual address from coordinates using reverse geocoding
 //             const response = await fetch(
-//               `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=${import.meta.env.VITE_MAP_KEY}`
+//               `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
 //             );
 
 //             const data = await response.json();
@@ -481,7 +481,7 @@ const LocationDetection = ({ show = true, onEnableLocation, onClose }) => {
     try {
       // Get actual address from coordinates using reverse geocoding
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.latitude},${coords.longitude}&key=${import.meta.env.VITE_MAP_KEY}`,
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.latitude},${coords.longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
       );
 
       const data = await response.json();

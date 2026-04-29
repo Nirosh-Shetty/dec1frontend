@@ -86,7 +86,7 @@
 //   const fixedPinRef = useRef(null);
 //   const fixedMessageRef = useRef(null);
 
-//   const API_KEY = import.meta.env.VITE_MAP_KEY;
+//   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 //   // Detect iOS device
 //   const isIOS =
@@ -3098,7 +3098,7 @@
 //   const isSmall = width <= 768; // For general mobile adjustments
 //   const isVerySmall = width <= 360; // For stacking buttons vertically
 
-//   const API_KEY = import.meta.env.VITE_MAP_KEY;
+//   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 //   // Function to check location permission
 //   const checkLocationPermission = useCallback(() => {
@@ -5889,7 +5889,7 @@ const UpdateLocation = () => {
   const isSmall = width <= 768;
   const isVerySmall = width <= 360;
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   // Enhanced iOS location permission check
   const checkIOSLocationPermission = useCallback(() => {

@@ -45,7 +45,7 @@ const LocationModal2 = ({
 
   const isTablet = window.innerWidth <= 1024;
 
-  const API_KEY = import.meta.env.VITE_MAP_KEY;
+  const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   // Update window dimensions
   useEffect(() => {

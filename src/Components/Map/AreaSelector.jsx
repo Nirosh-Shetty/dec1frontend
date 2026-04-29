@@ -194,7 +194,7 @@
 //     }
 //   }, [onChange, onGeoJSONChange]);
 
-//   const effectiveKey = apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_MAP_KEY || "";
+//   const effectiveKey = apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 //   const { isLoaded, loadError } = useJsApiLoader({
 //     googleMapsApiKey: effectiveKey,
 //     libraries: ["drawing"],
@@ -528,7 +528,7 @@
 //     [isDrawing, paths.length]
 //   );
 
-//   const effectiveKey = apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_MAP_KEY || "";
+//   const effectiveKey = apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 //   const { isLoaded, loadError } = useJsApiLoader({
 //     googleMapsApiKey: effectiveKey,
 //     libraries: ["geometry"],
@@ -957,7 +957,7 @@
 //     []
 //   );
 
-//   const effectiveKey = apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_MAP_KEY || "";
+//   const effectiveKey = apiKey || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 //   const { isLoaded, loadError } = useJsApiLoader({
 //     googleMapsApiKey: effectiveKey,
 //     libraries: ["geometry"],
@@ -1579,7 +1579,7 @@ const AreaSelector = ({
   const effectiveKey =
     apiKey ||
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
-    import.meta.env.VITE_MAP_KEY ||
+    import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
     "";
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: effectiveKey,
