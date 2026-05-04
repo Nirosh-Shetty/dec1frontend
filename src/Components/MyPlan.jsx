@@ -156,7 +156,26 @@ const MyPlan = () => {
   };
     const [loading, setLoading] = useState(false);
 
- const handleSkipOrCancel = async (planId, userId) => {
+ const handleSkipOrCancel = async (planId, userId, planStatus) => {
+      const actionWord = planStatus === "Confirmed" ? "cancel" : "skip";
+      const actionLabel = planStatus === "Confirmed" ? "Cancel Order" : "Skip Plan";
+
+      const confirmResult = await Swal2.fire({
+        title: `${actionLabel}?`,
+        text:
+          planStatus === "Confirmed"
+            ? "Your payment will be refunded to your wallet. This cannot be undone."
+            : "This plan will be removed from your upcoming list.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6b8e23",
+        confirmButtonText: `Yes, ${actionWord} it`,
+        cancelButtonText: "Keep it",
+      });
+
+      if (!confirmResult.isConfirmed) return;
+
       try {
         setLoading(true);
         await axios.post("https://dd-backend-3nm0.onrender.com/api/user/plan/skip-cancel", {
@@ -172,9 +191,9 @@ const MyPlan = () => {
           timerProgressBar: true,
           html: `
             <div class="myplans-toast-content">
-              <img src="${checkCircle}" alt="Success" class="myplans-toast-check" />
+              <img src="${success}" alt="Success" class="myplans-toast-check" />
               <div class="myplans-toast-text">
-                <div class="myplans-toast-title">Plan skipped.</div>
+                <div class="myplans-toast-title">Plan ${actionWord === "cancel" ? "cancelled" : "skipped"}.</div>
                 <div class="myplans-toast-subtitle">Removing from your upcoming list</div>
               </div>
             </div>
@@ -194,8 +213,7 @@ const MyPlan = () => {
           },
         });
 
-        onPlanUpdated && onPlanUpdated();
-        onClose();
+        fetchPlans();
       } catch (err) {
         alert(err?.response?.data?.error || "Something went wrong");
       } finally {
@@ -1651,8 +1669,10 @@ const MyPlan = () => {
                               ₹{plan.slotTotalAmount}
                             </div>
                           </div>
+                          
                         </div>
 
+                       
                         {/* SESSION & TIME Row */}
                         <div className="plan-session-row">
                           <div className="plan-session-left">
@@ -1689,6 +1709,21 @@ const MyPlan = () => {
                                             ? "✗ Cancelled"
                                             : "⊘ Skipped"}
                           </div>
+                        </div>
+ {/* ORDER ID & CANCEL ROW */}
+                        <div className="plan-orderid-row">
+                          <div className="plan-orderid-text">
+                            {plan.displayOrderId ? `#${plan.displayOrderId}` : ""}
+                          </div>
+                          {(plan.status === "Pending Payment" || plan.status === "Confirmed") && (
+                            <button
+                              className="plan-cancel-btn"
+                              onClick={() => handleSkipOrCancel(plan._id, userId, plan.status)}
+                              disabled={loading}
+                            >
+                              {plan.status === "Confirmed" ? "Cancel" : "Skip"}
+                            </button>
+                          )}
                         </div>
 
                         {/* ITEMS LIST */}
@@ -1738,9 +1773,6 @@ const MyPlan = () => {
                             </div>
                           </div>
                         </div>
-<button onClick={()=>{
-  handleSkipOrCancel(plan._id, userId)
-}}>cancel</button>
                         {/* FRESHNESS JOURNEY - Only show for active orders (hide when Delivered, Cancelled, Skipped) */}
                         {!(
                           plan.status === "Delivered" ||

@@ -876,7 +876,18 @@ const CheckoutMultiple = () => {
 
             return (
               <section key={session} className="cm-session-block">
-                <h4 className="cm-session-title">{session}</h4>
+                <h4 className="cm-session-title">
+                  {session}
+                  {items[0]?.deliveryDate && (
+                    <span className="cm-session-date">
+                      {" · "}
+                      {new Date(items[0].deliveryDate).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </span>
+                  )}
+                </h4>
 
                 <div className="cm-session-items">
                   {items.map((item, index) => {
