@@ -99,6 +99,7 @@ import LocationPage from "./Components/LocationPage";
 import DeliveryRate from "./Components/Admin/DeliveryRate";
 import AiSensyImage from "./Components/Admin/AiSensyImage";
 import CheckoutMultiple from "./Components/CheckoutMultiple";
+import BulkStatusUpdate from "./Components/Admin/BulkStatusUpdate";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -399,6 +400,10 @@ function App() {
           <Route
             path="admin/myplan-dashboard"
             element={<Main children={<AdminPlanDashboard />} />}
+          />
+          <Route
+            path="admin/bulk-status-update"
+            element={<Main children={<BulkStatusUpdate />} />}
           />
           <Route
             path="admin/menu-upload"

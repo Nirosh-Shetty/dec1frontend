@@ -19,6 +19,7 @@ import {
   FaGift,
   FaLocationArrow,
   FaMotorcycle,
+  FaTasks,
 } from "react-icons/fa";
 import { CiDiscount1 } from "react-icons/ci";
 import { MdProductionQuantityLimits } from "react-icons/md";
@@ -384,6 +385,14 @@ const Side = () => {
                     <FaGift style={{ fontSize: "20px" }} />
                   </span>
                   <span className="ms-2">My Plan Dashboard</span>
+                </li>
+              </Link>
+              <Link to="/admin/bulk-status-update" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <FaTasks style={{ fontSize: "20px" }} />
+                  </span>
+                  <span className="ms-2">Bulk Status Update</span>
                 </li>
               </Link>
               <Link to="/admin/user-feedback" onClick={handleNavCollapse}>
