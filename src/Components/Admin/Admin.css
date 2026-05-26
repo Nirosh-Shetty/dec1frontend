@@ -735,6 +735,45 @@ table thead tr th {
 
 /* Admin Panel ends */
 
+.admin-savings-page {
+  padding: 10px;
+}
+
+.admin-savings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 10px;
+}
+
+.admin-savings-panel {
+  background: #fff;
+  border: 1px solid #f1c8a8;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.admin-savings-panel h4 {
+  margin: 0;
+  color: #222;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.admin-savings-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.admin-savings-table-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
 
 @media screen and (max-width: 799px) {
   .uprdiv{
@@ -852,6 +891,11 @@ table thead tr th {
     height: 380px;
     width: 100%;
 }
+
+  .admin-savings-grid {
+    grid-template-columns: 1fr;
+    margin: 5px;
+  }
 }
 .hjhu button {
   width: 175px;

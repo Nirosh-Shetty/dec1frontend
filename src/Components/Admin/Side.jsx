@@ -339,6 +339,15 @@ const Side = () => {
                 </li>
               </Link>
 
+              <Link to="/admin/savings-settings" onClick={handleNavCollapse}>
+                <li className="a-ele ">
+                  <span>
+                    <CiDiscount1 style={{ fontSize: "20px" }} />
+                  </span>
+                  <span className="ms-2">Savings Settings</span>
+                </li>
+              </Link>
+
               <Link to="/hub-product-mangement" onClick={handleNavCollapse}>
                 <li className="a-ele ">
                   <span>

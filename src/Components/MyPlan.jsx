@@ -4,6 +4,7 @@ import { WalletContext } from "../WalletContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Modal } from "react-bootstrap";
+import { BadgeIndianRupee, ChevronRight, Clock3 } from "lucide-react";
 import IsVeg from "./../assets/isVeg=yes.svg";
 import IsNonVeg from "./../assets/isVeg=no.svg";
 // import name from "./../assets/successGroup.png";
@@ -48,6 +49,10 @@ const MyPlan = () => {
   const walletBalance = wallet?.balance || 0;
   const [deliveryCharge, setDeliveryCharge] = useState([]);
   const [filteredRates, setFilteredRates] = useState([]);
+  const [savingsData, setSavingsData] = useState(null);
+  const [isLoadingSavings, setIsLoadingSavings] = useState(false);
+  const [savingsModal, setSavingsModal] = useState(null);
+  const [showAllMoneySavings, setShowAllMoneySavings] = useState(false);
 
   // parse stored user once so we can access properties safely
   let user = null;
@@ -62,6 +67,23 @@ const MyPlan = () => {
   );
 
   const userId = user ? user._id : null;
+
+  const fetchSavings = async () => {
+    if (!userId) return;
+    try {
+      setIsLoadingSavings(true);
+      const res = await axios.get(
+        `https://dd-backend-3nm0.onrender.com/api/user/savings/lifetime-savings/${userId}`,
+      );
+      if (res.data.success) {
+        setSavingsData(res.data.data || null);
+      }
+    } catch (err) {
+      console.error("fetch savings error", err);
+    } finally {
+      setIsLoadingSavings(false);
+    }
+  };
 
   const fetchPlans = async () => {
     if (!userId) {
@@ -154,6 +176,35 @@ const MyPlan = () => {
       .toLocaleString("en-US", { weekday: "short" })
       .toUpperCase();
   };
+
+  const formatMoney = (amount = 0) =>
+    `₹${Math.max(0, Math.round(Number(amount || 0))).toLocaleString("en-IN")}`;
+
+  const formatSavedTime = (minutes = 0) => {
+    const totalMinutes = Math.max(0, Math.round(Number(minutes || 0)));
+    if (totalMinutes < 60) return `${totalMinutes} mins`;
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    return mins ? `${hours} hrs ${mins} mins` : `${hours} hrs`;
+  };
+
+  const moneySavingsRows = savingsData?.moneySavingsBreakdown || [];
+  const deliveryHandlingRow = moneySavingsRows.find((item) =>
+    String(item.name || "").toLowerCase().includes("delivery + handling"),
+  );
+  const moneyRowsWithoutDelivery = moneySavingsRows.filter(
+    (item) => item !== deliveryHandlingRow,
+  );
+  const visibleMoneyRows = showAllMoneySavings
+    ? moneySavingsRows
+    : [
+        ...moneyRowsWithoutDelivery.slice(0, 3),
+        ...(deliveryHandlingRow ? [deliveryHandlingRow] : []),
+      ];
+  const hiddenMoneyRowsCount = Math.max(
+    0,
+    moneySavingsRows.length - visibleMoneyRows.length,
+  );
     const [loading, setLoading] = useState(false);
 
  const handleSkipOrCancel = async (planId, userId, planStatus) => {
@@ -1274,6 +1325,7 @@ const MyPlan = () => {
 
   useEffect(() => {
     fetchPlans();
+    fetchSavings();
     getDeliveryRates();
   }, [userId]);
 
@@ -1576,6 +1628,64 @@ const MyPlan = () => {
           </div> */}
         </div>
 
+        <div className="myplan-savings-section">
+          <div className="myplan-savings-shell">
+          <div className="myplan-savings-heading">
+            <div>
+              <span>Savings snapshot</span>
+              <small>Since you joined DailyDish</small>
+            </div>
+            <em>{savingsData?.orderCount || 0} meals</em>
+          </div>
+          <div className="myplan-savings-grid">
+            <button
+              className="myplan-savings-card money"
+              type="button"
+              onClick={() => {
+                setShowAllMoneySavings(false);
+                setSavingsModal("money");
+              }}
+            >
+              <span className="myplan-savings-card-top">
+                <span className="myplan-savings-symbol">
+                  <BadgeIndianRupee size={17} strokeWidth={2.4} />
+                </span>
+                <ChevronRight className="myplan-savings-arrow" size={17} />
+              </span>
+              <span className="myplan-savings-icon">₹</span>
+              <span className="myplan-savings-label">Saved vs Swiggy</span>
+              <span className="myplan-savings-value">
+                {isLoadingSavings
+                  ? "..."
+                  : formatMoney(savingsData?.totalMoneySaved || 0)}
+              </span>
+              <span className="myplan-savings-meta">Includes prices + fees</span>
+            </button>
+
+            <button
+              className="myplan-savings-card time"
+              type="button"
+              onClick={() => setSavingsModal("time")}
+            >
+              <span className="myplan-savings-card-top">
+                <span className="myplan-savings-symbol">
+                  <Clock3 size={17} strokeWidth={2.4} />
+                </span>
+                <ChevronRight className="myplan-savings-arrow" size={17} />
+              </span>
+              <span className="myplan-savings-icon">h</span>
+              <span className="myplan-savings-label">Time freed</span>
+              <span className="myplan-savings-value">
+                {isLoadingSavings
+                  ? "..."
+                  : formatSavedTime(savingsData?.totalTimeSaved || 0)}
+              </span>
+              <span className="myplan-savings-meta">Cooking + cleanup</span>
+            </button>
+          </div>
+          </div>
+        </div>
+
         <div className="myplan-mid-section">
           <div className="plans-list">
             {isLoadingPlans ? (
@@ -1692,11 +1802,13 @@ const MyPlan = () => {
                           >
                             {plan.status === "Confirmed"
                               ? "⏳ Confirmed"
-                              : plan.status === "Pending Payment"
-                                ? "💳 Payment Pending"
-                                : plan.status === "Cooking"
-                                  ? "👨‍🍳 Being Prepared"
-                                  : plan.status === "Packing"
+                              : plan.status === "Sourced Fresh"
+                                ? "📦 Sourced Fresh"
+                                : plan.status === "Pending Payment"
+                                  ? "💳 Payment Pending"
+                                  : plan.status === "Cooking"
+                                    ? "👨‍🍳 Being Prepared"
+                                    : plan.status === "Packing"
                                     ? "📦 Packing"
                                     : plan.status === "Packed"
                                       ? "✓ Ready"
@@ -1780,6 +1892,7 @@ const MyPlan = () => {
                           plan.status === "Skipped"
                         ) &&
                           (plan.status === "Confirmed" ||
+                            plan.status === "Sourced Fresh" ||
                             plan.status === "Cooking" ||
                             plan.status === "Packing" ||
                             plan.status === "Packed" ||
@@ -1792,11 +1905,12 @@ const MyPlan = () => {
                                 {/* Step 1: Order placed */}
                                 <div className="journey-point">
                                   <div
-                                    className={`point-circle ${["Confirmed", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "done" : "pending"}`}
+                                    className={`point-circle ${["Confirmed", "Cooking", "Sourced Fresh", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? "done" : "pending"}`}
                                   >
                                     {[
                                       "Confirmed",
                                       "Cooking",
+                                      "Sourced Fresh",
                                       "Packing",
                                       "Packed",
                                       "ontheway",
@@ -1820,8 +1934,31 @@ const MyPlan = () => {
                                     })}
                                   </div>
                                 </div>
-
-                                {/* Step 2: Cooking */}
+{/* Step 2: Sourced Fresh */}
+                                <div className="journey-point">
+                                  <div
+                                    className={`point-circle ${["Sourced Fresh", "Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Sourced Fresh" ? "active" : "done") : "pending"}`}
+                                  >
+                                    {[
+                                      "Sourced Fresh",
+                                      "Cooking",
+                                      "Packing",
+                                      "Packed",
+                                      "ontheway",
+                                      "On the way",
+                                      "Delivered",
+                                    ].includes(plan.status)
+                                      ? plan.status === "Sourced Fresh"
+                                        ? "●"
+                                        : "✓"
+                                      : "○"}
+                                  </div>
+                                  <div className="point-label">Sourced Fresh</div>
+                                  <div className="point-time">
+                                    {plan.status === "Sourced Fresh" ? "now" : ""}
+                                  </div>
+                                </div>
+                                {/* Step 3: Cooking */}
                                 <div className="journey-point">
                                   <div
                                     className={`point-circle ${["Cooking", "Packing", "Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Cooking" ? "active" : "done") : "pending"}`}
@@ -1846,7 +1983,7 @@ const MyPlan = () => {
                                 </div>
 
                                 {/* Step 3: Packed and out */}
-                                <div className="journey-point">
+                                {/* <div className="journey-point">
                                   <div
                                     className={`point-circle ${["Packed", "ontheway", "On the way", "Delivered"].includes(plan.status) ? (plan.status === "Packed" || plan.status === "Packing" ? "active" : "done") : "pending"}`}
                                   >
@@ -1872,7 +2009,7 @@ const MyPlan = () => {
                                       ? "now"
                                       : ""}
                                   </div>
-                                </div>
+                                </div> */}
 
                                 {/* Step 4: On the way */}
                                 <div className="journey-point">
@@ -2270,6 +2407,148 @@ const MyPlan = () => {
           </button>
         </Modal.Footer>
       </Modal> */}
+
+      <Modal
+        show={!!savingsModal}
+        onHide={() => {
+          setSavingsModal(null);
+          setShowAllMoneySavings(false);
+        }}
+        centered
+        dialogClassName="myplan-savings-modal-dialog"
+      >
+        <Modal.Header closeButton className="myplan-savings-modal-header">
+          <div>
+            <Modal.Title className="myplan-savings-modal-title">
+              {savingsModal === "money"
+                ? `${formatMoney(savingsData?.totalMoneySaved || 0)} saved - here's the math`
+                : `${formatSavedTime(savingsData?.totalTimeSaved || 0)} freed - here's the math`}
+            </Modal.Title>
+            <div className="myplan-savings-modal-subtitle">
+              {savingsModal === "money"
+                ? "Each dish you've ordered - vs Swiggy listing price"
+                : "Cooking time by dish type - vs making it yourself"}
+            </div>
+          </div>
+        </Modal.Header>
+        <Modal.Body className="myplan-savings-modal-body">
+          {savingsModal === "money" ? (
+            <div className="myplan-savings-table">
+              <div className="myplan-savings-row myplan-savings-head">
+                <span>Dish</span>
+                <span>DailyDish</span>
+                <span>Swiggy</span>
+                <span>Saved</span>
+              </div>
+              {moneySavingsRows.length > 0 ? (
+                visibleMoneyRows.map((item, index) => (
+                  <div
+                    className={`myplan-savings-row ${
+                      item === deliveryHandlingRow
+                        ? "myplan-savings-fee-row"
+                        : ""
+                    }`}
+                    key={`${item.name}-${index}`}
+                  >
+                    <span>
+                      <strong>{item.name}</strong>
+                      <small>
+                        {item === deliveryHandlingRow
+                          ? `per order - x${item.quantity || 0}`
+                          : `ordered x${item.quantity || 1}`}
+                      </small>
+                    </span>
+                    <span>{formatMoney(item.dailyDishPrice || 0)}</span>
+                    <span className="myplan-muted">
+                      {formatMoney(item.swiggyPrice || 0)}
+                    </span>
+                    <span className="myplan-saved-value">
+                      {formatMoney(item.saved || 0)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="myplan-savings-empty">
+                  Total
+                  lifetime savings are calculated from each ordered product's
+                  aggregated price minus DailyDish price.
+                </div>
+              )}
+              {hiddenMoneyRowsCount > 0 && (
+                <button
+                  type="button"
+                  className="myplan-savings-view-more"
+                  onClick={() => setShowAllMoneySavings(true)}
+                >
+                  View {hiddenMoneyRowsCount} more rows
+                </button>
+              )}
+              <div className="myplan-savings-row myplan-savings-total">
+                <span>Total lifetime saving</span>
+                <span></span>
+                <span></span>
+                <span>{formatMoney(savingsData?.totalMoneySaved || 0)}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="myplan-savings-table">
+              <div className="myplan-savings-row myplan-savings-head">
+                <span>Dish</span>
+                <span>x Qty</span>
+                <span>Cook time</span>
+                <span>Freed</span>
+              </div>
+              {(savingsData?.categoryWiseTimeSavings || []).map((category) => (
+                <div className="myplan-savings-row" key={category.categoryName}>
+                  <span>
+                    <strong>{category.categoryName}</strong>
+                    <small>{category.categoryDescription}</small>
+                  </span>
+                  <span>x{category.itemCount || 0}</span>
+                  <span className="myplan-muted">
+                    ~{category.timeIfMadeAtHome || 0} min
+                  </span>
+                  <span className="myplan-saved-value">
+                    {formatSavedTime(category.totalTimeSaved || 0)}
+                  </span>
+                </div>
+              ))}
+              <div className="myplan-savings-row myplan-savings-highlight">
+                <span>
+                  <strong>Planning + cleanup</strong>
+                  <small>
+                    fixed per meal - x{savingsData?.orderCount || 0}
+                  </small>
+                </span>
+                <span>x{savingsData?.orderCount || 0}</span>
+                <span className="myplan-muted">
+                  ~
+                  {savingsData?.orderCount
+                    ? Math.round(
+                        (savingsData?.planningCleanupTime || 0) /
+                          savingsData.orderCount,
+                      )
+                    : 0}{" "}
+                  min
+                </span>
+                <span className="myplan-saved-value">
+                  {formatSavedTime(savingsData?.planningCleanupTime || 0)}
+                </span>
+              </div>
+              <div className="myplan-savings-note">
+                Overlap deducted: dishes in same meal share one planning +
+                cleanup block.
+              </div>
+              <div className="myplan-savings-row myplan-savings-total">
+                <span>Total time freed</span>
+                <span></span>
+                <span></span>
+                <span>{formatSavedTime(savingsData?.totalTimeSaved || 0)}</span>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+      </Modal>
 
       <BottomNav />
     </div>

@@ -100,6 +100,7 @@ import DeliveryRate from "./Components/Admin/DeliveryRate";
 import AiSensyImage from "./Components/Admin/AiSensyImage";
 import CheckoutMultiple from "./Components/CheckoutMultiple";
 import BulkStatusUpdate from "./Components/Admin/BulkStatusUpdate";
+import AdminSavingsSettings from "./Components/Admin/AdminSavingsSettings";
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -441,6 +442,10 @@ function App() {
           <Route
             path="/all-products"
             element={<Main children={<Add_Products />} />}
+          />
+          <Route
+            path="/admin/savings-settings"
+            element={<Main children={<AdminSavingsSettings />} />}
           />
           <Route
             path="/available-slots"

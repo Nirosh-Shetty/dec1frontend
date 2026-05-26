@@ -1307,7 +1307,10 @@ const Add_Products = () => {
 
   // Modal handlers
   const handleClose3 = () => setShow3(false);
-  const handleShow3 = () => setShow3(true);
+  const handleShow3 = () => {
+    setSelectedTimeSavingCategories([]);
+    setShow3(true);
+  };
   const handleClose4 = () => setShow4(false);
   const handleShow4 = (item) => {
     setShow4(true);
@@ -1329,6 +1332,11 @@ const Add_Products = () => {
     setQuantity(item?.quantity);
     setMealType(item?.foodmealtype);
     setAggregatedPrice(item?.aggregatedPrice);
+    setSelectedTimeSavingCategories(
+      (item?.timeSavingCategories || []).map((cat) =>
+        typeof cat === "object" ? String(cat._id) : String(cat),
+      ),
+    );
   };
   const handleClose5 = () => setShow5(false);
   const handleShow5 = () => setShow5(true);
@@ -1379,6 +1387,9 @@ const Add_Products = () => {
   const [tagsList, setTagsList] = useState([]);
   // selectedTags will hold tag id strings for simple Select multiple
   const [selectedTags, setSelectedTags] = useState([]);
+  const [timeSavingCategories, setTimeSavingCategories] = useState([]);
+  const [selectedTimeSavingCategories, setSelectedTimeSavingCategories] =
+    useState([]);
 
   // MenuProps to limit dropdown height (from MUI example)
   const ITEM_HEIGHT = 48;
@@ -1474,6 +1485,19 @@ const Add_Products = () => {
     }
   };
 
+  const getTimeSavingCategories = async () => {
+    try {
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/savings/time-saving-categories",
+      );
+      if (res.status === 200) {
+        setTimeSavingCategories(res.data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching time saving categories", error);
+    }
+  };
+
   // Add product
   const Addproductdetails = async () => {
     try {
@@ -1516,6 +1540,12 @@ const Add_Products = () => {
       if (selectedTags && selectedTags.length > 0) {
         formdata.append("foodTags", JSON.stringify(selectedTags));
       }
+      if (selectedTimeSavingCategories.length > 0) {
+        formdata.append(
+          "timeSavingCategories",
+          JSON.stringify(selectedTimeSavingCategories),
+        );
+      }
       formdata.append("aggregatedPrice", aggregatedPrice);
 
       setIsLoading(true);
@@ -1544,6 +1574,7 @@ const Add_Products = () => {
         setQuantity("");
         setProductDesc("");
         setSelectedTags([]);
+        setSelectedTimeSavingCategories([]);
       }
     } catch (error) {
       console.log(error);
@@ -1618,6 +1649,10 @@ const Add_Products = () => {
       if (selectedTags && selectedTags.length > 0) {
         formdata.append("foodTags", JSON.stringify(selectedTags));
       }
+      formdata.append(
+        "timeSavingCategories",
+        JSON.stringify(selectedTimeSavingCategories),
+      );
 
       setIsLoading(true);
       const config = {
@@ -1635,6 +1670,7 @@ const Add_Products = () => {
         await getAddproducts();
         setProductImage("");
         setSelectedTags([]);
+        setSelectedTimeSavingCategories([]);
       }
     } catch (error) {
       console.log(error);
@@ -1712,6 +1748,7 @@ const Add_Products = () => {
     getGst();
     fetchCategories();
     getTags();
+    getTimeSavingCategories();
     fetchMenuCategories();
   }, []);
 
@@ -1722,6 +1759,15 @@ const Add_Products = () => {
         typeof ft === "object" ? String(ft._id) : String(ft),
       );
       setSelectedTags(arr);
+    }
+  }, [Data1]);
+
+  useEffect(() => {
+    if (Data1 && Data1.timeSavingCategories) {
+      const arr = Data1.timeSavingCategories.map((cat) =>
+        typeof cat === "object" ? String(cat._id) : String(cat),
+      );
+      setSelectedTimeSavingCategories(arr);
     }
   }, [Data1]);
 
@@ -1890,6 +1936,7 @@ const Add_Products = () => {
 
                     <th>Name</th>
                     <th>Tags</th>
+                    <th>Time Saving</th>
                     <th>Image</th>
                     <th>Unit</th>
                     <th>Description</th>
@@ -1955,6 +2002,34 @@ const Add_Products = () => {
                           ))
                         ) : (
                           <span>—</span>
+                        )}
+                      </td>
+                                           <td
+                        style={{
+                          paddingTop: "20px",
+                          fontSize: "0.7rem",
+                          lineHeight: "0.9rem",
+                        }}
+                      >
+                        {items?.timeSavingCategories?.length > 0 ? (
+                          items.timeSavingCategories.map((cat, idx) => (
+                            <span
+                              key={idx}
+                              style={{
+                                display: "inline-block",
+                                marginRight: 6,
+                                marginBottom: 4,
+                                padding: "2px 6px",
+                                background: "#edf7e7",
+                                border: "1px solid #b8d5aa",
+                                borderRadius: 6,
+                              }}
+                            >
+                              {cat.name || cat}
+                            </span>
+                          ))
+                        ) : (
+                          <span>-</span>
                         )}
                       </td>
                       <td style={{ paddingTop: "20px" }}>
@@ -2127,6 +2202,29 @@ const Add_Products = () => {
                   {tagsList.map((tag) => (
                     <option key={tag._id} value={String(tag._id)}>
                       {tag.tagName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="row">
+              <div className="do-sear mt-2">
+                <label>Time Saving Categories</label>
+                <select
+                  multiple
+                  className="form-select"
+                  value={selectedTimeSavingCategories}
+                  onChange={(e) => {
+                    const vals = Array.from(e.target.selectedOptions).map(
+                      (o) => o.value,
+                    );
+                    setSelectedTimeSavingCategories(vals);
+                  }}
+                  style={{ minHeight: 110 }}
+                >
+                  {timeSavingCategories.map((cat) => (
+                    <option key={cat._id} value={String(cat._id)}>
+                      {cat.name} ({cat.timeIfMadeAtHome} min)
                     </option>
                   ))}
                 </select>
@@ -2506,6 +2604,29 @@ const Add_Products = () => {
                   {tagsList.map((tag) => (
                     <option key={tag._id} value={String(tag._id)}>
                       {tag.tagName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="row">
+              <div className="do-sear mt-2">
+                <label>Time Saving Categories</label>
+                <select
+                  multiple
+                  className="form-select"
+                  value={selectedTimeSavingCategories}
+                  onChange={(e) => {
+                    const vals = Array.from(e.target.selectedOptions).map(
+                      (o) => o.value,
+                    );
+                    setSelectedTimeSavingCategories(vals);
+                  }}
+                  style={{ minHeight: 110 }}
+                >
+                  {timeSavingCategories.map((cat) => (
+                    <option key={cat._id} value={String(cat._id)}>
+                      {cat.name} ({cat.timeIfMadeAtHome} min)
                     </option>
                   ))}
                 </select>

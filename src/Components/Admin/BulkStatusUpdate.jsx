@@ -21,10 +21,12 @@ const sessions = ["Breakfast", "Lunch", "Dinner"];
 const BulkStatusUpdate = () => {
   const [hubs, setHubs] = useState([]);
   const [form, setForm] = useState({
-    hubId: "",
+    hubId: "all", // Default to "all" for all hubs
     deliveryDate: new Date().toISOString().slice(0, 10),
     session: "Lunch",
-    newStatus: "Sourced Fresh",
+    status: "all", // New status filter, default to "all"
+    currentStatus: "all", // Filter by current status
+    newStatus: "Sourced Fresh", // Moved to update section
     sendNotification: false,
   });
   const [image, setImage] = useState(null);
@@ -34,7 +36,7 @@ const BulkStatusUpdate = () => {
   const [message, setMessage] = useState(null);
 
   const selectedHub = useMemo(
-    () => hubs.find((hub) => hub._id === form.hubId),
+    () => hubs.find((hub) => hub._id === form.hubId) || { hubName: "All Hubs" },
     [hubs, form.hubId]
   );
 
@@ -52,8 +54,8 @@ const BulkStatusUpdate = () => {
   };
 
   const fetchPreview = async () => {
-    if (!form.hubId || !form.deliveryDate || !form.session) {
-      setMessage({ type: "warning", text: "Please select hub, date, and session." });
+    if (!form.deliveryDate || !form.session) {
+      setMessage({ type: "warning", text: "Please select date and session." });
       return;
     }
 
@@ -79,7 +81,7 @@ const BulkStatusUpdate = () => {
     }
 
     if (preview.plansCount === 0 && preview.ordersCount === 0) {
-      setMessage({ type: "warning", text: "No non-cancelled orders found for this slot." });
+      setMessage({ type: "warning", text: "No eligible orders found for this slot." });
       return;
     }
 
@@ -122,13 +124,17 @@ const BulkStatusUpdate = () => {
 
       {message && <Alert variant={message.type}>{message.text}</Alert>}
 
+      {/* Filters Section */}
       <Card className="shadow-sm border-0 mb-4">
+        <Card.Header className="bg-light">
+          <h5 className="mb-0">Filters</h5>
+        </Card.Header>
         <Card.Body>
           <div className="row g-3 align-items-end">
             <div className="col-md-3">
               <Form.Label className="small fw-bold text-muted">Hub</Form.Label>
               <Form.Select value={form.hubId} onChange={(e) => updateField("hubId", e.target.value)}>
-                <option value="">Select hub</option>
+                <option value="all">All Hubs</option>
                 {hubs.map((hub) => (
                   <option key={hub._id} value={hub._id}>
                     {hub.hubName}
@@ -156,8 +162,9 @@ const BulkStatusUpdate = () => {
             </div>
 
             <div className="col-md-2">
-              <Form.Label className="small fw-bold text-muted">New Status</Form.Label>
-              <Form.Select value={form.newStatus} onChange={(e) => updateField("newStatus", e.target.value)}>
+              <Form.Label className="small fw-bold text-muted">Current Status</Form.Label>
+              <Form.Select value={form.status} onChange={(e) => updateField("status", e.target.value)}>
+                <option value="all">All Status</option>
                 {statuses.map((status) => (
                   <option key={status}>{status}</option>
                 ))}
@@ -174,29 +181,44 @@ const BulkStatusUpdate = () => {
         </Card.Body>
       </Card>
 
+      {/* Update Section */}
       <Card className="shadow-sm border-0 mb-4">
+        <Card.Header className="bg-light">
+          <h5 className="mb-0">Update Options</h5>
+        </Card.Header>
         <Card.Body>
           <div className="row g-3 align-items-end">
+            <div className="col-md-3">
+              <Form.Label className="small fw-bold text-muted">New Status</Form.Label>
+              <Form.Select value={form.newStatus} onChange={(e) => updateField("newStatus", e.target.value)}>
+                {statuses.map((status) => (
+                  <option key={status}>{status}</option>
+                ))}
+              </Form.Select>
+            </div>
+
             <div className="col-md-5">
               <Form.Label className="small fw-bold text-muted">Status Image</Form.Label>
               <Form.Control type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} />
               <small className="text-muted">Saved for Sourced Fresh and Cooking updates.</small>
             </div>
-            <div className="col-md-4">
+
+            <div className="col-md-2">
               <Form.Check
                 type="switch"
                 id="notify-users"
                 label={
                   <span>
                     <FaWhatsapp className="me-2 text-success" />
-                    Notify users with AiSensy
+                    Notify users
                   </span>
                 }
                 checked={form.sendNotification}
                 onChange={(e) => updateField("sendNotification", e.target.checked)}
               />
             </div>
-            <div className="col-md-3">
+
+            <div className="col-md-2">
               <Button variant="success" className="w-100 fw-bold" onClick={submitUpdate} disabled={saving || !preview}>
                 {saving ? <Spinner size="sm" /> : <FaCloudUploadAlt className="me-2" />}
                 Update Bulk Status
@@ -206,12 +228,13 @@ const BulkStatusUpdate = () => {
         </Card.Body>
       </Card>
 
+      {/* Preview Section */}
       <Card className="shadow-sm border-0">
         <Card.Header className="bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
           <div>
             <h5 className="fw-bold mb-0">Preview</h5>
             <small className="text-muted">
-              {selectedHub?.hubName || "No hub selected"} | {form.deliveryDate} | {form.session}
+              {selectedHub.hubName} | {form.deliveryDate} | {form.session} | Status: {form.status === "all" ? "All" : form.status}
             </small>
           </div>
           {preview && (
@@ -250,7 +273,7 @@ const BulkStatusUpdate = () => {
               ) : (
                 <tr>
                   <td colSpan="4" className="text-center text-muted py-5">
-                    Preview will show non-cancelled plans for the selected slot.
+                    Preview will show eligible plans for the selected filters.
                   </td>
                 </tr>
               )}
