@@ -9,6 +9,7 @@ const AdminSavingsSettings = () => {
   const [name, setName] = useState("");
   const [timeIfMadeAtHome, setTimeIfMadeAtHome] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
+  const [cookingPattern, setCookingPattern] = useState("SCALABLE");
   const [editingId, setEditingId] = useState(null);
   const [cleanupMinutes, setCleanupMinutes] = useState(25);
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,7 @@ const AdminSavingsSettings = () => {
     setName("");
     setTimeIfMadeAtHome("");
     setCategoryDescription("");
+    setCookingPattern("SCALABLE");
     setEditingId(null);
   };
 
@@ -58,6 +60,7 @@ const AdminSavingsSettings = () => {
         name: name.trim(),
         timeIfMadeAtHome: Number(timeIfMadeAtHome),
         categoryDescription: categoryDescription.trim(),
+        cookingPattern: cookingPattern,
       };
 
       if (editingId) {
@@ -68,6 +71,7 @@ const AdminSavingsSettings = () => {
 
       resetForm();
       await fetchCategories();
+      alert(`Category ${editingId ? "updated" : "added"} successfully!`);
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || "Failed to save category");
@@ -81,6 +85,7 @@ const AdminSavingsSettings = () => {
     setName(category.name || "");
     setTimeIfMadeAtHome(category.timeIfMadeAtHome ?? "");
     setCategoryDescription(category.categoryDescription || "");
+    setCookingPattern(category.cookingPattern || "SCALABLE");
   };
 
   const handleDelete = async (categoryId) => {
@@ -91,6 +96,7 @@ const AdminSavingsSettings = () => {
       await axios.delete(`${API_BASE}/time-saving-categories/${categoryId}`);
       if (editingId === categoryId) resetForm();
       await fetchCategories();
+      alert("Category deleted successfully!");
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || "Failed to delete category");
@@ -137,7 +143,7 @@ const AdminSavingsSettings = () => {
                   className="vi_0"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Curry, Rice, Sides"
+                  placeholder="e.g., Curry, Rice, Sides"
                 />
               </div>
               <div className="do-sear mt-3">
@@ -157,8 +163,23 @@ const AdminSavingsSettings = () => {
                   className="vi_0"
                   value={categoryDescription}
                   onChange={(e) => setCategoryDescription(e.target.value)}
-                  placeholder="Describe the category..."
+                  placeholder="e.g., Gravy-based curries"
                 />
+              </div>
+              <div className="do-sear mt-3">
+                <label>Cooking Pattern</label>
+                <select
+                  className="vi_0"
+                  value={cookingPattern}
+                  onChange={(e) => setCookingPattern(e.target.value)}
+                >
+                  <option value="SCALABLE">
+                    SCALABLE (Time increases with quantity, e.g., Chapati)
+                  </option>
+                  <option value="BATCH">
+                    BATCH (Same time regardless of quantity, e.g., Kichidi)
+                  </option>
+                </select>
               </div>
               <div className="admin-savings-actions">
                 <Button className="modal-add-btn" type="submit" disabled={saving}>
@@ -204,6 +225,7 @@ const AdminSavingsSettings = () => {
                   <th>Sl. No</th>
                   <th>Category</th>
                   <th>Minutes</th>
+                  <th>Pattern</th>
                   <th>Description</th>
                   <th>Action</th>
                 </tr>
@@ -211,14 +233,35 @@ const AdminSavingsSettings = () => {
               <tbody>
                 {categories.length === 0 ? (
                   <tr>
-                    <td colSpan="4">No time saving categories added yet</td>
+                    <td colSpan="6">No time saving categories added yet</td>
                   </tr>
                 ) : (
                   categories.map((category, index) => (
                     <tr key={category._id}>
                       <td>{index + 1}</td>
-                      <td>{category.name}</td>
+                      <td><strong>{category.name}</strong></td>
                       <td>{category.timeIfMadeAtHome} min</td>
+                      <td>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                            backgroundColor:
+                              category.cookingPattern === "BATCH"
+                                ? "rgba(255, 193, 7, 0.2)"
+                                : "rgba(107, 142, 35, 0.2)",
+                            color:
+                              category.cookingPattern === "BATCH"
+                                ? "#f57f17"
+                                : "#6b8e23",
+                          }}
+                        >
+                          {category.cookingPattern || "SCALABLE"}
+                        </span>
+                      </td>
                       <td>{category.categoryDescription}</td>
                       <td>
                         <div className="admin-savings-table-actions">

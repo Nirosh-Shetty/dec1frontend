@@ -2434,6 +2434,23 @@ const MyPlan = () => {
         <Modal.Body className="myplan-savings-modal-body">
           {savingsModal === "money" ? (
             <div className="myplan-savings-table">
+              <div className="myplan-savings-disclosure">
+                <div className="myplan-savings-disclosure-item">
+                  <span className="myplan-disclosure-icon">🍛</span>
+                  <div className="myplan-disclosure-content">
+                    <strong>Batch-cooked dishes</strong>
+                    <small>Kichidi, curries, rice – same time whether you make 1 or 5 portions</small>
+                  </div>
+                </div>
+                <div className="myplan-savings-disclosure-item">
+                  <span className="myplan-disclosure-icon">🫓</span>
+                  <div className="myplan-disclosure-content">
+                    <strong>Individually prepared</strong>
+                    <small>Chapati, roti – time increases with each portion you make</small>
+                  </div>
+                </div>
+              </div>
+
               <div className="myplan-savings-row myplan-savings-head">
                 <span>Dish</span>
                 <span>DailyDish</span>
@@ -2492,6 +2509,23 @@ const MyPlan = () => {
             </div>
           ) : (
             <div className="myplan-savings-table">
+              <div className="myplan-savings-disclosure">
+                <div className="myplan-savings-disclosure-item">
+                  <span className="myplan-disclosure-icon">🍛</span>
+                  <div className="myplan-disclosure-content">
+                    <strong>Batch-cooked dishes</strong>
+                    <small>Kichidi, curries, rice – same time whether you make 1 or 5 portions</small>
+                  </div>
+                </div>
+                <div className="myplan-savings-disclosure-item">
+                  <span className="myplan-disclosure-icon">🫓</span>
+                  <div className="myplan-disclosure-content">
+                    <strong>Individually prepared</strong>
+                    <small>Chapati, roti – time increases with each portion you make</small>
+                  </div>
+                </div>
+              </div>
+
               <div className="myplan-savings-row myplan-savings-head">
                 <span>Dish</span>
                 <span>x Qty</span>
