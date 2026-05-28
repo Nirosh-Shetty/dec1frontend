@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Spinner, Table } from "react-bootstrap";
 
-const API_BASE = "https://dd-backend-3nm0.onrender.com/api/admin/savings";
+const API_BASE = "http://localhost:7013/api/admin/savings";
 
 const AdminSavingsSettings = () => {
   const [categories, setCategories] = useState([]);

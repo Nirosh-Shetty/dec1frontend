@@ -91,7 +91,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/registercustomer",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
 
         headers: { "content-type": "application/json" },
         data: {
@@ -146,7 +146,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -171,7 +171,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -483,7 +483,7 @@ const Navbar1 = ({ selectArea, Carts, setCarts }) => {
                       <>
                         {user?.profileImage ? (
                           <img
-                            src={`https://dd-backend-3nm0.onrender.com/Customer/${user?.profileImage}`}
+                            src={`http://localhost:7013/Customer/${user?.profileImage}`}
                             alt=""
                             style={{ width: "50px", borderRadius: "50%" }}
                           />

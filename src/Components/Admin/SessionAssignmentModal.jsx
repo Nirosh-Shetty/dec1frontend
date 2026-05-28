@@ -37,7 +37,7 @@ const SessionAssignmentModal = ({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/riders",
+        "http://localhost:7013/api/admin/riders",
       );
       if (response.data?.riders) {
         setAvailableRiders(response.data.riders);
@@ -77,7 +77,7 @@ const SessionAssignmentModal = ({
     try {
       setIsAssigning(true);
       const response = await axios.put(
-        "https://dd-backend-3nm0.onrender.com/api/admin/bulk-assign-rider",
+        "http://localhost:7013/api/admin/bulk-assign-rider",
         {
           riderId: selectedRider,
           orderIds: selectedOrders,

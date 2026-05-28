@@ -51,7 +51,7 @@ function Bag() {
       const config = {
         url: "admin/addbag",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { bagNo },
       };
@@ -76,7 +76,7 @@ function Bag() {
       const config = {
         url: `admin/updatebag/${editData._id}`,
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: { bagNo },
       };
@@ -95,7 +95,7 @@ function Bag() {
   const getBags = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getbags",
+        "http://localhost:7013/api/admin/getbags",
       );
       if (res.status === 200) {
         setBagList(res.data.bags.reverse());
@@ -109,7 +109,7 @@ function Bag() {
   const deleteBag = async () => {
     try {
       let res = await axios.delete(
-        `https://dd-backend-3nm0.onrender.com/api/admin/deletebag/${delData._id}`,
+        `http://localhost:7013/api/admin/deletebag/${delData._id}`,
       );
       if (res.status === 200) {
         alert("Bag Deleted Successfully");

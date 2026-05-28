@@ -51,7 +51,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/contactus",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/Json" },
         data: {
           CAddress: CAddress,
@@ -78,7 +78,7 @@ const AdminContactus = () => {
   const getAddcontactus = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getcontactus",
+        "http://localhost:7013/api/admin/getcontactus",
       );
       if (res.status === 200) {
         setAddcontactus(res.data.getcontactus);
@@ -95,7 +95,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/Deletecontactus/" + Data,
         method: "delete",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -132,7 +132,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/editcontactus",
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -173,7 +173,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/social",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -195,7 +195,7 @@ const AdminContactus = () => {
   const getAddsocial = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getsocial",
+        "http://localhost:7013/api/admin/getsocial",
       );
       if (res.status === 200) {
         setAddsocial(res.data.getsocial);
@@ -212,7 +212,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/Deletesocial/" + Datas,
         method: "delete",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -246,7 +246,7 @@ const AdminContactus = () => {
       const config = {
         url: "admin/editsocial",
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };

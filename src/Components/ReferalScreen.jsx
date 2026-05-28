@@ -12,7 +12,7 @@ import "../Styles/ReferScreen.css";
 // Add this line after your imports
 // Import animation data
 import referralAnimation from "../assets/referral.json";
-axios.defaults.baseURL = "https://dd-backend-3nm0.onrender.com/api";
+axios.defaults.baseURL = "http://localhost:7013/api";
 
 export default function ReferScreen() {
   // const [copied, setCopied] = useState(false);

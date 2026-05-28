@@ -3,7 +3,7 @@ import axios from "axios";
 import { Alert, Badge, Button, Card, Form, Spinner, Table } from "react-bootstrap";
 import { FaCloudUploadAlt, FaSearch, FaWhatsapp } from "react-icons/fa";
 
-const API_BASE = "https://dd-backend-3nm0.onrender.com";
+const API_BASE = "http://localhost:7013";
 const PLAN_API = `${API_BASE}/api/user/plan`;
 
 const statuses = [

@@ -47,7 +47,7 @@ const BookingList = () => {
     try {
       setLoading(true);
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getAllAppartmentOrder",
+        "http://localhost:7013/api/admin/getAllAppartmentOrder",
       );
       if (res.status === 200) {
         const allorder = res.data.orders || [];
@@ -82,7 +82,7 @@ const BookingList = () => {
   const getAddproducts = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getFoodItems",
+        "http://localhost:7013/api/admin/getFoodItems",
       );
       if (res.status === 200) {
         setAddproducts(res.data.data);
@@ -98,7 +98,7 @@ const BookingList = () => {
     try {
       setLoading(true);
       let res = await axios.delete(
-        `https://dd-backend-3nm0.onrender.com/api/admin/deletefoodorder/${data}`,
+        `http://localhost:7013/api/admin/deletefoodorder/${data}`,
       );
       if (res) {
         alert(`Bookings Data Deleted Successfully`);
@@ -243,7 +243,7 @@ const BookingList = () => {
       const config = {
         url: "/admin/updateOrderStatus/" + item._id,
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: {
           newStatus: statusdata,
@@ -366,7 +366,7 @@ const BookingList = () => {
       const config = {
         url: "/admin/updateMultipleOrderStatus",
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
         data: {
           status: selectStatus,

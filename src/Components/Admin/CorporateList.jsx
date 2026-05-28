@@ -160,7 +160,7 @@ const CorporateList = () => {
       const config = {
         url: "/admin/addcorporate",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -207,7 +207,7 @@ const CorporateList = () => {
     try {
       setLoading(true);
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
+        "http://localhost:7013/api/admin/getcorporate",
       );
       if (res.status === 200) {
         setAddCorporate(res.data.corporatedata.reverse());
@@ -227,7 +227,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/deletecorporate/" + Data,
         method: "delete",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -308,7 +308,7 @@ const CorporateList = () => {
       const config = {
         url: "admin/updatecorporatelist",
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         headers: {
           "Content-Type": "multipart/form-data",
         },

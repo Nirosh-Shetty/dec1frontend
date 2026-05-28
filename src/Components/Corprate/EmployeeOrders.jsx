@@ -75,7 +75,7 @@ const EmployeeOrders = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getAllOrdersByCompanyId/" +
+        "http://localhost:7013/api/admin/getAllOrdersByCompanyId/" +
           corparate?._id,
       );
       if (res.status === 200) {

@@ -18,7 +18,7 @@ const Statusbar = () => {
     const getAddWebstory = async () => {
       try {
         let res = await axios.get(
-          "https://dd-backend-3nm0.onrender.com/api/admin/getstories",
+          "http://localhost:7013/api/admin/getstories",
         );
         if (res.status === 200) {
           const stories = res.data.getbanner.reverse(); // Adjust order if needed

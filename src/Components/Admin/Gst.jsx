@@ -30,7 +30,7 @@ function Gst() {
       const config = {
         url: "admin/addgst",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/Json" },
         data: {
           Cgst: cgst,
@@ -57,7 +57,7 @@ function Gst() {
   const getGst = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getgst",
+        "http://localhost:7013/api/admin/getgst",
       );
       if (res.status === 200) {
         setGstList(res.data.gst.reverse());
@@ -73,7 +73,7 @@ function Gst() {
   let deleteGst = async (id) => {
     try {
       let res = await axios.delete(
-        `https://dd-backend-3nm0.onrender.com/api/admin/deletegst/${delData?._id}`,
+        `http://localhost:7013/api/admin/deletegst/${delData?._id}`,
       );
       if (res.status === 200) {
         alert(`GST Deleted Successfully`);

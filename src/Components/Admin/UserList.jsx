@@ -93,7 +93,7 @@
 //       });
 
 //       const response = await axios.get(
-//         `https://dd-backend-3nm0.onrender.com/api/User/registeruser?${params}`,
+//         `http://localhost:7013/api/User/registeruser?${params}`,
 //       );
 //       if (response.status === 200) {
 //         setAdduser(response.data.success);
@@ -119,7 +119,7 @@
 //       const config = {
 //         url: `/User/deleteUser/${deleteID}`,
 //         method: "delete",
-//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
+//         baseURL: "http://localhost:7013/api",
 //         headers: { "Content-Type": "application/json" },
 //       };
 //       const res = await axios(config);
@@ -138,7 +138,7 @@
 //   const [ApartmentOrder, setApartmentOrder] = useState([]);
 //   const getApartmentOrder = async () => {
 //     try {
-//       let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getallorders");
+//       let res = await axios.get("http://localhost:7013/api/admin/getallorders");
 //       if (res.status === 200) {
 //         setApartmentOrder(res.data.order.reverse());
 //       }
@@ -157,7 +157,7 @@
 //       const config = {
 //         url: `/User/blockuser/${user?._id}`,
 //         method: "put",
-//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
+//         baseURL: "http://localhost:7013/api",
 //         headers: { "Content-Type": "application/json" },
 //       };
 //       const res = await axios(config);
@@ -196,8 +196,8 @@
 //     try {
 //       await axios.post(
 //         actionType === "add"
-//           ? "https://dd-backend-3nm0.onrender.com/api/wallet/add-free-cash"
-//           : "https://dd-backend-3nm0.onrender.com/api/wallet/deduct-cash",
+//           ? "http://localhost:7013/api/wallet/add-free-cash"
+//           : "http://localhost:7013/api/wallet/deduct-cash",
 //         {
 //           userId: userw,
 //           amount: Number(amount),
@@ -272,7 +272,7 @@
 //         });
 
 //         const response = await axios.get(
-//           `https://dd-backend-3nm0.onrender.com/api/User/export-all?${params}`,
+//           `http://localhost:7013/api/User/export-all?${params}`,
 //         );
 //         const chunkData = response.data.success;
 //         const pagination = response.data.pagination;
@@ -501,7 +501,7 @@
 //                 <td>
 //                   {item?.profileImage ? (
 //                     <img
-//                       src={`https://dd-backend-3nm0.onrender.com/Customer/${item?.profileImage}`}
+//                       src={`http://localhost:7013/Customer/${item?.profileImage}`}
 //                       alt="Profile"
 //                       style={{
 //                         width: "50px",
@@ -1035,7 +1035,7 @@ const UserList = () => {
       });
 
       const response = await axios.get(
-        `https://dd-backend-3nm0.onrender.com/api/User/registeruser?${params}`,
+        `http://localhost:7013/api/User/registeruser?${params}`,
       );
       if (response.status === 200) {
         setAdduser(response.data.success);
@@ -1061,7 +1061,7 @@ const UserList = () => {
       const config = {
         url: `/User/deleteUser/${deleteID}`,
         method: "delete",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
       };
       const res = await axios(config);
@@ -1081,7 +1081,7 @@ const UserList = () => {
   const getApartmentOrder = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getallorders",
+        "http://localhost:7013/api/admin/getallorders",
       );
       if (res.status === 200) {
         setApartmentOrder(res.data.order.reverse());
@@ -1101,7 +1101,7 @@ const UserList = () => {
       const config = {
         url: `/User/blockuser/${user?._id}`,
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "Content-Type": "application/json" },
       };
       const res = await axios(config);
@@ -1140,8 +1140,8 @@ const UserList = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "https://dd-backend-3nm0.onrender.com/api/wallet/add-free-cash"
-          : "https://dd-backend-3nm0.onrender.com/api/wallet/deduct-cash",
+          ? "http://localhost:7013/api/wallet/add-free-cash"
+          : "http://localhost:7013/api/wallet/deduct-cash",
         {
           userId: userw,
           amount: Number(amount),
@@ -1216,7 +1216,7 @@ const UserList = () => {
   //       });
 
   //       const response = await axios.get(
-  //         `https://dd-backend-3nm0.onrender.com/api/User/export-all?${params}`,
+  //         `http://localhost:7013/api/User/export-all?${params}`,
   //       );
   //       const chunkData = response.data.success;
   //       const pagination = response.data.pagination;
@@ -1264,7 +1264,7 @@ const UserList = () => {
 
         // Use the same endpoint as your main table
         const response = await axios.get(
-          `https://dd-backend-3nm0.onrender.com/api/User/registeruser?${params}`,
+          `http://localhost:7013/api/User/registeruser?${params}`,
         );
 
         const chunkData = response.data.success;
@@ -1512,7 +1512,7 @@ const UserList = () => {
     try {
       const dateStr = moment(startDate).format("YYYY-MM-DD");
       const res = await axios.post(
-        "https://dd-backend-3nm0.onrender.com/api/admin/plan/send-reminders-to-all",
+        "http://localhost:7013/api/admin/plan/send-reminders-to-all",
         // {
         //   date: dateStr,
         //   session: selectedSession,
@@ -1736,7 +1736,7 @@ const UserList = () => {
                 <td>
                   {item?.profileImage ? (
                     <img
-                      src={`https://dd-backend-3nm0.onrender.com/Customer/${item?.profileImage}`}
+                      src={`http://localhost:7013/Customer/${item?.profileImage}`}
                       alt="Profile"
                       style={{
                         width: "50px",

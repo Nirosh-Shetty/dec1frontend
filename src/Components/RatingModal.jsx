@@ -31,7 +31,7 @@ const RatingModal = () => {
       if (!userId) return;
 
       const res = await axios.get(
-        `https://dd-backend-3nm0.onrender.com/api/admin/getorderNotRatedByUserID/${userId?._id}`,
+        `http://localhost:7013/api/admin/getorderNotRatedByUserID/${userId?._id}`,
       );
 
       if (res.status === 200 && res.data.order) {
@@ -66,7 +66,7 @@ const RatingModal = () => {
       };
 
       const res = await axios.put(
-        "https://dd-backend-3nm0.onrender.com/api/admin/submitOrderRating",
+        "http://localhost:7013/api/admin/submitOrderRating",
         payload,
       );
 

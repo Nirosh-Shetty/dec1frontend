@@ -34,7 +34,7 @@ const Slot = () => {
       const config = {
         url: "/admin/addslots",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         header: { "content-type": "application/json" },
         data: {
           mainslots: mainslots,
@@ -57,7 +57,7 @@ const Slot = () => {
   const getAddSlots = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getslots",
+        "http://localhost:7013/api/admin/getslots",
       );
       if (res.status === 200) {
         setAddSlots(res.data.Newaddress);
@@ -75,7 +75,7 @@ const Slot = () => {
       const config = {
         url: "admin/deleteslots/" + Data,
         method: "delete",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -105,7 +105,7 @@ const Slot = () => {
       const config = {
         url: "admin/updateslots",
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           mainslots: mainslots,
@@ -179,7 +179,7 @@ const Slot = () => {
       const config = {
         url: "/admin/addavailableslots",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         header: { "content-type": "application/json" },
         data: {
           Mainslots: Mainslots,
@@ -204,7 +204,7 @@ const Slot = () => {
   const getAddAvailableslot = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getavailableslots",
+        "http://localhost:7013/api/admin/getavailableslots",
       );
       if (res.status === 200) {
         setAddAvailableslot(res.data.Newaddress);
@@ -222,7 +222,7 @@ const Slot = () => {
       const config = {
         url: "admin/deleteavailableslots/" + Datass,
         method: "delete",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -253,7 +253,7 @@ const Slot = () => {
       const config = {
         url: "admin/updateavailableslots",
         method: "put",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mainslot: Mainslot,

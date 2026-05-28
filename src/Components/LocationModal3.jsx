@@ -102,7 +102,7 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: {
@@ -215,7 +215,7 @@ const LocationModal3 = ({ show, onClose }) => {
       if (!customerId) return;
 
       const response = await fetch(
-        `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+        `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
         {
           method: "PATCH",
           headers: {

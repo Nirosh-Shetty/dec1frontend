@@ -28,7 +28,7 @@ const AdminWalletSettings = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://dd-backend-3nm0.onrender.com/api/wallet/getsettings",
+          "http://localhost:7013/api/wallet/getsettings",
         );
 
         if (response.data.success) {
@@ -59,7 +59,7 @@ const AdminWalletSettings = () => {
     try {
       setLoading(true);
       const response = await axios.put(
-        "https://dd-backend-3nm0.onrender.com/api/wallet/settings",
+        "http://localhost:7013/api/wallet/settings",
         settings,
       );
 

@@ -173,7 +173,7 @@ const SignInModal = ({ show, onHide, onSuccess, proceedToPlan }) => {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,

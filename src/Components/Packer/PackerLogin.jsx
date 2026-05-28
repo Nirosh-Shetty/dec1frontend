@@ -18,7 +18,7 @@ const LoginPage = () => {
     try {
       if (whatsappNumber.length === 10) {
         let res = await axios.post(
-          "https://dd-backend-3nm0.onrender.com/api/packer/sendPackerOtp",
+          "http://localhost:7013/api/packer/sendPackerOtp",
           {
             mobileNumber: whatsappNumber,
           },
@@ -65,7 +65,7 @@ const LoginPage = () => {
     try {
       if (otp.length === 6) {
         let res = await axios.post(
-          "https://dd-backend-3nm0.onrender.com/api/packer/verificationPacker",
+          "http://localhost:7013/api/packer/verificationPacker",
           {
             mobileNumber: whatsappNumber,
             otp: otp,

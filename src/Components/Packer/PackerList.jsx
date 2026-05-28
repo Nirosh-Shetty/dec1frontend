@@ -118,7 +118,7 @@ const PackerList = () => {
   const getHubs = async () => {
     try {
       const res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
+        "http://localhost:7013/api/Hub/hubs",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -138,7 +138,7 @@ const PackerList = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/packer/getAllPacker",
+        "http://localhost:7013/api/packer/getAllPacker",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -181,7 +181,7 @@ const PackerList = () => {
         mobileNumber: cleanPhoneNumber(newPacker.mobileNumber),
       };
       const res = await axios.post(
-        "https://dd-backend-3nm0.onrender.com/api/packer/createpacker",
+        "http://localhost:7013/api/packer/createpacker",
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -229,7 +229,7 @@ const PackerList = () => {
         packerId: selectedPacker.packerId,
       };
       const res = await axios.put(
-        `https://dd-backend-3nm0.onrender.com/api/packer/updatePacker`,
+        `http://localhost:7013/api/packer/updatePacker`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -254,7 +254,7 @@ const PackerList = () => {
     setDeletePackerLoading(true);
     try {
       const res = await axios.delete(
-        `https://dd-backend-3nm0.onrender.com/api/packer/deletPacker/${selectedPacker.packerId}`,
+        `http://localhost:7013/api/packer/deletPacker/${selectedPacker.packerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

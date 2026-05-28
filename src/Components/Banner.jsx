@@ -292,7 +292,7 @@ const Banner = ({
       setIsCheckingServiceability(true);
 
       const response = await fetch(
-        "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
+        "http://localhost:7013/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -378,7 +378,7 @@ const Banner = ({
 
     try {
       const response = await fetch(
-        `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubId}`,
+        `http://localhost:7013/api/Hub/get-cutoff-times/${hubId}`,
         {
           method: "GET",
           headers: {
@@ -412,7 +412,7 @@ const Banner = ({
       const userType = isEmployee ? "employee" : "organic";
 
       const response = await fetch(
-        "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
+        "http://localhost:7013/api/Hub/validate-order-timing",
         {
           method: "POST",
           headers: {
@@ -530,7 +530,7 @@ const Banner = ({
       };
 
       const response = await fetch(
-        "https://dd-backend-3nm0.onrender.com/api/service-requests",
+        "http://localhost:7013/api/service-requests",
         {
           method: "POST",
           headers: {
@@ -693,7 +693,7 @@ const Banner = ({
       }
 
       const response = await fetch(
-        "https://dd-backend-3nm0.onrender.com/api/Hub/get-default-hub",
+        "http://localhost:7013/api/Hub/get-default-hub",
       );
       if (response.ok) {
         const data = await response.json();
@@ -942,7 +942,7 @@ const Banner = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api",
+        baseURL: "http://localhost:7013/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1027,7 +1027,7 @@ const Banner = ({
   const getapartmentd = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
+        "http://localhost:7013/api/admin/getapartment",
       );
       if (res.status === 200) {
         setapartmentdata(res.data.corporatedata);
@@ -1045,7 +1045,7 @@ const Banner = ({
   const getcorporate = async () => {
     try {
       let res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
+        "http://localhost:7013/api/admin/getcorporate",
       );
       if (res.status === 200) {
         setcorporatedata(res.data.corporatedata);
@@ -1065,7 +1065,7 @@ const Banner = ({
     const getAddWebstory = async () => {
       try {
         let res = await axios.get(
-          "https://dd-backend-3nm0.onrender.com/api/admin/getstories",
+          "http://localhost:7013/api/admin/getstories",
         );
         if (res.status === 200) {
           setStoryLength(res.data.getbanner.length);
@@ -1149,7 +1149,7 @@ const Banner = ({
       const config = {
         url: "User/mobileotpverification",
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         header: { "content-type": "application/json" },
         data: {
           Mobile: Mobile,
@@ -1196,7 +1196,7 @@ const Banner = ({
   const getSelectedAddress = async () => {
     try {
       let res = await axios.get(
-        `https://dd-backend-3nm0.onrender.com/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`,
+        `http://localhost:7013/api/user/getSelectedAddressByUserIDAddType/${user?._id}/${addresstype}`,
       );
       if (res.status === 200) {
         setSelectedAddress(res.data.getdata);
@@ -1236,7 +1236,7 @@ const Banner = ({
     try {
       if (!user) return;
       let res = await axios.post(
-        `https://dd-backend-3nm0.onrender.com/api/user/addressadd`,
+        `http://localhost:7013/api/user/addressadd`,
         {
           Name: user?.Fname,
           Number: user?.Mobile,
@@ -1288,7 +1288,7 @@ const Banner = ({
         }
 
         const response = await fetch(
-          `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses`,
+          `http://localhost:7013/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: getAuthHeaders(),

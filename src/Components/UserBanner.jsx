@@ -16,7 +16,7 @@
 //   useEffect(() => {
 //     const fetchBanners = async () => {
 //       try {
-//         const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/banners");
+//         const res = await axios.get("http://localhost:7013/api/admin/banners");
 //         if (res.status === 200) {
 //           const bannerData = res.data.getbanner || [];
 //           setBanners(
@@ -383,7 +383,7 @@ const UserBanner = () => {
     const fetchBanners = async () => {
       try {
         const res = await axios.get(
-          "https://dd-backend-3nm0.onrender.com/api/admin/banners",
+          "http://localhost:7013/api/admin/banners",
         );
         if (res.status === 200) {
           const bannerData = res.data.getbanner || [];

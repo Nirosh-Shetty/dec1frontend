@@ -14,7 +14,7 @@ const TagsManager = () => {
   const load = async () => {
     try {
       const res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/food-tags",
+        "http://localhost:7013/api/admin/food-tags",
       );
       setTags(res.data.data || []);
     } catch (e) {
@@ -30,7 +30,7 @@ const TagsManager = () => {
     try {
       if (!name) return alert("Tag name required");
       await axios.post(
-        "https://dd-backend-3nm0.onrender.com/api/admin/food-tags",
+        "http://localhost:7013/api/admin/food-tags",
         {
           tagName: name,
           description: desc,
@@ -58,7 +58,7 @@ const TagsManager = () => {
   const saveEdit = async () => {
     try {
       await axios.put(
-        `https://dd-backend-3nm0.onrender.com/api/admin/food-tags/${editing._id}`,
+        `http://localhost:7013/api/admin/food-tags/${editing._id}`,
         { tagName: name, description: desc, tagColor: color },
       );
       setEditShow(false);
@@ -76,7 +76,7 @@ const TagsManager = () => {
     // if (!confirm('Delete this tag?')) return;
     try {
       await axios.delete(
-        `https://dd-backend-3nm0.onrender.com/api/admin/food-tags/${id}`,
+        `http://localhost:7013/api/admin/food-tags/${id}`,
       );
       load();
     } catch (e) {
