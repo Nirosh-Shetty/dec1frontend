@@ -77,7 +77,7 @@
 //     try {
 //       const token = localStorage.getItem("authToken");
 //       const res = await axios.get(
-//         `http://localhost:7013/api/Hub/get-cutoff-times/${hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubId}`,
 //         { headers: { Authorization: `Bearer ${token}` } },
 //       );
 //       if (res.status === 200) {
@@ -535,7 +535,7 @@ const DateSessionSelector = ({
     try {
       const token = localStorage.getItem("authToken");
       const res = await axios.get(
-        `http://localhost:7013/api/Hub/get-cutoff-times/${hubId}`,
+        `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubId}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.status === 200) {

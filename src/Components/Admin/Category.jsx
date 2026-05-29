@@ -48,7 +48,7 @@ const Category = () => {
       const config = {
         url: "/admin/category",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -71,7 +71,7 @@ const Category = () => {
   const getAddCategory = async () => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getcategory",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getcategory",
       );
       if (res.status === 200) {
         setAddCategory(res.data.getcategory);
@@ -89,7 +89,7 @@ const Category = () => {
       const config = {
         url: "admin/Deletecategory/" + Data,
         method: "delete",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         header: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -125,7 +125,7 @@ const Category = () => {
       const config = {
         url: "admin/editcategory",
         method: "put",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         header: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -254,7 +254,7 @@ const Category = () => {
 
                   {/* <td>
                         <Image
-                          src={`http://localhost:7013/Category/${items?.SubcatImage}`}
+                          src={`https://dd-backend-3nm0.onrender.com/Category/${items?.SubcatImage}`}
                           alt="pic"
                           style={{ width: "75px", height: "75px" }}
                         />

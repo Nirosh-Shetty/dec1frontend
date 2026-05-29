@@ -130,7 +130,7 @@
 //       const config = {
 //         url: "/User/Sendotp",
 //         method: "post",
-//         baseURL: "http://localhost:7013/api",
+//         baseURL: "https://dd-backend-3nm0.onrender.com/api",
 
 //         headers: { "content-type": "application/json" },
 //         data: {
@@ -767,7 +767,7 @@ export default function LeafWithLogo() {
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         headers: { "content-type": "application/json" },
         data: {
           Mobile: phone,

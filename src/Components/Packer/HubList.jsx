@@ -74,7 +74,7 @@
 //   const getCorporateLocations = useCallback(async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getcorporate",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -92,7 +92,7 @@
 //   const getApartmentLocations = useCallback(async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getapartment",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -134,7 +134,7 @@
 //   const getHubs = useCallback(async () => {
 //     setLoading(true);
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs", {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       setHubs(res.data);
@@ -166,7 +166,7 @@
 //     setAddHubLoading(true);
 //     try {
 //       const res = await axios.post(
-//         "http://localhost:7013/api/Hub/hubs",
+//         "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
 //         {
 //           hubName: newHub.hubName.trim(),
 //           locations: newHub.locations,
@@ -225,7 +225,7 @@
 //       //   payload.slots = editHub.slots;
 //       // }
 //       const res = await axios.put(
-//         `http://localhost:7013/api/Hub/hubs/${editHub.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${editHub.hubId}`,
 //         payload,
 //         { headers: { Authorization: `Bearer ${token}` } },
 //       );
@@ -249,7 +249,7 @@
 //     setDeleteHubLoading(true);
 //     try {
 //       const res = await axios.delete(
-//         `http://localhost:7013/api/Hub/hubs/${selectedHub.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${selectedHub.hubId}`,
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -1115,7 +1115,7 @@
 //   const getCorporateLocations = useCallback(async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getcorporate",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -1133,7 +1133,7 @@
 //   const getApartmentLocations = useCallback(async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getapartment",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -1174,7 +1174,7 @@
 //   const getHubs = useCallback(async () => {
 //     setLoading(true);
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs", {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       setHubs(res.data);
@@ -1202,7 +1202,7 @@
 //     setAddHubLoading(true);
 //     try {
 //       const res = await axios.post(
-//         "http://localhost:7013/api/Hub/hubs",
+//         "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
 //         {
 //           hubName: newHub.hubName.trim(),
 //           locations: newHub.locations,
@@ -1254,7 +1254,7 @@
 //       }
 
 //       const res = await axios.put(
-//         `http://localhost:7013/api/Hub/hubs/${editHub.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${editHub.hubId}`,
 //         payload,
 //         { headers: { Authorization: `Bearer ${token}` } },
 //       );
@@ -1278,7 +1278,7 @@
 //     setDeleteHubLoading(true);
 //     try {
 //       const res = await axios.delete(
-//         `http://localhost:7013/api/Hub/hubs/${selectedHub.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${selectedHub.hubId}`,
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -1306,7 +1306,7 @@
 //     setCutoffLoading(true);
 //     try {
 //       const res = await axios.put(
-//         `http://localhost:7013/api/Hub/update-cutoff-times/${selectedHubForCutoff.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/update-cutoff-times/${selectedHubForCutoff.hubId}`,
 //         {
 //           cutoffTimes: selectedHubForCutoff.cutoffTimes,
 //         },
@@ -2435,7 +2435,7 @@ const HubList = () => {
   const getCorporateLocations = useCallback(async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getcorporate",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -2453,7 +2453,7 @@ const HubList = () => {
   const getApartmentLocations = useCallback(async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/admin/getapartment",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -2494,7 +2494,7 @@ const HubList = () => {
   const getHubs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
+      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setHubs(res.data);
@@ -2554,7 +2554,7 @@ const HubList = () => {
     setAddHubLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:7013/api/Hub/hubs",
+        "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
         {
           hubName: newHub.hubName.trim(),
           locations: newHub.locations,
@@ -2605,7 +2605,7 @@ const HubList = () => {
       }
 
       const res = await axios.put(
-        `http://localhost:7013/api/Hub/hubs/${editHub.hubId}`,
+        `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${editHub.hubId}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -2631,7 +2631,7 @@ const HubList = () => {
     setOrderModeLoading(true);
     try {
       const res = await axios.put(
-        `http://localhost:7013/api/Hub/update-order-mode/${selectedHubForOrderMode.hubId}`,
+        `https://dd-backend-3nm0.onrender.com/api/Hub/update-order-mode/${selectedHubForOrderMode.hubId}`,
         {
           orderMode: selectedHubForOrderMode.orderMode,
         },
@@ -2663,7 +2663,7 @@ const HubList = () => {
     setDeleteHubLoading(true);
     try {
       const res = await axios.delete(
-        `http://localhost:7013/api/Hub/hubs/${selectedHub.hubId}`,
+        `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${selectedHub.hubId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -2691,7 +2691,7 @@ const HubList = () => {
     setCutoffLoading(true);
     try {
       const res = await axios.put(
-        `http://localhost:7013/api/Hub/update-cutoff-times/${selectedHubForCutoff.hubId}`,
+        `https://dd-backend-3nm0.onrender.com/api/Hub/update-cutoff-times/${selectedHubForCutoff.hubId}`,
         {
           cutoffTimes: selectedHubForCutoff.cutoffTimes,
         },
@@ -4094,7 +4094,7 @@ export default HubList;
 //   const getCorporateLocations = useCallback(async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getcorporate",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getcorporate",
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -4112,7 +4112,7 @@ export default HubList;
 //   const getApartmentLocations = useCallback(async () => {
 //     try {
 //       const res = await axios.get(
-//         "http://localhost:7013/api/admin/getapartment",
+//         "https://dd-backend-3nm0.onrender.com/api/admin/getapartment",
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -4153,7 +4153,7 @@ export default HubList;
 //   const getHubs = useCallback(async () => {
 //     setLoading(true);
 //     try {
-//       const res = await axios.get("http://localhost:7013/api/Hub/hubs", {
+//       const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/Hub/hubs", {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       setHubs(res.data);
@@ -4181,7 +4181,7 @@ export default HubList;
 //     setAddHubLoading(true);
 //     try {
 //       const res = await axios.post(
-//         "http://localhost:7013/api/Hub/hubs",
+//         "https://dd-backend-3nm0.onrender.com/api/Hub/hubs",
 //         {
 //           hubName: newHub.hubName.trim(),
 //           locations: newHub.locations,
@@ -4236,7 +4236,7 @@ export default HubList;
 //       }
 
 //       const res = await axios.put(
-//         `http://localhost:7013/api/Hub/hubs/${editHub.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${editHub.hubId}`,
 //         payload,
 //         { headers: { Authorization: `Bearer ${token}` } },
 //       );
@@ -4260,7 +4260,7 @@ export default HubList;
 //     setDeleteHubLoading(true);
 //     try {
 //       const res = await axios.delete(
-//         `http://localhost:7013/api/Hub/hubs/${selectedHub.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${selectedHub.hubId}`,
 //         {
 //           headers: { Authorization: `Bearer ${token}` },
 //         },
@@ -4288,7 +4288,7 @@ export default HubList;
 //     setCutoffLoading(true);
 //     try {
 //       const res = await axios.put(
-//         `http://localhost:7013/api/Hub/update-cutoff-times/${selectedHubForCutoff.hubId}`,
+//         `https://dd-backend-3nm0.onrender.com/api/Hub/update-cutoff-times/${selectedHubForCutoff.hubId}`,
 //         {
 //           cutoffTimes: selectedHubForCutoff.cutoffTimes
 //         },

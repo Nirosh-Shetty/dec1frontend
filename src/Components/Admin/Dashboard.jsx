@@ -13,7 +13,7 @@ const Dashboard = () => {
   const getApartmentOrder = async () => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getAllOrderCount",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getAllOrderCount",
       );
       if (res.status === 200) {
         setApartmentOrder(res.data);
@@ -42,7 +42,7 @@ const Dashboard = () => {
   const getAdduser = async () => {
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/User/registeruser",
+        "https://dd-backend-3nm0.onrender.com/api/User/registeruser",
       );
       if (res.status === 200) {
         setAdduser(res.data.success.reverse());

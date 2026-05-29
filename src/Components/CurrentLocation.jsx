@@ -117,7 +117,7 @@
 //       setIsValidatingServiceability(true);
 
 //       const response = await fetch(
-//         "http://localhost:7013/api/Hub/validate-location",
+//         "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
 //         {
 //           method: "POST",
 //           headers: {
@@ -727,7 +727,7 @@
 //         let hubData = null;
 //         try {
 //           const response = await fetch(
-//             "http://localhost:7013/api/Hub/validate-location",
+//             "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
 //             {
 //               method: "POST",
 //               headers: {
@@ -838,7 +838,7 @@
 //       // console.log("Submitting service request:", requestData);
 
 //       const response = await fetch(
-//         "http://localhost:7013/api/service-requests",
+//         "https://dd-backend-3nm0.onrender.com/api/service-requests",
 //         {
 //           method: "POST",
 //           headers: {
@@ -2036,7 +2036,7 @@ const LocationConfirmationSimple = () => {
       setIsValidatingServiceability(true);
 
       const response = await fetch(
-        "http://localhost:7013/api/Hub/validate-location",
+        "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
         {
           method: "POST",
           headers: {
@@ -2656,7 +2656,7 @@ const LocationConfirmationSimple = () => {
         let hubData = null;
         try {
           const response = await fetch(
-            "http://localhost:7013/api/Hub/validate-location",
+            "https://dd-backend-3nm0.onrender.com/api/Hub/validate-location",
             {
               method: "POST",
               headers: {
@@ -2756,7 +2756,7 @@ const LocationConfirmationSimple = () => {
       };
 
       const response = await fetch(
-        "http://localhost:7013/api/service-requests",
+        "https://dd-backend-3nm0.onrender.com/api/service-requests",
         {
           method: "POST",
           headers: {

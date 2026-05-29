@@ -232,7 +232,7 @@ const LocationModal2 = ({
         fetchAbortControllerRef.current = new AbortController();
 
         const response = await fetch(
-          `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+          `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -281,7 +281,7 @@ const LocationModal2 = ({
   const fetchAddressesInBackground = async (customerId) => {
     try {
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses`,
+        `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -582,7 +582,7 @@ const LocationModal2 = ({
 
         // API call (fire-and-forget, UI already updated)
         const response = await fetch(
-          `http://localhost:7013/api/User/customers/${customerId}/addresses/${address._id}/primary`,
+          `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses/${address._id}/primary`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -621,7 +621,7 @@ const LocationModal2 = ({
       }
 
       const response = await fetch(
-        `http://localhost:7013/api/User/customers/${customerId}/addresses/${addressToDelete._id}`,
+        `https://dd-backend-3nm0.onrender.com/api/User/customers/${customerId}/addresses/${addressToDelete._id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },

@@ -41,7 +41,7 @@ const WebStory = () => {
     try {
       setIsDataLoading(true);
       let res = await axios.get(
-        "http://localhost:7013/api/admin/getstories",
+        "https://dd-backend-3nm0.onrender.com/api/admin/getstories",
       );
       if (res.status === 200) {
         setAddWebstory(res.data.getbanner.reverse());
@@ -84,7 +84,7 @@ const WebStory = () => {
       const config = {
         url: "/admin/Addstories",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };
@@ -111,7 +111,7 @@ const WebStory = () => {
       const config = {
         url: "admin/Deletestories/" + Data,
         method: "delete",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "application/json" },
       };
       await axios(config).then((res) => {
@@ -142,7 +142,7 @@ const WebStory = () => {
       const config = {
         url: "admin/editstories",
         method: "put",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         headers: { "content-type": "multipart/form-data" },
         data: formdata,
       };

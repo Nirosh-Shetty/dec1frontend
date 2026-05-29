@@ -60,7 +60,7 @@ function OrderHistory() {
   const getorders = async (id) => {
     try {
       let res = await axios.get(
-        `http://localhost:7013/api/admin/getallordersbyUserId/${id}`,
+        `https://dd-backend-3nm0.onrender.com/api/admin/getallordersbyUserId/${id}`,
       );
       if (res.status === 200 && res.data.order) {
         const formattedOrders = res.data.order
@@ -517,7 +517,7 @@ function OrderHistory() {
     const comment = isFoodRating ? foodReview : deliveryReview;
 
     try {
-      await axios.put(`http://localhost:7013/api/admin/submitOrderRating`, {
+      await axios.put(`https://dd-backend-3nm0.onrender.com/api/admin/submitOrderRating`, {
         orderId: currentOrderId,
         ratingType,
         rating,

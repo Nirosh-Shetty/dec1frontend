@@ -64,7 +64,7 @@ const EmployeeList = () => {
 
   const getAllWallet = async () => {
     const result = await axios.get(
-      `http://localhost:7013/api/wallet/getAllWalletCompsny/${corporate._id}`,
+      `https://dd-backend-3nm0.onrender.com/api/wallet/getAllWalletCompsny/${corporate._id}`,
     );
     setAllWallet(result.data.data);
   };
@@ -129,7 +129,7 @@ const EmployeeList = () => {
     setLoading(true);
     try {
       let res = await axios.get(
-        "http://localhost:7013/api/User/getUserByCompany/" +
+        "https://dd-backend-3nm0.onrender.com/api/User/getUserByCompany/" +
           corporate._id,
       );
       if (res.status === 200) {
@@ -153,7 +153,7 @@ const EmployeeList = () => {
     setAddEmployeeLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:7013/api/User/registercustomer",
+        "https://dd-backend-3nm0.onrender.com/api/User/registercustomer",
         {
           Fname: newEmployee.Fname,
           Mobile: newEmployee.Mobile,
@@ -188,7 +188,7 @@ const EmployeeList = () => {
     setEditEmployeeLoading(true);
     try {
       const res = await axios.put(
-        `http://localhost:7013/api/User/updateuser`,
+        `https://dd-backend-3nm0.onrender.com/api/User/updateuser`,
         {
           Fname: editEmployee.Fname,
           Mobile: editEmployee.Mobile,
@@ -216,7 +216,7 @@ const EmployeeList = () => {
     setDeleteEmployeeLoading(true);
     try {
       const res = await axios.delete(
-        `http://localhost:7013/api/User/deleteUser/${selectedEmployee._id}`,
+        `https://dd-backend-3nm0.onrender.com/api/User/deleteUser/${selectedEmployee._id}`,
       );
       if (res.status === 200) {
         alert("Employee deleted successfully");
@@ -251,8 +251,8 @@ const EmployeeList = () => {
     try {
       await axios.post(
         actionType === "add"
-          ? "http://localhost:7013/api/wallet/add-free-cash"
-          : "http://localhost:7013/api/wallet/deduct-cash",
+          ? "https://dd-backend-3nm0.onrender.com/api/wallet/add-free-cash"
+          : "https://dd-backend-3nm0.onrender.com/api/wallet/deduct-cash",
         {
           userId: employeeW,
           amount: Number(amount),

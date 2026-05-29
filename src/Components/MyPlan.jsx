@@ -73,7 +73,7 @@ const MyPlan = () => {
     try {
       setIsLoadingSavings(true);
       const res = await axios.get(
-        `http://localhost:7013/api/user/savings/lifetime-savings/${userId}`,
+        `https://dd-backend-3nm0.onrender.com/api/user/savings/lifetime-savings/${userId}`,
       );
       if (res.data.success) {
         setSavingsData(res.data.data || null);
@@ -93,7 +93,7 @@ const MyPlan = () => {
     try {
       setIsLoadingPlans(true);
       const res = await axios.get(
-        `http://localhost:7013/api/user/plan/get-plan/${userId}`,
+        `https://dd-backend-3nm0.onrender.com/api/user/plan/get-plan/${userId}`,
       );
       if (res.data.success) {
         const newPlans = res.data.data || [];
@@ -121,7 +121,7 @@ const MyPlan = () => {
   const getDeliveryRates = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:7013/api/deliveryrate/all",
+        "https://dd-backend-3nm0.onrender.com/api/deliveryrate/all",
       );
       console.log("Delivery rates:", res.data.data);
       setDeliveryCharge(res.data.data);
@@ -229,7 +229,7 @@ const MyPlan = () => {
 
       try {
         setLoading(true);
-        await axios.post("http://localhost:7013/api/user/plan/skip-cancel", {
+        await axios.post("https://dd-backend-3nm0.onrender.com/api/user/plan/skip-cancel", {
           planId,
           userId,
         });
@@ -320,7 +320,7 @@ const MyPlan = () => {
 
   //     try {
   //       const res = await axios.post(
-  //         "http://localhost:7013/api/user/plan/update-product",
+  //         "https://dd-backend-3nm0.onrender.com/api/user/plan/update-product",
   //         {
   //           planId: localPlan._id,
   //           foodItemId:
@@ -396,7 +396,7 @@ const MyPlan = () => {
   //         throw new Error("Customer ID not found. Please login again.");
   //       }
   //       const response = await axios.patch(
-  //         `http://localhost:7013/api/User/customers/${userId}/addresses/${addressId}/primary`,
+  //         `https://dd-backend-3nm0.onrender.com/api/User/customers/${userId}/addresses/${addressId}/primary`,
   //       );
   //       alert("Setting primary address...");
 
@@ -521,7 +521,7 @@ const MyPlan = () => {
   //     try {
   //       setLoading(true);
   //       const response = await axios.post(
-  //         "http://localhost:7013/api/user/plan/update-address",
+  //         "https://dd-backend-3nm0.onrender.com/api/user/plan/update-address",
   //         {
   //           planId: localPlan._id,
   //           userId,
@@ -547,7 +547,7 @@ const MyPlan = () => {
   //   const handleSkipOrCancel = async () => {
   //     try {
   //       setLoading(true);
-  //       await axios.post("http://localhost:7013/api/user/plan/skip-cancel", {
+  //       await axios.post("https://dd-backend-3nm0.onrender.com/api/user/plan/skip-cancel", {
   //         planId: plan._id,
   //         userId,
   //       });
@@ -1394,7 +1394,7 @@ const MyPlan = () => {
 
         const configObj = {
           method: "post",
-          baseURL: "http://localhost:7013/api/",
+          baseURL: "https://dd-backend-3nm0.onrender.com/api/",
           url: "/user/plan/create-from-plan",
           headers: { "content-type": "application/json" },
           data: {
@@ -1459,7 +1459,7 @@ const MyPlan = () => {
 
       const configObj = {
         method: "post",
-        baseURL: "http://localhost:7013/api/",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
         url: "/user/plan/create-from-plan",
         headers: { "content-type": "application/json" },
         data: {

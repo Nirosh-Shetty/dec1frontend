@@ -145,7 +145,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   const getTotalOrder = async () => {
     try {
-      let res = await axios.get("http://localhost:7013/api/admin/getallorders");
+      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getallorders");
       if (res.status === 200) {
         setTotalOrder(res.data.order.reverse());
       }
@@ -210,7 +210,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const getAllOffer = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7013/api/admin/offers",
+        "https://dd-backend-3nm0.onrender.com/api/admin/offers",
       );
       if (response.status === 200 && response.data?.data) {
         let offers = response.data.data;
@@ -317,7 +317,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         });
 
         const response = await axios.post(
-          "http://localhost:7013/api/Hub/validate-order-timing",
+          "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
           {
             hubId: hubId,
             session: session.toLowerCase(),
@@ -833,11 +833,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
         // Fetch both in parallel
         const [menuRes, cutoffRes] = await Promise.allSettled([
-          axios.get("http://localhost:7013/api/user/get-hub-menu", {
+          axios.get("https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu", {
             params: { hubId: hubIdToUse },
           }),
           fetch(
-            `http://localhost:7013/api/Hub/get-cutoff-times/${hubIdToUse}`,
+            `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubIdToUse}`,
             { headers: { Authorization: `Bearer ${token}` } },
           ),
         ]);
@@ -1111,7 +1111,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [deliveryCharge, setDeliveryCharge] = useState([]);
   const getDeliveryRates = async () => {
     try {
-      const res = await axios.get("http://localhost:7013/api/deliveryrate/all");
+      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
       setDeliveryCharge(res.data.data);
     } catch (error) {
       console.error("Error fetching delivery rates:", error);
@@ -1324,7 +1324,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setCart(storedCart);
     const addonedCarts = async () => {
       try {
-        await axios.post("http://localhost:7013/api/cart/addCart", {
+        await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
           userId: user?._id,
           items: storedCart,
           lastUpdated: Date.now,

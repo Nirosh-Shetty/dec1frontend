@@ -84,7 +84,7 @@ const ValidateModal = ({
         const config = {
           url: "/User/mobileotpverification",
           method: "post",
-          baseURL: "http://localhost:7013/api",
+          baseURL: "https://dd-backend-3nm0.onrender.com/api",
           headers: { "content-type": "application/json" },
           data: payload,
         };
@@ -106,7 +106,7 @@ const ValidateModal = ({
           if (userData?.primaryAddress) {
             try {
               const response = await fetch(
-                `http://localhost:7013/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
+                `https://dd-backend-3nm0.onrender.com/api/User/customers/${userData._id}/addresses/${userData.primaryAddress}/primary`,
                 {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
@@ -694,7 +694,7 @@ const ValidateModal = ({
       const config = {
         url: "/User/Sendotp",
         method: "post",
-        baseURL: "http://localhost:7013/api",
+        baseURL: "https://dd-backend-3nm0.onrender.com/api",
 
         headers: { "content-type": "application/json" },
         data: {
