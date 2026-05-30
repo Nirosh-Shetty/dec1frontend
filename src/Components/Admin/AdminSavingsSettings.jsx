@@ -11,7 +11,10 @@ const AdminSavingsSettings = () => {
   const [categoryDescription, setCategoryDescription] = useState("");
   const [cookingPattern, setCookingPattern] = useState("SINGLE");
   const [editingId, setEditingId] = useState(null);
-  const [cleanupMinutes, setCleanupMinutes] = useState(25);
+  const [PlanAndCleanupMinutes, setPlanAndCleanupMinutes] = useState(25);
+  const [whatToCookOrOrder, setWhatToCookOrOrder] = useState(6);
+  const [groceriesCheckOrOrder, setGroceriesCheckOrOrder] = useState(10);
+  const [cleaningUp, setCleaningUp] = useState(15);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -22,7 +25,10 @@ const AdminSavingsSettings = () => {
 
   const fetchCleanupSettings = async () => {
     const res = await axios.get(`${API_BASE}/planning-cleanup-settings`);
-    setCleanupMinutes(res.data.data?.timePerOrder ?? 25);
+    setPlanAndCleanupMinutes(res.data.data?.timePerOrder ?? 25);
+    setWhatToCookOrOrder(res.data.data?.planningCleanupTimeBreakdown?.whatToCookOrOrder ?? 6);
+    setGroceriesCheckOrOrder(res.data.data?.planningCleanupTimeBreakdown?.groceriesCheckOrOrder ?? 10);
+    setCleaningUp(res.data.data?.planningCleanupTimeBreakdown?.cleaningUp ?? 15);
   };
 
   const loadData = async () => {
@@ -108,8 +114,23 @@ const AdminSavingsSettings = () => {
   const handleSaveCleanup = async () => {
     try {
       setSaving(true);
+      console.log("Saving cleanup time with breakdown:", {
+        timePerOrder: PlanAndCleanupMinutes,
+        whatToCookOrOrder,
+        groceriesCheckOrOrder,
+        cleaningUp
+      });
+      if (whatToCookOrOrder + groceriesCheckOrOrder + cleaningUp !== PlanAndCleanupMinutes) {
+        alert("Warning: The sum of breakdown times does not equal the total time per order. Please double-check your inputs.");
+        return
+      }
       await axios.put(`${API_BASE}/planning-cleanup-settings`, {
-        timePerOrder: Number(cleanupMinutes),
+        timePerOrder: PlanAndCleanupMinutes,
+        planningCleanupTimeBreakdown: {
+          whatToCookOrOrder: whatToCookOrOrder,
+          groceriesCheckOrOrder: groceriesCheckOrOrder,
+          cleaningUp: cleaningUp,
+        }
       });
       alert("Planning + cleanup time updated");
       await fetchCleanupSettings();
@@ -201,10 +222,39 @@ const AdminSavingsSettings = () => {
                   className="vi_0"
                   type="number"
                   min="0"
-                  value={cleanupMinutes}
-                  onChange={(e) => setCleanupMinutes(e.target.value)}
+                  value={PlanAndCleanupMinutes}
+                  onChange={(e) => setPlanAndCleanupMinutes(Number(e.target.value))}
                 />
               </div>
+              <br />
+              <h4>Time Breakdown</h4>
+              <h6>What to Cook/Order</h6>
+              <input
+                className="vi_0"
+                type="number"
+                min="0"
+                value={whatToCookOrOrder}
+                onChange={(e) => setWhatToCookOrOrder(Number(e.target.value))}
+                placeholder="What to cook/order"
+              />
+              <h6>Groceries Check/Order</h6>
+              <input
+                className="vi_0"
+                type="number"
+                min="0"
+                value={groceriesCheckOrOrder}
+                onChange={(e) => setGroceriesCheckOrOrder(Number(e.target.value))}
+                placeholder="Groceries check/order"
+              />
+              <h6>Cleaning Up</h6>
+              <input
+                className="vi_0"
+                type="number"
+                min="0"
+                value={cleaningUp}
+                onChange={(e) => setCleaningUp(Number(e.target.value))}
+                placeholder="Cleaning up"
+              />
               <div className="admin-savings-actions">
                 <Button
                   className="modal-add-btn"

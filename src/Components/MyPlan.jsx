@@ -2703,28 +2703,28 @@ const MyPlan = () => {
                 <div>
                   <p className="time-plan-item">What to cook / order</p>
                 </div>
-                <p className="time-plan-time">6 mins</p>
+                <p className="time-plan-time">{savingsData?.PlanningCleanupTime?.planningCleanupTimeBreakdown?.whatToCookOrOrder || 0} mins</p>
               </div>
               <div className="time-plan-row">
                 <div>
                   <p className="time-plan-item">Groceries check / order</p>
                 </div>
-                <p className="time-plan-time">10 mins</p>
+                <p className="time-plan-time">{savingsData?.PlanningCleanupTime?.planningCleanupTimeBreakdown?.groceriesCheckOrOrder || 0} mins</p>
               </div>
               <div className="time-plan-row">
                 <div>
                   <p className="time-plan-item">Cleanup</p>
                 </div>
-                <p className="time-plan-time">15 mins</p>
+                <p className="time-plan-time">{savingsData?.PlanningCleanupTime?.planningCleanupTimeBreakdown?.cleaningUp || 0} mins</p>
               </div>
 
               {/* Planning Subtotal */}
               <div className="time-subtotal">
                 <div>
                   <p className="time-sub-lbl">Planning subtotal</p>
-                  <p className="time-sub-note">{savingsData?.orderCount || 0} orders × {savingsData?.PlanningCleanupTimePerOrder || 0} mins</p>
+                  <p className="time-sub-note">{savingsData?.orderCount || 0} orders × {savingsData?.PlanningCleanupTime?.timePerOrder || 0} mins</p>
                 </div>
-                <p className="time-sub-val">{savingsData?.planningCleanupTime || 0} mins</p>
+                <p className="time-sub-val">{savingsData?.planningCleanupTimeTotal || 0} mins</p>
               </div>
 
               {/* Grand Total */}
