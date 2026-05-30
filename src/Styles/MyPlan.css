@@ -67,8 +67,10 @@
 .myplan-savings-section {
   width: 100%;
   margin: 0 auto;
-  padding: 14px 12px 12px;
+  padding: 10px 6px;
   background: var(--cream-walls);
+  border: 2px solid var(--warm-beige);
+  border-bottom: none;
 }
 
 .myplan-savings-shell {
@@ -77,6 +79,7 @@
   background: var(--app-foreground);
   border: 1px solid rgba(245, 222, 179, 0.95);
   box-shadow: 0 8px 18px rgba(44, 44, 44, 0.12);
+  margin: 0px 8px;
 }
 
 .myplan-savings-heading {
@@ -296,7 +299,7 @@
 .myplan-saved-value {
   color: #226c1f;
   font-weight: 800;
-  text-align: right;
+  text-align: left;
 }
 
 .myplan-savings-fee-row {
@@ -355,7 +358,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
+  padding: 6px;
   background: var(--cream-walls);
   border: 2px solid var(--warm-beige);
   border-bottom-left-radius: 16px;
@@ -2436,6 +2439,371 @@ font-size: 0.8rem;
   background: #f9f5f0;
 }
 
+
+/* ===== TIME BREAKDOWN MODAL STYLES ===== */
+.time-breakdown-sheet {
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.time-sheet-handle {
+  width: 36px;
+  height: 3px;
+  background: #e0d8cc;
+  border-radius: 2px;
+  margin: 14px auto 0;
+}
+
+.time-sheet-head {
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 0.5px solid #f0eae0;
+}
+
+.time-sheet-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 3px;
+}
+
+.time-sheet-sub {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+}
+
+.time-close-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f0eae0;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
+
+/* Explanation blocks */
+.time-explanation {
+  padding: 16px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.time-exp-block {
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.time-exp-block.home {
+  background: #f5f0e8;
+  border-left: 3px solid #c0a87a;
+}
+
+.time-exp-block.dd {
+  background: #eaf3de;
+  border-left: 3px solid #3b6d11;
+}
+
+.time-exp-block.burner {
+  background: #fffdf5;
+  border-left: 3px solid #f0c96a;
+}
+
+.time-exp-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+
+.time-exp-block.home .time-exp-eyebrow {
+  color: #9a7040;
+}
+
+.time-exp-block.dd .time-exp-eyebrow {
+  color: #3b6d11;
+}
+
+.time-exp-block.burner .time-exp-eyebrow {
+  color: #9a7a10;
+}
+
+.time-exp-text {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #444;
+}
+
+.time-exp-text strong {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Table styles */
+.time-tbl-head {
+  display: grid;
+  grid-template-columns: 1fr 42px 62px 58px;
+  padding: 8px 16px;
+  gap: 4px;
+  background: #f5f0e8;
+  border-bottom: 0.5px solid #e8e0d4;
+  margin-top: 14px;
+}
+
+.time-th {
+  font-size: 10px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.time-th.r {
+  text-align: right;
+}
+
+.time-tbl-row {
+  display: grid;
+  grid-template-columns: 1fr 42px 62px 58px;
+  padding: 11px 16px;
+  gap: 4px;
+  align-items: start;
+  border-bottom: 0.5px solid #f5f0e8;
+}
+
+.time-row-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.time-row-note {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.45;
+}
+.time-row-pattern{
+  border-radius: 6px;
+  font-size: 8px;
+  display:inline;
+  padding: 3px 6px;
+}
+.time-row-pattern.batch{
+  background-color: rgba(255, 193, 7, 0.15);
+  color: orange;
+}
+.time-row-pattern.single{
+  background-color: rgba(107, 142, 35, 0.15);
+  color: #6b8e23;
+}
+
+.time-td {
+  font-size: 13px;
+  color: #666;
+  text-align: right;
+  padding-top: 1px;
+}
+
+.time-td.green {
+  font-weight: 700;
+  color: #3b6d11;
+}
+
+.time-td-stack {
+  text-align: right;
+  padding-top: 1px;
+}
+
+.time-td-stack .time-td-num {
+  font-size: 13px;
+  color: #666;
+  display: block;
+}
+
+.time-td-stack .time-td-unit {
+  font-size: 10px;
+  color: #aaa;
+  display: block;
+  margin-top: 1px;
+}
+
+.time-td-stack.green .time-td-num {
+  font-weight: 700;
+  color: #3b6d11;
+}
+
+.time-td-stack.green .time-td-unit {
+  color: #7aad44;
+}
+
+/* Subtotal section */
+.time-subtotal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  padding: 11px 16px;
+  background: #f5f0e8;
+  border-top: 0.5px solid #e8e0d4;
+  border-bottom: 0.5px solid #e8e0d4;
+  align-items: center;
+}
+
+.time-sub-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.time-sub-note {
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.time-sub-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Burner adjustment section */
+.time-burner-adjustment {
+  padding: 12px 16px;
+  background: #fffdf5;
+  border-bottom: 0.5px solid #e8e0d4;
+}
+
+.time-burner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.time-burner-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7a5c00;
+  margin-bottom: 2px;
+}
+
+.time-burner-calc {
+  font-size: 11px;
+  color: #9a7a10;
+  margin-top: 2px;
+}
+
+.time-burner-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #7a5c00;
+}
+
+/* Planning section */
+.time-section-band {
+  padding: 10px 16px 6px;
+  background: #f5f0e8;
+  border-bottom: 0.5px solid #e8e0d4;
+  margin-top: 14px;
+}
+
+.time-section-band-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.time-plan-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 0.5px solid #f5f0e8;
+  gap: 10px;
+}
+
+.time-plan-row:last-child {
+  border-bottom: none;
+}
+
+.time-plan-item {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.time-plan-note {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.45;
+}
+
+.time-plan-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  flex-shrink: 0;
+}
+
+/* Grand total */
+.time-grand-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #3b5a1f;
+  margin-top: 14px;
+}
+
+.time-grand-lbl {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 3px;
+}
+
+.time-grand-sub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.time-grand-val {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+/* Disclaimer */
+.time-disclaimer {
+  padding: 12px 16px 24px;
+  background: #fafaf8;
+}
+
+.time-disclaimer p {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.75;
+  border-left: 2px solid #e8e0d4;
+  padding-left: 10px;
+}
 /* Tablet styles for 820x1120 resolution */
 @media screen and (min-width: 800px) and (max-width: 900px) {
   .my-plan-container {

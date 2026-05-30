@@ -73,7 +73,7 @@ const MyPlan = () => {
     try {
       setIsLoadingSavings(true);
       const res = await axios.get(
-        `https://dd-backend-3nm0.onrender.com/api/user/savings/lifetime-savings/${userId}`,
+        `http://localhost:7013/api/user/savings/lifetime-savings/${userId}`,
       );
       if (res.data.success) {
         setSavingsData(res.data.data || null);
@@ -93,7 +93,7 @@ const MyPlan = () => {
     try {
       setIsLoadingPlans(true);
       const res = await axios.get(
-        `https://dd-backend-3nm0.onrender.com/api/user/plan/get-plan/${userId}`,
+        `http://localhost:7013/api/user/plan/get-plan/${userId}`,
       );
       if (res.data.success) {
         const newPlans = res.data.data || [];
@@ -121,7 +121,7 @@ const MyPlan = () => {
   const getDeliveryRates = async () => {
     try {
       const res = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/deliveryrate/all",
+        "http://localhost:7013/api/deliveryrate/all",
       );
       console.log("Delivery rates:", res.data.data);
       setDeliveryCharge(res.data.data);
@@ -229,7 +229,7 @@ const MyPlan = () => {
 
       try {
         setLoading(true);
-        await axios.post("https://dd-backend-3nm0.onrender.com/api/user/plan/skip-cancel", {
+        await axios.post("http://localhost:7013/api/user/plan/skip-cancel", {
           planId,
           userId,
         });
@@ -320,7 +320,7 @@ const MyPlan = () => {
 
   //     try {
   //       const res = await axios.post(
-  //         "https://dd-backend-3nm0.onrender.com/api/user/plan/update-product",
+  //         "http://localhost:7013/api/user/plan/update-product",
   //         {
   //           planId: localPlan._id,
   //           foodItemId:
@@ -396,7 +396,7 @@ const MyPlan = () => {
   //         throw new Error("Customer ID not found. Please login again.");
   //       }
   //       const response = await axios.patch(
-  //         `https://dd-backend-3nm0.onrender.com/api/User/customers/${userId}/addresses/${addressId}/primary`,
+  //         `http://localhost:7013/api/User/customers/${userId}/addresses/${addressId}/primary`,
   //       );
   //       alert("Setting primary address...");
 
@@ -521,7 +521,7 @@ const MyPlan = () => {
   //     try {
   //       setLoading(true);
   //       const response = await axios.post(
-  //         "https://dd-backend-3nm0.onrender.com/api/user/plan/update-address",
+  //         "http://localhost:7013/api/user/plan/update-address",
   //         {
   //           planId: localPlan._id,
   //           userId,
@@ -547,7 +547,7 @@ const MyPlan = () => {
   //   const handleSkipOrCancel = async () => {
   //     try {
   //       setLoading(true);
-  //       await axios.post("https://dd-backend-3nm0.onrender.com/api/user/plan/skip-cancel", {
+  //       await axios.post("http://localhost:7013/api/user/plan/skip-cancel", {
   //         planId: plan._id,
   //         userId,
   //       });
@@ -1394,7 +1394,7 @@ const MyPlan = () => {
 
         const configObj = {
           method: "post",
-          baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+          baseURL: "http://localhost:7013/api/",
           url: "/user/plan/create-from-plan",
           headers: { "content-type": "application/json" },
           data: {
@@ -1459,7 +1459,7 @@ const MyPlan = () => {
 
       const configObj = {
         method: "post",
-        baseURL: "https://dd-backend-3nm0.onrender.com/api/",
+        baseURL: "http://localhost:7013/api/",
         url: "/user/plan/create-from-plan",
         headers: { "content-type": "application/json" },
         data: {
@@ -1627,66 +1627,207 @@ const MyPlan = () => {
             </div>
           </div> */}
         </div>
-
-        <div className="myplan-savings-section">
+        <div className="myplan-mid-section">
+          <div className="myplan-savings-section">
           <div className="myplan-savings-shell">
-          <div className="myplan-savings-heading">
-            <div>
-              <span>Savings snapshot</span>
-              <small>Since you joined DailyDish</small>
+            <div className="myplan-savings-heading">
+              <div>
+                <span>Your savings</span>
+                {/* Optional: You can hide this or keep it */}
+              </div>
             </div>
-            <em>{savingsData?.orderCount || 0} meals</em>
-          </div>
-          <div className="myplan-savings-grid">
-            <button
-              className="myplan-savings-card money"
-              type="button"
-              onClick={() => {
-                setShowAllMoneySavings(false);
-                setSavingsModal("money");
-              }}
-            >
-              <span className="myplan-savings-card-top">
-                <span className="myplan-savings-symbol">
-                  <BadgeIndianRupee size={17} strokeWidth={2.4} />
-                </span>
-                <ChevronRight className="myplan-savings-arrow" size={17} />
-              </span>
-              <span className="myplan-savings-icon">₹</span>
-              <span className="myplan-savings-label">Saved vs Swiggy</span>
-              <span className="myplan-savings-value">
-                {isLoadingSavings
-                  ? "..."
-                  : formatMoney(savingsData?.totalMoneySaved || 0)}
-              </span>
-              <span className="myplan-savings-meta">Includes prices + fees</span>
-            </button>
+            
+            <div style={{ width: '100%', cursor: 'pointer' }} onClick={() => setSavingsModal("time")}>
+              {/* Card Body */}
+              <div style={{
+                padding: '20px 18px 16px',
+                background: '#fff',
+                borderRadius: '16px 16px 0 0',
+                border: '0.5px solid #e0d8cc',
+              }}>
+                {/* Card Eyebrow */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                  marginBottom: '12px',
+                }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    background: '#eaf3de',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Clock3 size={15} strokeWidth={2.4} color="#3b6d11" />
+                  </div>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#3b6d11',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                  }}>
+                    Time freed
+                  </span>
+                </div>
 
-            <button
-              className="myplan-savings-card time"
-              type="button"
-              onClick={() => setSavingsModal("time")}
-            >
-              <span className="myplan-savings-card-top">
-                <span className="myplan-savings-symbol">
-                  <Clock3 size={17} strokeWidth={2.4} />
-                </span>
-                <ChevronRight className="myplan-savings-arrow" size={17} />
-              </span>
-              <span className="myplan-savings-icon">h</span>
-              <span className="myplan-savings-label">Time freed</span>
-              <span className="myplan-savings-value">
-                {isLoadingSavings
-                  ? "..."
-                  : formatSavedTime(savingsData?.totalTimeSaved || 0)}
-              </span>
-              <span className="myplan-savings-meta">Cooking + cleanup</span>
-            </button>
-          </div>
+                {/* Big Time Value */}
+                <p style={{
+                  fontSize: '44px',
+                  fontWeight: '700',
+                  color: '#1a1a1a',
+                  letterSpacing: '-2px',
+                  lineHeight: '1',
+                  marginBottom: '10px',
+                  margin: 0,
+                }}>
+                  <span style={{ color: '#3b6d11' }}>
+                    {isLoadingSavings ? '...' : formatSavedTime(savingsData?.totalTimeSaved || 0).split(' ')[0]}
+                  </span>
+                  {' '}
+                  {isLoadingSavings ? '' : formatSavedTime(savingsData?.totalTimeSaved || 0).split(' ').slice(1).join(' ')}
+                </p>
+
+                {/* Anchor Text */}
+                <p style={{
+                  fontSize: '14px',
+                  color: '#555',
+                  lineHeight: '1.55',
+                  borderLeft: '2px solid #c0dd97',
+                  paddingLeft: '10px',
+                  marginBottom: '4px',
+                }}>
+                  you spent doing <strong style={{ color: '#1a1a1a', fontWeight: '600' }}>something you love.</strong>
+                </p>
+              </div>
+
+              {/* Stats Row */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 18px',
+                borderTop: '0.5px solid #f0eae0',
+                background: '#fafaf8',
+                borderRadius: '0 0 16px 16px',
+              }}>
+                {/* Orders */}
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#1a1a1a',
+                    margin: 0,
+                  }}>
+                    {savingsData?.orderCount || 0}
+                  </p>
+                  <p style={{
+                    fontSize: '10px',
+                    color: '#888',
+                    marginTop: '2px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    margin: 0,
+                  }}>
+                    Orders
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div style={{
+                  width: '0.5px',
+                  height: '32px',
+                  background: '#e8e0d4',
+                }} />
+
+                {/* Dishes - TODO: Calculate from data */}
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#1a1a1a',
+                    margin: 0,
+                  }}>
+                    {savingsData?.categoryWiseTimeSavings?.reduce((sum, cat) => sum + (cat.itemCount || 0), 0) || 0}
+                  </p>
+                  <p style={{
+                    fontSize: '10px',
+                    color: '#888',
+                    marginTop: '2px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    margin: 0,
+                  }}>
+                    Dishes
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div style={{
+                  width: '0.5px',
+                  height: '32px',
+                  background: '#e8e0d4',
+                }} />
+
+                {/* Cooking Saved */}
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    color: '#1a1a1a',
+                    margin: 0,
+                  }}>
+                    {formatSavedTime(savingsData?.adjustedCookingTime || 0)}
+                  </p>
+                  <p style={{
+                    fontSize: '10px',
+                    color: '#888',
+                    marginTop: '2px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    margin: 0,
+                  }}>
+                    Cooking saved
+                  </p>
+                </div>
+              </div>
+
+              {/* See Math Button */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                padding: '11px',
+                borderTop: '0.5px solid #f0eae0',
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#3b5a1f',
+                cursor: 'pointer',
+                background: '#f5f2ec',
+              }}>
+                <span>See how we got this</span>
+                <div style={{
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  background: '#3b5a1f',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  color: '#fff',
+                  fontWeight: 'bold',
+                }}>
+                  ↗
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div className="myplan-mid-section">
           <div className="plans-list">
             {isLoadingPlans ? (
               <div className="loading-plans">
@@ -2434,23 +2575,6 @@ const MyPlan = () => {
         <Modal.Body className="myplan-savings-modal-body">
           {savingsModal === "money" ? (
             <div className="myplan-savings-table">
-              <div className="myplan-savings-disclosure">
-                <div className="myplan-savings-disclosure-item">
-                  <span className="myplan-disclosure-icon">🍛</span>
-                  <div className="myplan-disclosure-content">
-                    <strong>Batch-cooked dishes</strong>
-                    <small>Kichidi, curries, rice – same time whether you make 1 or 5 portions</small>
-                  </div>
-                </div>
-                <div className="myplan-savings-disclosure-item">
-                  <span className="myplan-disclosure-icon">🫓</span>
-                  <div className="myplan-disclosure-content">
-                    <strong>Individually prepared</strong>
-                    <small>Chapati, roti – time increases with each portion you make</small>
-                  </div>
-                </div>
-              </div>
-
               <div className="myplan-savings-row myplan-savings-head">
                 <span>Dish</span>
                 <span>DailyDish</span>
@@ -2461,9 +2585,7 @@ const MyPlan = () => {
                 visibleMoneyRows.map((item, index) => (
                   <div
                     className={`myplan-savings-row ${
-                      item === deliveryHandlingRow
-                        ? "myplan-savings-fee-row"
-                        : ""
+                      item === deliveryHandlingRow ? "myplan-savings-fee-row" : ""
                     }`}
                     key={`${item.name}-${index}`}
                   >
@@ -2472,12 +2594,13 @@ const MyPlan = () => {
                       <small>
                         {item === deliveryHandlingRow
                           ? `per order - x${item.quantity || 0}`
-                          : `ordered x${item.quantity || 1}`}
+                          : `ordered ${item.quantity || 1}x`}
                       </small>
                     </span>
-                    <span>{formatMoney(item.dailyDishPrice || 0)}</span>
+                    {/* Per-unit price columns */}
+                    <span>₹{item.dailyDishPricePerUnit || 0}</span>
                     <span className="myplan-muted">
-                      {formatMoney(item.swiggyPrice || 0)}
+                      ₹{item.swiggyPricePerUnit || 0}
                     </span>
                     <span className="myplan-saved-value">
                       {formatMoney(item.saved || 0)}
@@ -2508,76 +2631,114 @@ const MyPlan = () => {
               </div>
             </div>
           ) : (
-            <div className="myplan-savings-table">
-              <div className="myplan-savings-disclosure">
-                <div className="myplan-savings-disclosure-item">
-                  <span className="myplan-disclosure-icon">🍛</span>
-                  <div className="myplan-disclosure-content">
-                    <strong>Batch-cooked dishes</strong>
-                    <small>Kichidi, curries, rice – same time whether you make 1 or 5 portions</small>
-                  </div>
-                </div>
-                <div className="myplan-savings-disclosure-item">
-                  <span className="myplan-disclosure-icon">🫓</span>
-                  <div className="myplan-disclosure-content">
-                    <strong>Individually prepared</strong>
-                    <small>Chapati, roti – time increases with each portion you make</small>
-                  </div>
+            <div>
+              {/* Explanation Block */}
+              <div className="time-explanation">
+                <div className="time-exp-block dd">
+                  <p className="time-exp-eyebrow">How it's counted</p>
+                  <p className="time-exp-text">
+                    Say you order <strong>Dal × 2</strong> and <strong>Chapati × 4</strong>.<br /><br />
+                    Dal for two = same 35 mins, one pot. <strong>Counted once per order</strong> — just like home. Chapati is different, <strong>every piece counts.</strong><br /><br />
+                    Total divided by <strong>1.5</strong> for parallel cooking on two burners.
+                  </p>
                 </div>
               </div>
 
-              <div className="myplan-savings-row myplan-savings-head">
-                <span>Dish</span>
-                <span>x Qty</span>
-                <span>Cook time</span>
-                <span>Freed</span>
+              {/* Category Breakdown Table */}
+              <div className="time-tbl-head">
+                <p className="time-th">Category</p>
+                <p className="time-th r">Qty</p>
+                <p className="time-th r">Per dish</p>
+                <p className="time-th r">Total</p>
               </div>
-              {(savingsData?.categoryWiseTimeSavings || []).map((category) => (
-                <div className="myplan-savings-row" key={category.categoryName}>
-                  <span>
-                    <strong>{category.categoryName}</strong>
-                    <small>{category.categoryDescription}</small>
-                  </span>
-                  <span>x{category.itemCount || 0}</span>
-                  <span className="myplan-muted">
-                    ~{category.timeIfMadeAtHome || 0} min
-                  </span>
-                  <span className="myplan-saved-value">
-                    {formatSavedTime(category.totalTimeSaved || 0)}
-                  </span>
+
+              {(savingsData?.categoryWiseTimeSavings || []).map((category, idx) => (
+                <div className="time-tbl-row" key={`${category.categoryName}-${idx}`}>
+                  <div>
+                    <p className="time-row-name">{category.categoryName}</p>
+                    <p className={`time-row-pattern ${category.cookingPattern?.toLowerCase()}`}>
+                      {category.cookingPattern}
+                    </p>
+                  </div>
+                  <p className="time-td">{category.itemCount || 0}</p>
+                  <div className="time-td-stack">
+                    <span className="time-td-num">{category.timeIfMadeAtHome || 0}</span>
+                    <span className="time-td-unit">mins</span>
+                  </div>
+                  <div className="time-td-stack green">
+                    <span className="time-td-num">{category.totalTimeSaved || 0}</span>
+                    <span className="time-td-unit">mins</span>
+                  </div>
                 </div>
               ))}
-              <div className="myplan-savings-row myplan-savings-highlight">
-                <span>
-                  <strong>Planning + cleanup</strong>
-                  <small>
-                    fixed per meal - x{savingsData?.orderCount || 0}
-                  </small>
-                </span>
-                <span>x{savingsData?.orderCount || 0}</span>
-                <span className="myplan-muted">
-                  ~
-                  {savingsData?.orderCount
-                    ? Math.round(
-                        (savingsData?.planningCleanupTime || 0) /
-                          savingsData.orderCount,
-                      )
-                    : 0}{" "}
-                  min
-                </span>
-                <span className="myplan-saved-value">
-                  {formatSavedTime(savingsData?.planningCleanupTime || 0)}
-                </span>
+
+              {/* Cooking Subtotal */}
+              <div className="time-subtotal">
+                <div>
+                  <p className="time-sub-lbl">Cooking subtotal</p>
+                  <p className="time-sub-note">Raw total before 2-burner adjustment</p>
+                </div>
+                <p className="time-sub-val">{savingsData?.rawCookingTime || 0} mins</p>
               </div>
-              <div className="myplan-savings-note">
-                Overlap deducted: dishes in same meal share one planning +
-                cleanup block.
+
+              {/* Burner Adjustment */}
+              <div className="time-burner-adjustment">
+                <div className="time-burner-header">
+                  <div>
+                    <p className="time-burner-label">After 2-burner adjustment</p>
+                    <p className="time-burner-calc">
+                      {savingsData?.rawCookingTime || 0} ÷ 1.5 = {savingsData?.adjustedCookingTime || 0} mins
+                    </p>
+                  </div>
+                  <p className="time-burner-val">{savingsData?.adjustedCookingTime || 0} mins</p>
+                </div>
               </div>
-              <div className="myplan-savings-row myplan-savings-total">
-                <span>Total time freed</span>
-                <span></span>
-                <span></span>
-                <span>{formatSavedTime(savingsData?.totalTimeSaved || 0)}</span>
+
+              {/* Planning Section */}
+              <div className="time-section-band">
+                <p className="time-section-band-label">Planning + cleanup · per order</p>
+              </div>
+
+              <div className="time-plan-row">
+                <div>
+                  <p className="time-plan-item">What to cook / order</p>
+                </div>
+                <p className="time-plan-time">6 mins</p>
+              </div>
+              <div className="time-plan-row">
+                <div>
+                  <p className="time-plan-item">Groceries check / order</p>
+                </div>
+                <p className="time-plan-time">10 mins</p>
+              </div>
+              <div className="time-plan-row">
+                <div>
+                  <p className="time-plan-item">Cleanup</p>
+                </div>
+                <p className="time-plan-time">15 mins</p>
+              </div>
+
+              {/* Planning Subtotal */}
+              <div className="time-subtotal">
+                <div>
+                  <p className="time-sub-lbl">Planning subtotal</p>
+                  <p className="time-sub-note">{savingsData?.orderCount || 0} orders × {savingsData?.PlanningCleanupTimePerOrder || 0} mins</p>
+                </div>
+                <p className="time-sub-val">{savingsData?.planningCleanupTime || 0} mins</p>
+              </div>
+
+              {/* Grand Total */}
+              <div className="time-grand-total">
+                <div>
+                  <p className="time-grand-lbl">Time freed</p>
+                  <p className="time-grand-sub">Cooking + planning</p>
+                </div>
+                <p className="time-grand-val">{formatSavedTime(savingsData?.totalTimeSaved || 0)}</p>
+              </div>
+
+              {/* Disclaimer */}
+              <div className="time-disclaimer">
+                <p>Based on an average Bengaluru home cook. Your kitchen may differ — but the time is real.</p>
               </div>
             </div>
           )}

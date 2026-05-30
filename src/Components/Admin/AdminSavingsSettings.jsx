@@ -9,7 +9,7 @@ const AdminSavingsSettings = () => {
   const [name, setName] = useState("");
   const [timeIfMadeAtHome, setTimeIfMadeAtHome] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
-  const [cookingPattern, setCookingPattern] = useState("SCALABLE");
+  const [cookingPattern, setCookingPattern] = useState("SINGLE");
   const [editingId, setEditingId] = useState(null);
   const [cleanupMinutes, setCleanupMinutes] = useState(25);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ const AdminSavingsSettings = () => {
     setName("");
     setTimeIfMadeAtHome("");
     setCategoryDescription("");
-    setCookingPattern("SCALABLE");
+    setCookingPattern("SINGLE");
     setEditingId(null);
   };
 
@@ -85,7 +85,7 @@ const AdminSavingsSettings = () => {
     setName(category.name || "");
     setTimeIfMadeAtHome(category.timeIfMadeAtHome ?? "");
     setCategoryDescription(category.categoryDescription || "");
-    setCookingPattern(category.cookingPattern || "SCALABLE");
+    setCookingPattern(category.cookingPattern || "SINGLE");
   };
 
   const handleDelete = async (categoryId) => {
@@ -173,8 +173,8 @@ const AdminSavingsSettings = () => {
                   value={cookingPattern}
                   onChange={(e) => setCookingPattern(e.target.value)}
                 >
-                  <option value="SCALABLE">
-                    SCALABLE (Time increases with quantity, e.g., Chapati)
+                  <option value="SINGLE">
+                    SINGLE (Time increases with quantity, e.g., Chapati)
                   </option>
                   <option value="BATCH">
                     BATCH (Same time regardless of quantity, e.g., Kichidi)
@@ -259,7 +259,7 @@ const AdminSavingsSettings = () => {
                                 : "#6b8e23",
                           }}
                         >
-                          {category.cookingPattern || "SCALABLE"}
+                          {category.cookingPattern || ""}
                         </span>
                       </td>
                       <td>{category.categoryDescription}</td>
