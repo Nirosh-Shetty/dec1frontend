@@ -1629,7 +1629,7 @@ const MyPlan = () => {
         </div>
         <div className="myplan-mid-section">
           <div className="myplan-savings-section">
-          <div className="myplan-savings-shell">
+          <div className="myplan-savings-shell savings-card-fadeIn">
             <div className="myplan-savings-heading">
               <div>
                 <span>Your savings</span>
