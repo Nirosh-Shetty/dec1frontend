@@ -22,6 +22,7 @@ import Dashboard from "./Components/Admin/Dashboard";
 import Main from "./Components/Admin/Main";
 import HomeBanner from "./Components/Admin/HomeBanner";
 import Add_Products from "./Components/Admin/Add_Products";
+import AdminSavingsSettings from "./Components/Admin/AdminSavingsSettings";
 import DeliveryCharge from "./Components/Admin/DeliveryCharge";
 import BookingList from "./Components/Admin/BookingList";
 import UserList from "./Components/Admin/UserList";
@@ -100,7 +101,9 @@ import DeliveryRate from "./Components/Admin/DeliveryRate";
 import AiSensyImage from "./Components/Admin/AiSensyImage";
 import CheckoutMultiple from "./Components/CheckoutMultiple";
 import BulkStatusUpdate from "./Components/Admin/BulkStatusUpdate";
-import AdminSavingsSettings from "./Components/Admin/AdminSavingsSettings";
+import LocationRequiredPopup from "./Components/LocationRequiredPopup";
+
+
 
 // Component to handle dynamic theme colors
 const ThemeColorHandler = () => {
@@ -175,6 +178,7 @@ function App() {
           {/* <Route path="/" element={<LandingPage />} /> */}
           <Route path="/login" element={<LeafWithLogo />} />
           <Route path="/splash" element={<SplashScreen />} />
+          <Route path="/location-detect" element={<LocationDetection />} />
 
           {/* Redirect from root to splash, then splash redirects to home */}
           <Route path="/" element={<Navigate to="/splash" replace />} />
@@ -213,7 +217,6 @@ function App() {
                   setCarts={setCarts}
                 /> */}
                 <UserWallet />
-                <Footer />
               </>
             }
           />
@@ -235,7 +238,6 @@ function App() {
                   setCarts={setCarts}
                 /> */}
                 <AddressManagement />
-                <Footer />
               </>
             }
           />
@@ -252,15 +254,6 @@ function App() {
             element={
               <>
                 <CheckoutMultiple />
-              </>
-            }
-          />
-          <Route
-            path="/checkout-multiple"
-            element={
-              <>
-                <CheckoutMultiple />
-                <Footer />
               </>
             }
           />
@@ -342,7 +335,6 @@ function App() {
             element={
               <>
                 <TermsAndConditions />
-                <Footer />
               </>
             }
           />
@@ -355,7 +347,6 @@ function App() {
             element={
               <>
                 <Profile />
-                <Footer />
               </>
             }
           />
@@ -364,7 +355,6 @@ function App() {
             element={
               <>
                 <OrderHistory />
-                <Footer />
               </>
             }
           />
@@ -373,7 +363,6 @@ function App() {
             element={
               <>
                 <LiveStreams />
-                <Footer />
               </>
             }
           />
@@ -444,9 +433,9 @@ function App() {
             element={<Main children={<Add_Products />} />}
           />
           <Route
-            path="/admin/savings-settings"
-            element={<Main children={<AdminSavingsSettings />} />}
-          />
+                      path="/admin/savings-settings"
+                      element={<Main children={<AdminSavingsSettings />} />}
+                    />
           <Route
             path="/available-slots"
             element={<Main children={<Slot />} />}

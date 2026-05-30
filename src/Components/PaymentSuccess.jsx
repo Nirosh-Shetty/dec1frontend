@@ -1,3 +1,6 @@
+
+// PaymentSuccess.jsx - Updated version
+
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaTimesCircle } from "react-icons/fa";
@@ -17,8 +20,8 @@ const PaymentSuccess = () => {
     searchParams.get("userId") ||
     localStorage.getItem("userId") ||
     localStorage.getItem("userID");
-  const code = searchParams.get("code"); // PhonePe sends this (e.g., PAYMENT_ERROR)
-  const errorMessage = searchParams.get("error"); // Custom error message (Razorpay sends this)
+  const code = searchParams.get("code");
+  const errorMessage = searchParams.get("error");
 
   // Extract payment details from URL parameters
   const urlSession = searchParams.get("session");
@@ -28,25 +31,26 @@ const PaymentSuccess = () => {
   const urlOrderId = searchParams.get("orderId");
   const urlHubName = searchParams.get("hubName");
   const urlDelivaryLocation = searchParams.get("delivarylocation");
-  const urlStatus = searchParams.get("status"); // COMPLETED or FAILED (from backend)
-  const urlPaymentMethod = searchParams.get("paymentMethod"); // razorpay, phonepe, or wallet
+  const urlStatus = searchParams.get("status");
+  const urlPaymentMethod = searchParams.get("paymentMethod");
+  
+  // NEW: Parse multiple sessions from URL (comma-separated)
+  const urlMultipleSessions = searchParams.get("sessions");
+  const urlMultipleDeliveryDates = searchParams.get("deliveryDates");
+  const urlMultipleOrderIds = searchParams.get("orderIds");
 
   // State for payment status
   const [paymentStatus, setPaymentStatus] = useState("LOADING");
   const [paymentDetails, setPaymentDetails] = useState({
-    session: urlSession || "Lunch",
-    deliveryDate: urlDeliveryDate || new Date().toISOString(),
+    sessions: urlMultipleSessions ? urlMultipleSessions.split(',') : [urlSession || "Lunch"],
+    deliveryDates: urlMultipleDeliveryDates ? urlMultipleDeliveryDates.split(',') : [urlDeliveryDate || new Date().toISOString()],
+    orderIds: urlMultipleOrderIds ? urlMultipleOrderIds.split(',') : [urlOrderId || transactionId],
     username: urlUsername || "User",
     amount: parseFloat(urlAmount) || 0,
-    orderId: urlOrderId || transactionId,
     hubName: urlHubName || "",
     delivarylocation: urlDelivaryLocation || "",
     paymentMethod: urlPaymentMethod || "online",
   });
-
-  // Debug: Log current state
-  // console.log("Current payment status:", paymentStatus);
-  // console.log("URL params:", { transactionId, userId, code, errorMessage });
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -64,13 +68,16 @@ const PaymentSuccess = () => {
     }
   };
 
+  // Helper function to format session name
+  const formatSession = (session) => {
+    return session?.charAt(0).toUpperCase() + session?.slice(1) || "Meal";
+  };
+
   const handleFailureRedirect = () => {
-    navigate("/checkout-multiple", { replace: true }); // Go back to plan to retry
+    navigate("/checkout-multiple", { replace: true });
   };
 
   const checkPaymentStatus = async () => {
-    // No API call needed - all data is passed via URL parameters
-    // This function is kept for backward compatibility but does nothing
     console.log(
       "Payment details already available from URL parameters:",
       paymentDetails,
@@ -78,32 +85,12 @@ const PaymentSuccess = () => {
   };
 
   useEffect(() => {
-    console.log(
-      "PaymentSuccess useEffect - transactionId:",
-      transactionId,
-      "userId:",
-      userId,
-      "urlStatus:",
-      urlStatus,
-      "code:",
-      code,
-      "errorMessage:",
-      errorMessage,
-    );
-    console.log("URL Payment Details:", paymentDetails);
-
-    // PRIORITY 1: Check for explicit failure indicators
+    // Handle explicit failure indicators
     if (
       urlStatus === "FAILED" ||
       code === "PAYMENT_ERROR" ||
       code === "PAYMENT_FAILED"
     ) {
-      console.log(
-        "Setting payment status to FAILED - urlStatus:",
-        urlStatus,
-        "code:",
-        code,
-      );
       setPaymentStatus("FAILED");
       setTimeout(() => {
         navigate("/checkout-multiple", { replace: true });
@@ -111,13 +98,170 @@ const PaymentSuccess = () => {
       return;
     }
 
-    // PRIORITY 2: Check for explicit success indicators (wallet payment, etc.)
+    // Always fetch from backend when we have a real transactionId
+    // This ensures all order details (all sessions) are shown correctly
     if (
-      urlStatus === "COMPLETED" ||
-      transactionId === "completed" ||
-      code === "PAYMENT_SUCCESS"
+      transactionId &&
+      transactionId !== "null" &&
+      transactionId !== "undefined" &&
+      transactionId !== "completed" &&
+      userId
     ) {
-      console.log("Payment successful - urlStatus:", urlStatus);
+      setPaymentStatus("LOADING");
+
+      const fetchOrderDetails = async () => {
+        try {
+          const API_BASE_URL =
+            process.env.REACT_APP_API_URL ||
+            "https://dd-backend-3nm0.onrender.com";
+
+          // Poll up to 5 times with 1.5s delay — backend may still be creating plans
+          let result = null;
+          for (let attempt = 1; attempt <= 5; attempt++) {
+            const response = await fetch(
+              `${API_BASE_URL}/api/user/razorpay/check-payment/${transactionId}/${userId}`
+            );
+
+            if (!response.ok) {
+              if (attempt === 5) throw new Error(`HTTP ${response.status}`);
+              await new Promise(r => setTimeout(r, 1500));
+              continue;
+            }
+
+            const data = await response.json();
+            console.log(`[PaymentSuccess] attempt ${attempt}:`, data);
+
+            // Keep polling if transaction isn't COMPLETED yet
+            if (data.success && data.success.status === "COMPLETED") {
+              result = data;
+              break;
+            }
+
+            if (attempt < 5) {
+              await new Promise(r => setTimeout(r, 1500));
+            }
+          }
+
+          if (result && result.success && result.success.status === "COMPLETED") {
+            const orderDetails = result.success.orderDetails || [];
+
+            if (orderDetails.length > 0) {
+              // Use backend data — most reliable source
+              setPaymentDetails({
+                sessions: orderDetails.map(o => o.session),
+                deliveryDates: orderDetails.map(o => o.deliveryDate),
+                orderIds: orderDetails.map(o => o.orderId),
+                username: result.success.username || urlUsername || "User",
+                amount: result.success.amount || parseFloat(urlAmount) || 0,
+                hubName: orderDetails[0]?.hubName || urlHubName || "",
+                delivarylocation: orderDetails[0]?.delivarylocation || urlDelivaryLocation || "",
+                paymentMethod: result.success.paymentMethod || urlPaymentMethod || "razorpay",
+              });
+            } else {
+              // Backend returned no orderDetails — fall back to URL params
+              const parsedSessions = urlMultipleSessions
+                ? urlMultipleSessions.split(",").filter(Boolean)
+                : urlSession ? [urlSession] : ["Lunch"];
+              const parsedDates = urlMultipleDeliveryDates
+                ? urlMultipleDeliveryDates.split(",").filter(Boolean)
+                : urlDeliveryDate ? [urlDeliveryDate] : [new Date().toISOString()];
+              const parsedOrderIds = urlMultipleOrderIds
+                ? urlMultipleOrderIds.split(",").filter(Boolean)
+                : urlOrderId ? [urlOrderId] : [transactionId];
+
+              setPaymentDetails(prev => ({
+                ...prev,
+                sessions: parsedSessions,
+                deliveryDates: parsedDates,
+                orderIds: parsedOrderIds,
+              }));
+            }
+
+            setPaymentStatus("COMPLETED");
+            localStorage.removeItem("cart");
+            setTimeout(() => {
+              navigate("/my-plan", { replace: true });
+            }, 5000);
+          } else {
+            // All attempts failed or status not COMPLETED — fall back to URL params
+            const parsedSessions = urlMultipleSessions
+              ? urlMultipleSessions.split(",").filter(Boolean)
+              : urlSession ? [urlSession] : ["Lunch"];
+            const parsedDates = urlMultipleDeliveryDates
+              ? urlMultipleDeliveryDates.split(",").filter(Boolean)
+              : urlDeliveryDate ? [urlDeliveryDate] : [new Date().toISOString()];
+
+            if (urlStatus === "COMPLETED" || code === "PAYMENT_SUCCESS") {
+              // URL says success but backend didn't confirm — trust URL params
+              setPaymentDetails(prev => ({
+                ...prev,
+                sessions: parsedSessions,
+                deliveryDates: parsedDates,
+              }));
+              setPaymentStatus("COMPLETED");
+              localStorage.removeItem("cart");
+              setTimeout(() => {
+                navigate("/my-plan", { replace: true });
+              }, 5000);
+            } else {
+              setPaymentStatus("FAILED");
+              setTimeout(() => {
+                navigate("/my-plan", { replace: true });
+              }, 8000);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching order details:", error);
+          // On network error, fall back to URL params if status says COMPLETED
+          if (urlStatus === "COMPLETED") {
+            const parsedSessions = urlMultipleSessions
+              ? urlMultipleSessions.split(",").filter(Boolean)
+              : urlSession ? [urlSession] : ["Lunch"];
+            const parsedDates = urlMultipleDeliveryDates
+              ? urlMultipleDeliveryDates.split(",").filter(Boolean)
+              : urlDeliveryDate ? [urlDeliveryDate] : [new Date().toISOString()];
+
+            setPaymentDetails(prev => ({
+              ...prev,
+              sessions: parsedSessions,
+              deliveryDates: parsedDates,
+            }));
+            setPaymentStatus("COMPLETED");
+            localStorage.removeItem("cart");
+            setTimeout(() => {
+              navigate("/my-plan", { replace: true });
+            }, 5000);
+          } else {
+            setPaymentStatus("FAILED");
+            setTimeout(() => {
+              navigate("/my-plan", { replace: true });
+            }, 8000);
+          }
+        }
+      };
+
+      fetchOrderDetails();
+      return;
+    }
+
+    // No transactionId — wallet-only or direct success from URL
+    if (urlStatus === "COMPLETED" || code === "PAYMENT_SUCCESS") {
+      const parsedSessions = urlMultipleSessions
+        ? urlMultipleSessions.split(",").filter(Boolean)
+        : urlSession ? [urlSession] : ["Lunch"];
+      const parsedDates = urlMultipleDeliveryDates
+        ? urlMultipleDeliveryDates.split(",").filter(Boolean)
+        : urlDeliveryDate ? [urlDeliveryDate] : [new Date().toISOString()];
+      const parsedOrderIds = urlMultipleOrderIds
+        ? urlMultipleOrderIds.split(",").filter(Boolean)
+        : urlOrderId ? [urlOrderId] : [];
+
+      setPaymentDetails(prev => ({
+        ...prev,
+        sessions: parsedSessions,
+        deliveryDates: parsedDates,
+        orderIds: parsedOrderIds,
+      }));
       setPaymentStatus("COMPLETED");
       localStorage.removeItem("cart");
       setTimeout(() => {
@@ -126,193 +270,88 @@ const PaymentSuccess = () => {
       return;
     }
 
-    // PRIORITY 3: If we have transactionId and userId, verify from backend
-    if (
-      transactionId &&
-      transactionId !== "null" &&
-      transactionId !== "undefined" &&
-      transactionId !== "completed" &&
-      userId
-    ) {
-      console.log(
-        "Transaction ID exists, verifying payment status from backend",
-      );
-      setPaymentStatus("LOADING");
-
-      // Poll for payment status every 2 seconds for up to 30 seconds
-      let pollCount = 0;
-      const maxPolls = 15;
-
-      const pollInterval = setInterval(async () => {
-        pollCount++;
-        console.log(
-          `Polling payment status (attempt ${pollCount}/${maxPolls})...`,
-        );
-
-        try {
-          const API_BASE_URL =
-            process.env.REACT_APP_API_URL || "https://dd-backend-3nm0.onrender.com";
-          const response = await fetch(
-            `${API_BASE_URL}/api/user/razorpay/check-payment/${transactionId}/${userId}`,
-          );
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log("Poll result:", result);
-
-            if (result.success && result.success.status === "COMPLETED") {
-              console.log("Payment verified as COMPLETED");
-              clearInterval(pollInterval);
-
-              // Update payment details from backend response
-              if (result.success.planDetails) {
-                setPaymentDetails({
-                  session:
-                    result.success.planDetails.session ||
-                    paymentDetails.session,
-                  deliveryDate:
-                    result.success.planDetails.deliveryDate ||
-                    paymentDetails.deliveryDate,
-                  username:
-                    result.success.planDetails.username ||
-                    result.success.username ||
-                    paymentDetails.username,
-                  amount: result.success.amount || paymentDetails.amount,
-                  orderId: result.success.orderId || paymentDetails.orderId,
-                  hubName:
-                    result.success.planDetails.hubName ||
-                    paymentDetails.hubName,
-                  delivarylocation:
-                    result.success.planDetails.delivarylocation ||
-                    paymentDetails.delivarylocation,
-                  paymentMethod: "razorpay",
-                });
-              }
-
-              setPaymentStatus("COMPLETED");
-              localStorage.removeItem("cart");
-              setTimeout(() => {
-                navigate("/my-plan", { replace: true });
-              }, 5000);
-            } else if (result.success && result.success.status === "FAILED") {
-              console.log("Payment verified as FAILED");
-              clearInterval(pollInterval);
-              setPaymentStatus("FAILED");
-              setTimeout(() => {
-                navigate("/my-plan", { replace: true });
-              }, 8000);
-            } else if (pollCount >= maxPolls) {
-              // Max polls reached, assume success (webhook might still be processing)
-              console.log("Max polls reached, assuming success");
-              clearInterval(pollInterval);
-              setPaymentStatus("COMPLETED");
-              localStorage.removeItem("cart");
-              setTimeout(() => {
-                navigate("/my-plan", { replace: true });
-              }, 5000);
-            }
-          } else if (pollCount >= maxPolls) {
-            clearInterval(pollInterval);
-            setPaymentStatus("FAILED");
-            setTimeout(() => {
-              navigate("/my-plan", { replace: true });
-            }, 8000);
-          }
-        } catch (error) {
-          console.error("Error polling payment status:", error);
-          if (pollCount >= maxPolls) {
-            clearInterval(pollInterval);
-            setPaymentStatus("FAILED");
-            setTimeout(() => {
-              navigate("/my-plan", { replace: true });
-            }, 8000);
-          }
-        }
-      }, 2000);
-
-      return () => clearInterval(pollInterval);
-    }
-
-    // PRIORITY 4: No transaction ID - this is a failure case
-    console.log("No transaction ID found, treating as failure");
+    // No transactionId and no success indicator — failure
     setPaymentStatus("FAILED");
     setTimeout(() => {
       navigate("/my-plan", { replace: true });
     }, 8000);
+  }, [transactionId, userId, code, errorMessage, urlStatus, navigate]);
 
-    // eslint-disable-next-line
-  }, [transactionId, userId, code, errorMessage, urlStatus]);
+  // Helper to render order summary
+  const renderOrderSummary = () => {
+    if (!paymentDetails.sessions || paymentDetails.sessions.length === 1) {
+      // Single order display
+      return (
+        <p className="success-subtitle">
+          Your{" "}
+          <span className="highlight-text">
+            {formatSession(paymentDetails.sessions[0])}
+          </span>
+          {paymentDetails.deliveryDates[0] && (
+            <> order for{" "}
+            <span className="highlight-text">
+              {formatDate(paymentDetails.deliveryDates[0])}
+            </span>
+            </>
+          )} is confirmed and scheduled!
+        </p>
+      );
+    }
 
-  // Additional safety net - if we're still in an unknown state after 15 seconds, verify from backend
-  useEffect(() => {
-    const safetyTimeout = setTimeout(() => {
-      if (
-        paymentStatus === "LOADING" &&
-        transactionId &&
-        transactionId !== "null" &&
-        transactionId !== "undefined" &&
-        transactionId !== "completed"
-      ) {
-        console.log(
-          "Safety timeout reached, verifying payment status from backend",
-        );
-
-        const verifyPaymentStatus = async () => {
-          try {
-            const API_BASE_URL =
-              process.env.REACT_APP_API_URL || "https://dd-backend-3nm0.onrender.com";
-            const response = await fetch(
-              `${API_BASE_URL}/api/user/razorpay/check-payment/${transactionId}/${userId}`,
-            );
-
-            if (response.ok) {
-              const result = await response.json();
-              console.log(
-                "Safety timeout - Payment verification result:",
-                result,
-              );
-
-              if (result.success && result.success.status === "COMPLETED") {
-                setPaymentStatus("COMPLETED");
-                localStorage.removeItem("cart");
-                setTimeout(() => {
-                  navigate("/my-plan", { replace: true });
-                }, 5000);
-              } else {
-                setPaymentStatus("FAILED");
-                setTimeout(() => {
-                  navigate("/my-plan", { replace: true });
-                }, 8000);
-              }
-            } else {
-              setPaymentStatus("FAILED");
-              setTimeout(() => {
-                navigate("/my-plan", { replace: true });
-              }, 8000);
-            }
-          } catch (error) {
-            console.error(
-              "Safety timeout - Error verifying payment status:",
-              error,
-            );
-            setPaymentStatus("FAILED");
-            setTimeout(() => {
-              navigate("/my-plan", { replace: true });
-            }, 8000);
-          }
-        };
-
-        verifyPaymentStatus();
-      } else if (paymentStatus === "LOADING") {
-        console.log(
-          "Safety timeout reached with no transaction ID, setting status to FAILED",
-        );
-        setPaymentStatus("FAILED");
-      }
-    }, 15000);
-
-    return () => clearTimeout(safetyTimeout);
-  }, [paymentStatus, transactionId, userId, navigate]);
+    // Multiple orders display
+    const uniqueDates = [...new Set(paymentDetails.deliveryDates)];
+    
+    if (uniqueDates.length === 1) {
+      // All orders for the same date
+      const sessionsList = paymentDetails.sessions.map(s => formatSession(s));
+      const sessionText = sessionsList.join(", ");
+      const lastCommaIndex = sessionText.lastIndexOf(", ");
+      const formattedSessions = lastCommaIndex !== -1
+        ? `${sessionText.substring(0, lastCommaIndex)} & ${sessionText.substring(lastCommaIndex + 2)}`
+        : sessionText;
+      
+      return (
+        <>
+          <p className="success-subtitle">
+            Your <span className="highlight-text">{formattedSessions}</span> orders
+            for <span className="highlight-text">{formatDate(uniqueDates[0])}</span> are confirmed and scheduled!
+          </p>
+          {/* <div className="order-details-list">
+            {paymentDetails.sessions.map((session, index) => (
+              <div key={index} className="order-detail-item">
+                <span className="session-name">{formatSession(session)}</span>
+                {paymentDetails.orderIds[index] && (
+                  <span className="order-id-small">Order ID: {paymentDetails.orderIds[index]}</span>
+                )}
+              </div>
+            ))}
+          </div> */}
+        </>
+      );
+    } else {
+      // Orders for different dates
+      const ordersByDate = {};
+      paymentDetails.sessions.forEach((session, index) => {
+        const date = paymentDetails.deliveryDates[index];
+        if (!ordersByDate[date]) ordersByDate[date] = [];
+        ordersByDate[date].push(formatSession(session));
+      });
+      
+      return (
+        <>
+          <p className="success-subtitle">Your orders are confirmed and scheduled!</p>
+          <div className="order-details-multidate">
+            {Object.entries(ordersByDate).map(([date, sessions]) => (
+              <div key={date} className="date-order-group">
+                <div className="date-label">{formatDate(date)}</div>
+                <div className="sessions-list">{sessions.join(", ")}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      );
+    }
+  };
 
   return (
     <div
@@ -324,44 +363,6 @@ const PaymentSuccess = () => {
             : ""
       }`}
     >
-      {/* Debug info - remove in production */}
-      {/* {process.env.NODE_ENV === 'development' && (
-        <div style={{ position: 'fixed', top: 10, left: 10, background: 'white', padding: '10px', zIndex: 9999, fontSize: '12px', border: '1px solid #ccc' }}>
-          <div><strong>Debug Info:</strong></div>
-          <div>Status: {paymentStatus}</div>
-          <div>TransactionId: {transactionId || 'null'}</div>
-          <div>UserId: {userId || 'null'}</div>
-          <div>Code: {code || 'null'}</div>
-          <div>Error: {errorMessage || 'null'}</div>
-          <div>Session: {paymentDetails?.session || 'null'}</div>
-          <div>Date: {paymentDetails?.deliveryDate || 'null'}</div>
-          <div>Amount: {paymentDetails?.amount || 'null'}</div>
-          <div>OrderId: {paymentDetails?.orderId || 'null'}</div>
-          <div>Hub: {paymentDetails?.hubName || 'null'}</div>
-          <div>Payment Method: {paymentDetails?.paymentMethod || 'null'}</div>
-          <div style={{ marginTop: '10px' }}>
-            <button 
-              onClick={() => {
-                console.log("Manually setting status to FAILED");
-                setPaymentStatus("FAILED");
-              }}
-              style={{ marginRight: '5px', padding: '5px', fontSize: '10px', background: '#ff4444', color: 'white', border: 'none' }}
-            >
-              Test Failure
-            </button>
-            <button 
-              onClick={() => {
-                console.log("Manually setting status to COMPLETED");
-                setPaymentStatus("COMPLETED");
-              }}
-              style={{ padding: '5px', fontSize: '10px', background: '#44ff44', color: 'white', border: 'none' }}
-            >
-              Test Success
-            </button>
-          </div>
-        </div>
-      )} */}
-
       {paymentStatus === "COMPLETED" ? (
         <div className="success-content">
           {/* Lottie Animation */}
@@ -378,115 +379,27 @@ const PaymentSuccess = () => {
             <h1 className="success-title">
               Great choice! This is how stress-free eating starts
             </h1>
-            <p className="success-subtitle">
-              Your{" "}
-              <span className="highlight-text">
-                {paymentDetails?.session || "meal"}
-              </span>
-              order for{" "}
-              <span className="highlight-text">
-                {formatDate(paymentDetails?.deliveryDate)}
-              </span>{" "}
-              is confirmed and scheduled!
-            </p>
-            {/* {paymentDetails?.orderId && (
-              <p className="success-subtitle" style={{ fontSize: '16px', marginTop: '10px' }}>
-                Order ID: <span className="highlight-text">{paymentDetails.orderId}</span>
-              </p>
-            )} */}
+            {renderOrderSummary()}
           </div>
         </div>
       ) : paymentStatus === "FAILED" ? (
-        <div
-          className="failure-content"
-          style={{
-            background: "white",
-            padding: "40px 20px",
-            borderRadius: "16px",
-          }}
-        >
-          <FaTimesCircle
-            className="payment-failed-icon"
-            style={{ color: "#b22222", fontSize: "60px", marginBottom: "20px" }}
-          />
-          <h1
-            className="payment-failed-title"
-            style={{
-              color: "#333",
-              fontSize: "24px",
-              fontWeight: "700",
-              marginBottom: "10px",
-            }}
-          >
+        <div className="failure-content" style={{ background: "white", padding: "40px 20px", borderRadius: "16px" }}>
+          <FaTimesCircle className="payment-failed-icon" style={{ color: "#b22222", fontSize: "60px", marginBottom: "20px" }} />
+          <h1 className="payment-failed-title" style={{ color: "#333", fontSize: "24px", fontWeight: "700", marginBottom: "10px" }}>
             Payment Failed
           </h1>
-          <p
-            className="payment-failed-message"
-            style={{
-              color: "#666",
-              fontSize: "16px",
-              marginBottom: "30px",
-              lineHeight: "1.4",
-            }}
-          >
-            {errorMessage ||
-              "We could not process your payment or it was cancelled. Please try again."}
+          <p className="payment-failed-message" style={{ color: "#666", fontSize: "16px", marginBottom: "30px", lineHeight: "1.4" }}>
+            {errorMessage || "We could not process your payment or it was cancelled. Please try again."}
           </p>
-          <div
-            className="failure-actions"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "15px",
-              margin: "30px 0",
-              width: "100%",
-              maxWidth: "300px",
-            }}
-          >
-            <button
-              onClick={handleFailureRedirect}
-              className="failure-action-button primary"
-              style={{
-                backgroundColor: "#ff6b35",
-                color: "white",
-                padding: "15px 30px",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                width: "100%",
-              }}
-            >
+          <div className="failure-actions" style={{ display: "flex", flexDirection: "column", gap: "15px", margin: "30px 0", width: "100%", maxWidth: "300px" }}>
+            <button onClick={handleFailureRedirect} className="failure-action-button primary" style={{ backgroundColor: "#ff6b35", color: "white", padding: "15px 30px", border: "none", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: "pointer", width: "100%" }}>
               Retry Payment
             </button>
-            <button
-              onClick={() => navigate("/", { replace: true })}
-              className="failure-action-button secondary"
-              style={{
-                backgroundColor: "transparent",
-                color: "#b22222",
-                padding: "15px 30px",
-                border: "2px solid #b22222",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                width: "100%",
-              }}
-            >
+            <button onClick={() => navigate("/", { replace: true })} className="failure-action-button secondary" style={{ backgroundColor: "transparent", color: "#b22222", padding: "15px 30px", border: "2px solid #b22222", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: "pointer", width: "100%" }}>
               Go to Home
             </button>
           </div>
-          <p
-            className="auto-redirect-text"
-            style={{
-              color: "#999",
-              fontSize: "14px",
-              marginTop: "20px",
-              fontStyle: "italic",
-            }}
-          >
+          <p className="auto-redirect-text" style={{ color: "#999", fontSize: "14px", marginTop: "20px", fontStyle: "italic" }}>
             You will be redirected to My Plan in 8 seconds...
           </p>
         </div>
@@ -498,97 +411,24 @@ const PaymentSuccess = () => {
           <p>Verifying payment status...</p>
         </div>
       ) : (
-        // Fallback for any unknown state - treat as failure
-        <div
-          className="failure-content"
-          style={{
-            background: "white",
-            padding: "40px 20px",
-            borderRadius: "16px",
-          }}
-        >
-          <FaTimesCircle
-            className="payment-failed-icon"
-            style={{ color: "#b22222", fontSize: "60px", marginBottom: "20px" }}
-          />
-          <h1
-            className="payment-failed-title"
-            style={{
-              color: "#333",
-              fontSize: "24px",
-              fontWeight: "700",
-              marginBottom: "10px",
-            }}
-          >
+        // Fallback for any unknown state
+        <div className="failure-content" style={{ background: "white", padding: "40px 20px", borderRadius: "16px" }}>
+          <FaTimesCircle className="payment-failed-icon" style={{ color: "#b22222", fontSize: "60px", marginBottom: "20px" }} />
+          <h1 className="payment-failed-title" style={{ color: "#333", fontSize: "24px", fontWeight: "700", marginBottom: "10px" }}>
             Payment Status Unknown
           </h1>
-          <p
-            className="payment-failed-message"
-            style={{
-              color: "#666",
-              fontSize: "16px",
-              marginBottom: "30px",
-              lineHeight: "1.4",
-            }}
-          >
-            We couldn't determine your payment status. Please check your order
-            history or try again.
+          <p className="payment-failed-message" style={{ color: "#666", fontSize: "16px", marginBottom: "30px", lineHeight: "1.4" }}>
+            We couldn't determine your payment status. Please check your order history or try again.
           </p>
-          <div
-            className="failure-actions"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "15px",
-              margin: "30px 0",
-              width: "100%",
-              maxWidth: "300px",
-            }}
-          >
-            <button
-              onClick={handleFailureRedirect}
-              className="failure-action-button primary"
-              style={{
-                backgroundColor: "#ff6b35",
-                color: "white",
-                padding: "15px 30px",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                width: "100%",
-              }}
-            >
+          <div className="failure-actions" style={{ display: "flex", flexDirection: "column", gap: "15px", margin: "30px 0", width: "100%", maxWidth: "300px" }}>
+            <button onClick={handleFailureRedirect} className="failure-action-button primary" style={{ backgroundColor: "#ff6b35", color: "white", padding: "15px 30px", border: "none", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: "pointer", width: "100%" }}>
               Check My Orders
             </button>
-            <button
-              onClick={() => navigate("/", { replace: true })}
-              className="failure-action-button secondary"
-              style={{
-                backgroundColor: "transparent",
-                color: "#b22222",
-                padding: "15px 30px",
-                border: "2px solid #b22222",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                width: "100%",
-              }}
-            >
+            <button onClick={() => navigate("/", { replace: true })} className="failure-action-button secondary" style={{ backgroundColor: "transparent", color: "#b22222", padding: "15px 30px", border: "2px solid #b22222", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: "pointer", width: "100%" }}>
               Go to Home
             </button>
           </div>
-          <p
-            className="auto-redirect-text"
-            style={{
-              color: "#999",
-              fontSize: "14px",
-              marginTop: "20px",
-              fontStyle: "italic",
-            }}
-          >
+          <p className="auto-redirect-text" style={{ color: "#999", fontSize: "14px", marginTop: "20px", fontStyle: "italic" }}>
             You will be redirected to My Plan in 8 seconds...
           </p>
         </div>

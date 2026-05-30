@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Clock } from "lucide-react";
+import PreorderInfoModal from "../Components/PreorderInfoModal";
 
 export default function CutoffStatusCard({
   cutoffValidation,
@@ -10,6 +11,7 @@ export default function CutoffStatusCard({
   cutoffLoading,
 }) {
   const [timeLeft, setTimeLeft] = useState("");
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const intervalRef = useRef(null);
 
   const isEmployee = userStatus === "Employee";
@@ -114,9 +116,10 @@ export default function CutoffStatusCard({
 
     const getRelativeLabel = (date) => {
       const dateLabel = `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
-      if (isSameDay(date, today)) return `Today, ${dateLabel}`;
-      if (isSameDay(date, tomorrow)) return `Tomorrow, ${dateLabel}`;
-      return dateLabel;
+      if (isSameDay(date, today)) return { prefix: "Today", date: dateLabel };
+      if (isSameDay(date, tomorrow))
+        return { prefix: "Tomorrow", date: dateLabel };
+      return { prefix: null, date: dateLabel };
     };
 
     // Use locally-derived allowed so stale API flags don't cause wrong display
@@ -125,20 +128,18 @@ export default function CutoffStatusCard({
       !allowed && isToday ? tomorrow : deliveryDateObj;
 
     let displayDate;
-    let orderingText;
 
     if (isEmployee) {
       displayDate = effectiveDeliveryDateObj || today;
-      orderingText = `You're ordering for ${getRelativeLabel(displayDate)}`;
     } else if (orderMode === "instant") {
       displayDate = effectiveDeliveryDateObj || today;
-      orderingText = `You're ordering for ${getRelativeLabel(displayDate)}`;
     } else {
       displayDate = effectiveDeliveryDateObj || tomorrow;
-      orderingText = `You're ordering for ${getRelativeLabel(displayDate)}`;
     }
 
-    return { orderingText, cutoffDate, allowed };
+    const relativeLabel = getRelativeLabel(displayDate);
+
+    return { relativeLabel, cutoffDate, allowed };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cutoffTimestamp,
@@ -149,12 +150,19 @@ export default function CutoffStatusCard({
   ]);
 
   // Countdown interval — restarts when cutoff time changes
+  // Only ticks when within 3 hours of cutoff
+  const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
   useEffect(() => {
     if (!displayInfo?.cutoffDate) return;
     const updateTimer = () => {
       const now = new Date();
       const msLeft = displayInfo.cutoffDate - now;
-      setTimeLeft(formatTimeLeft(msLeft));
+      // Only show time when within 3 hours of cutoff (or already past)
+      if (msLeft <= THREE_HOURS_MS) {
+        setTimeLeft(formatTimeLeft(msLeft));
+      } else {
+        setTimeLeft(""); // hide pill when more than 3 hours away
+      }
     };
     updateTimer();
     intervalRef.current = setInterval(updateTimer, 1000);
@@ -170,122 +178,24 @@ export default function CutoffStatusCard({
       (cutoffValidation === null || cutoffValidation === undefined));
 
   if (showSkeleton) {
-    return (
-      <div className="cutoff-status-main-card">
-        <div className="cutoff-status-card cutoff-skeleton">
-          <div className="cutoff-inner">
-            <div className="cutoff-info-group">
-              <div className="skeleton-circle" />
-              <div className="skeleton-bar skeleton-bar-long" />
-            </div>
-            <div className="skeleton-pill" />
-          </div>
-          <style jsx>{`
-            .cutoff-status-main-card {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-family: "Inter", sans-serif;
-            }
-            .cutoff-status-card {
-              max-width: 655px;
-              width: 100%;
-              background: #e6b800;
-              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-              overflow: hidden;
-            }
-            .cutoff-inner {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              padding: 12px 20px;
-              width: 100%;
-              gap: 16px;
-            }
-            .cutoff-info-group {
-              display: flex;
-              align-items: center;
-              gap: 12px;
-              flex: 1;
-            }
-            @keyframes shimmer {
-              0% {
-                background-position: -400px 0;
-              }
-              100% {
-                background-position: 400px 0;
-              }
-            }
-            .skeleton-circle {
-              width: 22px;
-              height: 22px;
-              border-radius: 50%;
-              background: linear-gradient(
-                90deg,
-                rgba(139, 69, 19, 0.15) 25%,
-                rgba(139, 69, 19, 0.3) 50%,
-                rgba(139, 69, 19, 0.15) 75%
-              );
-              background-size: 400px 100%;
-              animation: shimmer 1.4s infinite linear;
-              flex-shrink: 0;
-            }
-            .skeleton-bar {
-              height: 14px;
-              border-radius: 6px;
-              background: linear-gradient(
-                90deg,
-                rgba(139, 69, 19, 0.15) 25%,
-                rgba(139, 69, 19, 0.3) 50%,
-                rgba(139, 69, 19, 0.15) 75%
-              );
-              background-size: 400px 100%;
-              animation: shimmer 1.4s infinite linear;
-            }
-            .skeleton-bar-long {
-              width: 180px;
-            }
-            .skeleton-pill {
-              width: 90px;
-              height: 32px;
-              border-radius: 40px;
-              background: linear-gradient(
-                90deg,
-                rgba(253, 242, 208, 0.6) 25%,
-                rgba(253, 242, 208, 1) 50%,
-                rgba(253, 242, 208, 0.6) 75%
-              );
-              background-size: 400px 100%;
-              animation: shimmer 1.4s infinite linear;
-              flex-shrink: 0;
-            }
-            @media (max-width: 480px) {
-              .cutoff-inner {
-                padding: 12px 30px;
-              }
-              .skeleton-bar-long {
-                width: 130px;
-              }
-              .skeleton-pill {
-                width: 72px;
-                height: 28px;
-              }
-            }
-          `}</style>
-        </div>
-      </div>
-    );
+    return null; // Home.jsx gates rendering until data is ready — no skeleton needed
   }
 
   if (!displayInfo) return null;
 
-  const { orderingText, allowed } = displayInfo;
-  const isCutoffPassed = !allowed || timeLeft === "Cutoff passed";
-  const displayMessage = isCutoffPassed ? (
-    <>❌ Orders closed</>
-  ) : (
-    <>{orderingText}</>
-  );
+  const { relativeLabel, allowed } = displayInfo;
+
+  // Never show "Orders closed" here — Home.jsx handles that separately.
+  // If cutoff has passed, render nothing and let Home show its own closed card.
+  if (!allowed) return null;
+
+  // If the countdown has already hit zero/negative (cutoff passed locally),
+  // don't render — avoids a stale-data flash on refresh where the API still
+  // says allowed=true but the cutoffDateTime is already in the past.
+  if (timeLeft === "Cutoff passed") return null;
+
+  // Only show the time pill when within 3 hours of cutoff (timeLeft is non-empty)
+  const showTimePill = timeLeft !== "";
 
   return (
     <div className="cutoff-status-main-card">
@@ -296,100 +206,261 @@ export default function CutoffStatusCard({
               <Clock size={20} />
             </div>
             <div className="cutoff-text-group">
-              <span className="cutoff-message">{displayMessage}</span>
+              <span className="cutoff-label">Ordering for</span>
+              <span className="cutoff-date">
+                {relativeLabel.prefix && `${relativeLabel.prefix}, `}
+                {relativeLabel.date}
+              </span>
             </div>
           </div>
-          <div className="time-left-pill">
-            {isCutoffPassed ? "Cutoff passed" : timeLeft || "..."}
-          </div>
+          {/* Time pill — hidden in UI for now; logic preserved above */}
+          {/* {showTimePill && <div className="time-left-pill">{timeLeft}</div>} */}
+          <button
+            className="cutoff-info-btn"
+            onClick={() => setShowInfoModal(true)}
+            aria-label="Why tomorrow?"
+          >
+            Why tomorrow? →
+          </button>
         </div>
 
+        <PreorderInfoModal
+          isOpen={showInfoModal}
+          onClose={() => setShowInfoModal(false)}
+        />
+
         <style jsx>{`
-          .cutoff-status-main-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: "Inter", sans-serif;
-          }
-          .cutoff-status-card {
-            max-width: 655px;
-            width: 100%;
-            background: #e6b800;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-          }
-          .cutoff-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            width: 100%;
-            gap: 16px;
-          }
-          .cutoff-info-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 0;
-          }
-          .clock-icon {
-            flex-shrink: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #8b4513;
-          }
-          .cutoff-message {
-            font-size: 14px;
-            font-weight: 500;
-            color: #8b4513;
-            line-height: 1.4;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            letter-spacing: -0.2px;
-          }
-          .cutoff-text-group {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
-          }
-          .time-left-pill {
-            border-radius: 40px;
-            padding: 6px 16px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #4a2a0c;
-            background-color: #fdf2d0;
-            white-space: nowrap;
-            flex-shrink: 0;
-            box-shadow:
-              inset 0 1px 1px rgba(255, 255, 255, 0.3),
-              0 1px 2px rgba(0, 0, 0, 0.05);
-          }
-          @media (max-width: 480px) {
-            .cutoff-inner {
-              padding: 12px 30px;
-              gap: 10px;
-            }
-            .cutoff-info-group {
-              min-width: calc(100% - 80px);
-            }
-            .cutoff-message {
-              white-space: normal;
-              font-size: 13px;
-            }
-            .time-left-pill {
-              font-size: 12px;
-              padding: 4px 12px;
-            }
-          }
-        `}</style>
+  .cutoff-status-main-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", sans-serif;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  .cutoff-status-card {
+    max-width: 655px;
+    width: 100%;
+    background: #e6b800;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .cutoff-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    width: 100%;
+    gap: 16px;
+  }
+  .cutoff-info-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+  .clock-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b4513;
+  }
+  .cutoff-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .cutoff-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(139, 69, 19, 0.8);
+    line-height: 1.3;
+    letter-spacing: -0.1px;
+  }
+  .cutoff-date {
+    font-size: 18px;
+    font-weight: 700;
+    color: #8b4513;
+    line-height: 1.25;
+    letter-spacing: -0.4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .time-left-pill {
+    border-radius: 40px;
+    padding: 6px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #4a2a0c;
+    background-color: #fdf2d0;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  .cutoff-info-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: none;
+    border-radius: 40px;
+    padding: 10px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    color: #5a3a00;
+    white-space: nowrap;
+    letter-spacing: -0.2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .cutoff-info-btn:hover {
+    opacity: 0.9;
+  }
+  .cutoff-info-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* ✅ Mobile & Tablets (below 1024px) - FULL WIDTH (MUST come first) */
+  @media (max-width: 1023px) {
+    .cutoff-status-card {
+      max-width: 100% !important;
+      width: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+    .cutoff-inner {
+      padding: 10px 16px;
+      gap: 10px;
+    }
+    .cutoff-info-group {
+      min-width: 0;
+      flex: 1;
+    }
+    .cutoff-date {
+      font-size: 14px;
+    }
+    .cutoff-label {
+      font-size: 11px;
+    }
+    .cutoff-info-btn {
+      font-size: 12px;
+      padding: 7px 12px;
+    }
+    .time-left-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+    }
+  }
+
+  /* ✅ Laptop-S (1280×800) → 406px centered */
+  @media (min-width: 1024px) and (max-width: 1300px) {
+    .cutoff-status-card {
+      max-width: 406px;
+    }
+    .cutoff-inner {
+      padding: 10px 14px;
+      gap: 12px;
+    }
+    .cutoff-date {
+      font-size: 15px;
+    }
+    .cutoff-label {
+      font-size: 11px;
+    }
+    .cutoff-info-btn {
+      font-size: 12px;
+      padding: 8px 12px;
+    }
+    .time-left-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+    }
+    .clock-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* ✅ Laptop-M (1366×768) → 435px centered */
+  @media (min-width: 1301px) and (max-width: 1450px) {
+    .cutoff-status-card {
+      max-width: 435px;
+    }
+    .cutoff-inner {
+      padding: 11px 16px;
+      gap: 14px;
+    }
+    .cutoff-date {
+      font-size: 16px;
+    }
+    .cutoff-label {
+      font-size: 12px;
+    }
+    .cutoff-info-btn {
+      font-size: 13px;
+      padding: 9px 14px;
+    }
+  }
+
+  /* ✅ Desktop (1920px and above) → 655px centered */
+  @media (min-width: 1451px) {
+    .cutoff-status-card {
+      max-width: 655px;
+    }
+  }
+
+  /* ✅ Very small phones (below 480px) - extra compact */
+  @media (max-width: 480px) {
+    .cutoff-inner {
+      padding: 8px 12px;
+      gap: 8px;
+    }
+    .cutoff-date {
+      font-size: 12px;
+    }
+    .cutoff-label {
+      font-size: 10px;
+    }
+    .cutoff-info-btn {
+      font-size: 11px;
+      padding: 6px 10px;
+    }
+    .time-left-pill {
+      font-size: 10px;
+      padding: 3px 8px;
+    }
+    .clock-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+`}</style>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+

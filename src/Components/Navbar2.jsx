@@ -25,7 +25,7 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
   const phoneNumber = "7204188504";
   const message = "Hello! I need assistance.";
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
+    message,
   )}`;
 
   const handleLogout = () => {
@@ -62,18 +62,13 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
       onHide={handleClose}
       placement="end"
       className="profile-offcanvas"
-      style={{
-        backgroundColor: "#F8F6F0",
-        zIndex:10000
-      }}
     >
       <Offcanvas.Body className="p-0">
         <div className="profile-container-in-offcanvas">
           {/* Header */}
           <div className="profile-header">
-            {/* We only show user details if the user exists */}
             {user ? (
-              <div className="user-info" style={{ paddingTop: "20px" }}>
+              <div className="user-info">
                 <button onClick={handleClose} className="nav-back-btn">
                   <img
                     src="/Assets/checkoutback.svg"
@@ -85,35 +80,20 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                     }}
                   />
                 </button>
-                {/* <div className="avatar"> */}
-                <Link
-                  to="/profile"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-evenly",
-                  }}
-                >
+                <Link to="/profile" className="user-info-link">
                   <img
-                    style={{
-                      paddingRight: "10px",
-                    }}
                     src="/Assets/profile.svg"
                     alt="profile"
-                    // className="icon-img-l"
+                    className="user-info-avatar"
                   />
-                  {/* </div> */}
                   <div className="user-details">
                     <h4>{`${user.Fname} ${user.Lname || ""}`}</h4>
-                    <p>
-                      {/* {user.Mobile} | {user.Email} */}
-                      {user.Mobile}
-                    </p>
+                    <p>{user.Mobile}</p>
                   </div>
                 </Link>
               </div>
             ) : (
-              <div className="user-info" style={{ paddingTop: "20px" }}>
+              <div className="user-info">
                 <button onClick={handleClose} className="nav-back-btn">
                   <img
                     src="/Assets/checkoutback.svg"
@@ -139,15 +119,11 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
           {/* Body */}
           <div className="profile-body">
             {user ? (
-              // --- MENU FOR LOGGED-IN USERS ---
               <>
                 <div className="row g-3 top-widgets">
                   <div className="col-6">
                     <div
                       className="widget-card"
-                      style={{
-                        paddingLeft: "5px",
-                      }}
                       onClick={() => handleLinkClick("/orders")}
                     >
                       <img
@@ -161,14 +137,11 @@ const ProfileOffcanvas = ({ show, handleClose }) => {
                   <div className="col-6">
                     <div
                       className="widget-card"
-                      style={{
-                        paddingLeft: "5px",
-                      }}
                       onClick={() => handleLinkClick("/wallet")}
                     >
                       <img
                         src="/Assets/wallet1.svg"
-                        alt="WhatsApp"
+                        alt="My Wallet"
                         className="icon-img-l"
                       />
                       <span>My Wallet</span>
@@ -292,7 +265,12 @@ const NavItem = ({ icon, text, onClick }) => (
   </div>
 );
 const NavItemExternal = ({ icon, text, href }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="side-nav-item">
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="side-nav-item"
+  >
     <div className="side-nav-item-content">
       <span className="nav-icon">{icon}</span>
       <span>{text}</span>

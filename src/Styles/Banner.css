@@ -1,6 +1,7 @@
 .mobile-banner {
   display: block;
   width: 32%;
+  overflow-x: hidden;
 }
 .mobile-banner-updated {
   display: block;
@@ -8,6 +9,7 @@
   top: 0;
   z-index: 100;
   width: 32%;
+  overflow-x: hidden;
 }
 
 .ban-container {
@@ -66,7 +68,7 @@
   align-items: center;
   justify-content: space-evenly;
   gap: 2px;
-  margin-right: -400px;
+  margin-right: 0;
 }
 .veg-btn-toggle {
   background: white;
@@ -103,13 +105,13 @@
     font-size: 14px;
   }
   .veg-btn {
-    margin-right: -230px;
+    margin-right: 0;
   }
 }
 
 @media (max-width: 576px) {
   .veg-btn {
-    margin-right: -230px;
+    margin-right: 0;
   }
 }
 
@@ -577,6 +579,7 @@ input[type="number"] {
     width: 100% !important;
     padding-left: 4px; /* default 16px */
     padding-right: 6px; /* default 16px */
+    overflow-x: hidden;
     /* background-color: rgb(237, 234, 234); */
   }
   .mobile-banner-updated {
@@ -585,6 +588,7 @@ input[type="number"] {
     position: sticky;
     top: 0;
     z-index: 100;
+    overflow-x: hidden;
     /* background-color: rgb(237, 234, 234); */
   }
 
@@ -1333,7 +1337,7 @@ input[type="number"] {
     height: 38px;
     border-radius: 18px;
     padding: 4px 2px;
-    margin-right: -600px;
+    margin-right: 0;
   }
 
   .veg-title {

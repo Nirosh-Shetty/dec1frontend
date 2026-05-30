@@ -35,6 +35,29 @@ export const createRazorpayOrder = async (orderData) => {
   }
 };
 
+// ✅ NEW: Create order for multiple plans
+export const createRazorpayOrderMultiple = async (orderData) => {
+  try {
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dd-backend-3nm0.onrender.com';
+    const response = await fetch(`${API_BASE_URL}/api/user/razorpay/create-order-multiple`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create multiple order');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating Razorpay order (multiple):', error);
+    throw error;
+  }
+};
+
 export const verifyRazorpayPayment = async (paymentData) => {
   try {
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://dd-backend-3nm0.onrender.com';
@@ -95,8 +118,14 @@ export const handleRazorpayPayment = async (orderData, onSuccess, onFailure) => 
       throw new Error('Failed to load Razorpay script');
     }
 
-    // Create order
-    const order = await createRazorpayOrder(orderData);
+    // ✅ CREATE ORDER - Use multiple order endpoint if planIds provided
+    let order;
+    if (orderData.planIds && orderData.planIds.length > 1) {
+      console.log('Creating order for multiple plans:', orderData.planIds);
+      order = await createRazorpayOrderMultiple(orderData);
+    } else {
+      order = await createRazorpayOrder(orderData);
+    }
 
     const options = {
       key: order.key,

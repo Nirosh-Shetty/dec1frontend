@@ -1,9 +1,8 @@
 import { useContext, useEffect, useMemo, useState, useRef } from "react";
-import { Button, Form, Modal, Spinner } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { MdRemoveShoppingCart } from "react-icons/md";
 import "../Styles/Checkout.css";
 import { FaCheck } from "react-icons/fa";
-import { PiWarningCircleBold } from "react-icons/pi";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import { WalletContext } from "../WalletContext";
@@ -25,6 +24,14 @@ import {
   updateCartItemQty,
   isSlotPastCutoff,
 } from "../Helper/cartHelper";
+import bagdiscount from "./../assets/bagdiscount.png";
+import breakfast from "./../assets/breakfast.png";
+import dinner from "./../assets/dinner.png";
+import lunch from "./../assets/lunch.png";
+import { Modal } from "react-bootstrap";
+import door from "./../assets/door.png";
+import lobby from "./../assets/lobby.png";
+import { FaScaleBalanced } from "react-icons/fa6";
 
 const fireToast = ({ title, subtitle, icon = checkCircle }) => {
   Swal2.fire({
@@ -57,6 +64,14 @@ const CheckoutMultiple = () => {
   const data = location?.state;
   const addresstype = localStorage.getItem("addresstype");
 
+  // Add this with your other state declarations
+  const [addMoreModal, setAddMoreModal] = useState({
+    show: false,
+    hubId: null,
+    session: null,
+    deliveryDate: null,
+  });
+
   // State declarations
   const [deliveryMethod, setDeliveryMethod] = useState("slot");
   const [address, setAddress] = useState(
@@ -72,8 +87,41 @@ const CheckoutMultiple = () => {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [cartVersion, setCartVersion] = useState(0);
 
+  // Add state for modal
+  const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
+  const [selectedPickupPoint, setSelectedPickupPoint] = useState(null);
+  // Add this state
+  const [pickupPointsList, setPickupPointsList] = useState([]);
+
   // Get cart data from helper
   const cartItems = useMemo(() => getCart(), [cartVersion]);
+
+  console.log(cartItems, "cartItems.................");
+
+  // Handle opening the add more modal
+  const handleOpenAddMoreModal = (hubId, session, deliveryDate) => {
+    setAddMoreModal({
+      show: true,
+      hubId: hubId,
+      session: session,
+      deliveryDate: deliveryDate,
+    });
+  };
+
+  // Handle closing the add more modal
+  const handleCloseAddMoreModal = () => {
+    setAddMoreModal({
+      show: false,
+      hubId: null,
+      session: null,
+      deliveryDate: null,
+    });
+  };
+
+  // Handle items added from modal
+  const handleItemsAdded = () => {
+    refreshCartData();
+  };
 
   const groupedCarts = useMemo(() => {
     try {
@@ -181,43 +229,126 @@ const CheckoutMultiple = () => {
   const [couponId, setCouponId] = useState("");
   const [coupon, setCoupon] = useState(0);
   const [discountWallet, setDiscountWallet] = useState(0);
+  const [walletApplied, setWalletApplied] = useState(true); // auto-apply by default
   const [loading, setLoading] = useState(false);
   const [gstRate, setGstRate] = useState(5); // Default GST rate
-  const [deliveryRates, setDeliveryRates] = useState([]);
   const [hubCutoffTimes, setHubCutoffTimes] = useState(null);
+  const [hubOrderMode, setHubOrderMode] = useState("preorder");
 
-  // // Use the calculated totals from cartHelper
-  // const subtotal = totals.total;
   const totalSavings = totals.totalSavings;
   const regularTotal = totals.regularTotal;
-  // const calculateTaxPrice = (5 / 100) * regularTotal;
 
   const primaryAddress =
     JSON.parse(localStorage.getItem("primaryAddress")) || {};
   const defaultAddress = primaryAddress;
   const addressHubId = defaultAddress?.hubId || "";
 
-  useEffect(() => {
-    const fetchDeliveryRatesByHub = async () => {
-      if (!addressHubId) {
-        setDeliveryRates([]);
-        return;
-      }
+  const [hubs, setHubs] = useState([]); // Fixed: usestate -> useState
 
+  const [showSmallCartModal, setShowSmallCartModal] = useState(false);
+
+  const getHubById = async (hubId) => {
+    if (!hubId) {
+      console.log("No hubId provided");
+      return;
+    }
+
+    try {
+      console.log("Fetching hub with ID:", hubId);
+
+      const response = await axios.get(
+        `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${hubId}`,
+      );
+
+      console.log("Hub API Response:", response);
+      console.log("Hub Data:", response.data);
+
+      if (response.status === 200 && response.data) {
+        setHubs(response.data);
+        console.log("Hub set to state:", response.data);
+        return response.data;
+      }
+    } catch (error) {
+      console.error("Error fetching hub:", error);
+      console.error("Error response:", error.response);
+      console.error("Error message:", error.message);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    getHubById(addressHubId);
+  }, []);
+
+  const userDeliveryStatus =
+    user?.status === "Employee" ? "Employee" : "Normal";
+  const userAcquisitionChannel = user?.acquisition_channel || "organic";
+
+  // --- Delivery rate helpers ---
+  const roundAmount = (value) => Math.round((Number(value) || 0) * 100) / 100;
+
+  // Seed delivery rate state instantly from navigation state (passed by Home on navigate).
+  // If not present (e.g. user navigated directly), fall back to fetching.
+  const passedRate = location?.state?.deliveryRateRecord || null;
+
+  const [doorDeliveryRatePerSlot, setDoorDeliveryRatePerSlot] = useState(
+    () => Number(passedRate?.doorDeliveryRate) || 0,
+  );
+  const [gateDeliveryRatePerSlot, setGateDeliveryRatePerSlot] = useState(
+    () => Number(passedRate?.gateDeliveryRate) ?? 0,
+  );
+  const [gateDeliveryAvailable, setGateDeliveryAvailable] = useState(
+    () => passedRate?.gateDeliveryAvailable === true,
+  );
+  const [deliveryRatesLoaded, setDeliveryRatesLoaded] = useState(
+    () => passedRate !== null, // already loaded if passed from Home
+  );
+  const [deliveryType, setDeliveryType] = useState(() => {
+    if (passedRate === null) return null; // unknown — wait for fetch
+    return passedRate.gateDeliveryAvailable === true ? "gate" : "door";
+  });
+
+  // Only fetch if Home didn't pass the rate (e.g. direct navigation to /checkout-multiple)
+  useEffect(() => {
+    if (passedRate !== null) return; // already have data — skip fetch
+    if (!addressHubId) return;
+    const fetchDeliveryRatesByHub = async () => {
       try {
         const res = await axios.get(
           `https://dd-backend-3nm0.onrender.com/api/deliveryrate/hub/${encodeURIComponent(addressHubId)}`,
         );
         const rates = Array.isArray(res.data?.data) ? res.data.data : [];
-        setDeliveryRates(rates);
-        console.log("Delivery rates fetched:", rates);
-      } catch (error) {
-        console.error("Error fetching delivery rates by hub:", error);
-        setDeliveryRates([]);
+        if (rates.length === 0) {
+          setDeliveryType("door");
+          setDeliveryRatesLoaded(true);
+          return;
+        }
+
+        const matchedRate =
+          rates.find((r) => r.status === userDeliveryStatus) ||
+          rates.find((r) => r.status === "Normal") ||
+          rates[0];
+
+        if (!matchedRate) {
+          setDeliveryType("door");
+          setDeliveryRatesLoaded(true);
+          return;
+        }
+
+        setDoorDeliveryRatePerSlot(Number(matchedRate.doorDeliveryRate) || 0);
+        setGateDeliveryRatePerSlot(Number(matchedRate.gateDeliveryRate) ?? 0);
+        setGateDeliveryAvailable(matchedRate.gateDeliveryAvailable === true);
+        setDeliveryType(
+          matchedRate.gateDeliveryAvailable === true ? "gate" : "door",
+        );
+      } catch {
+        setDeliveryType("door");
+      } finally {
+        setDeliveryRatesLoaded(true);
       }
     };
-
     fetchDeliveryRatesByHub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressHubId]);
 
   // Fetch hub cutoff times for checkout validation
@@ -231,6 +362,7 @@ const CheckoutMultiple = () => {
         if (res.ok) {
           const data = await res.json();
           setHubCutoffTimes(data.cutoffTimes || null);
+          setHubOrderMode(data.orderMode || "preorder");
         }
       } catch {
         // silently fail — cutoff validation will be skipped if unavailable
@@ -238,8 +370,6 @@ const CheckoutMultiple = () => {
     };
     fetchCutoffTimes();
   }, [addressHubId]);
-
-  const roundAmount = (value) => Math.round((Number(value) || 0) * 100) / 100;
 
   const subtotal = useMemo(() => {
     return roundAmount(
@@ -261,77 +391,13 @@ const CheckoutMultiple = () => {
     return slots.size;
   }, [cartdata]);
 
-  const findDeliveryRate = (rates, hubId, acquisitionChannel, status) => {
-    if (!hubId || !Array.isArray(rates) || rates.length === 0) return null;
-
-    const matchesHub = (rate) => String(rate.hubId) === String(hubId);
-    const matchers = [
-      (rate) =>
-        matchesHub(rate) &&
-        rate.acquisition_channel === acquisitionChannel &&
-        rate.status === status,
-      (rate) =>
-        matchesHub(rate) && rate.acquisition_channel === acquisitionChannel,
-      (rate) => matchesHub(rate) && rate.status === status,
-      (rate) =>
-        matchesHub(rate) &&
-        rate.acquisition_channel === "organic" &&
-        rate.status === "Normal",
-      matchesHub,
-    ];
-
-    const matchedRate = matchers
-      .map((matcher) => rates.find(matcher))
-      .find(Boolean);
-
-    return matchedRate ? Number(matchedRate.deliveryRate || 0) : null;
-  };
-
-  const userDeliveryStatus =
-    user?.status === "Employee" ? "Employee" : "Normal";
-  const userAcquisitionChannel = user?.acquisition_channel || "organic";
-  const fallbackDeliveryRate = Number(
-    defaultAddress?.Delivarycharge ?? address?.Delivarycharge ?? 0,
-  );
-
-  // Calculate delivery charge per slot - use delivery rate if available, otherwise use fallback or default 15
-  const deliveryChargePerSlot = useMemo(() => {
-    const rateFromApi = findDeliveryRate(
-      deliveryRates,
-      addressHubId,
-      userAcquisitionChannel,
-      userDeliveryStatus,
-    );
-
-    console.log("Calculating delivery charge:", {
-      rateFromApi,
-      fallbackDeliveryRate,
-      addressHubId,
-      deliveryRatesLength: deliveryRates.length,
-    });
-
-    // If we have a rate from API, use it
-    if (rateFromApi !== null) {
-      return roundAmount(rateFromApi);
-    }
-
-    // Otherwise use fallback from address or default to 15
-    return roundAmount(fallbackDeliveryRate || 15);
-  }, [
-    deliveryRates,
-    addressHubId,
-    userAcquisitionChannel,
-    userDeliveryStatus,
-    fallbackDeliveryRate,
-  ]);
-  const totalDeliveryCharge = roundAmount(
-    deliveryChargePerSlot * deliverySlotCount,
-  );
-  const totalPayable = roundAmount(
-    Math.max(
-      subtotal + Cutlery + totalDeliveryCharge - discountWallet - coupon,
-      0,
-    ),
+  // Gate = rebate (minus from total), Door = extra charge (plus to total)
+  const deliveryAdjustmentPerSlot =
+    deliveryType === "gate"
+      ? -gateDeliveryRatePerSlot
+      : doorDeliveryRatePerSlot;
+  const totalDeliveryAdjustment = roundAmount(
+    deliveryAdjustmentPerSlot * deliverySlotCount,
   );
 
   // For TAX-INCLUSIVE products: break down the tax that's already in the price
@@ -392,6 +458,57 @@ const CheckoutMultiple = () => {
     fireToast({ title: "Coupon feature coming soon" });
   };
 
+  const toggleBillingDetails = () => {
+    setIsBillingOpen(!isBillingOpen);
+  };
+
+  const [isBillingOpen, setIsBillingOpen] = useState(true);
+
+  // Minimum cart threshold for handling charges - fetched from API
+  const minCartThreshold = hubs?.minCart || 0; // Default to 50 if not available from API
+
+  // Calculate handling charge and GST based on subtotal
+  const baseTotal = subtotal + Cutlery + totalDeliveryAdjustment - coupon;
+  const calculateHandlingChargePerSession = () => {
+    // Group cart by session and sum per session
+    const sessionTotals = {};
+    cartdata.forEach((item) => {
+      const sessionKey = `${item.deliveryDate}|${item.session}`;
+      const itemTotal = Number(
+        item.totalPrice ??
+          (item.preOrderPrice ?? item.price ?? item.hubPrice ?? 0) *
+            (item.quantity || 1),
+      );
+      sessionTotals[sessionKey] = (sessionTotals[sessionKey] || 0) + itemTotal;
+    });
+
+    // Count sessions that are below threshold AND have items
+    let totalHandlingCharge = 0;
+    Object.values(sessionTotals).forEach((sessionTotal) => {
+      if (sessionTotal > 0 && sessionTotal < minCartThreshold) {
+        totalHandlingCharge += 20; // ₹20 per session below threshold
+      }
+    });
+    return totalHandlingCharge;
+  };
+  const handlingCharge = calculateHandlingChargePerSession();
+
+  // GST only on item subtotal (and cutlery if applicable) — not on delivery or handling
+  const gstableAmount = subtotal + Cutlery;
+  const gstOnTotal = roundAmount(gstableAmount * (gstRate / 100));
+
+  // Final total = items + delivery adjustment + handling + GST - coupon
+  const finalTotal = roundAmount(
+    subtotal +
+      Cutlery +
+      totalDeliveryAdjustment -
+      coupon +
+      handlingCharge +
+      gstOnTotal,
+  );
+
+  const totalPayable = roundAmount(Math.max(finalTotal - discountWallet, 0));
+
   const handleApplyWallet = (e) => {
     if (wallet?.balance === 0) {
       fireToast({ title: "Wallet balance is 0", icon: cross });
@@ -399,20 +516,164 @@ const CheckoutMultiple = () => {
       return;
     }
     if (e.target.checked) {
-      let maxUsableAmount = subtotal + Cutlery + totalDeliveryCharge - coupon;
-      let walletBalance = wallet?.balance || 0;
-      let finalAmount = Math.min(walletBalance, Math.max(maxUsableAmount, 0));
+      setWalletApplied(true);
+      const gstableAmount = subtotal + Cutlery;
+      const gstOnItems = roundAmount(gstableAmount * (gstRate / 100));
+      const maxUsableAmount = Math.max(
+        roundAmount(
+          subtotal +
+            Cutlery +
+            totalDeliveryAdjustment -
+            coupon +
+            handlingCharge +
+            gstOnItems,
+        ),
+        0,
+      );
+      const finalAmount = Math.min(wallet?.balance || 0, maxUsableAmount);
       setDiscountWallet(finalAmount);
     } else {
+      setWalletApplied(false);
       setDiscountWallet(0);
     }
   };
 
-  const toggleBillingDetails = () => {
-    setIsBillingOpen(!isBillingOpen);
-  };
+  // Auto-apply wallet if balance > 0, and keep it clamped to the current order
+  // total whenever subtotal/delivery/coupon changes (e.g. user adjusts quantity).
+  useEffect(() => {
+    const walletBalance = wallet?.balance || 0;
+    if (walletBalance <= 0 || !walletApplied) return;
 
-  const [isBillingOpen, setIsBillingOpen] = useState(true);
+    const gstableAmount = subtotal + Cutlery;
+    const gstOnItems = roundAmount(gstableAmount * (gstRate / 100));
+    const fullOrderTotal = Math.max(
+      roundAmount(
+        subtotal +
+          Cutlery +
+          totalDeliveryAdjustment -
+          coupon +
+          handlingCharge +
+          gstOnItems,
+      ),
+      0,
+    );
+
+    const optimal = Math.min(walletBalance, fullOrderTotal);
+    setDiscountWallet(optimal);
+  }, [
+    wallet?.balance,
+    walletApplied,
+    subtotal,
+    Cutlery,
+    totalDeliveryAdjustment,
+    coupon,
+    handlingCharge,
+    gstRate,
+  ]);
+
+  // REMOVE the old separate auto-select useEffect:
+  // useEffect(() => {
+  //   if (gateDeliveryAvailable && pickupPointsList.length > 0) {
+  //     setSelectedPickupPoint(pickupPointsList[0]);
+  //     setDeliveryType("gate");
+  //   }
+  // }, [gateDeliveryAvailable, pickupPointsList]);
+
+  // UPDATE the fetch delivery rates useEffect to auto-select inline:
+
+  // Update the fetch delivery rates effect
+  useEffect(() => {
+    if (!addressHubId) return;
+    const fetchDeliveryRatesByHub = async () => {
+      try {
+        const res = await axios.get(
+          `https://dd-backend-3nm0.onrender.com/api/deliveryrate/hub/${encodeURIComponent(addressHubId)}`,
+        );
+        const rates = Array.isArray(res.data?.data) ? res.data.data : [];
+
+        if (rates.length === 0) {
+          setDeliveryType("door");
+          setDeliveryRatesLoaded(true);
+          return;
+        }
+
+        const matchedRate =
+          rates.find((r) => r.status === userDeliveryStatus) ||
+          rates.find((r) => r.status === "Normal") ||
+          rates[0];
+
+        if (!matchedRate) {
+          setDeliveryType("door");
+          setDeliveryRatesLoaded(true);
+          return;
+        }
+
+        const points = matchedRate.pickupPoints || [];
+
+        setDoorDeliveryRatePerSlot(Number(matchedRate.doorDeliveryRate) || 0);
+        setGateDeliveryRatePerSlot(Number(matchedRate.gateDeliveryRate) ?? 0);
+        setGateDeliveryAvailable(matchedRate.gateDeliveryAvailable === true);
+        setPickupPointsList(points);
+
+        if (matchedRate.gateDeliveryAvailable === true && points.length > 0) {
+          setSelectedPickupPoint(points[0]); // ← auto-select first point
+          setDeliveryType("gate");
+        } else {
+          setDeliveryType("door");
+        }
+      } catch {
+        setDeliveryType("door");
+      } finally {
+        setDeliveryRatesLoaded(true);
+      }
+    };
+    fetchDeliveryRatesByHub();
+  }, [addressHubId]);
+
+  const getPickupSlotTimes = (pickupPoint, session) => {
+    console.log("getPickupSlotTimes called with:", { pickupPoint, session });
+
+    if (!pickupPoint || !session) {
+      console.log("Missing pickupPoint or session");
+      return { startTime: null, endTime: null };
+    }
+
+    // New format: deliverySlots = [{ session, timeSlots: [{ startTime, endTime, isActive }] }]
+    if (
+      Array.isArray(pickupPoint.deliverySlots) &&
+      pickupPoint.deliverySlots.length > 0
+    ) {
+      console.log("Found deliverySlots array:", pickupPoint.deliverySlots);
+      const slotGroup = pickupPoint.deliverySlots.find(
+        (s) => s.session?.toLowerCase() === session?.toLowerCase(),
+      );
+      console.log("Found slotGroup:", slotGroup);
+      const activeSlot = slotGroup?.timeSlots?.find(
+        (ts) => ts.isActive !== false,
+      );
+      console.log("Found activeSlot:", activeSlot);
+      return {
+        startTime: activeSlot?.startTime || null,
+        endTime: activeSlot?.endTime || null,
+      };
+    }
+
+    // Old format: deliverySlot = "12:30,1:00" (fallback)
+    if (typeof pickupPoint.deliverySlot === "string") {
+      console.log("Using old format deliverySlot:", pickupPoint.deliverySlot);
+      const parts = pickupPoint.deliverySlot
+        .replace("-", ",")
+        .split(",")
+        .map((s) => s.trim());
+      return {
+        startTime: parts[0] || null,
+        endTime: parts[1] || null,
+      };
+    }
+
+    console.log("No valid format found, returning null");
+    return { startTime: null, endTime: null };
+  };
 
   const handleCheckout = async () => {
     if (!user) {
@@ -427,6 +688,12 @@ const CheckoutMultiple = () => {
 
     if (!defaultAddress) {
       fireToast({ title: "Please add an address", icon: cross });
+      return;
+    }
+
+    // ── NEW guard ──
+    if (deliveryType === "gate" && !selectedPickupPoint) {
+      fireToast({ title: "Please select a pickup point", icon: cross });
       return;
     }
 
@@ -451,17 +718,57 @@ const CheckoutMultiple = () => {
         }
       }
 
-      const subtotalForPayable =
-        subtotal + Cutlery + totalDeliveryCharge - coupon;
+      const gstableAmount = subtotal + Cutlery;
+      const gstAmount = roundAmount(gstableAmount * (gstRate / 100));
+      const totalWithChargesAndGST = roundAmount(
+        subtotal +
+          Cutlery +
+          totalDeliveryAdjustment -
+          coupon +
+          handlingCharge +
+          gstAmount,
+      );
+
       const payableAmount = roundAmount(
-        Math.max(subtotalForPayable - effectiveWalletDiscount, 0),
+        Math.max(totalWithChargesAndGST - effectiveWalletDiscount, 0),
       );
       const totalAmount = Math.round(payableAmount * 100) / 100;
+
+      // Build per-slot breakdown so the backend can store exact GST and handling
+      // charge per plan document (needed for accurate cancel refunds).
+      // GST is proportional to each slot's share of the total subtotal.
+      // Handling charge is ₹20 for any slot whose item total < minCartThreshold.
+      const slotBreakdown = (() => {
+        const sessionTotals = {};
+        cartdata.forEach((item) => {
+          const slotKey = `${item.deliveryDate}|${item.session}`;
+          const itemTotal = Number(
+            item.totalPrice ??
+              (item.preOrderPrice ?? item.price ?? item.hubPrice ?? 0) *
+                (item.quantity || 1),
+          );
+          sessionTotals[slotKey] = (sessionTotals[slotKey] || 0) + itemTotal;
+        });
+        const breakdown = {};
+        const totalSubtotal = Object.values(sessionTotals).reduce((s, v) => s + v, 0) || 1;
+        Object.entries(sessionTotals).forEach(([slotKey, slotSubtotal]) => {
+          // GST proportional to this slot's share of the total subtotal
+          const slotGstPaid = roundAmount(gstAmount * (slotSubtotal / totalSubtotal));
+          // Handling charge: ₹20 if this slot's item total is below the threshold
+          const slotHandlingCharge =
+            slotSubtotal > 0 && slotSubtotal < (minCartThreshold || 0) ? 20 : 0;
+          breakdown[slotKey] = { gstPaid: slotGstPaid, handlingCharge: slotHandlingCharge };
+        });
+        return breakdown;
+      })();
 
       // Cutoff validation — check every cart slot before proceeding to payment
       // Uses a 2:30 min grace window so users already mid-payment aren't blocked
       if (hubCutoffTimes) {
-        const hubCutoffData = { cutoffTimes: hubCutoffTimes };
+        const hubCutoffData = {
+          cutoffTimes: hubCutoffTimes,
+          orderMode: hubOrderMode,
+        };
         const GRACE_MS = 2.5 * 60 * 1000;
         const nowWithGrace = new Date(Date.now() - GRACE_MS); // shift "now" back by 2:30
         const expiredSlots = cartdata
@@ -514,29 +821,100 @@ const CheckoutMultiple = () => {
           return;
         }
       }
-      const enrichedCartItems = cartdata.map((item) => ({
-        ...item,
-        deliveryCharge: deliveryChargePerSlot,
-        username: user.Fname,
-        mobile: user.Mobile,
-        userId: user._id,
-        hubId: defaultAddress?.hubId || "",
-        hubName: defaultAddress?.hubName || "",
-        address: defaultAddress?.fullAddress || "",
-        customerType: user?.status || "User",
-        coordinates: defaultAddress?.location,
-      }));
+      // Right before enrichedCartItems, add this guard log during dev:
+      console.log("selectedPickupPoint at checkout:", selectedPickupPoint);
+      console.log("deliveryType at checkout:", deliveryType);
+      console.log(
+        "Full selectedPickupPoint structure:",
+        JSON.stringify(selectedPickupPoint, null, 2),
+      );
+
+      const enrichedCartItems = cartdata.map((item) => {
+        console.log(`Processing item with session: ${item.session}`);
+        const pickupTimes =
+          deliveryType === "gate" && selectedPickupPoint
+            ? getPickupSlotTimes(selectedPickupPoint, item.session)
+            : { startTime: null, endTime: null };
+
+        console.log(`Pickup times for ${item.session}:`, pickupTimes);
+
+        return {
+          ...item,
+          deliveryCharge: deliveryType === "door" ? doorDeliveryRatePerSlot : 0,
+          gateDeliveryCharge:
+            deliveryType === "gate" ? gateDeliveryRatePerSlot : 0,
+          deliveryType: deliveryType,
+          username: user.Fname,
+          mobile: user.Mobile,
+          userId: user._id,
+          hubId: defaultAddress?.hubId || "",
+          hubName: defaultAddress?.hubName || "",
+          address: defaultAddress?.fullAddress || "",
+          customerType: user?.status,
+          coordinates: defaultAddress?.location,
+          selectedPickupPoint:
+            deliveryType === "gate" && selectedPickupPoint
+              ? {
+                  name: selectedPickupPoint.name || null,
+                  location: selectedPickupPoint.location || null,
+                  contactNumber: selectedPickupPoint.contactNumber || null,
+                  session: item.session || null, // e.g. "Breakfast"
+                  startTime: pickupTimes.startTime, // e.g. "8:00"
+                  endTime: pickupTimes.endTime, // e.g. "8:30"
+                }
+              : null,
+        };
+      });
 
       console.log(enrichedCartItems, "cartitems.............");
       console.log(payableAmount, "payable...............");
-      console.log("Delivery Charge Per Slot:", deliveryChargePerSlot);
-      console.log("Total Delivery Charge:", totalDeliveryCharge);
+      console.log("Delivery Type:", deliveryType);
+      console.log("Door Rate Per Slot:", doorDeliveryRatePerSlot);
+      console.log("Gate Rate Per Slot:", gateDeliveryRatePerSlot);
+      console.log("Delivery Adjustment Per Slot:", deliveryAdjustmentPerSlot);
+      console.log("Total Delivery Adjustment:", totalDeliveryAdjustment);
       console.log("Delivery Slot Count:", deliverySlotCount);
       console.log("Total Amount being sent to backend:", totalAmount);
       const handleSuccessfulCheckout = async (
         txnId,
         paymentMethod = "razorpay",
       ) => {
+        // Persist offer-used slots to localStorage so Home.jsx can check
+        // hasUserUsedOffer() instantly on next load without any API call.
+        if (user?._id) {
+          try {
+            const offerItems = enrichedCartItems.filter(
+              (item) => item.offerApplied === true,
+            );
+            if (offerItems.length > 0) {
+              const raw = localStorage.getItem("offerUsedSlots");
+              const slots = raw ? JSON.parse(raw) : {};
+              if (!Array.isArray(slots[user._id])) slots[user._id] = [];
+              offerItems.forEach((item) => {
+                const dateStr =
+                  typeof item.deliveryDate === "string"
+                    ? item.deliveryDate.split("T")[0]
+                    : item.deliveryDate instanceof Date
+                      ? `${item.deliveryDate.getFullYear()}-${String(item.deliveryDate.getMonth() + 1).padStart(2, "0")}-${String(item.deliveryDate.getDate()).padStart(2, "0")}`
+                      : null;
+                if (dateStr && item.session) {
+                  // Include hubId in slot key for cross-hub blocking
+                  const hubIdStr = item.hubId
+                    ? item.hubId.toString()
+                    : "unknown";
+                  const slotKey = `${dateStr}|${item.session.toLowerCase()}|${hubIdStr}`;
+                  if (!slots[user._id].includes(slotKey)) {
+                    slots[user._id].push(slotKey);
+                  }
+                }
+              });
+              localStorage.setItem("offerUsedSlots", JSON.stringify(slots));
+            }
+          } catch {
+            // non-critical — don't block checkout
+          }
+        }
+
         localStorage.removeItem("cart");
         clearCart();
 
@@ -545,10 +923,11 @@ const CheckoutMultiple = () => {
           fetchWalletData();
         }
 
-        // Get first delivery slot info for params
+        // Get all delivery slots info for params
+        const allSessions = [...new Set(enrichedCartItems.map(item => item.session || "Lunch"))];
+        const allDeliveryDates = [...new Set(enrichedCartItems.map(item => item.deliveryDate || new Date().toISOString()))];
         const firstItem = enrichedCartItems?.[0] || {};
-        const firstDeliveryDate =
-          firstItem.deliveryDate || new Date().toISOString();
+        const firstDeliveryDate = firstItem.deliveryDate || new Date().toISOString();
         const firstSession = firstItem.session || "Lunch";
 
         // Navigate immediately to success page
@@ -557,6 +936,8 @@ const CheckoutMultiple = () => {
           userId: user._id,
           session: firstSession,
           deliveryDate: firstDeliveryDate,
+          sessions: allSessions.join(","),
+          deliveryDates: allDeliveryDates.join(","),
           username: user.Fname || "User",
           amount: payableAmount,
           orderId: txnId || "pending",
@@ -564,7 +945,7 @@ const CheckoutMultiple = () => {
           delivarylocation: defaultAddress?.fullAddress || "",
           status: "COMPLETED",
           paymentMethod: paymentMethod,
-          deliveryCharge: deliveryChargePerSlot,
+          deliveryCharge: deliveryType === "door" ? doorDeliveryRatePerSlot : 0,
         });
 
         navigate("/payment-success?" + successParams.toString(), {
@@ -596,13 +977,32 @@ const CheckoutMultiple = () => {
         "https://dd-backend-3nm0.onrender.com/api/user/razorpay/create-order-from-cart",
         {
           userId: user._id,
-          cartItems: enrichedCartItems,
+          cartItems: enrichedCartItems, // each item has selectedPickupPoint
           totalAmount,
-          totalDeliveryCharge: Number(totalDeliveryCharge || 0),
-          deliveryChargePerSlot: Number(deliveryChargePerSlot || 0),
+          totalDeliveryCharge: Number(
+            totalDeliveryAdjustment > 0 ? totalDeliveryAdjustment : 0,
+          ),
+          deliveryChargePerSlot: Number(
+            deliveryType === "door" ? doorDeliveryRatePerSlot : 0,
+          ),
+          gateDeliveryRebate: Number(
+            deliveryType === "gate"
+              ? gateDeliveryRatePerSlot * deliverySlotCount
+              : 0,
+          ),
           deliverySlotCount: Number(deliverySlotCount || 0),
           discountWallet: Number(effectiveWalletDiscount || 0),
           addressId: defaultAddress._id,
+          slotBreakdown,
+          // ── NEW ──
+          selectedPickupPoint:
+            deliveryType === "gate" && selectedPickupPoint
+              ? {
+                  name: selectedPickupPoint.name || null,
+                  location: selectedPickupPoint.location || null,
+                  contactNumber: selectedPickupPoint.contactNumber || null,
+                }
+              : null,
           notes: {
             username: user.Fname,
             mobile: user.Mobile,
@@ -625,47 +1025,6 @@ const CheckoutMultiple = () => {
 
         console.log("Razorpay Amount from backend:", razorpayAmount);
         console.log("Expected Total Amount:", totalAmount);
-        console.log("Difference:", razorpayAmount - totalAmount * 100);
-
-        // Validate that backend calculated the correct amount
-        const expectedRazorpayAmount = Math.round(totalAmount * 100);
-        if (Math.abs(razorpayAmount - expectedRazorpayAmount) > 1) {
-          console.error("⚠️ AMOUNT MISMATCH DETECTED!");
-          console.error(
-            "Expected:",
-            expectedRazorpayAmount,
-            "paise (₹" + totalAmount + ")",
-          );
-          console.error(
-            "Received:",
-            razorpayAmount,
-            "paise (₹" + razorpayAmount / 100 + ")",
-          );
-          console.error(
-            "Delivery charge may not be included in backend calculation!",
-          );
-
-          // Show warning to user
-          await Swal2.fire({
-            icon: "warning",
-            title: "Amount Mismatch",
-            html: `
-              <p>Expected amount: ₹${totalAmount.toFixed(2)}</p>
-              <p>Razorpay amount: ₹${(razorpayAmount / 100).toFixed(2)}</p>
-              <p>Difference: ₹${Math.abs(razorpayAmount / 100 - totalAmount).toFixed(2)}</p>
-              <p><strong>The backend may not be including delivery charges correctly.</strong></p>
-            `,
-            confirmButtonText: "Proceed Anyway",
-            showCancelButton: true,
-            cancelButtonText: "Cancel",
-          }).then((result) => {
-            if (!result.isConfirmed) {
-              throw new Error(
-                "Payment cancelled by user due to amount mismatch",
-              );
-            }
-          });
-        }
 
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -829,11 +1188,11 @@ const CheckoutMultiple = () => {
       .replace(/\.00$/, "")
       .replace(/(\.\d*[1-9])0$/, "$1");
   };
+
   const renderReferenceCartItems = () => {
     const groupedBySession = {};
     const sessionOrder = ["Breakfast", "Lunch", "Dinner"];
     const rupeeSymbol = "\u20B9";
-    const addMoreArrow = "\u2190";
 
     cartdata.forEach((item) => {
       const session = item.session || "Lunch";
@@ -848,7 +1207,6 @@ const CheckoutMultiple = () => {
       ([sessionA], [sessionB]) => {
         const indexA = sessionOrder.indexOf(sessionA);
         const indexB = sessionOrder.indexOf(sessionB);
-
         if (indexA === -1 && indexB === -1)
           return sessionA.localeCompare(sessionB);
         if (indexA === -1) return 1;
@@ -873,22 +1231,61 @@ const CheckoutMultiple = () => {
               (sum, item) => sum + getItemRegularTotal(item),
               0,
             );
+            const needsMore =
+              sessionTotal > 0 && sessionTotal < minCartThreshold;
+            const amountNeeded = minCartThreshold - sessionTotal;
+
+            // Get hubId from first item or use default
+            const hubIdForSession = items[0]?.hubId || addressHubId;
 
             return (
               <section key={session} className="cm-session-block">
-                <h4 className="cm-session-title">
-                  {session}
-                  {items[0]?.deliveryDate && (
-                    <span className="cm-session-date">
-                      {" · "}
-                      {new Date(items[0].deliveryDate).toLocaleDateString("en-US", {
-                        day: "numeric",
-                        month: "short",
-                      })}
+                {/* Session header */}
+                <div className="cm-session-header">
+                  <div className="cm-session-header-left">
+                    <span className="cm-session-meal-icon">
+                      {session === "Breakfast" ? (
+                        <img
+                          src={breakfast}
+                          alt="Breakfast"
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                      ) : session === "Lunch" ? (
+                        <img
+                          src={lunch}
+                          alt="Lunch"
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                      ) : (
+                        <img
+                          src={dinner}
+                          alt="Dinner"
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                      )}
                     </span>
-                  )}
-                </h4>
+                    <div>
+                      <h4 className="cm-session-title">{session}</h4>
+                      {items[0]?.deliveryDate && (
+                        <span className="cm-session-date">
+                          {new Date(items[0].deliveryDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                            },
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="cm-session-item-count">
+                    {items.length} item{items.length !== 1 ? "s" : ""}
+                  </div>
+                </div>
 
+                {/* Items list */}
                 <div className="cm-session-items">
                   {items.map((item, index) => {
                     const itemTotal = getItemTotalPrice(item);
@@ -899,12 +1296,7 @@ const CheckoutMultiple = () => {
                     const itemQuantity = getItemQuantity(item);
 
                     return (
-                      <div
-                        key={item.cartId || index}
-                        className={`cm-item-row ${
-                          index < items.length - 1 ? "cm-item-row--divided" : ""
-                        }`}
-                      >
+                      <div key={item.cartId || index} className="cm-item-row">
                         <div className="cm-item-main">
                           {item?.foodcategory === "Veg" ? (
                             <img
@@ -932,9 +1324,9 @@ const CheckoutMultiple = () => {
                               onClick={() => debouncedDecreaseQuantity(item)}
                               aria-label={`Decrease quantity for ${itemName}`}
                             >
-                              -
+                              −
                             </button>
-                            <div className="cm-qty-value">{itemQuantity}</div>
+                            <span className="cm-qty-value">{itemQuantity}</span>
                             <button
                               type="button"
                               className="cm-qty-btn"
@@ -963,26 +1355,77 @@ const CheckoutMultiple = () => {
                   })}
                 </div>
 
-                <div className="cm-session-footer">
-                  <Link to="/home" replace className="cm-add-more-link">
-                    <span className="cm-add-more-arrow">{addMoreArrow}</span>
-                    <span className="cm-add-more-text">Add More</span>
-                  </Link>
-
-                  <div className="cm-total-chip">
-                    <div className="cm-total-label">Total</div>
-                    <div className="cm-total-price">
-                      {sessionSavings > 0 && (
-                        <div className="cm-total-old">
-                          {rupeeSymbol}
-                          {formatCartPrice(sessionOriginalTotal)}
-                        </div>
-                      )}
-                      <div className="cm-total-current">
-                        {rupeeSymbol}
-                        {formatCartPrice(sessionTotal)}
-                      </div>
+                {/* Handling charge banner — ABOVE footer */}
+                {needsMore && (
+                  <div
+                    className="scf-inline-row"
+                    onClick={() => setShowSmallCartModal(true)}
+                  >
+                    <div className="scf-inline-left">
+                      <button type="button" className="scf-inline-fee-btn">
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <rect x="1" y="3" width="15" height="13" rx="2" />
+                          <path d="M16 8h4l3 5v3h-7V8z" />
+                          <circle cx="5.5" cy="18.5" r="2.5" />
+                          <circle cx="18.5" cy="18.5" r="2.5" />
+                        </svg>
+                        Small cart fee
+                      </button>
                     </div>
+                    <span className="scf-inline-amount">₹20</span>
+                  </div>
+                )}
+
+                {/* Footer: Add More + Total — BELOW fee banner */}
+                <div className="cm-session-footer">
+                  <button
+                    type="button"
+                    className="cm-add-more-link"
+                    onClick={() =>
+                      handleOpenAddMoreModal(
+                        hubIdForSession,
+                        session,
+                        items[0]?.deliveryDate,
+                      )
+                    }
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add more
+                  </button>
+
+                  {/* Total chip: slashed → "Total" → price */}
+                  <div className="cm-total-chip">
+                    <span className="cm-total-current">
+                      {rupeeSymbol}
+                      {formatCartPrice(sessionTotal + (needsMore ? 20 : 0))}
+                    </span>
+                    {needsMore && (
+                      <span className="cm-total-sub">
+                        No small cart fee above ₹{minCartThreshold}
+                      </span>
+                    )}
                   </div>
                 </div>
               </section>
@@ -991,6 +1434,584 @@ const CheckoutMultiple = () => {
         </div>
       </div>
     );
+  };
+
+  const SmallCartFeeModal = ({ show, onClose, minCartThreshold }) => (
+    <Modal
+      show={show}
+      onHide={onClose}
+      centered
+      className="hiw-modal"
+      scrollable={false}
+    >
+      <div className="scf-sheet-handle" />
+      <div className="scf-sheet-header">
+        <div className="scf-sheet-icon">
+          <FaScaleBalanced
+            style={{
+              color: "#8B4513",
+              fontSize: "24px",
+            }}
+          />
+        </div>
+        <div className="scf-sheet-title">Why there's a ₹20 fee</div>
+      </div>
+      <Modal.Body className="scf-sheet-body">
+        <p className="scf-sheet-desc">
+          Below ₹99 per slot, the cost of cooking, packing and delivering
+          exceeds what we earn. The ₹20 bridges that gap — not a penalty, just
+          what keeps us running
+        </p>
+        {/* <div className="scf-sheet-table mt-4">
+          <div className="scf-sheet-row">
+            <span className="scf-row-label">Minimum per slot</span>
+            <span className="scf-row-val">₹{minCartThreshold}</span>
+          </div>
+          <div className="scf-sheet-row">
+            <span className="scf-row-label">Fee if below</span>
+            <span className="scf-row-val">₹20 per slot</span>
+          </div>
+          
+        </div> */}
+      </Modal.Body>
+      {/* <Modal.Footer className="scf-sheet-footer">
+        <button className="scf-got-it-btn" onClick={() => navigate("/home")}>
+          Add more to this slot
+        </button>
+      </Modal.Footer> */}
+    </Modal>
+  );
+
+  // Add More Modal Component
+  const AddMoreModal = ({
+    show,
+    onClose,
+    hubId,
+    session,
+    deliveryDate,
+    onItemsAdded,
+  }) => {
+    const [menuItems, setMenuItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [quantities, setQuantities] = useState({});
+    const [originalQuantities, setOriginalQuantities] = useState({});
+    const user = JSON.parse(localStorage.getItem("user"));
+    const [hubCutoffTimes, setHubCutoffTimes] = useState(null);
+    const [hubOrderMode, setHubOrderMode] = useState("preorder");
+
+    useEffect(() => {
+      if (!hubId) return;
+      const fetchCutoffTimes = async () => {
+        try {
+          const res = await fetch(
+            `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${encodeURIComponent(hubId)}`,
+          );
+          if (res.ok) {
+            const data = await res.json();
+            setHubCutoffTimes(data.cutoffTimes || null);
+            setHubOrderMode(data.orderMode || "preorder");
+          }
+        } catch (error) {
+          console.error("Error fetching cutoff times:", error);
+        }
+      };
+      fetchCutoffTimes();
+    }, [hubId]);
+
+    const isOrderingAllowed = useMemo(() => {
+      if (!hubCutoffTimes || !deliveryDate || !session) return true;
+      const GRACE_MS = 2.5 * 60 * 1000;
+      const nowWithGrace = new Date(Date.now() - GRACE_MS);
+      return !isSlotPastCutoff(
+        deliveryDate,
+        session,
+        { cutoffTimes: hubCutoffTimes, orderMode: hubOrderMode },
+        user?.status,
+        nowWithGrace,
+      );
+    }, [hubCutoffTimes, deliveryDate, session, hubOrderMode, user?.status]);
+
+    const fetchMenuForSlot = async () => {
+      if (!hubId || !deliveryDate || !session) return;
+      setIsLoading(true);
+      try {
+        const res = await axios.get(
+          `https://dd-backend-3nm0.onrender.com/api/admin/hub-menu/get-hub-menu`,
+          { params: { hubId, menuDate: deliveryDate, session } },
+        );
+        if (res.data && res.data.menu) {
+          const menu = res.data.menu;
+          setMenuItems(menu);
+
+          const currentCart = getCart();
+
+          console.log(
+            "CART ENTRIES for this slot:",
+            currentCart.filter(
+              (c) => c.session === session && c.deliveryDate === deliveryDate,
+            ),
+          );
+          console.log(
+            "MENU ITEMS:",
+            menu.map((m) => ({
+              menuId: m._id,
+              productId: m.productId?._id,
+              foodname: m.productId?.foodname,
+            })),
+          );
+
+          const initQty = {};
+          menu.forEach((menuItem) => {
+            const menuProductId = String(menuItem.productId?._id || "").trim();
+            const menuFoodname = (menuItem.productId?.foodname || "")
+              .trim()
+              .toLowerCase();
+
+            const cartEntry = currentCart.find((c) => {
+              // Normalise date comparison — strip time part if ISO string
+              const cartDate =
+                typeof c.deliveryDate === "string"
+                  ? c.deliveryDate.split("T")[0]
+                  : c.deliveryDate;
+              const modalDate =
+                typeof deliveryDate === "string"
+                  ? deliveryDate.split("T")[0]
+                  : deliveryDate;
+
+              const dateMatch = cartDate === modalDate;
+              const sessionMatch =
+                (c.session || "").toLowerCase() ===
+                (session || "").toLowerCase();
+
+              // Try productId match first, fall back to foodname
+              const cartProductId = String(c.productId || "").trim();
+              const idMatch =
+                menuProductId &&
+                cartProductId &&
+                menuProductId === cartProductId;
+              const nameMatch =
+                menuFoodname &&
+                (c.foodname || "").trim().toLowerCase() === menuFoodname;
+
+              return dateMatch && sessionMatch && (idMatch || nameMatch);
+            });
+
+            if (cartEntry) {
+              console.log(
+                `MATCHED: ${menuItem.productId?.foodname} → qty ${cartEntry.quantity}`,
+              );
+            }
+
+            initQty[menuItem._id] = cartEntry
+              ? Number(cartEntry.quantity) || 1
+              : 0;
+          });
+
+          setQuantities(initQty);
+          setOriginalQuantities({ ...initQty });
+        }
+      } catch (error) {
+        console.error("Error fetching menu:", error);
+        fireToast({ title: "Failed to load menu", icon: cross });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      if (show && hubId && deliveryDate && session) fetchMenuForSlot();
+    }, [show, hubId, deliveryDate, session]);
+
+    const updateQuantity = (itemId, delta, maxStock) => {
+      setQuantities((prev) => {
+        const next = Math.max(0, (prev[itemId] || 0) + delta);
+        if (delta > 0 && next > (maxStock || 99)) return prev;
+        return { ...prev, [itemId]: next };
+      });
+    };
+
+    // Only items that changed from their original cart quantity
+    const changedItems = menuItems.filter((item) => {
+      const orig = originalQuantities[item._id] ?? 0;
+      const curr = quantities[item._id] ?? 0;
+      return curr !== orig;
+    });
+
+    const selectedTotal = menuItems.reduce((sum, item) => {
+      const qty = quantities[item._id] || 0;
+      if (qty === 0) return sum;
+      let price =
+        item.isOffer && item.offerPrice > 0
+          ? item.offerPrice
+          : item.preOrderPrice > 0
+            ? item.preOrderPrice
+            : item.hubPrice;
+      return sum + price * qty;
+    }, 0);
+
+    const handleAddToCart = () => {
+      if (changedItems.length === 0) {
+        fireToast({ title: "No changes to apply", icon: cross });
+        return;
+      }
+      if (!isOrderingAllowed) {
+        fireToast({ title: "Ordering cutoff passed", icon: cross });
+        return;
+      }
+
+      const currentCart = getCart();
+
+      changedItems.forEach((menuItem) => {
+        const newQty = quantities[menuItem._id] || 0;
+        const menuProductId = String(menuItem.productId?._id || "").trim();
+        const menuFoodname = (menuItem.productId?.foodname || "")
+          .trim()
+          .toLowerCase();
+        const modalDate =
+          typeof deliveryDate === "string"
+            ? deliveryDate.split("T")[0]
+            : deliveryDate;
+
+        // Log all price fields to find which one has the value
+        console.log("PRICE DEBUG for", menuItem.productId?.foodname, {
+          offerPrice: menuItem.offerPrice,
+          preOrderPrice: menuItem.preOrderPrice,
+          hubPrice: menuItem.hubPrice,
+          basePrice: menuItem.basePrice,
+          price: menuItem.price,
+          fullItem: menuItem,
+        });
+      });
+
+      localStorage.setItem("cart", JSON.stringify(currentCart));
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("cartUpdated"));
+
+      const added = changedItems.filter(
+        (i) => (quantities[i._id] || 0) > (originalQuantities[i._id] || 0),
+      ).length;
+      const removed = changedItems.filter(
+        (i) => (quantities[i._id] || 0) < (originalQuantities[i._id] || 0),
+      ).length;
+      const msg = [
+        added > 0 && `${added} added`,
+        removed > 0 && `${removed} removed`,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      fireToast({ title: "Cart updated!", subtitle: msg, icon: checkCircle });
+      if (onItemsAdded) onItemsAdded();
+      onClose();
+    };
+
+    const sessionIcon =
+      session === "Breakfast"
+        ? breakfast
+        : session === "Lunch"
+          ? lunch
+          : dinner;
+    const formattedDate = deliveryDate
+      ? new Date(deliveryDate).toLocaleDateString("en-US", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        })
+      : "";
+
+    const hasChanges = changedItems.length > 0;
+
+    return (
+      <Modal
+        show={show}
+        onHide={onClose}
+        centered
+        className="amm-modal"
+        scrollable
+      >
+        <Modal.Header closeButton className="amm-header">
+          <div className="amm-header-inner">
+            <div className="amm-header-session">
+              <img
+                src={sessionIcon}
+                alt={session}
+                className="amm-session-icon"
+              />
+              <div>
+                <div className="amm-session-label">{session}</div>
+                <div className="amm-session-date">{formattedDate}</div>
+              </div>
+            </div>
+          </div>
+        </Modal.Header>
+
+        <Modal.Body className="amm-body">
+          {!isOrderingAllowed && (
+            <div className="amm-cutoff-banner">
+              <ShieldAlert size={15} />
+              <span>
+                Ordering cutoff passed — items cannot be added for this slot.
+              </span>
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="amm-loading">
+              <Spinner
+                animation="border"
+                style={{
+                  color: "#6B8E23",
+                  width: 32,
+                  height: 32,
+                  borderWidth: 3,
+                }}
+              />
+              <span>Loading menu…</span>
+            </div>
+          ) : menuItems.length === 0 ? (
+            <div className="amm-empty">
+              <span>No items available for this slot</span>
+            </div>
+          ) : (
+            <div className="amm-items">
+              {menuItems.map((item) => {
+                const qty = quantities[item._id] ?? 0;
+                const origQty = originalQuantities[item._id] ?? 0;
+                const isSoldOut = item.remainingQuantity === 0;
+                const isUnavailable = isSoldOut || !isOrderingAllowed;
+                const isInCart = origQty > 0;
+
+                let displayPrice =
+                  item.isOffer && item.offerPrice > 0
+                    ? item.offerPrice
+                    : item.preOrderPrice > 0
+                      ? item.preOrderPrice
+                      : item.hubPrice;
+                let originalPrice =
+                  item.isOffer && item.offerPrice > 0 ? item.hubPrice : null;
+
+                return (
+                  <div
+                    key={item._id}
+                    className={`amm-item ${isUnavailable ? "amm-item--unavail" : ""}`}
+                  >
+                    <div className="amm-item-img">
+                      {item.productId?.Foodgallery?.[0]?.image2 ? (
+                        <img
+                          src={item.productId.Foodgallery[0].image2}
+                          alt={item.productId?.foodname}
+                        />
+                      ) : (
+                        <div className="amm-item-img-placeholder" />
+                      )}
+                    </div>
+
+                    <div className="amm-item-info">
+                      <div className="amm-item-top">
+                        {item.productId?.foodcategory === "Veg" ? (
+                          <img src={IsVeg} alt="veg" className="amm-veg-icon" />
+                        ) : (
+                          <img
+                            src={IsNonVeg}
+                            alt="non-veg"
+                            className="amm-veg-icon"
+                          />
+                        )}
+                        <span className="amm-item-name">
+                          {item.productId?.foodname}
+                        </span>
+                        {item.isOffer && (
+                          <span className="amm-offer-badge">Offer</span>
+                        )}
+                        {isInCart && qty > 0 && (
+                          <span className="amm-in-cart-badge">In cart</span>
+                        )}
+                      </div>
+                      <div className="amm-item-price-row">
+                        {originalPrice && (
+                          <span className="amm-price-old">
+                            ₹{originalPrice}
+                          </span>
+                        )}
+                        <span className="amm-price-current">
+                          ₹{displayPrice}
+                        </span>
+                        {isSoldOut && (
+                          <span className="amm-soldout-tag">Sold out</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="amm-item-action">
+                      {isUnavailable ? (
+                        <span className="amm-unavail-label">Unavailable</span>
+                      ) : qty === 0 ? (
+                        <button
+                          type="button"
+                          className="amm-add-btn"
+                          onClick={() =>
+                            updateQuantity(item._id, 1, item.remainingQuantity)
+                          }
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <div className="cm-qty-pill amm-qty-pill">
+                          <button
+                            type="button"
+                            className="cm-qty-btn"
+                            onClick={() =>
+                              updateQuantity(
+                                item._id,
+                                -1,
+                                item.remainingQuantity,
+                              )
+                            }
+                            aria-label="Decrease"
+                          >
+                            −
+                          </button>
+                          <span className="cm-qty-value">{qty}</span>
+                          <button
+                            type="button"
+                            className="cm-qty-btn"
+                            onClick={() =>
+                              updateQuantity(
+                                item._id,
+                                1,
+                                item.remainingQuantity,
+                              )
+                            }
+                            disabled={qty >= (item.remainingQuantity || 99)}
+                            aria-label="Increase"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Modal.Body>
+
+        {/* Footer — only show when there are actual changes */}
+        {hasChanges && (
+          <Modal.Footer className="amm-footer">
+            <div className="amm-footer-summary">
+              <span className="amm-footer-count">
+                {changedItems.length} change
+                {changedItems.length !== 1 ? "s" : ""}
+              </span>
+              <span className="amm-footer-total">
+                ₹{selectedTotal.toFixed(2)}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="amm-confirm-btn"
+              onClick={handleAddToCart}
+              disabled={isLoading || !isOrderingAllowed}
+            >
+              Update cart
+            </button>
+          </Modal.Footer>
+        )}
+      </Modal>
+    );
+  };
+
+  // How it works modal
+  const HowItWorksModal = ({ show, onClose, pickupPoints }) => {
+    return (
+      <Modal show={show} onHide={onClose} centered className="hiw-modal">
+        <Modal.Header  className="hiw-header">
+          <div>
+            <span className="hiw-badge">LOBBY PICKUP · FREE</span>
+            <Modal.Title className="scf-sheet-title">
+              Your food arrives at your pickup point.
+            </Modal.Title>
+          </div>
+        </Modal.Header>
+        <Modal.Body className="hiw-body">
+          <div className="hiw-step">
+            <div className="hiw-step-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#6b8e23">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+                </svg>
+            </div>
+            <div>
+              <div className="hiw-step-title">
+                We'll ping you the moment it arrives.
+              </div>
+              <div className="hiw-step-sub">
+                No guessing, no waiting around.
+              </div>
+               <span className="hiw-wa-tag">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#6b8e23">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+                </svg>
+                WhatsApp alert
+              </span>
+            </div>
+          </div>
+
+          <div className="hiw-step">
+            <div className="hiw-step-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6B8E23"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <div>
+              <div className="hiw-step-title">Walk down, pick it up — done</div>
+              <div className="hiw-step-sub">
+                Your name and flat number are on your order.
+              </div>
+            </div>
+          </div>
+
+          
+        </Modal.Body>
+        {/* <Modal.Footer className="hiw-footer">
+          <Button className="hiw-got-it-btn" onClick={onClose}>
+            Got it
+          </Button>
+        </Modal.Footer> */}
+      </Modal>
+    );
+  };
+
+  // Delivery Type UI - Exactly matching your 2nd image
+  {
+    /* ── Lobby / Door Delivery Type ── */
+  }
+
+  // Helper — add near your other helpers (top of component, before return)
+  const formatDeliverySlots = (deliverySlots = []) => {
+    const sessionOrder = ["Breakfast", "Lunch", "Dinner"];
+    return [...deliverySlots].sort(
+      (a, b) =>
+        sessionOrder.indexOf(a.session) - sessionOrder.indexOf(b.session),
+    );
+  };
+
+  const sessionBadgeClass = (session) => {
+    if (session === "Breakfast")
+      return "dt-slot-session dt-slot-session--breakfast";
+    if (session === "Dinner") return "dt-slot-session dt-slot-session--dinner";
+    return "dt-slot-session";
   };
 
   return (
@@ -1085,8 +2106,8 @@ const CheckoutMultiple = () => {
                         </div>
                       </div>
                       <div className="center mt-1">
-                        {deliveryChargePerSlot > 0 ? (
-                          <b>₹ {deliveryChargePerSlot}</b>
+                        {doorDeliveryRatePerSlot > 0 ? (
+                          <b>₹ {doorDeliveryRatePerSlot}</b>
                         ) : (
                           <b
                             style={{
@@ -1124,8 +2145,8 @@ const CheckoutMultiple = () => {
                         </div>
                       </div>
                       <div className="center mt-1">
-                        {deliveryChargePerSlot > 0 ? (
-                          <b>₹ {deliveryChargePerSlot}</b>
+                        {doorDeliveryRatePerSlot > 0 ? (
+                          <b>₹ {doorDeliveryRatePerSlot}</b>
                         ) : (
                           <b
                             style={{
@@ -1165,8 +2186,8 @@ const CheckoutMultiple = () => {
                       </div>
                     </div>
                     <div className="center mt-1">
-                      {deliveryChargePerSlot > 0 ? (
-                        <b>₹ {deliveryChargePerSlot}</b>
+                      {doorDeliveryRatePerSlot > 0 ? (
+                        <b>₹ {doorDeliveryRatePerSlot}</b>
                       ) : (
                         <b
                           style={{
@@ -1192,25 +2213,22 @@ const CheckoutMultiple = () => {
             </div>
           )}
 
-          <div className="delivery-details-container">
-            <div className="delivery-details-row">
-              <div className="delivery-icon-wrapper">
-                <img
-                  style={{
-                    filter:
-                      "invert(40%) sepia(88%) saturate(390%) hue-rotate(36deg) brightness(94%) contrast(89%)",
-                  }}
-                  src="/Assets/selectlocation.svg"
-                  alt="Location"
-                  className="delivery-icon"
-                />
+          <div className="dd-card">
+            <div className="dd-card-inner">
+              <div className="dd-icon-col">
+                <div className="dd-location-dot">
+                  <img
+                    src="/Assets/selectlocation.svg"
+                    alt=""
+                    className="dd-location-svg"
+                  />
+                </div>
               </div>
-              <div className="delivery-content-wrapper">
-                <p
-                  className="select-location-text fw-semibold text-truncate mb-0"
-                  style={{ maxWidth: "220px", color: "black" }}
-                  title={
-                    defaultAddress?.addressType === "Home"
+
+              <div className="dd-content-col">
+                <div className="dd-name-row">
+                  <span className="wallet-title">
+                    {defaultAddress?.addressType === "Home"
                       ? defaultAddress?.homeName
                       : defaultAddress?.addressType === "PG"
                         ? defaultAddress?.apartmentName
@@ -1218,115 +2236,116 @@ const CheckoutMultiple = () => {
                           ? defaultAddress?.schoolName
                           : defaultAddress?.addressType === "Work"
                             ? defaultAddress?.companyName
-                            : defaultAddress?.houseName || "No default address"
-                  }
-                >
-                  {defaultAddress?.addressType === "Home"
-                    ? defaultAddress?.homeName
-                    : defaultAddress?.addressType === "PG"
-                      ? defaultAddress?.apartmentName
-                      : defaultAddress?.addressType === "School"
-                        ? defaultAddress?.schoolName
-                        : defaultAddress?.addressType === "Work"
-                          ? defaultAddress?.companyName
-                          : defaultAddress?.houseName || "No default address"}
-                </p>
-                <p
-                  className="small text-truncate mb-0"
-                  style={{
-                    maxWidth: "280px",
-                    color: "black",
-                  }}
-                  title={defaultAddress?.fullAddress}
-                >
+                            : defaultAddress?.houseName || "No address saved"}
+                  </span>
+                  <span className="dd-type-badge">
+                    {defaultAddress?.addressType || "Home"}
+                  </span>
+                </div>
+
+                <p className="dd-full-address">
                   {defaultAddress?.fullAddress || ""}
                 </p>
-                <div className="caption-section" data-text-role="Caption">
-                  <div className="user-detailss mt-1">
-                    {address?.name || address?.Fname} | {user?.Mobile}
-                  </div>
-                  <div className="user-detailss mt-1">
-                    {defaultAddress?.addressType === "School" ? (
-                      <div className="d-flex gap-1">
-                        <p>{defaultAddress?.studentInformation?.schoolName}</p>
-                        <p>{defaultAddress?.studentInformation?.studentName}</p>
-                        <p>
-                          {defaultAddress?.studentInformation?.studentClass}
-                        </p>
-                        <p>
-                          {defaultAddress?.studentInformation?.studentSection}
-                        </p>
-                      </div>
-                    ) : (
-                      ""
+
+                <div className="dd-meta-row">
+                  <span className="dd-meta-item">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    {address?.name || address?.Fname || user?.Fname}
+                  </span>
+                  <span className="dd-meta-dot">·</span>
+                  <span className="dd-meta-item">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17.92z" />
+                    </svg>
+                    {user?.Mobile}
+                  </span>
+                </div>
+
+                {defaultAddress?.addressType === "School" && (
+                  <div className="dd-school-row">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                    <span>
+                      {defaultAddress?.studentInformation?.studentName}
+                    </span>
+                    {defaultAddress?.studentInformation?.studentClass && (
+                      <span className="dd-school-chip">
+                        Class {defaultAddress?.studentInformation?.studentClass}
+                        {defaultAddress?.studentInformation?.studentSection
+                          ? ` · ${defaultAddress?.studentInformation?.studentSection}`
+                          : ""}
+                      </span>
                     )}
                   </div>
-                </div>
-                {address.locationType === "school" && (
-                  <div className="caption-section" data-text-role="Caption">
-                    <div className="user-detailss mt-1">
-                      {storedInfo?.studentName || ""} | class -{" "}
-                      {storedInfo?.studentClass || ""}{" "}
-                      {storedInfo?.studentSection
-                        ? `| section - ${storedInfo.studentSection}`
-                        : ""}
-                    </div>
-                  </div>
                 )}
-              </div>
-              <div className="change-button">
-                <div className="change-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M12.7869 4.06006C13.0026 4.06408 13.197 4.13649 13.3679 4.27393L13.4402 4.3374L13.4421 4.33936L14.0691 4.96729H14.0701C14.2584 5.15512 14.3562 5.37816 14.3562 5.63135C14.3561 5.88443 14.2583 6.10722 14.0701 6.29541L8.06909 12.2964L8.12964 12.356L7.97827 12.3872L7.92847 12.437L7.89526 12.4038L6.14429 12.7642L6.14331 12.7632C5.99732 12.7977 5.86495 12.7583 5.75757 12.6509C5.6507 12.5438 5.61079 12.4117 5.64526 12.2661L6.00366 10.5142L5.97144 10.4819L6.02124 10.4312L6.05249 10.2798L6.11304 10.3394L12.1277 4.33936C12.3159 4.15164 12.537 4.05551 12.7869 4.06006ZM3.90894 4.93896C4.82094 5.04553 5.51534 5.25975 5.98022 5.59033L6.14624 5.72217C6.50712 6.04333 6.68917 6.46017 6.68921 6.96631C6.68921 7.46798 6.48149 7.87559 6.07202 8.18018C5.66644 8.48179 5.09567 8.65629 4.37183 8.71533L4.3728 8.71631C3.56599 8.78862 2.97488 8.95356 2.58765 9.20166C2.20735 9.44537 2.02278 9.7739 2.02319 10.1958L2.03003 10.3452C2.06267 10.6821 2.20957 10.9385 2.46753 11.1235C2.76926 11.3398 3.255 11.4829 3.93921 11.5415L4.03296 11.5493L4.03101 11.6431L4.01538 12.3101L4.01245 12.4146L3.90894 12.4077C3.02682 12.3515 2.34286 12.14 1.86987 11.7622C1.39341 11.3812 1.15698 10.8553 1.15698 10.1958C1.15698 9.53364 1.4429 8.99511 2.00562 8.5874C2.56435 8.18297 3.33478 7.93994 4.3064 7.8501C4.8365 7.80039 5.22055 7.69624 5.46948 7.54639C5.71114 7.40131 5.823 7.21012 5.823 6.96631C5.82295 6.63775 5.67929 6.38651 5.37964 6.20361C5.07099 6.01541 4.55566 5.87468 3.82104 5.7915L3.72241 5.78076L3.73218 5.68213L3.79761 5.02881L3.80835 4.92725L3.90894 4.93896ZM12.7771 4.99463C12.7176 4.99466 12.671 5.01448 12.6306 5.05518H12.6296L7.20581 10.4771L7.9314 11.2026L13.3542 5.78076C13.3953 5.73967 13.4148 5.69221 13.4148 5.6333C13.4148 5.58902 13.4041 5.55139 13.3816 5.51807L13.3552 5.48584L12.9236 5.05518C12.883 5.01429 12.8361 4.99463 12.7771 4.99463Z"
-                      fill="#6B6B6B"
-                      stroke="#6B6B6B"
-                      strokeWidth="0.2"
-                    />
-                  </svg>
-                </div>
-                <div className="change-badge" data-text-role="Badge/Chip">
-                  <div className="change-text">
-                    <span
-                      onClick={() => setShowLocationModal(true)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {defaultAddress ? "Change" : "Add address"}
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
+          {/* ── Wallet apply ── */}
+
           <div>
-            <h4 className="spply-s">Apply & Save</h4>
+            <h4 className="spply-s">Apply &amp; Save</h4>
             <div className="promo-wallet-container">
               <div className="wallet-section">
                 <input
                   type="checkbox"
                   className="form-check-input wallet-checkbox"
                   name="Apply Wallet"
-                  checked={discountWallet ? true : false}
+                  checked={walletApplied && (wallet?.balance || 0) > 0}
                   onChange={(e) => handleApplyWallet(e)}
                   style={{
-                    border: discountWallet
-                      ? "1px solid #6B8E23 !important"
-                      : "1px solid #6B6B6B !important",
-                    backgroundColor: discountWallet ? "#6B8E23" : "white",
+                    border:
+                      walletApplied && (wallet?.balance || 0) > 0
+                        ? "1px solid #6B8E23 !important"
+                        : "1px solid #6B6B6B !important",
+                    backgroundColor:
+                      walletApplied && (wallet?.balance || 0) > 0
+                        ? "#6B8E23"
+                        : "white",
                   }}
                 />
                 <div className="wallet-text">
                   <div className="wallet-header">
                     <span className="wallet-title">Apply Wallet Credit</span>
                     <span className="wallet-amount">
-                      (₹{(wallet?.balance - discountWallet)?.toFixed(2)}{" "}
+                      (₹
+                      {Math.max(
+                        (wallet?.balance || 0) - discountWallet,
+                        0,
+                      ).toFixed(2)}{" "}
                       available)
                     </span>
                   </div>
@@ -1344,7 +2363,7 @@ const CheckoutMultiple = () => {
                           (walletSeting?.minCartValueForWallet || 0) -
                             (Number(subtotal) +
                               Number(Cutlery) +
-                              Number(totalDeliveryCharge) || 0),
+                              Number(totalDeliveryAdjustment) || 0),
                         ),
                       )}{" "}
                       more to use
@@ -1355,99 +2374,364 @@ const CheckoutMultiple = () => {
             </div>
           </div>
 
+          {/* ── Lobby / Door Delivery Type ── */}
+          <div className="dt-selector-wrapper">
+            <h4 className="delivery-details mb-3">Delivery Type</h4>
+            {!deliveryRatesLoaded ? (
+              <div
+                style={{
+                  height: "80px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div className="lds-ripple" style={{ transform: "scale(0.5)" }}>
+                  <div></div>
+                  <div></div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="dt-selector-row">
+                  {/* Lobby Pickup */}
+                  {gateDeliveryAvailable && (
+                    <button
+                      type="button"
+                      className={`dt-option-card dt-option-card--lobby ${deliveryType === "gate" ? "dt-option-card--active" : ""}`}
+                      onClick={() => setDeliveryType("gate")}
+                      aria-pressed={deliveryType === "gate"}
+                    >
+                      {deliveryType === "gate" && (
+                        <span className="dt-option-check" aria-hidden="true">
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                          >
+                            <circle cx="10" cy="10" r="10" fill="#6B8E23" />
+                            <path
+                              d="M5.5 10.5L8.3 13.3L14.5 6.5"
+                              stroke="#fff"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </span>
+                      )}
+                      <div className="dt-option-icon dt-option-icon--lobby">
+                        <img src={lobby} alt="Lobby pickup" />
+                      </div>
+                      <div className="dt-option-body">
+                        <span className="dt-option-title">Lobby Pickup</span>
+                      </div>
+                       <span className="dt-option-badge dt-option-badge--free mt-1">
+                          Free
+                        </span>
+                      <button
+                        type="button"
+                        className="dt-how-link"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowHowItWorksModal(true);
+                        }}
+                      >
+                        How does it work?
+                      </button>
+                    </button>
+                  )}
+
+                  {/* Door Delivery */}
+                  <button
+                    type="button"
+                    className={`dt-option-card ${deliveryType === "door" ? "dt-option-card--active" : ""}`}
+                    onClick={() => setDeliveryType("door")}
+                    aria-pressed={deliveryType === "door"}
+                  >
+                    {deliveryType === "door" && (
+                      <span className="dt-option-check" aria-hidden="true">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                        >
+                          <circle cx="10" cy="10" r="10" fill="#6B8E23" />
+                          <path
+                            d="M5.5 10.5L8.3 13.3L14.5 6.5"
+                            stroke="#fff"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                    <div className="dt-option-icon">
+                      <img src={door} alt="Door delivery" />
+                    </div>
+                    <div className="dt-option-body">
+                      <span className="dt-option-title">To your door</span>
+                    </div>
+                     <span className="dt-option-badge dt-option-badge--paid mt-1">
+                        {doorDeliveryRatePerSlot > 0
+                          ? `₹${doorDeliveryRatePerSlot} extra`
+                          : "Free"}
+                      </span>
+                  </button>
+                </div>
+
+                {/* Pickup point selector — only when lobby is chosen */}
+                {gateDeliveryAvailable &&
+                  deliveryType === "gate" &&
+                  pickupPointsList.length > 0 && (
+                    <div className="dt-pickup-section">
+                      <div className="dt-pickup-label">
+                        Select your pickup point
+                      </div>
+                      <div className="dt-pickup-grid">
+                        {pickupPointsList.map((point) => (
+                          <button
+                            key={point._id}
+                            type="button"
+                            className={`dt-pickup-card ${selectedPickupPoint?._id === point._id ? "dt-pickup-card--active" : ""}`}
+                            onClick={() => setSelectedPickupPoint(point)}
+                          >
+                            {selectedPickupPoint?._id === point._id && (
+                              <span
+                                className="dt-pickup-check"
+                                aria-hidden="true"
+                              >
+                                <svg
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                >
+                                  <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="10"
+                                    fill="#6B8E23"
+                                  />
+                                  <path
+                                    d="M5.5 10.5L8.3 13.3L14.5 6.5"
+                                    stroke="#fff"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </span>
+                            )}
+                            <div className="dt-pickup-name">{point.name}</div>
+                            <div className="dt-pickup-loc">
+                              <svg
+                                width="11"
+                                height="11"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                              </svg>
+                              {point.location}
+                            </div>
+
+                            {/* ── NEW: deliverySlots grouped by session ── */}
+                            <div className="dt-pickup-slots">
+                              {formatDeliverySlots(point.deliverySlots).map(
+                                (slotGroup) => (
+                                  <div
+                                    key={slotGroup.session}
+                                    className="dt-slot-row mt-1"
+                                  >
+                                    <span
+                                      className={sessionBadgeClass(
+                                        slotGroup.session,
+                                      )}
+                                    >
+                                      {slotGroup.session}
+                                    </span>
+                                    <div className="dt-slot-times">
+                                      {(slotGroup.timeSlots || [])
+                                        .filter((ts) => ts.isActive !== false)
+                                        .map((ts, i) => (
+                                          <span
+                                            key={i}
+                                            className="dt-slot-time-entry"
+                                          >
+                                            {ts.startTime} – {ts.endTime}
+                                          </span>
+                                        ))}
+                                    </div>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </>
+            )}
+          </div>
+
+          {/* ── Billing Details ── */}
           <div className="belling-head">
             <span className="billinf">Billing Details</span>
-            <span onClick={toggleBillingDetails}>
-              <span
-                onClick={toggleBillingDetails}
-                style={{ cursor: "pointer", display: "inline-block" }}
-              >
-                <img
-                  src="/Assets/expanddown.svg"
-                  alt="Toggle"
-                  className={`expandable-chevron ${
-                    isBillingOpen ? "open" : ""
-                  }`}
-                />
-              </span>
+            <span onClick={toggleBillingDetails} style={{ cursor: "pointer" }}>
+              <img
+                src="/Assets/expanddown.svg"
+                alt="Toggle"
+                className={`expandable-chevron ${isBillingOpen ? "open" : ""}`}
+              />
             </span>
           </div>
 
           {isBillingOpen && (
-            <div className="deliverycard">
-              <div className="maincard2 p-3">
-                <div
-                  className="billdetail  w-100 flex-wrap"
-                  style={{ gap: "20px" }}
-                >
-                  <div className="label-column">
-                    <div className="toatal-va">Total Order Value</div>
-                    {totalSavings > 0 && (
-                      <div className="toatal-va" style={{ color: "green" }}>
-                        Offer Savings
-                      </div>
-                    )}
-                    <div className="toatal-va">Tax Breakdown ({gstRate}%)</div>
-                    <div className="toatal-va">Delivery Charge</div>
-                    {Cutlery !== 0 && <div className="toatal-va">Cutlery</div>}
-                    {coupon !== 0 && (
-                      <div className="toatal-va">Coupon Discount</div>
-                    )}
-                    {selectedOption && (
-                      <div className="toatal-va">{`${selectedOption} Delivery`}</div>
-                    )}
-                    {discountWallet !== 0 && (
-                      <div className="toatal-va">Wallet Pay</div>
-                    )}
-                    <div>
-                      <b className="toatal-va">Total Payable</b>
-                    </div>
-                  </div>
-                  <div className="value-column">
-                    <div className="toatal-va">
-                      ₹ {(regularTotal - calculateTaxPrice)?.toFixed(2)}
-                    </div>
-                    {totalSavings > 0 && (
-                      <div className="toatal-va" style={{ color: "green" }}>
-                        - ₹ {totalSavings.toFixed(2)}
-                      </div>
-                    )}
-                    <div className="toatal-va">
-                      ₹ {calculateTaxPrice.toFixed(2)}
-                    </div>
-                    {/* <div className="toatal-va">
-                      ₹ {cartdata?.deliveryCharge || 0}
-                    </div> */}
-                    {/* {Cutlery !== 0 && (
-                      <div className="toatal-va">₹ {Cutlery}</div>
-                    )} */}
-                    {/* {coupon !== 0 && (
-                      <div className="toatal-va" style={{ color: "green" }}>
-                        - ₹ {coupon}
-                      </div>
-                    )} */}
+            <div className="bd-card">
+              <div className="bd-rows">
+                {/* Item total */}
+                <div className="bd-row">
+                  <span className="bd-label">Item total</span>
+                  <span className="bd-value">₹{subtotal.toFixed(2)}</span>
+                </div>
 
-                    {/* {totalDeliveryCharge !== 0 && (
-                      <div className="toatal-va">
-                        {deliverySlotCount > 1
-                          ? `Delivery (${deliverySlotCount} slots)`
-                          : selectedOption
-                            ? `${selectedOption} Delivery`
-                            : "Delivery"}
-                      </div>
-                    )} */}
-                    {/* {totalDeliveryCharge !== 0 && ( */}
-                    <div className="toatal-va">₹ {totalDeliveryCharge}</div>
-                    {/* )} */}
-                    {discountWallet !== 0 && (
-                      <div className="toatal-va" style={{ color: "green" }}>
-                        - ₹ {discountWallet?.toFixed(2)}
-                      </div>
-                    )}
-                    <div className="toatal-va">
-                      <b>₹ {totalPayable.toFixed(2)}</b>
-                    </div>
+                {/* Offer savings */}
+                {/* {totalSavings > 0 && (
+                  <div className="bd-row">
+                    <span className="bd-label">Offer savings</span>
+                    <span className="bd-value bd-value--green">
+                      − ₹{totalSavings.toFixed(2)}
+                    </span>
                   </div>
+                )} */}
+
+                {/* Delivery */}
+                {deliveryType === "door" && (
+                  <div className="bd-row">
+                    <span className="bd-label">
+                      Delivery fee
+                      <span className="bd-label-sub">
+                        × {deliverySlotCount} slot
+                        {deliverySlotCount !== 1 ? "s" : ""}
+                      </span>
+                    </span>
+
+                    <span className="bd-value">
+                      {doorDeliveryRatePerSlot > 0 ? (
+                        `+ ₹${(doorDeliveryRatePerSlot * deliverySlotCount).toFixed(2)}`
+                      ) : (
+                        <span className="bd-free-badge">FREE</span>
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {/* ── Handling Charges section ── */}
+                {(() => {
+                  const sessionOrder = ["Breakfast", "Lunch", "Dinner"];
+                  const sessionTotals = {};
+
+                  cartdata.forEach((item) => {
+                    const key =
+                      item.session?.charAt(0).toUpperCase() +
+                        item.session?.slice(1) || "Lunch";
+
+                    const itemTotal = Number(
+                      item.totalPrice ??
+                        (item.preOrderPrice ??
+                          item.price ??
+                          item.hubPrice ??
+                          0) * (item.quantity || 1),
+                    );
+
+                    sessionTotals[key] = (sessionTotals[key] || 0) + itemTotal;
+                  });
+
+                  const sessions = Object.entries(sessionTotals).sort(
+                    ([a], [b]) =>
+                      sessionOrder.indexOf(a) - sessionOrder.indexOf(b),
+                  );
+
+                  const totalHC = sessions.reduce(
+                    (sum, [, total]) =>
+                      sum + (total > 0 && total < minCartThreshold ? 20 : 0),
+                    0,
+                  );
+
+                  // Hide completely if no handling charge
+                  if (sessions.length === 0 || totalHC === 0) return null;
+
+                  return (
+                    <>
+                      <div className="bd-row bd-row--section-header">
+                        <span className="bd-label bd-label--section">
+                          Small cart fees
+                          <span className="bd-label-sub">
+                            Below min. order ₹{minCartThreshold}/session
+                          </span>
+                        </span>
+
+                        <span className="bd-value bd-value--red">
+                          {`+ ₹${totalHC.toFixed(2)}`}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {/* Cutlery */}
+                {Cutlery !== 0 && (
+                  <div className="bd-row">
+                    <span className="bd-label">Cutlery</span>
+                    <span className="bd-value">+ ₹{Cutlery}</span>
+                  </div>
+                )}
+
+                {/* Coupon */}
+                {coupon !== 0 && (
+                  <div className="bd-row">
+                    <span className="bd-label">Coupon discount</span>
+                    <span className="bd-value bd-value--green">
+                      − ₹{coupon}
+                    </span>
+                  </div>
+                )}
+
+                {/* GST */}
+                <div className="bd-row">
+                  <span className="bd-label">
+                    GST ({gstRate}%)
+                    <span className="bd-label-sub">On item total only</span>
+                  </span>
+                  <span className="bd-value">+ ₹{gstOnTotal.toFixed(2)}</span>
+                </div>
+
+                {/* Wallet */}
+                {discountWallet !== 0 && (
+                  <div className="bd-row">
+                    <span className="bd-label">Wallet credit</span>
+                    <span className="bd-value bd-value--green">
+                      − ₹{discountWallet.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                {/* To Pay */}
+                <div className="bd-row bd-row--total">
+                  <span className="bd-label bd-label--total">To pay</span>
+                  <span className="bd-value bd-value--total">
+                    ₹{totalPayable.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1493,8 +2777,8 @@ const CheckoutMultiple = () => {
                       gap: "8px",
                     }}
                   >
-                    <div className="paybutton">Place Order | </div>
-                    <p className="price-pay">{totalPayable.toFixed(2)}</p>
+                    <div className="paybutton">Pay | </div>
+                    <p className="price-pay">₹ {totalPayable.toFixed(2)}</p>
                   </div>
                 )}
               </Button>
@@ -1509,6 +2793,28 @@ const CheckoutMultiple = () => {
       <LocationModal
         show={showLocationModal}
         onClose={() => setShowLocationModal(false)}
+      />
+
+      {/* Inside the return, before the closing tags */}
+      <AddMoreModal
+        show={addMoreModal.show}
+        onClose={handleCloseAddMoreModal}
+        hubId={addMoreModal.hubId}
+        session={addMoreModal.session}
+        deliveryDate={addMoreModal.deliveryDate}
+        onItemsAdded={handleItemsAdded}
+      />
+
+      <HowItWorksModal
+        show={showHowItWorksModal}
+        onClose={() => setShowHowItWorksModal(false)}
+        pickupPoints={pickupPointsList}
+      />
+
+      <SmallCartFeeModal
+        show={showSmallCartModal}
+        onClose={() => setShowSmallCartModal(false)}
+        minCartThreshold={minCartThreshold}
       />
     </div>
   );

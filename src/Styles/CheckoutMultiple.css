@@ -8,12 +8,13 @@
   border: 2px solid var(--cummin-brown);
   border-radius: 22px;
   background: #fff8dc;
-  box-shadow:2px 2px 10px 4px rgba(0, 0, 0, 0.132);
-    /* 0 2px 10px rgba(149, 122, 47, 0.14); */
+  box-shadow: 2px 2px 10px 4px rgba(0, 0, 0, 0.132);
+  /* 0 2px 10px rgba(149, 122, 47, 0.14); */
   padding: 12px 12px 10px;
+   box-sizing: border-box; /* ← add this */
 }
 
-.cm-session-block{
+.cm-session-block {
   padding: 10px 10px;
   border-radius: 10px;
   background: var(--app-foreground);
@@ -31,7 +32,6 @@
   font-weight: 700;
   line-height: 20px;
 }
-
 .cm-session-date {
   font-weight: 500;
   color: #6b6b6b;
@@ -269,3 +269,2785 @@
     padding: 0 8px;
   }
 }
+
+/* ============================================================
+   CHECKOUT MULTIPLE — UNIFORM INTER FONT SYSTEM
+   Sections: Delivery Details · Apply & Save · Billing Details
+   Breakpoints: 768 · 576 · 480 · 340
+   ============================================================ */
+
+/* --- Google Fonts import (Inter) --- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* --- Base (≥ 769px) --- */
+
+/* Section headings: "Delivery Details", "Apply & Save", "Billing Details" */
+.delivery-details,
+.spply-s,
+.billinf {
+  font-family: "Inter", sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  line-height: 24px !important;
+  letter-spacing: -0.4px !important;
+  color: var(--Primary-Text, #2c2c2c) !important;
+}
+
+/* Billing row labels & values */
+.toatal-va {
+  font-family: "Inter", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
+  letter-spacing: -0.3px !important;
+  color: var(--Primary-Text, #2c2c2c) !important;
+}
+
+.toatal-va2 {
+  font-family: "Inter", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
+  letter-spacing: -0.3px !important;
+}
+
+/* Wallet title */
+.wallet-title {
+  font-family: "Inter", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 20px !important;
+  letter-spacing: -0.3px !important;
+}
+
+/* Wallet available amount */
+.wallet-amount {
+  font-family: "Inter", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 18px !important;
+  letter-spacing: -0.3px !important;
+}
+
+/* Wallet sub-text */
+.wallet-subtext {
+  font-family: "Inter", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  letter-spacing: -0.2px !important;
+}
+
+/* Delivery address name */
+.select-location-text2 {
+  font-family: "Inter", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 20px !important;
+}
+
+/* Delivery address sub-line */
+.delivery-details-container .small {
+  font-family: "Inter", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+}
+
+/* User details (name | mobile) */
+.user-detailss {
+  font-family: "Inter", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  letter-spacing: -0.2px !important;
+}
+
+/* Place Order button text */
+.paybutton {
+  font-family: "Inter", sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 22px !important;
+  letter-spacing: -0.4px !important;
+}
+
+/* Price badge next to Place Order */
+.price-pay {
+  font-family: "Inter", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  line-height: 20px !important;
+  letter-spacing: -0.3px !important;
+}
+
+/* Checkout page title */
+.checkout-title {
+  font-family: "Inter", sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  line-height: 26px !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* --- 768px --- */
+@media (max-width: 768px) {
+  .delivery-details,
+  .spply-s,
+  .billinf {
+    font-size: 17px !important;
+    line-height: 23px !important;
+  }
+
+  .toatal-va {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  .wallet-title {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  .wallet-amount {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .wallet-subtext {
+    font-size: 12px !important;
+    line-height: 16px !important;
+  }
+
+  .paybutton {
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  .price-pay {
+    font-size: 15px !important;
+    line-height: 20px !important;
+  }
+
+  .checkout-title {
+    font-size: 19px !important;
+    line-height: 25px !important;
+  }
+}
+
+/* --- 576px --- */
+@media (max-width: 576px) {
+  .delivery-details,
+  .spply-s,
+  .billinf {
+    font-size: 20px !important;
+    line-height: 22px !important;
+    letter-spacing: -0.3px !important;
+  }
+
+  .toatal-va {
+    font-size: 15px !important;
+    line-height: 19px !important;
+  }
+
+  .wallet-title {
+    font-size: 13px !important;
+    line-height: 19px !important;
+  }
+
+  .wallet-amount {
+    font-size: 12px !important;
+    line-height: 17px !important;
+  }
+
+  .wallet-subtext {
+    font-size: 11px !important;
+    line-height: 15px !important;
+  }
+
+  .select-location-text2 {
+    font-size: 13px !important;
+    line-height: 19px !important;
+  }
+
+  .user-detailss {
+    font-size: 11px !important;
+    line-height: 15px !important;
+  }
+
+  .paybutton {
+    font-size: 15px !important;
+    line-height: 21px !important;
+  }
+
+  .price-pay {
+    font-size: 14px !important;
+    line-height: 19px !important;
+  }
+
+  .checkout-title {
+    font-size: 28px !important;
+    line-height: 24px !important;
+  }
+}
+
+/* --- 480px --- */
+@media (max-width: 480px) {
+  .delivery-details,
+  .spply-s,
+  .billinf {
+    font-size: 15px !important;
+    line-height: 21px !important;
+    letter-spacing: -0.3px !important;
+  }
+
+  .toatal-va {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .wallet-title {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .wallet-amount {
+    font-size: 12px !important;
+    line-height: 16px !important;
+  }
+
+  .wallet-subtext {
+    font-size: 11px !important;
+    line-height: 15px !important;
+  }
+
+  .select-location-text2 {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .user-detailss {
+    font-size: 11px !important;
+    line-height: 15px !important;
+  }
+
+  .paybutton {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  .price-pay {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .checkout-title {
+    font-size: 28px !important;
+    line-height: 23px !important;
+    margin-top:6px;
+  }
+}
+
+/* --- 340px --- */
+@media (max-width: 340px) {
+  .delivery-details,
+  .spply-s,
+  .billinf {
+    font-size: 14px !important;
+    line-height: 20px !important;
+    letter-spacing: -0.2px !important;
+    margin: 6px 12px !important;
+  }
+
+  .toatal-va {
+    font-size: 12px !important;
+    line-height: 17px !important;
+  }
+
+  .wallet-title {
+    font-size: 12px !important;
+    line-height: 17px !important;
+  }
+
+  .wallet-amount {
+    font-size: 11px !important;
+    line-height: 15px !important;
+  }
+
+  .wallet-subtext {
+    font-size: 10px !important;
+    line-height: 14px !important;
+  }
+
+  .select-location-text2 {
+    font-size: 12px !important;
+    line-height: 17px !important;
+  }
+
+  .user-detailss {
+    font-size: 10px !important;
+    line-height: 14px !important;
+  }
+
+  .paybutton {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .price-pay {
+    font-size: 12px !important;
+    line-height: 16px !important;
+    padding: 6px 10px !important;
+  }
+
+  .checkout-title {
+    font-size: 24px !important;
+    line-height: 22px !important;
+    margin-top:6px;
+  }
+}
+
+/* ============================================================
+   DELIVERY TYPE SELECTOR  (Gate / Door)
+   ============================================================ */
+
+.dt-selector-wrapper {
+  margin: 16px 0 4px;
+}
+
+.dt-selector-row {
+  display: flex;
+  gap: 12px;
+}
+
+/* Card base */
+.dt-option-card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid #e5e0d6;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    box-shadow 0.18s;
+  text-align: left;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.dt-option-card:focus-visible {
+  outline: 2px solid #6b8e23;
+  outline-offset: 2px;
+}
+
+/* Active / selected state */
+.dt-option-card--active {
+  border-color: #6b8e23;
+  background: #f4f9ec;
+  box-shadow: 0 2px 8px rgba(107, 142, 35, 0.15);
+}
+
+/* Icon */
+.dt-option-icon {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  /* background: #f5f0e8; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dt-option-card--active .dt-option-icon {
+  background: #e8f0d4;
+}
+
+.dt-option-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  padding :6px;
+}
+
+/* Text body */
+.dt-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dt-option-title {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 17px;
+  color: #2c2c2c;
+  white-space: nowrap;
+}
+
+/* Badges */
+.dt-option-badge {
+  display: inline-block;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.dt-option-badge--free {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.dt-option-badge--paid {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffcc80;
+}
+
+/* Check icon (top-right) */
+.dt-option-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  line-height: 0;
+}
+
+/* Responsive */
+@media (max-width: 360px) {
+  .dt-option-card {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+
+  .dt-option-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .dt-option-icon img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dt-option-title {
+    font-size: 12px;
+  }
+
+  .dt-option-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+
+
+
+
+/* Add this to your existing CSS file - it extends your original styles */
+
+/* ============================================================
+   INLINE HANDLING CHARGE MESSAGE (per session)
+   Matches your yellow-green aesthetic
+   ============================================================ */
+
+.cm-handling-message {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #fafafa;
+  border-radius: 10px;
+  border: 1px solid #d6a505;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b87c00;
+}
+
+.cm-handling-message svg {
+  flex-shrink: 0;
+}
+
+.cm-handling-message span {
+  font-size: 11px;
+  font-weight: 500;
+  color: #b87c00;
+}
+
+/* Update session footer to accommodate message */
+.cm-session-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* When handling message is present, adjust footer layout */
+.cm-session-footer:has(.cm-handling-message) {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cm-session-footer:has(.cm-handling-message) .cm-add-more-link,
+.cm-session-footer:has(.cm-handling-message) .cm-total-chip {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.cm-session-footer:has(.cm-handling-message) .cm-handling-message {
+  order: 3;
+}
+
+/* ============================================================
+   BILLING DETAILS - PER SESSION HANDLING CHARGE LINE
+   Matches your existing billing style
+   ============================================================ */
+
+/* Handling charge row in billing - matches delivery charge style */
+.billdetail .toatal-va .handling-per-session {
+  font-size: 10px;
+  font-weight: 400;
+  color: #8a7a5a;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Make handling charge row stand out slightly */
+.label-column .toatal-va[data-handling="true"] {
+  color: #c0392b;
+}
+
+.value-column .toatal-va[data-handling="true"] {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* ============================================================
+   DELIVERY TYPE SELECTOR - Keep your original design
+   (Already defined in your CSS, just ensuring consistency)
+   ============================================================ */
+
+.dt-selector-wrapper {
+  margin: 16px 0 4px;
+}
+
+.dt-selector-row {
+  display: flex;
+  gap: 12px;
+}
+
+.dt-option-card {
+  flex: 1;
+  /* background: #fff8dc; */
+  border: 2px solid #e5e0d6;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+}
+
+.dt-option-card--active {
+  border-color: #6b8e23;
+  background: #fff3c9;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.dt-option-icon img {
+  width: 28px;
+  height: 28px;
+  opacity: 0.85;
+}
+
+.dt-option-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #2c261f;
+}
+
+.dt-option-badge {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.dt-option-badge--free {
+  color: #2e7d32;
+}
+
+.dt-option-badge--paid {
+  color: #e67e22;
+}
+
+.dt-option-check {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+}
+
+/* ============================================================
+   WALLET SECTION - Match your theme
+   ============================================================ */
+
+.promo-wallet-container {
+  margin-top: 12px;
+}
+
+.wallet-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fffdf5;
+  border: 1px solid #e0dbc8;
+  border-radius: 16px;
+  padding: 12px 16px;
+}
+
+.wallet-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #d6a505;
+}
+
+.wallet-header {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.wallet-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #2c261f;
+}
+
+.wallet-amount {
+  font-size: 11px;
+  color: #6b8e23;
+  font-weight: 500;
+}
+
+.wallet-subtext {
+  font-size: 10px;
+  color: #8a7a5a;
+  margin-top: 3px;
+}
+
+/* ============================================================
+   BILLING HEADER
+   ============================================================ */
+
+.belling-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 8px 0;
+  margin-top: 12px;
+  border-top: 1px solid #e5e0d6;
+}
+
+.billinf {
+  font-weight: 700;
+  font-size: 16px;
+  color: #2c261f;
+}
+
+.expandable-chevron {
+  transition: transform 0.2s;
+  width: 18px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.expandable-chevron.open {
+  transform: rotate(180deg);
+}
+
+
+
+/* ============================================================
+   LOADING OVERLAY
+   ============================================================ */
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 248, 220, 0.94);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  gap: 16px;
+}
+
+/* ============================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .cm-handling-message {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+  
+  .cm-handling-message span {
+    font-size: 10px;
+  }
+  
+  .dt-option-card {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+  
+  .dt-option-icon img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .dt-option-title {
+    font-size: 12px;
+  }
+  
+  .wallet-section {
+    padding: 10px 14px;
+  }
+  
+  .belling-head {
+    padding: 12px 0 6px 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .cm-handling-message {
+    padding: 6px 8px;
+  }
+  
+  .dt-option-card {
+    padding: 8px 8px;
+  }
+  
+  .dt-option-icon img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+
+/* ============================================================
+   HANDLING CHARGE BANNER — matches reference image 1
+   ============================================================ */
+
+.hc-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 16px 10px 8px 8px;
+  background: #fffde8;
+  border: 1px solid #d6c84a;
+  border-radius: 12px;
+}
+
+.hc-banner-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hc-banner-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.hc-banner-text {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+
+.hc-progress-track {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hc-progress-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.hc-progress-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: #e5e0d0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hc-progress-bar-fill {
+  height: 100%;
+  background: #6b8e23;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  min-width: 4px;
+}
+
+.hc-shop-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  background: #4a7c10;
+  color: #fff !important;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none !important;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.hc-shop-btn:hover {
+  background: #3d6a0d;
+  color: #fff !important;
+}
+
+/* Remove old conflicting rules */
+.handling-charge-ui,
+.handling-text,
+.handling-range-line,
+.handling-start,
+.handling-end,
+.handling-line,
+.handling-shop-more {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .hc-banner {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hc-banner {
+    gap: 8px;
+    padding: 7px 8px 7px 7px;
+  }
+
+  .hc-banner-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .hc-banner-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .hc-banner-text {
+    font-size: 11px;
+  }
+
+  .hc-shop-btn {
+    padding: 7px 11px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+}
+
+
+/* ============================================================
+   BILLING DETAILS — row-per-item layout (no misalignment)
+   ============================================================ */
+
+.bd-card {
+  background: #fff;
+  border: 1px solid #e5e0d6;
+  border-radius: 16px;
+  padding: 4px 0;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.bd-rows {
+  width: 100%;
+}
+
+.bd-row {
+  display: flex;
+  align-items: flex-start;      /* both sides start at top */
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid #f0ece4;
+}
+
+.bd-row:last-child {
+  border-bottom: none;
+}
+
+/* Separator before total row */
+.bd-row--total {
+  border-top: 1.5px dashed #d6cfc0;
+  border-bottom: none;
+  margin-top: 2px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+/* Label side */
+.bd-label {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #4a4a4a;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bd-label-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9a9080;
+  line-height: 1.3;
+}
+
+.bd-label--total {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e1e1e;
+}
+
+/* Value side */
+.bd-value {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e1e1e;
+  white-space: nowrap;   /* ← key fix: never wraps, never shifts up */
+  flex-shrink: 0;
+  text-align: right;
+  padding-top: 1px;      /* optical alignment with first line of label */
+}
+
+.bd-value--green { color: #3d7a1a; }
+.bd-value--red   { color: #c0392b; }
+
+.bd-value--total {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e1e1e;
+}
+
+.bd-free-badge {
+  display: inline-block;
+  background: #e8f5d0;
+  color: #3d7a1a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid #b5d980;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .bd-row {
+    padding: 10px 14px;
+  }
+
+  .bd-label {
+    font-size: 12.5px;
+  }
+
+  .bd-value {
+    font-size: 12.5px;
+  }
+
+  .bd-label--total {
+    font-size: 14px;
+  }
+
+  .bd-value--total {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .bd-row {
+    padding: 9px 12px;
+    gap: 8px;
+  }
+
+  .bd-label {
+    font-size: 12px;
+  }
+
+  .bd-value {
+    font-size: 12px;
+  }
+}
+
+
+
+/* ============================================================
+   DELIVERY DETAILS CARD
+   ============================================================ */
+
+.dd-card {
+   border: 0.4px solid var(--copper-accents,#B87333);
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  background: #fff;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+.dd-card-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+/* Left icon column */
+.dd-icon-col {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.dd-location-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eef5e0;
+  border: 1.5px solid #c5d98a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dd-location-svg {
+  width: 18px;
+  height: 18px;
+  filter: invert(40%) sepia(88%) saturate(390%) hue-rotate(36deg) brightness(94%) contrast(89%);
+}
+
+/* Right content column */
+.dd-content-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Name + badge row */
+.dd-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dd-place-name {
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e1e1e;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.dd-type-badge {
+  flex-shrink: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #4a7c10;
+  background: #eef5e0;
+  border: 1px solid #c5d98a;
+  border-radius: 20px;
+  padding: 2px 8px;
+  line-height: 1.4;
+  text-transform: capitalize;
+}
+
+/* Full address */
+.dd-full-address {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b6b6b;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Name + phone row */
+.dd-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.dd-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+.dd-meta-item svg {
+  color: #888;
+  flex-shrink: 0;
+}
+
+.dd-meta-dot {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* School info row */
+.dd-school-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.dd-school-row svg {
+  color: #6b8e23;
+  flex-shrink: 0;
+}
+
+.dd-school-row span {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+.dd-school-chip {
+  background: #eef5e0;
+  color: #3d6a10 !important;
+  border: 1px solid #c5d98a;
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .dd-card-inner {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .dd-location-dot {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dd-location-svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dd-place-name {
+    font-size: 14px;
+    max-width: 160px;
+  }
+
+  .dd-full-address {
+    font-size: 11.5px;
+  }
+
+  .dd-meta-item {
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 360px) {
+  .dd-card-inner {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .dd-place-name {
+    font-size: 13px;
+    max-width: 140px;
+  }
+}
+
+
+
+/* ============================================================
+   CART SHELL
+   ============================================================ */
+
+.cm-cart-shell {
+  width: 100%;
+  margin: 4px 0 16px;
+}
+
+.cm-cart-panel {
+  width: 100%;
+  background: #fffef5;
+  border: 1.5px solid #ddd5a8;
+  border-radius: 20px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   SESSION BLOCK
+   ============================================================ */
+
+.cm-session-block {
+  background: #fff;
+  border: 1px solid #ece8da;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.cm-session-block:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Header --- */
+.cm-session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid #f0ece0;
+}
+
+.cm-session-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cm-session-meal-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.cm-session-title {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e1e1e;
+  line-height: 1.2;
+}
+
+.cm-session-date {
+  display: block;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #9a8f75;
+  margin-top: 1px;
+  line-height: 1.2;
+}
+
+.cm-session-item-count {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b8e23;
+  background: #eef5e0;
+  border: 1px solid #c8dc8a;
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+/* --- Items --- */
+.cm-session-items {
+  padding: 4px 14px;
+}
+
+.cm-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f2ea;
+}
+
+.cm-item-row:last-child {
+  border-bottom: none;
+}
+
+.cm-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cm-item-indicator {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.cm-item-name {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c2c2c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm-item-side {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Qty pill */
+.cm-qty-pill {
+  display: flex;
+  align-items: center;
+  background: #efbc00;
+  border: 1px solid #d6a800;
+  border-radius: 999px;
+  width: 88px;
+  height: 28px;
+  overflow: hidden;
+}
+
+.cm-qty-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #1e1e1e;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.cm-qty-btn:active {
+  background: rgba(0,0,0,0.08);
+}
+
+.cm-qty-value {
+  flex: 1;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e1e1e;
+}
+
+/* Price stack */
+.cm-price-stack {
+  min-width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.cm-price-old {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #b0a890;
+  text-decoration: line-through;
+  line-height: 1.2;
+}
+
+.cm-price-current {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e1e1e;
+  line-height: 1.3;
+}
+
+/* --- Footer: Add more + Total --- */
+.cm-session-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 12px;
+  border-top: 1px solid #f0ece0;
+}
+
+.cm-add-more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b8e23;
+  text-decoration: none;
+  border: 1.5px solid #c8dc8a;
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: #f4faeb;
+  transition: background 0.15s;
+}
+
+.cm-add-more-link:hover {
+  background: #eaf3d6;
+  color: #5a7a1a;
+}
+
+.cm-add-more-link svg {
+  flex-shrink: 0;
+  color: #6b8e23;
+}
+
+.cm-total-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cm-total-label {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7a7060;
+}
+
+.cm-total-old {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #b0a890;
+  text-decoration: line-through;
+}
+
+.cm-total-current {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e1e1e;
+}
+
+/* ============================================================
+   HANDLING CHARGE BANNER
+   ============================================================ */
+
+.hc-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px 12px;
+  padding: 10px 12px;
+  background: #fffbe8;
+  border: 1px solid #e8d96a;
+  border-radius: 12px;
+}
+
+.hc-banner-img {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.hc-banner-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.hc-banner-text {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3a3010;
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+
+.hc-banner-text strong {
+  font-weight: 700;
+  color: #1e1e1e;
+}
+
+.hc-progress-track {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hc-progress-label {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9a8f6a;
+  flex-shrink: 0;
+}
+
+.hc-progress-bar-wrap {
+  flex: 1;
+  height: 5px;
+  background: #e8e0c0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hc-progress-bar-fill {
+  height: 100%;
+  background: #6b8e23;
+  border-radius: 999px;
+  min-width: 6px;
+  transition: width 0.4s ease;
+}
+
+.hc-shop-btn {
+  flex-shrink: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #5a7a1a;
+  border-radius: 8px;
+  padding: 7px 12px;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.hc-shop-btn:hover {
+  background: #4a6814;
+  color: #fff;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .cm-cart-panel { padding: 8px; border-radius: 18px; }
+  .cm-session-block { border-radius: 12px; }
+  .cm-session-header { padding: 10px 12px 8px; }
+  .cm-session-items { padding: 2px 12px; }
+  .cm-session-footer { padding: 8px 12px 10px; }
+  .cm-session-title { font-size: 14px; }
+  .cm-qty-pill { width: 82px; height: 26px; }
+  .cm-qty-btn { width: 26px; height: 26px; font-size: 16px; }
+  .cm-price-current { font-size: 14px; }
+  .cm-total-current { font-size: 15px; }
+  .hc-banner { margin: 0 8px 10px; padding: 9px 10px; }
+  .hc-banner-img { width: 32px; height: 32px; }
+  .hc-banner-text { font-size: 11px; }
+  .hc-shop-btn { font-size: 11px; padding: 6px 10px; }
+}
+
+@media (max-width: 360px) {
+  .cm-session-header-left { gap: 7px; }
+  .cm-session-meal-icon { font-size: 17px; }
+  .cm-item-side { gap: 8px; }
+  .cm-qty-pill { width: 78px; }
+  .cm-add-more-link { font-size: 12px; padding: 4px 10px; }
+}
+
+
+.cm-session-meal-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Per-session tints */
+.cm-session-block--breakfast .cm-session-meal-icon {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffcc80;
+}
+
+.cm-session-block--lunch .cm-session-meal-icon {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.cm-session-block--dinner .cm-session-meal-icon {
+  background: #ede7f6;
+  color: #4527a0;
+  border: 1px solid #ce93d8;
+}
+/* ============================================================
+   ADD MORE MODAL  (amm-*)
+   Reuses cm-qty-pill / cm-qty-btn / cm-qty-value from checkout
+   ============================================================ */
+
+.amm-modal .modal-content {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid #ddd5a8;
+}
+
+/* ── Header ── */
+.amm-header {
+  background: #fffef5;
+  border-bottom: 1px solid #ece8da;
+  padding: 14px 18px 12px;
+}
+
+.amm-header .btn-close {
+  margin-left: auto;
+  margin-top: -4px;
+}
+
+.amm-header-inner {
+  flex: 1;
+}
+
+.amm-header-session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.amm-session-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.amm-session-label {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e1e1e;
+  line-height: 1.2;
+}
+
+.amm-session-date {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #9a8f75;
+  margin-top: 1px;
+}
+
+/* ── Body ── */
+.amm-body {
+  padding: 12px 14px;
+  background: #fafaf6;
+}
+
+.amm-cutoff-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff3f3;
+  border: 1px solid #f5c6c6;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #c0392b;
+  margin-bottom: 12px;
+}
+
+.amm-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 0;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: #9a8f75;
+}
+
+.amm-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: #9a8f75;
+}
+
+/* ── Item list ── */
+.amm-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.amm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #ece8da;
+  border-radius: 14px;
+  padding: 10px 12px;
+  transition: box-shadow 0.15s;
+}
+
+.amm-item:hover {
+  box-shadow: 0 2px 8px rgba(107, 142, 35, 0.1);
+}
+
+.amm-item--unavail {
+  opacity: 0.55;
+}
+
+.amm-item-img {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f0ece0;
+}
+
+.amm-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.amm-item-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #ece8da;
+}
+
+.amm-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.amm-item-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.amm-veg-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.amm-item-name {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+
+.amm-offer-badge {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  background: #fff3cd;
+  color: #8a6200;
+  border: 1px solid #ffd966;
+  border-radius: 20px;
+  padding: 1px 7px;
+  flex-shrink: 0;
+}
+
+.amm-item-price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amm-price-old {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #b0a890;
+  text-decoration: line-through;
+}
+
+.amm-price-current {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e1e1e;
+}
+
+.amm-soldout-tag {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  background: #fdecea;
+  color: #c0392b;
+  border: 1px solid #f5c6c6;
+  border-radius: 20px;
+  padding: 1px 7px;
+}
+
+/* ── Item action ── */
+.amm-item-action {
+  flex-shrink: 0;
+}
+
+.amm-unavail-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #b0a890;
+}
+
+/* "Add" pill — shown when qty is 0 */
+.amm-add-btn {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a7c10;
+  background: #f4faeb;
+  border: 1.5px solid #c8dc8a;
+  border-radius: 999px;
+  padding: 4px 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.amm-add-btn:hover {
+  background: #eaf3d6;
+}
+
+/* Qty pill — reuse checkout styles, just size-match */
+.amm-qty-pill {
+  width: 90px !important;
+  height: 30px !important;
+}
+
+/* ── Footer ── */
+.amm-footer {
+  background: #fff;
+  border-top: 1px solid #ece8da;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.amm-footer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.amm-footer-count {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #9a8f75;
+}
+
+.amm-footer-total {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e1e1e;
+}
+
+.amm-confirm-btn {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: #6b8e23;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.amm-confirm-btn:hover:not(:disabled) {
+  background: #5a7a1a;
+}
+
+.amm-confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .amm-item { padding: 9px 10px; gap: 8px; }
+  .amm-item-img { width: 46px; height: 46px; }
+  .amm-item-name { font-size: 12px; max-width: 130px; }
+  .amm-qty-pill { width: 84px !important; }
+  .amm-add-btn { padding: 4px 14px; font-size: 12px; }
+  .amm-footer { padding: 10px 14px; }
+  .amm-footer-total { font-size: 16px; }
+  .amm-confirm-btn { padding: 9px 18px; font-size: 13px; }
+}
+
+.amm-in-cart-badge {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  background: #eef5e0;
+  color: #4a7c10;
+  border: 1px solid #c8dc8a;
+  border-radius: 20px;
+  padding: 1px 7px;
+  flex-shrink: 0;
+}
+
+
+
+
+
+
+/* ── Section header row (Handling charges) ── */
+.bd-row--section-header {
+  background: #fafaf6;
+  border-top: 1px solid #ece8da;
+  margin-top: 2px;
+}
+
+.bd-label--section {
+  font-size: 13px;
+  font-weight: 700 !important;
+  color: #1e1e1e;
+}
+
+/* ── Per-session handling rows ── */
+.bd-row--session {
+  padding: 8px 16px 8px 20px;
+  background: #fdfcf8;
+  border-bottom: 1px dashed #ece8da;
+}
+
+.bd-row--session:last-of-type {
+  border-bottom: none;
+}
+
+.bd-label--session {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.bd-session-emoji {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.bd-session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bd-session-name {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2c2c2c;
+  line-height: 1.3;
+}
+
+.bd-session-sub {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #9a8f75;
+  line-height: 1.3;
+}
+
+.bd-session-charge {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* Saved pill (green check + text) */
+.bd-saved-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eef5e0;
+  color: #3d7a1a;
+  border: 1px solid #c8dc8a;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bd-saved-pill svg {
+  color: #3d7a1a;
+  flex-shrink: 0;
+}
+
+/* ── Existing overrides (keep these) ── */
+.bd-value--green { color: #3d7a1a; }
+.bd-value--red   { color: #c0392b; }
+
+.bd-free-badge {
+  display: inline-block;
+  background: #e8f5d0;
+  color: #3d7a1a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid #b5d980;
+}
+
+/* ── Total row ── */
+.bd-row--total {
+  border-top: 1.5px dashed #d6cfc0;
+  border-bottom: none;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  background: #fffef9;
+}
+
+.bd-label--total {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #1e1e1e !important;
+}
+
+.bd-value--total {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #1e1e1e !important;
+}
+
+@media (max-width: 480px) {
+  .bd-row--session { padding: 7px 14px 7px 16px; }
+  .bd-session-emoji { font-size: 16px; }
+  .bd-session-name { font-size: 11.5px; }
+  .bd-session-sub { font-size: 10.5px; }
+  .bd-saved-pill { font-size: 10px; padding: 2px 7px; }
+}
+
+
+/* ── Delivery type cards (Lobby / Door) ── */
+.dt-option-card {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 14px 14px 12px;
+  border: 1.5px solid #e5e0d6;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  transition: border-color 0.18s, background 0.18s;
+  gap: 0;
+}
+.dt-option-card--active {
+  border-color: #6b8e23;
+  background: #f0f7e6;
+}
+.dt-option-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eef5e0;
+  border: 1px solid #c8dc8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.dt-option-card:not(.dt-option-card--lobby):not(.dt-option-card--active) .dt-option-icon {
+  background: #f5f5f5;
+  border-color: #e0dbd0;
+}
+.dt-option-icon img { width: 90px; height: 90px; object-fit: contain; }
+.dt-option-body { display: flex; flex-direction: column; gap: 3px; }
+.dt-option-title { font-size: 14px; font-weight: 700; color: #1e1e1e; line-height: 1.2; }
+.dt-option-badge { font-size: 11px; font-weight: 600; display: inline-block; }
+.dt-option-badge--free { color: #3d7a1a; }
+.dt-option-badge--paid { color: #c05000; }
+.dt-option-check { position: absolute; top: 10px; right: 10px; line-height: 0; }
+.dt-how-link {
+  font-size: 11px;
+  color: #888;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ── Pickup point grid ── */
+.dt-pickup-section { margin-top: 14px; }
+.dt-pickup-label { font-size: 12px; color: #2c2c2c; font-weight: 500; margin-bottom: 8px; margin: 6px 12px ; }
+.dt-pickup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dt-pickup-card {
+  position: relative;
+  border: 1.5px solid #e5e0d6;
+  border-radius: 12px;
+  padding: 12px 12px 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  transition: border-color 0.18s, background 0.18s;
+}
+.dt-pickup-card--active { border-color: #6b8e23; background: #f0f7e6; }
+.dt-pickup-check { position: absolute; top: 8px; right: 8px; line-height: 0; }
+.dt-pickup-name { font-size: 14px; font-weight: 700; color: #6b6b6b; margin-bottom: 4px; }
+.dt-pickup-loc {
+  font-size: 11px; color: #666; display: flex; align-items: center;
+  gap: 3px; margin-bottom: 2px;
+}
+.dt-pickup-time { font-size: 11px; color: #9a8f75; }
+
+/* ── How it works modal ── */
+.hiw-modal .modal-content { border-radius: 20px; overflow: hidden; border: 1.5px solid #ddd5a8; }
+.hiw-header { background: #fafafa; border-bottom: 1px solid #ece8da; padding: 20px 20px 14px; flex-direction: column; align-items: flex-start; }
+.hiw-badge {
+  font-size: 11px; font-weight: 700; color: #3d7a1a; background: #eef5e0;
+  border: 1px solid #c8dc8a; border-radius: 20px; padding: 3px 10px;
+  display: inline-block; margin-bottom: 8px;
+}
+.hiw-title { font-size: 20px !important; font-weight: 700 !important; color: #1e1e1e; line-height: 1.3; }
+.hiw-subtitle { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; margin-bottom: 0; }
+.hiw-body { padding: 0; }
+.hiw-step {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 20px; border-bottom: 1px solid #f0ece0;
+}
+.hiw-step-icon {
+  width: 36px; height: 36px; border-radius: 50%; background: #eef5e0;
+  border: 1px solid #c8dc8a; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.hiw-step-title { font-size: 14px; font-weight: 700; color: #1e1e1e; }
+.hiw-step-sub { font-size: 12px; color: #888; margin-top: 2px; line-height: 1.4; }
+.hiw-wa-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid #6b8e23; border-radius: 20px; padding: 3px 10px;
+  font-size: 12px; font-weight: 500; color: #6b8e23; margin-top: 6px;
+}
+.hiw-footer { padding: 14px 20px; background: #fff; border-top: 1px solid #f0ece0; }
+.hiw-got-it-btn {
+  width: 100%; background: #6b8e23 !important; color: #fff !important;
+  border: none !important; border-radius: 14px !important; padding: 14px !important;
+  font-size: 15px; font-weight: 700;
+}
+
+@media (max-width: 380px) {
+  .dt-pickup-name { font-size: 13px; }
+  .dt-pickup-loc, .dt-pickup-time { font-size: 10px; }
+  .dt-option-title { font-size: 13px; }
+}
+
+
+.dt-option-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+}
+
+.dt-option-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e1e1e;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.dt-option-badge {
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+
+/* ── Pickup point: delivery slots by session ── */
+.dt-pickup-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+.dt-slot-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.dt-slot-session {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  /* background: #eef5e0; */
+  color: #6b6b6b;
+  /* border: 1px solid #c8dc8a; */
+  border-radius: 20px;
+  /* padding: 2px 7px; */
+  flex-shrink: 0;
+  margin-top: 1px;
+  line-height: 1.4;
+}
+
+.dt-slot-session--breakfast {
+  /* background: #fff3e0; */
+  color: #6b6b6b;
+  /* border-color: #ffcc80; */
+}
+
+.dt-slot-session--dinner {
+  /* background: #ede7f6; */
+  color: #6b6b6b;
+  /* border-color: #ce93d8; */
+}
+
+.dt-slot-times {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dt-slot-time-entry {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  color: #6b6b6b;
+  line-height: 1.4;
+}
+
+/* HiW modal slot group */
+.hiw-slot-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 380px) {
+  .dt-slot-session { font-size: 9px;  }
+  .dt-slot-time-entry { font-size: 10px; }
+}
+
+
+/* ── Pickup card: contact row ── */
+.dt-pickup-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #ddd5a8;
+}
+
+.dt-contact-number {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4a4a4a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dt-contact-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.dt-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dt-contact-btn:active { transform: scale(0.92); }
+
+.dt-contact-btn--call {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.dt-contact-btn--wa {
+  background: #e8f5e9;
+  color: #128C7E;
+  border: 1px solid #a5d6a7;
+}
+
+.dt-no-contact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #ddd5a8;
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  color: #b0a890;
+}
+
+/* ── HiW modal: contact chips ── */
+.hiw-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.hiw-contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 5px 12px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hiw-contact-chip:active { opacity: 0.75; }
+
+.hiw-contact-chip--call {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.hiw-contact-chip--wa {
+  background: #e8f5e9;
+  color: #128C7E;
+  border: 1px solid #a5d6a7;
+}
+
+@media (max-width: 380px) {
+  .dt-contact-btn { width: 26px; height: 26px; }
+  .dt-contact-number { font-size: 10px; }
+  .hiw-contact-chip { font-size: 11px; padding: 4px 10px; }
+}
+
+
+/* ── Small cart fee banner (inside session card footer) ── */
+.scf-banner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px 14px 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scf-banner-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.scf-fee-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #b87c00;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-style: dotted;
+}
+
+.scf-sub-line {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  color: #9a8a6a;
+  font-weight: 400;
+  text-align: right;
+}
+
+.scf-chevron {
+  color: #b87c00;
+  flex-shrink: 0;
+}
+
+/* ── Small cart fee modal ── */
+.scf-modal .modal-content {
+  border-radius: 20px 20px 0 0;
+  border: none;
+  overflow: hidden;
+}
+
+.scf-modal .modal-dialog {
+  margin: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 100%;
+}
+
+.scf-sheet-handle {
+  /* width: 36px;
+  height: 4px; */
+  background: #ddd;
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+.scf-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px 14px;
+}
+
+.scf-sheet-icon {
+  /* width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #fff8e6; */
+  /* border: 1px solid #f0d88a; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.scf-sheet-title {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.scf-sheet-body {
+  padding: 0 22px 20px !important;
+}
+
+.scf-sheet-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.scf-sheet-table {
+  background: #f7f5f0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #ece8da;
+}
+
+.scf-sheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  border-bottom: 1px solid #ece8da;
+  font-size: 13px;
+}
+
+.scf-row-label {
+  font-family: "Inter", sans-serif;
+  color: #666;
+  font-weight: 400;
+}
+
+.scf-row-val {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: right;
+}
+
+.scf-row-val--em {
+  color: #2c4a10;
+}
+
+.scf-sheet-footer {
+  padding: 0 22px 32px !important;
+  border: none !important;
+  background: #fff;
+}
+
+.scf-got-it-btn {
+  width: 100%;
+  background: #6b8e23;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scf-got-it-btn:hover {
+  background: #243d0d;
+}
+
+
+/* ── Small cart fee inline row ── */
+.scf-inline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  border-bottom: 1px dashed #e8d96a;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scf-inline-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scf-inline-fee-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b87c00;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  pointer-events: none; /* parent div handles click */
+}
+
+.scf-inline-fee-btn svg {
+  color: #b87c00;
+  flex-shrink: 0;
+}
+
+.scf-inline-sub {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  color: #9a8a6a;
+  font-weight: 400;
+  padding-left: 2px;
+}
+
+.scf-inline-amount {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #b87c00;
+  flex-shrink: 0;
+}
+
+/* ── Footer: Add more row — total shows price on right with sub-text below ── */
+.cm-session-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 12px;
+  border-top: none; /* fee row above already has border */
+}
+
+.cm-total-chip {
+  display: flex;
+  flex-direction: column;   /* stack: price on top, sub-text below */
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.cm-total-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.cm-total-label {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7a7060;
+}
+
+.cm-total-old {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #b0a890;
+  text-decoration: line-through;
+}
+
+.cm-total-current {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e1e1e;
+}
+
+.cm-total-sub {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  color: #9a8a6a;
+  font-weight: 400;
+}
+
+
+.cm-total-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-width: unset;
+  height: unset;
+}
+
+.cm-total-current {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e1e1e;
+  line-height: 1.2;
+}
+
+.cm-total-sub {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  color: #9a8a6a;
+  font-weight: 400;
+  text-align: right;
+  line-height: 1.3;
+}
+
+/* Remove old label and old styles */
+.cm-total-label { display: none; }
+.cm-total-old { display: none; }
+.cm-total-price-row { display: contents; }

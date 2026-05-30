@@ -1,200 +1,148 @@
-import { useState , useEffect} from "react";
-import { Carousel } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-// Icons as inline SVGs
-const HomeCookedIcon = () => (
-  <svg
-    width="34"
-    height="36"
-    viewBox="0 0 34 36"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M28 12H6C4.89543 12 4 12.8954 4 14V30C4 31.1046 4.89543 32 6 32H28C29.1046 32 30 31.1046 30 30V14C30 12.8954 29.1046 12 28 12Z"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="#54811F"
-    />
-    <path
-      d="M22 8L17 4L12 8"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-    />
-    <circle
-      cx="17"
-      cy="22"
-      r="4"
-      stroke="white"
-      strokeWidth="2"
-      fill="#3D6701"
-    />
-    <path
-      d="M17 18V20M17 24V26"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <path d="M15 22H19" stroke="white" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-const DoorstepIcon = () => (
-  <svg
-    width="34"
-    height="36"
-    viewBox="0 0 34 36"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4 10L17 4L30 10V28C30 29.1046 29.1046 30 28 30H6C4.89543 30 4 29.1046 4 28V10Z"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="#54811F"
-    />
-    <path
-      d="M12 30V18H22V30"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-    />
-    <path
-      d="M17 22H17.01"
-      stroke="white"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <circle cx="8" cy="14" r="1.5" fill="white" stroke="white" />
-    <circle cx="26" cy="14" r="1.5" fill="white" stroke="white" />
-  </svg>
-);
-
-const FreshSourcedIcon = () => (
-  <svg
-    width="34"
-    height="36"
-    viewBox="0 0 34 36"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M17 4L19.5 9.5L25.5 10L21 14.5L22.5 20L17 17L11.5 20L13 14.5L8.5 10L14.5 9.5L17 4Z"
-      fill="#54811F"
-      stroke="white"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
-    <path d="M17 17V28" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    <path
-      d="M12 24L17 28L22 24"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-    />
-    <circle cx="17" cy="13" r="1.5" fill="white" />
-  </svg>
-);
+import { useState, useEffect, useRef } from "react";
+import {
+  Leaf,
+  CookingPot,
+  BadgeDollarSign,
+  SquareCheckBig,
+} from "lucide-react";
 
 const carouselData = [
   {
-    title: "Cooked like home, every time",
+    title: "Fresh every meal.",
     description:
-      "Made fresh by our kitchen team. No reheating. No preservatives. Just real food.",
-    icon: <HomeCookedIcon />,
+      "Veggies sourced at 5AM. Meat 2 hours before cooking.",
+    icon: <Leaf size={24} color="white" />,
   },
   {
-    title: "On your doorstep, on the dot",
+    title: "Cooking like home, every time.",
     description:
-      "Breakfast 7 AM · Lunch 12 PM · Dinner 7 PM — free delivery, always.",
-    icon: <DoorstepIcon />,
+      "No added colours. No MSG. Never oily",
+    icon: <CookingPot size={24} color="white" />,
   },
   {
-    title: "Sourced fresh at 5 AM tomorrow",
+    title: "Cheaper than cooking yourself.",
     description:
-      "We buy ingredients only after you order — nothing sits in storage overnight.",
-    icon: <FreshSourcedIcon />,
+      "Groceries + gas + your time. We're cheaper.",
+    icon: <BadgeDollarSign size={24} color="white" />,
+  },
+  {
+    title: "Cancel anytime. No questions.",
+    description:
+      "Up to 10 free cancellations. No charges.",
+    icon: <SquareCheckBig size={24} color="white" />,
   },
 ];
 
+const TOTAL = carouselData.length;
+
+// Left-to-right infinite loop strategy:
+// DOM order: [clone of last] [slide0] [slide1] [slide2]
+// We start at visualIndex=1 (showing slide0, offset = -1*100%).
+// Each tick we DECREASE the offset (move track right → content enters from left).
+// When visualIndex reaches 0 (showing clone of last), we snap to visualIndex=TOTAL (real last slide).
 const FreshIngredientsCarousel = () => {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  // visualIndex: position in the extended array [clone-of-last, slide0, slide1, slide2]
+  // starts at 1 so we're showing slide0
+  const [visualIndex, setVisualIndex] = useState(1);
+  const [animated, setAnimated] = useState(true);
+  const timerRef = useRef(null);
+
+  const startTimer = () => {
+    timerRef.current = setInterval(() => {
+      setAnimated(true);
+      setVisualIndex((prev) => prev - 1); // move right → content slides in from left
+    }, 3500);
+  };
 
   useEffect(() => {
-    if (paused) return;
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % carouselData.length);
-    }, 2800);
-    return () => clearInterval(timer);
-  }, [paused]);
+    startTimer();
+    return () => clearInterval(timerRef.current);
+  }, []);
 
-  const handleSelect = (selectedIndex) => {
-    setIndex(selectedIndex);
-  };
+  // When we land on the clone at position 0, snap to the real last slide
+  useEffect(() => {
+    if (visualIndex !== 0) return;
+    const snap = setTimeout(() => {
+      setAnimated(false);
+      setVisualIndex(TOTAL); // real last slide is at index TOTAL in extended array
+    }, 450);
+    return () => clearTimeout(snap);
+  }, [visualIndex]);
 
-  const togglePause = () => {
-    setPaused((p) => !p);
-  };
+  // Re-enable animation one frame after the silent snap
+  useEffect(() => {
+    if (animated) return;
+    const id = requestAnimationFrame(() => setAnimated(true));
+    return () => cancelAnimationFrame(id);
+  }, [animated]);
 
   return (
     <div className="fresh-carousel-wrapper">
-      <style jsx>{`
+      <style>{`
+        *,
+        *::before,
+        *::after {
+          box-sizing: border-box;
+        }
+
         .fresh-carousel-wrapper {
-          max-width: 665px;
+          max-width: 657px;
           width: 100%;
           margin: 0 auto;
-         
+          overflow: hidden;
         }
 
         .fresh-carousel-card {
           background: transparent;
           overflow: hidden;
-          max-width: 655px;
           width: 100%;
-          margin: 0 auto;
-          border-radius:"20px"
+          border-radius: 0 0 40px 40px;
         }
 
-        /* Original fresh-ingredients-section style */
+        .fresh-carousel-track-outer {
+          overflow: hidden;
+          width: 100%;
+        }
+
+        .fresh-carousel-track {
+          display: flex;
+          will-change: transform;
+          width: 100%;
+        }
+
+        .fresh-carousel-slide {
+          min-width: 100%;
+          width: 100%;
+          flex-shrink: 0;
+          overflow: hidden;
+        }
+
         .fresh-ingredients-section {
           background-color: #3d6701;
           padding: 16px 20px;
           display: flex;
-          justify-content: center;
+          justify-content: flex-start;
           align-items: center;
           height: auto;
-          min-height: 147.5px;
+          min-height: 120px;
           width: 100%;
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-          border-radius:40px;
-          border-top-left-radius:0;
-          border-top-right-radius:0;
+          border-radius: 0 0 40px 40px;
+          overflow: hidden;
         }
 
         .fresh-ingredients-content {
           display: flex;
           align-items: center;
-          justify-content: center;
           gap: 14px;
-          max-width: 100%;
+          width: 100%;
+          min-width: 0;
         }
 
         .fresh-icon-wrapper {
           width: 50px;
           height: 50px;
+          min-width: 50px;
           background-color: #54811f;
           border-radius: 12px;
           display: flex;
@@ -204,10 +152,10 @@ const FreshIngredientsCarousel = () => {
         }
 
         .fresh-icon {
-          width: 34px;
-          height: 36px;
-          object-fit: contain;
-          display: block;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
         }
 
         .fresh-text {
@@ -215,236 +163,158 @@ const FreshIngredientsCarousel = () => {
           flex-direction: column;
           gap: 4px;
           flex: 1;
+          min-width: 0;
+          overflow: hidden;
         }
 
         .fresh-title {
-          font-size: 18px;
+          font-size: 17px;
           font-weight: 600;
           color: #ffffff;
           letter-spacing: -0.2px;
           line-height: 1.3;
+          white-space: normal;
+          word-break: break-word;
         }
 
         .fresh-description {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 400;
           color: rgba(255, 255, 255, 0.85);
           line-height: 1.4;
           letter-spacing: -0.1px;
+          white-space: normal;
+          word-break: break-word;
         }
 
-        /* Carousel custom styles - clean and fresh */
-        .custom-carousel :global(.carousel-control-prev),
-        .custom-carousel :global(.carousel-control-next) {
-          width: 40px;
-          height: 40px;
-          background: rgba(61, 103, 1, 0.85);
-          border-radius: 50%;
-          top: 50%;
-          transform: translateY(-50%);
-          opacity: 0.9;
-          transition: all 0.2s ease;
-        }
-
-        .custom-carousel :global(.carousel-control-prev) {
-          left: 12px;
-        }
-
-        .custom-carousel :global(.carousel-control-next) {
-          right: 12px;
-        }
-
-        .custom-carousel :global(.carousel-control-prev:hover),
-        .custom-carousel :global(.carousel-control-next:hover) {
-          background: #3d6701;
-          opacity: 1;
-        }
-
-        .custom-carousel :global(.carousel-indicators) {
-          display: none;
-        }
-
-        /* Custom indicator row */
-        .carousel-indicator-row {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 6px;
-          padding: 0 16px 12px;
-          background-color: #3d6701;
-        }
-
-        .carousel-pause-btn {
-          background: none;
-          border: none;
-          padding: 0 4px 0 0;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 2.5px;
-          opacity: 0.75;
-        }
-
-        .carousel-pause-btn:hover {
-          opacity: 1;
-        }
-
-        .pause-bar {
-          width: 2.5px;
-          height: 11px;
-          background-color: rgba(255, 255, 255, 0.75);
-          border-radius: 2px;
-        }
-
-        .play-triangle {
-          width: 0;
-          height: 0;
-          border-top: 5.5px solid transparent;
-          border-bottom: 5.5px solid transparent;
-          border-left: 9px solid rgba(255, 255, 255, 0.75);
-        }
-
-        .carousel-dot {
-          height: 4px;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          border: none;
-          padding: 0;
-        }
-
-        .carousel-dot.active {
-          width: 24px;
-          background-color: #e6b800;
-        }
-
-        .carousel-dot.inactive {
-          width: 16px;
-          background-color: rgba(255, 255, 255, 0.35);
-        }
-
-        /* Mobile responsive overrides */
-        @media (max-width: 480px) {
+        @media (max-width: 576px) {
           .fresh-ingredients-section {
             padding: 14px 16px;
-            min-height: 135px;
+            min-height: 110px;
+            border-radius: 0 0 32px 32px;
           }
-
+          .fresh-carousel-card {
+            border-radius: 0 0 32px 32px;
+          }
           .fresh-ingredients-content {
             gap: 12px;
           }
-
           .fresh-icon-wrapper {
             width: 44px;
             height: 44px;
+            min-width: 44px;
           }
-
-          .fresh-icon svg {
-            width: 28px;
-            height: 30px;
-          }
-
           .fresh-title {
-            font-size: 16px;
+            font-size: 15px;
           }
-
           .fresh-description {
-            font-size: 13px;
-          }
-
-          .custom-carousel :global(.carousel-control-prev),
-          .custom-carousel :global(.carousel-control-next) {
-            width: 32px;
-            height: 32px;
+            font-size: 12px;
           }
         }
 
-        @media (max-width: 380px) {
+        @media (max-width: 480px) {
+          .fresh-ingredients-section {
+            padding: 12px 14px;
+            min-height: 100px;
+            border-radius: 0 0 28px 28px;
+          }
+          .fresh-carousel-card {
+            border-radius: 0 0 28px 28px;
+          }
           .fresh-ingredients-content {
             gap: 10px;
           }
-
           .fresh-icon-wrapper {
             width: 40px;
             height: 40px;
+            min-width: 40px;
+            border-radius: 10px;
           }
-
-          .fresh-icon svg {
-            width: 24px;
-            height: 26px;
-          }
-
-          .fresh-text {
-            gap: 2px;
-          }
-
           .fresh-title {
             font-size: 14px;
           }
-
           .fresh-description {
-            font-size: 11px;
+            font-size: 11.5px;
+            line-height: 1.35;
+          }
+        }
+
+        @media (max-width: 320px) {
+          .fresh-ingredients-section {
+            padding: 10px 12px;
+            min-height: 90px;
+            border-radius: 0 0 20px 20px;
+          }
+          .fresh-carousel-card {
+            border-radius: 0 0 20px 20px;
+          }
+          .fresh-ingredients-content {
+            gap: 8px;
+          }
+          .fresh-icon-wrapper {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 8px;
+          }
+          .fresh-text {
+            gap: 2px;
+          }
+          .fresh-title {
+            font-size: 12.5px;
+            letter-spacing: 0;
+          }
+          .fresh-description {
+            font-size: 10.5px;
+            line-height: 1.3;
           }
         }
       `}</style>
 
       <div className="fresh-carousel-card">
-        <Carousel
-          activeIndex={index}
-          onSelect={handleSelect}
-          interval={null}
-          pause={false}
-          className="custom-carousel"
-          indicators={false}
-          controls={false}
-        >
-          {carouselData.map((item, idx) => (
-            <Carousel.Item key={idx}>
-              <div className="fresh-ingredients-section">
-                <div className="fresh-ingredients-content">
-                  <div className="fresh-icon-wrapper">
-                    <div className="fresh-icon">{item.icon}</div>
-                  </div>
-                  <div className="fresh-text">
-                    <span className="fresh-title">{item.title}</span>
-                    <span className="fresh-description">
-                      {item.description}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Carousel.Item>
-          ))}
-        </Carousel>
-
-        {/* Custom indicator row */}
-        {/* <div className="carousel-indicator-row">
-          <button
-            className="carousel-pause-btn"
-            onClick={togglePause}
-            aria-label={paused ? "Play" : "Pause"}
+        <div className="fresh-carousel-track-outer">
+          {/*
+            DOM order: [clone-of-last] [slide0] [slide1] [slide2]
+            visualIndex starts at 1 (showing slide0).
+            Each tick decreases visualIndex → track moves right → content enters from the LEFT.
+            When visualIndex hits 0 (clone-of-last visible), snap to TOTAL (real last slide).
+          */}
+          <div
+            className="fresh-carousel-track"
+            style={{
+              transform: `translateX(-${visualIndex * 100}%)`,
+              transition: animated ? "transform 0.45s ease-in-out" : "none",
+            }}
           >
-            {paused ? (
-              <span className="play-triangle" />
-            ) : (
-              <>
-                <span className="pause-bar" />
-                <span className="pause-bar" />
-              </>
-            )}
-          </button>
-          {carouselData.map((_, idx) => (
-            <button
-              key={idx}
-              className={`carousel-dot ${idx === index ? "active" : "inactive"}`}
-              onClick={() => setIndex(idx)}
-              aria-label={`Slide ${idx + 1}`}
-            />
-          ))}
-        </div> */}
+            {/* Clone of last slide prepended for seamless wrap */}
+            <div className="fresh-carousel-slide" key="clone">
+              <SlideContent item={carouselData[TOTAL - 1]} />
+            </div>
+            {/* Real slides in correct order */}
+            {carouselData.map((item, idx) => (
+              <div className="fresh-carousel-slide" key={idx}>
+                <SlideContent item={item} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+const SlideContent = ({ item }) => (
+  <div className="fresh-ingredients-section">
+    <div className="fresh-ingredients-content">
+      <div className="fresh-icon-wrapper">
+        <div className="fresh-icon">{item.icon}</div>
+      </div>
+      <div className="fresh-text">
+        <span className="fresh-title">{item.title}</span>
+        <span className="fresh-description">{item.description}</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default FreshIngredientsCarousel;

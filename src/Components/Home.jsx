@@ -1,4 +1,4 @@
-import {
+﻿import {
   useContext,
   useEffect,
   useMemo,
@@ -39,6 +39,9 @@ import { MdDeliveryDining, MdOutlineTimer } from "react-icons/md";
 import FreshIngredientsCarousel from "./FreshIngredientsCarousel.jsx";
 import confetti from "canvas-confetti";
 import cross from "../assets/cross.png";
+import dishImg from "../assets/dish.png";
+import { BsCartPlus } from "react-icons/bs";
+
 
 const fireToast = ({ title, subtitle, icon = checkCircle }) => {
   Swal2.fire({
@@ -70,6 +73,63 @@ const fireToast = ({ title, subtitle, icon = checkCircle }) => {
       }
     },
   });
+};
+
+// Sticky wrapper: sits in normal flow, switches to fixed when scrolled past top
+const CutoffStickyWrapper = ({ children }) => {
+  const placeholderRef = useRef(null);
+  const [isFixed, setIsFixed] = useState(false);
+  const [barHeight, setBarHeight] = useState(0);
+  const barRef = useRef(null);
+
+  useEffect(() => {
+    const placeholder = placeholderRef.current;
+    if (!placeholder) return;
+
+    const onScroll = () => {
+      const rect = placeholder.getBoundingClientRect();
+      setIsFixed(rect.top <= 0);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // run once on mount
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (barRef.current) {
+      setBarHeight(barRef.current.offsetHeight);
+    }
+  });
+
+  return (
+    <>
+      {/* Placeholder keeps the space so content below doesn't jump when bar goes fixed */}
+      <div ref={placeholderRef} style={{ height: isFixed ? barHeight : 0 }} />
+      <div
+        ref={barRef}
+        style={
+          isFixed
+            ? {
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 999,
+                width: "100%",
+                maxWidth: "100vw",
+                overflowX: "hidden",
+              }
+            : {
+                width: "100%",
+                overflowX: "hidden",
+              }
+        }
+      >
+        {children}
+      </div>
+    </>
+  );
 };
 
 const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
@@ -116,6 +176,14 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [address, setAddress] = useState(null);
   const [shouldLoadDefaultMenu, setShouldLoadDefaultMenu] = useState(!user);
+
+  // Computed hub ID: use address.hubId if available, otherwise default hub for guests
+  const effectiveHubId = useMemo(() => {
+    if (address?.hubId) return address.hubId;
+    if (!user) return "69e747f999c3e8209908cb7b";
+    return null;
+  }, [address?.hubId, user]);
+
   const [cutoffValidation, setCutoffValidation] = useState({
     allowed: true,
     message: "",
@@ -126,10 +194,15 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [cutoffLoading, setCutoffLoading] = useState(false);
   const [hubOrderMode, setHubOrderMode] = useState("preorder");
   const [hubLocalCutoffData, setHubLocalCutoffData] = useState(null); // local cutoff times for instant checks
+  const [hubSettled, setHubSettled] = useState(false); // true once auto-jump has completed for the current hub
   const [gifUrl, setGifUrl] = useState("");
   const [message, setMessage] = useState("");
-  const [AllOffer, setAllOffer] = useState([]);
-  const [totalOrder, setTotalOrder] = useState([]);
+  const [ordersLoaded, setOrdersLoaded] = useState(false);
+  // userOrderCount = total orders placed by this user (for customerType eligibility)
+  const [userOrderCount, setUserOrderCount] = useState(0);
+  // New offer management: tracks which date|session|hubId slots the user has used an offer on
+  const [userOfferStatus, setUserOfferStatus] = useState({ usedOfferCount: 0, usedSlots: [] });
+  const [offerStatusLoaded, setOfferStatusLoaded] = useState(false);
 
   // Auto-switch tracking refs
   const autoSwitchInProgressRef = useRef(null); // stores last switched "date|session" key to prevent re-firing
@@ -143,120 +216,80 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     return () => clearInterval(timer);
   }, []);
 
-  const getTotalOrder = async () => {
+  // Fetch user order count for customerType eligibility check
+  const fetchUserOrderCounts = async (userId) => {
+    if (!userId) {
+      console.log("[Offer] fetchUserOrderCounts: no userId, setting count=0");
+      setUserOrderCount(0);
+      setOrdersLoaded(true);
+      return;
+    }
     try {
-      let res = await axios.get("https://dd-backend-3nm0.onrender.com/api/admin/getallorders");
-      if (res.status === 200) {
-        setTotalOrder(res.data.order.reverse());
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/count",
+        { params: { userId } },
+      );
+      console.log("[Offer] fetchUserOrderCounts response:", res.status, res.data);
+      if (res.status === 200 && res.data?.success) {
+        const count = res.data.count ?? 0;
+        console.log("[Offer] userOrderCount set to:", count);
+        setUserOrderCount(count);
+        setOrdersLoaded(true);
       }
     } catch (error) {
-      console.log(error);
+      console.error("[Offer] fetchUserOrderCounts error:", error);
+    } finally {
+      setOrdersLoaded(true);
+    }
+  };
+
+  // Fetch user offer status: which date|session|hubId slots have been used
+  const fetchUserOfferStatus = async (userId) => {
+    if (!userId || user?.status === "Employee") {
+      console.log("[Offer] fetchUserOfferStatus: no userId or Employee, skipping");
+      setUserOfferStatus({ usedOfferCount: 0, usedSlots: [] });
+      setOfferStatusLoaded(true);
+      return;
+    }
+    try {
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/admin/hub-menu/user-offer-status",
+        { params: { userId } }
+      );
+      console.log("[Offer] fetchUserOfferStatus response:", res.status, res.data);
+      if (res.status === 200 && res.data?.success) {
+        console.log("[Offer] userOfferStatus set to:", res.data.usedOfferCount, res.data.usedSlots);
+        setUserOfferStatus({
+          usedOfferCount: res.data.usedOfferCount ?? 0,
+          usedSlots: res.data.usedSlots ?? []
+        });
+      }
+    } catch (e) {
+      console.error("[Offer] fetchUserOfferStatus error:", e);
+    } finally {
+      setOfferStatusLoaded(true);
     }
   };
 
   useEffect(() => {
-    getTotalOrder();
-  }, []);
+    if (Carts?.length > 0) handleShow();
+    // Refresh order count and offer status when user changes (also runs on mount)
+    const refresh = async () => {
+      setOfferStatusLoaded(false);
+      setOrdersLoaded(false);
+      await fetchUserOrderCounts(user?._id);
+      await fetchUserOfferStatus(user?._id);
+    };
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id]);
 
+  // Returns total order count for the current user
   const findNumberofOrders = () => {
-    const customerId = user?._id;
-    if (!customerId) return 0;
-    return totalOrder.filter((customer) => customer?.customerId === customerId)
-      .length;
+    if (!user?._id) return 0;
+    return userOrderCount;
   };
 
-  const hasUserUsedOffer = (session = selectedSession) => {
-    const customerId = user?._id;
-    if (!customerId) return false;
-
-    const selectedDateStr =
-      selectedDate instanceof Date
-        ? selectedDate.toISOString().split("T")[0]
-        : new Date(selectedDate).toISOString().split("T")[0];
-
-    const sessionLower = session?.toLowerCase();
-
-    return totalOrder.some((order) => {
-      if (order?.customerId !== customerId) return false;
-
-      const orderDeliveryDate = order?.deliveryDate
-        ? new Date(order.deliveryDate).toISOString().split("T")[0]
-        : null;
-      if (orderDeliveryDate !== selectedDateStr) return false;
-
-      const orderItems =
-        order?.allProduct || order?.items || order?.cartItems || [];
-      return orderItems.some(
-        (item) =>
-          item?.offerApplied === true &&
-          item?.session?.toLowerCase() === sessionLower,
-      );
-    });
-  };
-
-  const doesCustomerQualifyForOffer = (
-    customerOrderCount,
-    offerCustomerType,
-  ) => {
-    if (offerCustomerType === -1) return true;
-    if (offerCustomerType === 0) return customerOrderCount === 0;
-    return customerOrderCount <= offerCustomerType;
-  };
-
-  const getCustomerOrderCount = useMemo(() => {
-    return findNumberofOrders();
-  }, [user, totalOrder]);
-
-  const getAllOffer = async () => {
-    try {
-      const response = await axios.get(
-        "https://dd-backend-3nm0.onrender.com/api/admin/offers",
-      );
-      if (response.status === 200 && response.data?.data) {
-        let offers = response.data.data;
-        if (user?._id) {
-          const customerOrderCount = findNumberofOrders();
-          const filteredOffers = offers.filter((offer) => {
-            return offer.products.some((product) =>
-              doesCustomerQualifyForOffer(
-                customerOrderCount,
-                product.customerType,
-              ),
-            );
-          });
-          const processedOffers = filteredOffers.map((offer) => ({
-            ...offer,
-            products: offer.products.filter((product) =>
-              doesCustomerQualifyForOffer(
-                customerOrderCount,
-                product.customerType,
-              ),
-            ),
-          }));
-          setAllOffer(processedOffers);
-        } else {
-          const publicOffers = offers
-            .filter((offer) =>
-              offer.products.some(
-                (product) =>
-                  product.customerType === -1 || product.customerType === 0,
-              ),
-            )
-            .map((offer) => ({
-              ...offer,
-              products: offer.products.filter(
-                (product) =>
-                  product.customerType === -1 || product.customerType === 0,
-              ),
-            }));
-          setAllOffer(publicOffers);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching offers:", error);
-      setAllOffer([]);
-    }
-  };
 
   // Convert backend UTC time to IST display time
   const convertUTCToISTDisplay = (utcDateString) => {
@@ -306,15 +339,15 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         setCutoffLoading(true);
         const status = user?.status === "Employee" ? "Employee" : "Normal";
 
-        console.log("[validateCutoffTiming] Request:", {
-          hubId,
-          session: session.toLowerCase(),
-          status,
-          deliveryDate:
-            deliveryDate instanceof Date
-              ? deliveryDate.toISOString()
-              : deliveryDate,
-        });
+        // console.log("[validateCutoffTiming] Request:", {
+        //   hubId,
+        //   session: session.toLowerCase(),
+        //   status,
+        //   deliveryDate:
+        //     deliveryDate instanceof Date
+        //       ? deliveryDate.toISOString()
+        //       : deliveryDate,
+        // });
 
         const response = await axios.post(
           "https://dd-backend-3nm0.onrender.com/api/Hub/validate-order-timing",
@@ -330,10 +363,10 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         );
 
         if (response.status === 200) {
-          console.log(
-            "[validateCutoffTiming] Raw API response:",
-            response.data,
-          );
+          // console.log(
+          //   "[validateCutoffTiming] Raw API response:",
+          //   response.data,
+          // );
 
           const rawCutoff = response.data.cutoffDateTime
             ? new Date(response.data.cutoffDateTime)
@@ -352,12 +385,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             ? new Date(rawNext.getTime() - IST_OFFSET_MS)
             : null;
 
-          console.log("[validateCutoffTiming] Corrected times:", {
-            rawCutoff: rawCutoff?.toISOString(),
-            correctedCutoff: correctedCutoff?.toISOString(),
-            now: new Date().toISOString(),
-            allowed: response.data.allowed,
-          });
+          // console.log("[validateCutoffTiming] Corrected times:", {
+          //   rawCutoff: rawCutoff?.toISOString(),
+          //   correctedCutoff: correctedCutoff?.toISOString(),
+          //   now: new Date().toISOString(),
+          //   allowed: response.data.allowed,
+          // });
 
           const validationData = {
             allowed: response.data.allowed,
@@ -365,6 +398,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             cutoffDateTime: correctedCutoff,
             nextAvailableDateTime: correctedNext,
             orderMode: response.data.orderMode || "preorder",
+            // Stamp the session+date this validation was fetched for so stale
+            // results from a previous session don't bleed into the current view.
+            _forSession: session.toLowerCase(),
+            _forDate:
+              deliveryDate instanceof Date
+                ? deliveryDate.toISOString().split("T")[0]
+                : new Date(deliveryDate).toISOString().split("T")[0],
           };
 
           setCutoffValidation(validationData);
@@ -467,8 +507,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       setSelectedSession(nextSession);
       setSelectedCategory("");
       window.scrollTo(0, 0);
-      if (address?.hubId) {
-        validateCutoffTiming(address.hubId, nextSession, selectedDate);
+      if (effectiveHubId) {
+        validateCutoffTiming(effectiveHubId, nextSession, selectedDate);
       }
     } else {
       // All today's sessions are past cutoff — find next available date+session
@@ -505,8 +545,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             setSelectedSession(firstSession);
             setSelectedCategory("");
             window.scrollTo(0, 0);
-            if (address?.hubId) {
-              validateCutoffTiming(address.hubId, firstSession, futureDate);
+            if (effectiveHubId) {
+              validateCutoffTiming(effectiveHubId, firstSession, futureDate);
             }
             break;
           }
@@ -519,7 +559,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     allHubMenuData,
     hubLocalCutoffData,
     isSessionPastCutoffLocal,
-    address?.hubId,
+    effectiveHubId,
     validateCutoffTiming,
   ]);
 
@@ -529,7 +569,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       if (slotKey) {
         const itemDateStr =
           item.deliveryDate?.split("T")[0] || item.deliveryDate;
-        const itemSlotKey = `${itemDateStr}|${item.session?.toLowerCase()}`;
+        // const itemSlotKey = `${itemDateStr}|${item.session?.toLowerCase()}`;
+        const itemSlotKey = `${itemDateStr}|${item.session}`;
         return (
           itemSlotKey === slotKey &&
           item.offerProduct === true &&
@@ -540,12 +581,28 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     });
   };
 
+  // Count how many distinct date|session slots already have an offer applied in the cart
+  const countOfferSlotsInCart = () => {
+    if (!Carts || Carts.length === 0) return 0;
+    const offerSlots = new Set();
+    Carts.forEach((item) => {
+      if (item.offerProduct === true && item.offerApplied === true) {
+        const itemDateStr =
+          item.deliveryDate?.split("T")[0] || item.deliveryDate;
+        const slotKey = `${itemDateStr}|${(item.session || "").toLowerCase()}`;
+        offerSlots.add(slotKey);
+      }
+    });
+    return offerSlots.size;
+  };
+
   const getAppliedOfferFromCart = (slotKey = null) => {
     if (!Carts || Carts.length === 0) return null;
     return Carts.find((item) => {
       if (slotKey) {
         const itemDateStr =
           item.deliveryDate?.split("T")[0] || item.deliveryDate;
+        // const itemSlotKey = `${itemDateStr}|${item.session?.toLowerCase()}`;
         const itemSlotKey = `${itemDateStr}|${item.session?.toLowerCase()}`;
         return (
           itemSlotKey === slotKey &&
@@ -562,26 +619,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       // Don't validate until hub data is loaded and auto-jump has settled.
       // This prevents the initial today+Lunch (cutoff passed) flash on refresh.
       if (!hubLocalCutoffData) return;
-      if (autoJumpedHubRef.current !== address?.hubId) return;
+      if (autoJumpedHubRef.current !== effectiveHubId) return;
 
-      const currentAddress =
-        address ||
-        (() => {
-          try {
-            const primaryAddress = localStorage.getItem("primaryAddress");
-            const currentLocation = localStorage.getItem("currentLocation");
-            return primaryAddress
-              ? JSON.parse(primaryAddress)
-              : currentLocation
-                ? JSON.parse(currentLocation)
-                : null;
-          } catch {
-            return null;
-          }
-        })();
-      if (currentAddress?.hubId && selectedDate && selectedSession) {
+      if (effectiveHubId && selectedDate && selectedSession) {
         await validateCutoffTiming(
-          currentAddress.hubId,
+          effectiveHubId,
           selectedSession,
           selectedDate,
         );
@@ -590,6 +632,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     checkCutoff();
   }, [
     address,
+    effectiveHubId,
     selectedDate,
     selectedSession,
     validateCutoffTiming,
@@ -676,7 +719,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
     // Check if current selection is already valid — if so, don't override
     // BUT always re-jump if the hub changed (different orderMode may apply)
-    const hubChanged = autoJumpedHubRef.current !== address?.hubId;
+    const hubChanged = autoJumpedHubRef.current !== effectiveHubId;
     const curDate = selectedDateRef.current;
     const curSession = selectedSessionRef.current;
     if (!hubChanged && curDate && curSession) {
@@ -691,6 +734,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         if (isToday && orderMode === "preorder" && !isEmployee) {
           // fall through to auto-jump
         } else if (!isToday || !isSessionPastCutoffLocal(curSession, now)) {
+          autoJumpedHubRef.current = effectiveHubId; // mark settled even when no jump needed
+          setHubSettled(true);
           return; // Valid selection, leave it alone
         }
       }
@@ -724,12 +769,13 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const jumpKey = `${dateKey}|${firstSession}`;
       if (autoJumpedToRef.current === jumpKey && !hubChanged) return; // already jumped here for this hub
       autoJumpedToRef.current = jumpKey;
-      autoJumpedHubRef.current = address?.hubId;
+      autoJumpedHubRef.current = effectiveHubId;
+      setHubSettled(true);
       setSelectedDate(checkDate);
       setSelectedSession(firstSession);
       setSelectedCategory("");
-      if (address?.hubId) {
-        validateCutoffTiming(address.hubId, firstSession, checkDate);
+      if (effectiveHubId) {
+        validateCutoffTiming(effectiveHubId, firstSession, checkDate);
       }
       return;
     }
@@ -737,7 +783,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     allHubMenuData,
     hubLocalCutoffData,
     isSessionPastCutoffLocal,
-    address?.hubId,
+    effectiveHubId,
     validateCutoffTiming,
   ]);
 
@@ -765,7 +811,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             hubId:
               parsedDefault.hubId ||
               parsedDefault._id ||
-              "694e3650e5d3b79091854de9",
+              "69e747f999c3e8209908cb7b",
             hubName:
               parsedDefault.hubName || parsedDefault.name || "Default Hub",
             fullAddress:
@@ -801,9 +847,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   // Combined hub data + menu fetch — runs once per hub change, sets both atomically
   // so the auto-jump logic always has both pieces of data at the same time (no flicker).
   useEffect(() => {
-    const hubIdToUse =
-      address?.hubId ||
-      (shouldLoadDefaultMenu && !user ? "694e3650e5d3b79091854de9" : null);
+    const hubIdToUse = effectiveHubId;
 
     if (!hubIdToUse) {
       setAllHubMenuData([]);
@@ -815,6 +859,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     // Reset auto-jump guard so the new hub gets a fresh auto-jump
     autoJumpedToRef.current = null;
     autoJumpedHubRef.current = null;
+    // Mark hub as not yet settled — hides the "Orders Closed" card until auto-jump completes
+    setHubSettled(false);
     // Clear stale cutoff data immediately so the auto-jump gate waits for fresh data
     setHubLocalCutoffData(null);
     // Clear stale cutoffValidation so CutoffStatusCard stays hidden until new data arrives
@@ -833,9 +879,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
         // Fetch both in parallel
         const [menuRes, cutoffRes] = await Promise.allSettled([
-          axios.get("https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu", {
-            params: { hubId: hubIdToUse },
-          }),
+          axios.get(
+            "https://dd-backend-3nm0.onrender.com/api/user/get-hub-menu",
+            {
+              params: { hubId: hubIdToUse },
+            },
+          ),
           fetch(
             `https://dd-backend-3nm0.onrender.com/api/Hub/get-cutoff-times/${hubIdToUse}`,
             { headers: { Authorization: `Bearer ${token}` } },
@@ -844,7 +893,25 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
         // Process menu
         if (menuRes.status === "fulfilled" && menuRes.value.status === 200) {
-          setAllHubMenuData(menuRes.value.data.menu);
+          const menuData = menuRes.value.data.menu;
+          // Debug: log offer items received from backend
+          const offerItems = menuData.filter(m => m.isOffer);
+          // console.log("[OFFER DEBUG] Menu loaded. Total items:", menuData.length, "Offer items:", offerItems.length);
+          // if (offerItems.length > 0) {
+          //   console.log("[OFFER DEBUG] Offer items from backend:", offerItems.map(m => ({
+          //     foodname: m.foodname,
+          //     isOffer: m.isOffer,
+          //     offerPrice: m.offerPrice,
+          //     offerStartDate: m.offerStartDate,
+          //     offerEndDate: m.offerEndDate,
+          //     customerType: m.customerType,
+          //     deliveryDate: m.deliveryDate,
+          //     hubId: m.hubId,
+          //   })));
+          // } else {
+          //   console.log("[OFFER DEBUG] ⚠️ No offer items in menu response. Sample item:", menuData[0]);
+          // }
+          setAllHubMenuData(menuData);
         } else {
           setAllHubMenuData([]);
         }
@@ -883,7 +950,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     };
 
     fetchHubDataAndMenu();
-  }, [address?.hubId, shouldLoadDefaultMenu, user]);
+  }, [effectiveHubId]);
 
   // Listen for location updates
   useEffect(() => {
@@ -926,8 +993,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     window.scrollTo(0, 0);
 
     // Immediately validate cutoff for the new selection
-    if (address?.hubId && date1 && session1) {
-      validateCutoffTiming(address.hubId, session1, date1);
+    if (effectiveHubId && date1 && session1) {
+      validateCutoffTiming(effectiveHubId, session1, date1);
     }
   };
 
@@ -940,6 +1007,72 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     window.dispatchEvent(new Event("locationUpdated"));
   }, []);
 
+  // Build a preliminary cutoffValidation from local hub cutoff data so CutoffStatusCard
+  // can render as soon as the menu loads — without waiting for the validate-order-timing
+  // API call to complete. Once the real API response arrives, cutoffValidation takes over.
+  const preliminaryCutoffValidation = useMemo(() => {
+    // If the real API data is already here, no need for a preliminary value
+    if (cutoffValidation?.cutoffDateTime) return cutoffValidation;
+    // Need local cutoff data and a selected session to compute anything
+    if (!hubLocalCutoffData?.cutoffTimes || !selectedSession || !selectedDate)
+      return null;
+
+    const key = selectedSession.toLowerCase();
+    const times = hubLocalCutoffData.cutoffTimes[key];
+    if (!times) return null;
+
+    const cutoffStr =
+      user?.status === "Employee" ? times.employeeCutoff : times.defaultCutoff;
+    if (!cutoffStr) return null;
+
+    const [h, m] = cutoffStr.split(":").map(Number);
+    // Build cutoff datetime for the selected date at the local cutoff time
+    const cutoffDate = new Date(selectedDate);
+    cutoffDate.setHours(h, m, 0, 0);
+
+    const now = new Date();
+    const allowed = now < cutoffDate;
+    const orderMode = hubLocalCutoffData.orderMode || "preorder";
+
+    return {
+      allowed,
+      message: allowed ? "" : `Orders closed for ${selectedSession}`,
+      cutoffDateTime: cutoffDate,
+      nextAvailableDateTime: null,
+      orderMode,
+      _forSession: key,
+      _forDate: selectedDate.toISOString().split("T")[0],
+      _isPreliminary: true,
+    };
+  }, [
+    cutoffValidation,
+    hubLocalCutoffData,
+    selectedSession,
+    selectedDate,
+    user?.status,
+  ]);
+
+  // The effective cutoff to pass to CutoffStatusCard — real API data when available,
+  // preliminary local data otherwise (so the card shows with the menu on refresh).
+  const effectiveCutoffValidation = cutoffValidation?.cutoffDateTime
+    ? cutoffValidation
+    : preliminaryCutoffValidation;
+
+  // Derive ordering-allowed state from the corrected cutoff timestamp rather than
+  // trusting the raw API `allowed` flag, which can be stale or double-offset.
+  // This mirrors the same logic in CutoffTimer.jsx (isActuallyAllowed).
+  const isOrderingAllowed = useMemo(() => {
+    if (!cutoffValidation?.cutoffDateTime)
+      return cutoffValidation?.allowed ?? true;
+    const now = currentTime; // updates every second
+    const cutoff = new Date(cutoffValidation.cutoffDateTime);
+    const calculated = now < cutoff;
+    // If API says allowed but our local clock says cutoff passed, trust local clock
+    // (the IST correction in validateCutoffTiming already adjusted the timestamp)
+    if (cutoffValidation.allowed === true && !calculated) return false;
+    return calculated;
+  }, [cutoffValidation, currentTime]);
+
   const currentSlotItems = useMemo(() => {
     if (!allHubMenuData?.length) return [];
 
@@ -950,7 +1083,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const selKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
     const isViewingToday = todayKey === selKey;
 
-    if (!cutoffValidation.allowed && isViewingToday) {
+    if (!isOrderingAllowed && isViewingToday) {
       return [];
     }
 
@@ -965,7 +1098,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       const itemKey = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
       return itemKey === selUTCKey;
     });
-  }, [allHubMenuData, selectedDate, selectedSession, cutoffValidation.allowed]);
+  }, [allHubMenuData, selectedDate, selectedSession, isOrderingAllowed]);
 
   const vegFilteredItems = useMemo(() => {
     if (isVegOnly) {
@@ -1024,7 +1157,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     if (hubOrderMode === "instant") {
       return { price: hubPrice };
     }
-    const beforeCutoff = cutoffValidation.allowed;
+    const beforeCutoff = isOrderingAllowed;
     if (beforeCutoff && preOrderPrice > 0) return { price: preOrderPrice };
     return { price: hubPrice };
   };
@@ -1059,49 +1192,102 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   const getProductOffer = (item) => {
     try {
-      const primaryAddressJson = localStorage.getItem("primaryAddress");
-      if (!primaryAddressJson || !AllOffer?.length) return null;
-      const primaryAddress = JSON.parse(primaryAddressJson);
-      const isEmployeeForOffer = user?.status === "Employee";
-      const acquisitionChannelForOffer = isEmployeeForOffer
-        ? "employee"
-        : user?.acquisition_channel || "organic";
-      const customerOrderCount = findNumberofOrders();
-      const dateStr =
-        selectedDate instanceof Date
-          ? selectedDate.toISOString().split("T")[0]
-          : new Date(selectedDate).toISOString().split("T")[0];
-      const slotKey = `${dateStr}|${selectedSession.toLowerCase()}`;
-      const hasOfferInCart = isOfferAlreadyAppliedInCart(slotKey);
+      // Rule 1: Employees never get offers
+      if (user?.status === "Employee") return null;
 
-      for (const offer of AllOffer) {
-        const hubMatches = offer?.hubId === primaryAddress?.hubId;
-        const acquisitionChannelMatch =
-          offer?.acquisition_channel === acquisitionChannelForOffer;
-        const offerStartDate = new Date(offer?.startDate);
-        const offerEndDate = new Date(offer?.endDate);
-        const deliverydate = new Date(item.deliveryDate);
-        const isWithinDateRange =
-          deliverydate >= offerStartDate && deliverydate <= offerEndDate;
+      // Rule 2: Item must be flagged as offer in HubMenu
+      if (!item?.isOffer || !item?.offerPrice) {
+        // Only log for items that have isOffer set to see what's happening
+        if (item?.isOffer) console.log("[OFFER DEBUG] Rule2 fail - isOffer:", item?.isOffer, "offerPrice:", item?.offerPrice, "item:", item?.foodname);
+        return null;
+      }
 
-        if (hubMatches && isWithinDateRange && acquisitionChannelMatch) {
-          const matchingProduct = offer.products?.find(
-            (product) =>
-              product?.foodItemId?.toString() === item?._id?.toString(),
-          );
-          if (matchingProduct) {
-            const customerQualifies = doesCustomerQualifyForOffer(
-              customerOrderCount,
-              matchingProduct.customerType,
-            );
-            if (!customerQualifies) return null;
-            if (hasUserUsedOffer()) return null;
-            if (hasOfferInCart) return { ...matchingProduct, isBlocked: true };
-            return matchingProduct;
-          }
+      // console.log("[OFFER DEBUG] Checking offer for:", item?.foodname, {
+      //   isOffer: item.isOffer,
+      //   offerPrice: item.offerPrice,
+      //   offerStartDate: item.offerStartDate,
+      //   offerEndDate: item.offerEndDate,
+      //   customerType: item.customerType,
+      //   deliveryDate: item.deliveryDate,
+      //   menuDate: item.menuDate,
+      //   hubId: item.hubId,
+      // });
+
+      // Rule 3: Must be within offer date range (compare date strings only — ignore time component)
+      const deliveryDateStr = (item.deliveryDate || item.menuDate || "").toString().split("T")[0];
+      if (!deliveryDateStr) {
+        console.log("[OFFER DEBUG] Rule3 fail - no deliveryDateStr");
+        return null;
+      }
+      // If no date range is set, the offer is always valid date-wise
+      if (item.offerStartDate) {
+        const startStr = new Date(item.offerStartDate).toISOString().split("T")[0];
+        if (deliveryDateStr < startStr) {
+          console.log("[OFFER DEBUG] Rule3 fail - before start:", deliveryDateStr, "<", startStr);
+          return null;
         }
       }
-      return null;
+      if (item.offerEndDate) {
+        const endStr = new Date(item.offerEndDate).toISOString().split("T")[0];
+        if (deliveryDateStr > endStr) {
+          console.log("[OFFER DEBUG] Rule3 fail - after end:", deliveryDateStr, ">", endStr);
+          return null;
+        }
+      }
+
+      // Rule 4: Customer type eligibility (skip for non-logged-in — show offer to entice login)
+      const orderCount = userOrderCount;
+      const customerType = item.customerType ?? -1;
+      if (user && customerType !== -1) {
+        if (customerType === 0 && orderCount !== 0) {
+          console.log("[OFFER DEBUG] Rule4 fail - customerType=0 but orderCount:", orderCount);
+          return null;
+        }
+        if (customerType > 0 && orderCount > customerType) {
+          console.log("[OFFER DEBUG] Rule4 fail - orderCount", orderCount, "> customerType", customerType);
+          return null;
+        }
+      }
+
+      // Rule 5: Check if user has exhausted their offer slot budget
+      // Skip for non-logged-in users — show offer price to entice them
+      if (user) {
+        const maxAllowed = customerType === -1 ? Infinity : customerType + 1;
+        const usedInPast = userOfferStatus.usedOfferCount;
+        const usedInCart = countOfferSlotsInCart();
+        const remaining = maxAllowed - usedInPast - usedInCart;
+        // console.log("[OFFER DEBUG] Rule5 - maxAllowed:", maxAllowed, "usedInPast:", usedInPast, "usedInCart:", usedInCart, "remaining:", remaining);
+        if (remaining <= 0) {
+          console.log("[OFFER DEBUG] Rule5 fail - no remaining slots");
+          return null;
+        }
+      }
+
+      // Rule 6: Cross-hub + same-session block (logged-in only)
+      const dateStr = deliveryDateStr;
+      if (user) {
+        const itemHubId = item.hubId?.toString();
+        const slotKey = `${dateStr}|${selectedSession.toLowerCase()}|${itemHubId}`;
+        const slotAlreadyUsed = userOfferStatus.usedSlots.includes(slotKey);
+        // console.log("[OFFER DEBUG] Rule6 - slotKey:", slotKey, "usedSlots:", userOfferStatus.usedSlots, "alreadyUsed:", slotAlreadyUsed);
+        if (slotAlreadyUsed) {
+          console.log("[OFFER DEBUG] Rule6 fail - slot already used");
+          return null;
+        }
+      }
+
+      // Rule 7: One offer per date|session slot in cart (logged-in only)
+      const cartSlotKey = `${dateStr}|${selectedSession.toLowerCase()}`;
+      if (user) {
+        const hasOfferInCart = isOfferAlreadyAppliedInCart(cartSlotKey);
+        if (hasOfferInCart) {
+          // console.log("[OFFER DEBUG] Rule7 - offer already in cart, returning isBlocked");
+          return { ...item, isBlocked: true };
+        }
+      }
+
+      // console.log("[OFFER DEBUG] ✅ Offer ELIGIBLE for:", item?.foodname);
+      return item; // eligible
     } catch (error) {
       console.error("Error getting product offer:", error);
       return null;
@@ -1111,7 +1297,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   const [deliveryCharge, setDeliveryCharge] = useState([]);
   const getDeliveryRates = async () => {
     try {
-      const res = await axios.get("https://dd-backend-3nm0.onrender.com/api/deliveryrate/all");
+      const res = await axios.get(
+        "https://dd-backend-3nm0.onrender.com/api/deliveryrate/all",
+      );
       setDeliveryCharge(res.data.data);
     } catch (error) {
       console.error("Error fetching delivery rates:", error);
@@ -1122,27 +1310,34 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     getDeliveryRates();
   }, []);
 
-  const findDeliveryRate = (hubId, acquisitionChannel, status) => {
-    if (!deliveryCharge || deliveryCharge.length === 0) return 15;
-    const matchedRate = deliveryCharge.find(
-      (rate) =>
-        rate.hubId === hubId &&
-        rate.acquisition_channel === acquisitionChannel &&
-        rate.status === status,
+  const findDeliveryRate = (hubId, status) => {
+    if (!deliveryCharge || deliveryCharge.length === 0) return 0;
+    // Match by hubId + status, fall back to any record for this hub
+    const matchedRate =
+      deliveryCharge.find(
+        (rate) =>
+          String(rate.hubId) === String(hubId) && rate.status === status,
+      ) || deliveryCharge.find((rate) => String(rate.hubId) === String(hubId));
+    // Use doorDeliveryRate — the base charge stored on cart items
+    return Number(matchedRate?.doorDeliveryRate) || 0;
+  };
+
+  // Returns the full matched delivery rate record for the current hub+status
+  const findDeliveryRateRecord = (hubId, status) => {
+    if (!deliveryCharge || deliveryCharge.length === 0) return null;
+    return (
+      deliveryCharge.find(
+        (rate) => String(rate.hubId) === String(hubId) && rate.status === status,
+      ) || deliveryCharge.find((rate) => String(rate.hubId) === String(hubId)) || null
     );
-    return matchedRate?.deliveryRate || 15;
   };
 
   const isEmployeeForDelivery = user?.status === "Employee";
-  const acquisitionChannelForDelivery = isEmployeeForDelivery
-    ? "employee"
-    : user?.acquisition_channel || "organic";
   const userStatus = user?.status;
   const hubId = address?.hubId;
   const deliveryRate = findDeliveryRate(
     hubId,
-    acquisitionChannelForDelivery,
-    userStatus,
+    isEmployeeForDelivery ? "Employee" : "Normal",
   );
 
   const triggerConfetti = () => {
@@ -1182,7 +1377,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
   };
 
   const addCart1 = async (item, offerData, matchedLocation) => {
-    if (!cutoffValidation.allowed) {
+    if (!user) {
+      fireToast({ title: `Login to continue` });
+      return;
+    }
+
+    if (!isOrderingAllowed) {
       fireToast({
         title:
           cutoffValidation.message ||
@@ -1194,22 +1394,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     if (!matchedLocation || matchedLocation?.Remainingstock === 0) {
       fireToast({ title: `Product is out of stock` });
       return;
-    }
-
-    if (offerData && offerData.customerType !== undefined && user?._id) {
-      const customerOrderCount = findNumberofOrders();
-      const customerQualifies = doesCustomerQualifyForOffer(
-        customerOrderCount,
-        offerData.customerType,
-      );
-      if (!customerQualifies) {
-        let message =
-          offerData.customerType === 0
-            ? `This offer is only for first-time customers! You have already placed ${customerOrderCount} order(s).`
-            : `This offer is for customers with ${offerData.customerType} or fewer orders. You have placed ${customerOrderCount} order(s).`;
-        fireToast({ title: message });
-        return;
-      }
     }
 
     const dateStr =
@@ -1231,32 +1415,38 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     let finalOfferPrice = null;
     let finalRegularPrice = regularPrice;
 
-    if (offerData && offerData.price && user?._id) {
-      const customerOrderCount = findNumberofOrders();
-      const customerQualifies = doesCustomerQualifyForOffer(
-        customerOrderCount,
-        offerData.customerType,
-      );
-      if (customerQualifies) {
-        if (!hasOfferInCart && !hasUserUsedOffer()) {
-          appliedPrice = offerData.price;
-          isOfferApplied = true;
-          finalOfferPrice = offerData.price;
-        } else if (hasUserUsedOffer()) {
-          appliedPrice = regularPrice;
-          isOfferApplied = false;
-          fireToast({
-            title: `You've already used this offer for ${selectedSession} today.`,
-          });
-        } else {
-          appliedPrice = regularPrice;
-          isOfferApplied = false;
-          fireToast({
-            title: `Only one offer per slot allowed! ${appliedOffer?.foodname} already has the offer.`,
-          });
-        }
+    // New offer management: read offer data directly from HubMenu item
+    if (user?.status === "Employee") {
+      // Employees never get offer price
+      appliedPrice = regularPrice;
+    } else if (offerData && offerData.offerPrice && user?._id) {
+      const itemHubId = matchedLocation?.hubId?.toString() || item?.hubId?.toString();
+      const slotKey = `${dateStr}|${selectedSession.toLowerCase()}|${itemHubId}`;
+      const cartSlotKey = `${dateStr}|${selectedSession.toLowerCase()}`;
+
+      const slotAlreadyUsed = userOfferStatus.usedSlots.includes(slotKey);
+      const customerType = offerData.customerType ?? -1;
+      const maxAllowed = customerType === -1 ? Infinity : customerType + 1;
+      const remaining = maxAllowed - userOfferStatus.usedOfferCount - countOfferSlotsInCart();
+      const thisSlotInCart = isOfferAlreadyAppliedInCart(cartSlotKey);
+      const wouldExceed = !thisSlotInCart && remaining <= 0;
+
+      if (!slotAlreadyUsed && !thisSlotInCart && !wouldExceed) {
+        appliedPrice = offerData.offerPrice;
+        isOfferApplied = true;
+        finalOfferPrice = offerData.offerPrice;
+      } else if (slotAlreadyUsed) {
+        appliedPrice = regularPrice;
+        isOfferApplied = false;
+        fireToast({ title: `Offer already used for this session today.` });
+      } else if (wouldExceed) {
+        appliedPrice = regularPrice;
+        isOfferApplied = false;
+        fireToast({ title: `Offer limit reached. Added at regular price.` });
       } else {
         appliedPrice = regularPrice;
+        isOfferApplied = false;
+        fireToast({ title: `Offer already applied for this session.` });
       }
     } else {
       appliedPrice = regularPrice;
@@ -1278,7 +1468,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       basePrice: matchedLocation?.basePrice || item?.basePrice || 0,
       hubPrice: matchedLocation?.hubPrice || item?.hubPrice || 0,
       preOrderPrice: matchedLocation?.preOrderPrice || item?.preOrderPrice || 0,
-      offerProduct: !!offerData,
+      offerProduct: !!(offerData && offerData.isOffer),
       offerApplied: isOfferApplied,
       offerPrice: finalOfferPrice,
       regularPrice: finalRegularPrice,
@@ -1298,7 +1488,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     }
 
     addToCart(itemToAdd, selectedDate, selectedSession, 1, {
-      offerProduct: !!offerData,
+      offerProduct: !!(offerData && offerData.isOffer),
       offerPrice: finalOfferPrice,
       regularPrice: finalRegularPrice,
       offerApplied: isOfferApplied,
@@ -1324,13 +1514,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     setCart(storedCart);
     const addonedCarts = async () => {
       try {
-        await axios.post("https://dd-backend-3nm0.onrender.com/api/cart/addCart", {
-          userId: user?._id,
-          items: storedCart,
-          lastUpdated: Date.now,
-          username: user?.Fname,
-          mobile: user?.Mobile,
-        });
+        await axios.post(
+          "https://dd-backend-3nm0.onrender.com/api/cart/addCart",
+          {
+            userId: user?._id,
+            items: storedCart,
+            lastUpdated: Date.now,
+            username: user?.Fname,
+            mobile: user?.Mobile,
+          },
+        );
       } catch (error) {
         console.log(error);
       }
@@ -1365,7 +1558,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const currentQuantity = existingItem.quantity;
     const newQuantity = currentQuantity + 1;
 
-    if (!cutoffValidation.allowed) {
+    if (!isOrderingAllowed) {
       fireToast({
         title:
           cutoffValidation.message ||
@@ -1436,7 +1629,9 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     updateCartData(updatedCart);
 
     if (gotOfferPrice && currentQuantity === 1 && newQuantity === 2) {
-      fireToast({ title: `Second item added at ₹${regularPrice}` });
+      fireToast({
+        title: `Adding at full price — welcome price already used.`,
+      });
     }
   };
 
@@ -1461,7 +1656,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     const currentQuantity = existingItem.quantity;
     const newQuantity = currentQuantity - 1;
 
-    if (!cutoffValidation.allowed) {
+    if (!isOrderingAllowed) {
       fireToast({
         title:
           cutoffValidation.message ||
@@ -1540,11 +1735,6 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     updateCartData(updatedCart);
   };
 
-  useEffect(() => {
-    if (Carts?.length > 0) handleShow();
-    getAllOffer();
-  }, [user?._id]);
-
   const groupedCarts = useMemo(() => {
     if (!Carts || Carts.length === 0) return [];
     const groups = Carts.reduce((acc, item) => {
@@ -1591,7 +1781,12 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
       fireToast({ title: `Please Select Address!` });
       return;
     }
-    navigate("/checkout-multiple");
+    // Pass the already-fetched delivery rate record so checkout doesn't need to re-fetch
+    const deliveryStatus = user?.status === "Employee" ? "Employee" : "Normal";
+    const rateRecord = findDeliveryRateRecord(address?.hubId, deliveryStatus);
+    navigate("/checkout-multiple", {
+      state: { deliveryRateRecord: rateRecord },
+    });
   };
 
   const getCartQuantity = (itemId) => {
@@ -1615,16 +1810,16 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
 
   useEffect(() => {
     const checkCutoffForDisplay = async () => {
-      if (address?.hubId && selectedDate && selectedSession) {
+      if (effectiveHubId && selectedDate && selectedSession) {
         await validateCutoffTiming(
-          address.hubId,
+          effectiveHubId,
           selectedSession,
           selectedDate,
         );
       }
     };
     checkCutoffForDisplay();
-  }, [address?.hubId, selectedDate, selectedSession, validateCutoffTiming]);
+  }, [effectiveHubId, selectedDate, selectedSession, validateCutoffTiming]);
 
   const lastCartRawRef = useRef(null);
   useEffect(() => {
@@ -1661,46 +1856,123 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
     sessionStorage.removeItem("justAddedAddress");
   }, []);
 
-  // Rest of the return statement remains the same...
   return (
     <div>
       <ToastContainer />
       <div>
         <Banner
           Carts={Carts}
-          getAllOffer={getAllOffer}
           isVegOnly={isVegOnly}
           setIsVegOnly={setIsVegOnly}
           onLocationDetected={handleLocationDetected}
         />
       </div>
 
-      {address?.hubId &&
+      {user &&
+        effectiveHubId &&
         selectedDate &&
         selectedSession &&
-        (hubLocalCutoffData &&
-        cutoffValidation?.cutoffDateTime &&
-        autoJumpedHubRef.current === address?.hubId ? (
-          <CutoffStatusCard
-            selectedDate={selectedDate}
-            selectedSession={selectedSession}
-            userStatus={user?.status}
-            cutoffValidation={cutoffValidation}
-            cutoffLoading={false}
-            currentSelectedDate={selectedDate}
-          />
-        ) : (
-          <CutoffStatusCard
-            selectedDate={selectedDate}
-            selectedSession={selectedSession}
-            userStatus={user?.status}
-            cutoffValidation={null}
-            cutoffLoading={true}
-            currentSelectedDate={selectedDate}
-          />
-        ))}
+        hubSettled &&
+        effectiveCutoffValidation?.cutoffDateTime && (
+          <CutoffStickyWrapper>
+            <CutoffStatusCard
+              selectedDate={selectedDate}
+              selectedSession={selectedSession}
+              userStatus={user?.status}
+              cutoffValidation={effectiveCutoffValidation}
+              cutoffLoading={false}
+              currentSelectedDate={selectedDate}
+            />
+          </CutoffStickyWrapper>
+        )}
 
-      <FreshIngredientsCarousel />
+      {/* <FreshIngredientsCarousel /> */}
+
+      {/* New User Offer Banner */}
+      {(() => {
+        const ordersWithOffer = user ? userOfferStatus.usedOfferCount : 0;
+        const maxIntroOrders = 3;
+        const introRemaining = Math.max(0, maxIntroOrders - ordersWithOffer);
+
+        // Never show for employees
+        if (user?.status === "Employee") return null;
+
+        // Hide once all intro orders are used (logged-in only)
+        if (user && introRemaining <= 0) return null;
+
+        const headlineMap = {
+          3: "3 dishes remaining at welcome price",
+          2: "2 dishes remaining at welcome price",
+          1: "1 dish remaining at welcome price",
+        };
+        const heading = user
+          ? headlineMap[introRemaining] ||
+            introRemaining + " dishes remaining at welcome price"
+          : "Your first 3 meals at ₹25";
+        const subtext = user
+          ? "One per session"
+          : "3 discounted dishes · one per session · New users only";
+
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto",
+            }}
+            className="user-banner-home"
+          >
+            <div
+              style={{
+                backgroundColor: "#6b8e23",
+                padding: "10px 16px",
+                // borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    color: "#ffffff",
+                    fontWeight: "700",
+                    fontSize: "14px",
+                    lineHeight: "1.3",
+                  }}
+                >
+                  {heading}
+                </div>
+                <div
+                  style={{
+                    color: "#ffffff",
+                    fontSize: "12px",
+                    marginTop: "2px",
+                  }}
+                >
+                  {subtext}
+                </div>
+              </div>
+              <div
+                style={{
+                  backgroundColor: "#f5c842",
+                  color: "#3b1a00",
+                  fontWeight: "700",
+                  fontSize: "13px",
+                  borderRadius: "20px",
+                  padding: "4px 12px",
+                  whiteSpace: "nowrap",
+                  marginLeft: "12px",
+                }}
+              >
+                ₹25 only
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {wallet?.balance > 0 && show && (
         <div style={{ position: "relative" }}>
@@ -1745,6 +2017,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
         ) : null}
       </Container>
 
+
       <div className="maincontainer">
         <div className="mobile-product-box" style={{ marginBottom: "30px" }}>
           <div style={{ marginBottom: "20px" }}>
@@ -1755,24 +2028,29 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
             />
           </div>
 
-          {!cutoffValidation.allowed && finalDisplayItems.length === 0 && (
-            <div
-              style={{
-                background: "#FFF3E0",
-                border: "1px solid #FF9800",
-                borderRadius: "12px",
-                padding: "20px",
-                margin: "16px",
-                textAlign: "center",
-              }}
-            >
-              <MdOutlineTimer size={48} color="#FF9800" />
-              <h4 style={{ marginTop: "12px", color: "#E65100" }}>
-                Orders Closed for {selectedSession}
-              </h4>
-              <p style={{ color: "#666" }}>{cutoffValidation.message}</p>
-            </div>
-          )}
+          {!isOrderingAllowed &&
+            finalDisplayItems.length === 0 &&
+            hubSettled &&
+            cutoffValidation?._forSession === selectedSession?.toLowerCase() &&
+            cutoffValidation?._forDate ===
+              selectedDate?.toISOString().split("T")[0] && (
+              <div
+                style={{
+                  background: "#FFF3E0",
+                  border: "1px solid #FF9800",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  margin: "16px",
+                  textAlign: "center",
+                }}
+              >
+                <MdOutlineTimer size={48} color="#FF9800" />
+                <h4 style={{ marginTop: "12px", color: "#E65100" }}>
+                  Orders Closed for {selectedSession}
+                </h4>
+                <p style={{ color: "#666" }}>{cutoffValidation.message}</p>
+              </div>
+            )}
 
           <div className="d-flex gap-1 mb-2 flex-column">
             <div className="row">
@@ -1787,8 +2065,32 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                 const productOffer = getProductOffer(item);
                 const slotKey = `${selectedDate.toISOString().split("T")[0]}|${selectedSession.toLowerCase()}`;
                 const hasOfferInCart = isOfferAlreadyAppliedInCart(slotKey);
+                // Only evaluate offer display once both offers and order history have loaded.
+                // This prevents the flicker where the price briefly shows the offer price
+                // (or original price) before the eligibility check data is available.
+                // For non-logged-in users, no user-specific data is needed so skip the wait.
+                const offerDataReady = !user || (offerStatusLoaded && ordersLoaded);
                 const showOfferPrice =
-                  productOffer && !hasOfferInCart && !productOffer.isBlocked;
+                  offerDataReady &&
+                  productOffer &&
+                  !hasOfferInCart &&
+                  !productOffer.isBlocked;
+
+                // Debug log for offer items only
+                // if (item.isOffer) {
+                //   console.log("[OFFER DEBUG] Card render for:", item.foodname, {
+                //     offerDataReady,
+                //     offerStatusLoaded,
+                //     ordersLoaded,
+                //     productOffer: productOffer ? "✅ eligible" : "❌ null",
+                //     hasOfferInCart,
+                //     isBlocked: productOffer?.isBlocked,
+                //     showOfferPrice: !!showOfferPrice,
+                //     user: user ? user._id : "not logged in",
+                //     userOrderCount,
+                //     userOfferStatus,
+                //   });
+                // }
                 const { price: effectivePrice } = getEffectivePrice(
                   item,
                   matchedLocation,
@@ -1806,18 +2108,24 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                 let offerPrice = null;
 
                 if (cartItem && typeof cartItem.totalPrice === "number") {
-                  displayPrice = Math.round(cartItem.totalPrice);
-                  if (
-                    cartItem.offerApplied &&
-                    cartItem.Quantity > 1 &&
-                    cartItem.regularPrice
-                  ) {
-                    offerPrice = Math.round(
-                      cartItem.regularPrice * cartItem.Quantity,
-                    );
+                  // If the item is in cart with offer applied, show cart total and strikethrough regular
+                  if (cartItem.offerApplied) {
+                    displayPrice = Math.round(cartItem.totalPrice);
+                    if (cartItem.Quantity > 1 && cartItem.regularPrice) {
+                      offerPrice = Math.round(
+                        cartItem.regularPrice * cartItem.Quantity,
+                      );
+                    }
+                  } else if (showOfferPrice && productOffer?.offerPrice) {
+                    // Item is in cart at regular price (offer limit exceeded) but offer still exists —
+                    // keep showing the offer price so the user knows what the offer is.
+                    displayPrice = productOffer.offerPrice;
+                    offerPrice = effectivePrice;
+                  } else {
+                    displayPrice = Math.round(cartItem.totalPrice);
                   }
-                } else if (showOfferPrice && productOffer?.price) {
-                  displayPrice = productOffer.price;
+                } else if (showOfferPrice && productOffer?.offerPrice) {
+                  displayPrice = productOffer.offerPrice;
                   offerPrice = effectivePrice;
                 }
 
@@ -1842,7 +2150,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                             >
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                             </svg>
-                            <span>SPECIAL OFFER</span>
+                            <span>WELCOME OFFER</span>
                           </div>
                         )}
                         <div className="prduct-box rounded-1 cardbx">
@@ -1986,23 +2294,20 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                               </button>
                             ) : (
                               <button
-                                className={`add-to-cart-btn ${(user && !address) || !cutoffValidation.allowed ? "disabled-btn" : ""}`}
+                                className={`add-to-cart-btn ${(user && !address) || !isOrderingAllowed ? "disabled-btn" : ""}`}
                                 onClick={() =>
                                   addCart1(item, productOffer, matchedLocation)
                                 }
                                 disabled={
-                                  (user && !address) ||
-                                  !cutoffValidation.allowed
+                                  (user && !address) || !isOrderingAllowed
                                 }
                                 style={{
                                   opacity:
-                                    (user && !address) ||
-                                    !cutoffValidation.allowed
+                                    (user && !address) || !isOrderingAllowed
                                       ? 0.5
                                       : 1,
                                   cursor:
-                                    (user && !address) ||
-                                    !cutoffValidation.allowed
+                                    (user && !address) || !isOrderingAllowed
                                       ? "not-allowed"
                                       : "pointer",
                                 }}
@@ -2020,8 +2325,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                               <div
                                 className="faplus"
                                 onClick={() =>
-                                  !(user && !address) &&
-                                  !cutoffValidation.allowed
+                                  !(user && !address) && !isOrderingAllowed
                                     ? null
                                     : decreaseQuantity(
                                         item?._id,
@@ -2031,13 +2335,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 }
                                 style={{
                                   opacity:
-                                    (user && !address) ||
-                                    !cutoffValidation.allowed
+                                    (user && !address) || !isOrderingAllowed
                                       ? 0.5
                                       : 1,
                                   pointerEvents:
-                                    (user && !address) ||
-                                    !cutoffValidation.allowed
+                                    (user && !address) || !isOrderingAllowed
                                       ? "none"
                                       : "auto",
                                 }}
@@ -2050,8 +2352,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                               <div
                                 className="faplus"
                                 onClick={() =>
-                                  !(user && !address) &&
-                                  !cutoffValidation.allowed
+                                  !(user && !address) && !isOrderingAllowed
                                     ? null
                                     : increaseQuantity(
                                         item?._id,
@@ -2062,13 +2363,11 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                                 }
                                 style={{
                                   opacity:
-                                    (user && !address) ||
-                                    !cutoffValidation.allowed
+                                    (user && !address) || !isOrderingAllowed
                                       ? 0.5
                                       : 1,
                                   pointerEvents:
-                                    (user && !address) ||
-                                    !cutoffValidation.allowed
+                                    (user && !address) || !isOrderingAllowed
                                       ? "none"
                                       : "auto",
                                 }}
@@ -2108,7 +2407,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
               {!loader &&
                 !cutoffLoading &&
                 finalDisplayItems.length === 0 &&
-                cutoffValidation.allowed && (
+                isOrderingAllowed && (
                   <div className="col-12 text-center my-5">
                     {user &&
                     (!localStorage.getItem("primaryAddress") ||
@@ -2216,6 +2515,7 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                 const slotKey = `${selectedDate.toISOString().split("T")[0]}|${selectedSession.toLowerCase()}`;
                 const hasOfferInCart = isOfferAlreadyAppliedInCart(slotKey);
                 const showOfferPrice =
+                  (!user || (offerStatusLoaded && ordersLoaded)) &&
                   productOffer && !hasOfferInCart && !productOffer.isBlocked;
                 const eff = getEffectivePrice(
                   foodData,
@@ -2223,8 +2523,8 @@ const Home = ({ selectArea, setSelectArea, Carts, setCarts }) => {
                   foodData?.session,
                 );
                 const currentPrice =
-                  showOfferPrice && productOffer?.price
-                    ? productOffer.price
+                  showOfferPrice && productOffer?.offerPrice
+                    ? productOffer.offerPrice
                     : eff.price;
                 const originalPrice = eff.price;
                 const stockCount = matchedLocation?.Remainingstock || 0;

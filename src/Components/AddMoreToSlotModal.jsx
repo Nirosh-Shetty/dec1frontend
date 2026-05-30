@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import IsVeg from "./../assets/isVeg=yes.svg";
 import IsNonVeg from "./../assets/isVeg=no.svg";
 import "../Styles/AddMoreToSlotModal.css";
@@ -14,6 +15,7 @@ const AddMoreToSlotModal = ({
   userId,
   onItemsUpdated,
 }) => {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -59,6 +61,21 @@ const AddMoreToSlotModal = ({
       [itemId]: qty,
     }));
   };
+
+  const handleSlotDetailClick = (slot) => {
+    // Normalize session to title case (e.g. "lunch" -> "Lunch")
+    const normalizedSession =
+      slot.session.charAt(0).toUpperCase() +
+      slot.session.slice(1).toLowerCase();
+    // Navigate to home with selected date and session
+    navigate("/home", {
+      state: {
+        selectedDate: slot.date || slot.deliveryDate,
+        selectedSession: normalizedSession,
+      },
+    });
+  };
+
   const totalSelectedQty = Object.values(quantities).reduce((a, b) => a + b, 0);
   const handleAddMore = async () => {
     try {

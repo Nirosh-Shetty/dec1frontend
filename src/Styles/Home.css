@@ -19,6 +19,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  overflow-x: hidden;
   /* padding-bottom: 100px;  */
 }
 .copyright-text {
@@ -40,6 +41,7 @@
   width: 32%;
   background: #fff8dc;
   padding-top: 16px;
+  overflow-x: hidden;
 }
 
 /* Loading */
@@ -1090,6 +1092,7 @@ body.nav-hidden .cartbtn {
     width: 100%;
     background: "#FFF8DC";
     padding-top: 16px;
+    overflow-x: hidden;
   }
 
   .incrementbtnn {
@@ -1223,7 +1226,7 @@ body.nav-hidden .cartbtn {
   }
 
   .mobl-product-card {
-    width: 112% !important;
+    width: 100% !important;
     /* margin-bottom: 5px !important;  */
     /* border: 1px solid black; */
     padding: 0%;
@@ -2957,5 +2960,110 @@ body.drawer-open .ant-drawer.description-product {
   .offer-percentage-badge {
     font-size: 11px;
     padding: 3px 8px;
+  }
+}
+
+
+.min-cart-card {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  gap: 14px;
+  background: #fff8e8;
+  border: 1px solid #f0ddb2;
+  border-radius: 18px;
+  padding: 16px;
+  margin: 14px 16px 18px;
+  max-width: 655px;
+  width:100%;
+}
+
+.min-cart-icon {
+  min-width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #f7ead0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.min-cart-icon i {
+  font-size: 24px;
+  color: #8B4513;
+}
+
+.min-cart-content h6 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.min-cart-content p {
+  margin: 6px 0 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b4b4b;
+}
+
+.min-cart-note {
+  font-size: 13px;
+  color: #7a7a7a;
+  font-weight: 500;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .min-cart-card {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 16px;
+  }
+
+  .min-cart-icon {
+    min-width: 46px;
+    height: 46px;
+  }
+
+  .min-cart-content h6 {
+    font-size: 15px;
+  }
+
+  .min-cart-content p {
+    font-size: 13px;
+  }
+
+  .min-cart-note {
+    font-size: 12px;
+  }
+}
+
+
+.user-banner-home {
+  max-width: 655px;
+  width: 100%;
+}
+
+
+
+/* ✅ Laptop-S (1280×800 and similar) - ONLY for screens 1024px to 1300px */
+@media (min-width: 1024px) and (max-width: 1300px) {
+  .user-banner-home {
+    max-width: 406px;
+  }
+}
+
+/* ✅ Laptop-M (1366×768 and similar) - ONLY for screens 1301px to 1450px */
+@media (min-width: 1301px) and (max-width: 1450px) {
+  .user-banner-home {
+    max-width: 435px;
+  }
+}
+
+/* ✅ Larger desktops (1451px and above) */
+@media (min-width: 1451px) {
+  .user-banner-home {
+    max-width: 655px;
   }
 }

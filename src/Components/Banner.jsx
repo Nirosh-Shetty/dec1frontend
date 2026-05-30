@@ -143,8 +143,8 @@ const Banner = ({
   //live Default hub ID for non-serviceable areas
   // const DEFAULT_HUB_ID = "69613cb1145c1aaedd9859cd";
 
-  //testing Default hub ID for non-serviceable areas
-  const DEFAULT_HUB_ID = "694e3650e5d3b79091854de9";
+  //live Default hub ID for non-serviceable areas
+  const DEFAULT_HUB_ID = "69e747f999c3e8209908cb7b";
 
   // Add state to track if default hub is loaded
   const [defaultHubLoaded, setDefaultHubLoaded] = useState(false);
@@ -436,19 +436,19 @@ const Banner = ({
       });
 
       // Show warning if not allowed
-      if (!data.allowed && user) {
-        Swal2.fire({
-          toast: true,
-          position: "bottom",
-          icon: "warning",
-          title: "Order Timing Alert",
-          text: data.message,
-          showConfirmButton: true,
-          confirmButtonText: "OK",
-          timer: 5000,
-          timerProgressBar: true,
-        });
-      }
+      // if (!data.allowed && user) {
+      //   Swal2.fire({
+      //     toast: true,
+      //     position: "bottom",
+      //     icon: "warning",
+      //     title: "Order Timing Alert",
+      //     text: data.message,
+      //     showConfirmButton: true,
+      //     confirmButtonText: "OK",
+      //     timer: 5000,
+      //     timerProgressBar: true,
+      //   });
+      // }
     } catch (error) {
       console.error("Error checking order timing:", error);
     } finally {
@@ -667,29 +667,34 @@ const Banner = ({
       const savedDefaultHub = localStorage.getItem("defaultHubData");
       if (savedDefaultHub) {
         const hubData = JSON.parse(savedDefaultHub);
-        setDefaultHubLoaded(true);
+        // Invalidate cache if it belongs to a different hub ID
+        if (hubData?._id && hubData._id !== DEFAULT_HUB_ID) {
+          localStorage.removeItem("defaultHubData");
+        } else {
+          setDefaultHubLoaded(true);
 
-        const defaultLocationData = {
-          fullAddress: "Select your location to view menu",
-          hubName: "Default Hub",
-          hubId: DEFAULT_HUB_ID,
-          isAutoDetected: false,
-          isDefaultHub: true,
-          timestamp: new Date().toISOString(),
-        };
+          const defaultLocationData = {
+            fullAddress: "Select your location to view menu",
+            hubName: "Default Hub",
+            hubId: DEFAULT_HUB_ID,
+            isAutoDetected: false,
+            isDefaultHub: true,
+            timestamp: new Date().toISOString(),
+          };
 
-        setCurrentLocation(defaultLocationData);
+          setCurrentLocation(defaultLocationData);
 
-        if (onLocationDetected) {
-          onLocationDetected({
-            ...defaultLocationData,
-            location: {
-              type: "Point",
-              coordinates: [0, 0],
-            },
-          });
+          if (onLocationDetected) {
+            onLocationDetected({
+              ...defaultLocationData,
+              location: {
+                type: "Point",
+                coordinates: [0, 0],
+              },
+            });
+          }
+          return;
         }
-        return;
       }
 
       const response = await fetch(

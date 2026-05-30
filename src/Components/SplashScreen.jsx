@@ -94,42 +94,41 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "./../assets/base_logo.png";
 import "./../Styles/SplashScreen.css";
+import WelcomeInfoModal from "./WelcomeInfoModal";
 
 const SplashScreen = ({ onLoadingComplete }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [splashVisible, setSplashVisible] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set timeout for splash screen duration
+    // Show splash for 2.5 seconds, then open the welcome modal
     const timer = setTimeout(() => {
-      setIsVisible(false);
+      setSplashVisible(false);
       if (onLoadingComplete) {
         onLoadingComplete();
       }
-      
-      // Always navigate to home after splash screen
-      navigate("/home");
-      
-    }, 2500); // Show splash for 2.5 seconds
+      setShowModal(true);
+    }, 2500);
 
     return () => clearTimeout(timer);
-  }, [onLoadingComplete, navigate]);
+  }, [onLoadingComplete]);
 
-  if (!isVisible) {
-    return null;
-  }
-
-  return (
-    <div className="splash-screen">
-      <div className="splash-content">
-        <div className="logo-container">
-          <img src={logo} alt="Food You'd Cook Logo" className="splash-logo" />
+  // Splash is still showing
+  if (splashVisible) {
+    return (
+      <div className="splash-screen">
+        <div className="splash-content">
+          <div className="logo-container">
+            <img src={logo} alt="Food You'd Cook Logo" className="splash-logo" />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // After splash — show the welcome modal (modal handles navigation on "Got it")
+  return <WelcomeInfoModal isOpen={showModal} />;
 };
-
-
 
 export default SplashScreen;

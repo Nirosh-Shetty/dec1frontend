@@ -46,7 +46,7 @@ const Checkout = () => {
   const [activeDateKey, setActiveDateKey] = useState(null); // e.g., "2025-11-09T00:00:00.000Z"
   const [activeSession, setActiveSession] = useState(null); // e.g., "Lunch"
   // --- END NEW ---
-
+  const [hubs, setHubs] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [childName, setChildName] = useState("");
   const [childClass, setChildClass] = useState("");
@@ -54,6 +54,36 @@ const Checkout = () => {
   const storedInfo =
     JSON.parse(localStorage.getItem("studentInformation")) || {};
   const [showLocationModal, setShowLocationModal] = useState(false);
+
+  const getHubById = async (hubId) => {
+    if (!hubId) {
+      console.log("No hubId provided");
+      return;
+    }
+
+    try {
+      console.log("Fetching hub with ID:", hubId);
+
+      const response = await axios.get(
+        `https://dd-backend-3nm0.onrender.com/api/Hub/hubs/${hubId}`,
+      );
+
+      console.log("Hub API Response:", response);
+      console.log("Hub Data:", response.data);
+
+      if (response.status === 200 && response.data) {
+        setHubs(response.data);
+        console.log("Hub set to state:", response.data);
+        return response.data;
+      }
+    } catch (error) {
+      console.error("Error fetching hub:", error);
+      console.error("Error response:", error.response);
+      console.error("Error message:", error.message);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const storedInfo = localStorage.getItem("studentInformation");
     if (storedInfo) {
@@ -1815,6 +1845,36 @@ const Checkout = () => {
 
   const defaultAddress = primaryAddress;
   console.log("sfssssssssssssssssssss", defaultAddress);
+
+ // ✅ MOVED THIS useEffect BEFORE the return statement
+  useEffect(() => {
+    const fetchHubData = async () => {
+      console.log("=== FETCHING HUB DATA ===");
+      console.log("defaultAddress:", defaultAddress);
+      console.log("hubId from defaultAddress:", defaultAddress?.hubId);
+
+      if (defaultAddress?.hubId) {
+        console.log("✅ Found hubId, calling getHubById");
+        await getHubById(defaultAddress.hubId);
+      } else {
+        console.log("❌ No hubId found in defaultAddress");
+      }
+    };
+
+    fetchHubData();
+  }, [defaultAddress?.hubId]); // Re-run when hubId changes
+
+  // ✅ Also add a useEffect to monitor hubs state changes
+  useEffect(() => {
+    if (hubs && hubs.hubId) {
+      console.log("✅ Hubs state updated:", hubs);
+      console.log("Hub Name:", hubs.hubName);
+      console.log("Hub Min Cart:", hubs.minCart);
+      console.log("Hub Order Mode:", hubs.orderMode);
+    }
+  }, [hubs]);
+
+  // ✅ NOW the return statement comes AFTER all hooks
 
   return (
     <div className="mainbg">

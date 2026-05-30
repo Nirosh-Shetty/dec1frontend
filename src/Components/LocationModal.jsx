@@ -4863,13 +4863,16 @@ const LocationModal = ({ show, onClose }) => {
 
       console.log("Final address data being sent:", addressData);
 
-      const response = await fetch("https://dd-backend-3nm0.onrender.com/api/User/addresses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://dd-backend-3nm0.onrender.com/api/User/addresses",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(addressData),
         },
-        body: JSON.stringify(addressData),
-      });
+      );
 
       const result = await response.json();
       console.log("API Response:", result);

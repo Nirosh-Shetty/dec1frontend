@@ -8,11 +8,11 @@
   --turmeric-golden: #e6b800;
   --green-cardamom: #6b8e23;
   --copper-accents: #b87333;
-  --warm-beige: #F5DEB3; 
-  --cuminBrown: #A0522D;
-  --steel-dark:#c0c0c0;
-  --success-green:#6B8E23;
-  --neu-STB:#3A8DAD;
+  --warm-beige: #f5deb3;
+  --cuminBrown: #a0522d;
+  --steel-dark: #c0c0c0;
+  --success-green: #6b8e23;
+  --neu-STB: #3a8dad;
 }
 
 /* .App {
@@ -69,6 +69,7 @@
 
 body {
   background-color: #fafcfc !important;
+  overflow-x: hidden;
 }
 .App-link {
   color: #ec3198;
@@ -1468,22 +1469,22 @@ svg {
   border-radius: 16px;
   border: none;
   /* padding: 8px; */
-  color:var(--primary-text)
+  color: var(--primary-text);
 }
 
 .faq-modal-updated .modal-header {
   border-bottom: none;
   padding: 1rem 1.5rem 0.5rem 1.5rem;
 }
-.faq-modal-header{
+.faq-modal-header {
   background: none !important;
   margin-bottom: 10px;
 }
 
 .faq-modal-updated .modal-title {
   font-size: 16px;
-  line-height:21px;
-  letter-spacing:-0.6px;
+  line-height: 21px;
+  letter-spacing: -0.6px;
   font-weight: 500;
   font-family: Inter;
 }
@@ -1510,9 +1511,9 @@ svg {
 
 .faq-item strong {
   font-weight: 500;
-  font-size:14px;
-  line-height:15px;
-  letter-spacing:-0.6px
+  font-size: 14px;
+  line-height: 15px;
+  letter-spacing: -0.6px;
 }
 
 .faq-modal-updated .modal-footer {
@@ -1689,4 +1690,74 @@ svg {
 .express-price {
   font-weight: 700;
   letter-spacing: -0.7px; /* Add some negative spacing for consistency */
+}
+
+/* ── Location Permission Denied Modal ── */
+.location-denied-popup {
+  border-radius: 24px !important;
+  font-family: "Inter", sans-serif !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22) !important;
+  overflow: hidden !important;
+}
+
+.location-denied-popup .swal2-html-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.location-denied-popup .swal2-actions {
+  margin: 0 !important;
+  padding: 0 16px 4px !important;
+  width: 100% !important;
+}
+
+.location-denied-popup .swal2-close {
+  color: #9ca3af !important;
+  font-size: 24px !important;
+  top: 12px !important;
+  right: 14px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  transition:
+    background 0.15s,
+    color 0.15s !important;
+}
+
+.location-denied-popup .swal2-close:hover {
+  color: #2c2c2c !important;
+  background: #f3f4f6 !important;
+}
+
+.location-denied-btn {
+  border-radius: 14px !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  padding: 14px 24px !important;
+  letter-spacing: -0.3px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  box-shadow: 0 4px 14px rgba(107, 142, 35, 0.35) !important;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s !important;
+}
+
+.location-denied-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(107, 142, 35, 0.45) !important;
+}
+
+.location-denied-btn:active {
+  transform: translateY(0) !important;
+}
+
+@media (max-width: 420px) {
+  .location-denied-popup {
+    width: 94vw !important;
+    margin: 0 auto !important;
+    border-radius: 20px !important;
+  }
 }

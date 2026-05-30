@@ -458,10 +458,29 @@ export const isSlotPastCutoff = (dateStr, session, hubLocalCutoffData, userStatu
   const cutoffStr = userStatus === "Employee" ? times.employeeCutoff : times.defaultCutoff;
   if (!cutoffStr) return false;
 
-  // Build the cutoff datetime on the delivery date
   const [h, m] = cutoffStr.split(":").map(Number);
   const [y, mo, d] = dateStr.split("-").map(Number);
-  const cutoffAt = new Date(y, mo - 1, d, h, m, 0, 0);
+
+  const orderMode = hubLocalCutoffData.orderMode || "preorder";
+
+  let cutoffAt;
+  if (orderMode === "preorder") {
+    // Preorder: ordering happens the day BEFORE delivery.
+    // The cutoff deadline is on the ordering day (deliveryDate - 1 day).
+    const deliveryDate = new Date(y, mo - 1, d);
+    const orderingDay = new Date(deliveryDate);
+    orderingDay.setDate(orderingDay.getDate() - 1);
+    cutoffAt = new Date(
+      orderingDay.getFullYear(),
+      orderingDay.getMonth(),
+      orderingDay.getDate(),
+      h, m, 0, 0
+    );
+  } else {
+    // Instant: ordering and delivery are on the same day.
+    // The cutoff deadline is on the delivery date itself.
+    cutoffAt = new Date(y, mo - 1, d, h, m, 0, 0);
+  }
 
   return now >= cutoffAt;
 };

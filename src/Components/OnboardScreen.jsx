@@ -68,7 +68,7 @@ const OnboardScreen = () => {
   }
 
   const handleGetStarted = () => {
-    navigate('/location')
+    navigate('/home')
   }
 
   return (

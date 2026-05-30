@@ -14,8 +14,24 @@
   background-color: #F8F6F0;
 } */
 
+.profile-offcanvas {
+  background-color: #f8f6f0;
+  max-width: 360px;
+  width: 100% !important;
+  z-index: 10000 !important;
+}
+
+.profile-container-in-offcanvas {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
 .profile-header {
-  background-color: var(--success-green, #6b8e23); /* App's primary green */
+  background-color: var(--success-green, #6b8e23);
   color: white;
   padding: 0px 15px 16px 10px;
   border-bottom-left-radius: 30px;
@@ -33,6 +49,22 @@
 .user-info {
   display: flex;
   align-items: center;
+  padding-top: 20px;
+}
+
+.user-info-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  text-decoration: none;
+  color: inherit;
+}
+
+.user-info-avatar {
+  padding-right: 10px;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -49,6 +81,7 @@
 .avatar-icon {
   color: #6b8e23;
 }
+
 .user-details {
   display: flex;
   flex-direction: column;
@@ -61,8 +94,6 @@
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
-
-  /* gap: 4px; */
 }
 
 .user-details p {
@@ -82,7 +113,7 @@
 }
 
 .widget-card {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
   border-radius: 15px;
   padding: 15px;
   display: flex;
@@ -95,6 +126,7 @@
   transition: transform 0.2s ease-in-out;
   height: 56px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .widget-card:hover {
@@ -104,7 +136,7 @@
 
 .widget-icon {
   color: #6b8e23;
-  margin-right: 12px; /* Space between icon and text */
+  margin-right: 12px;
 }
 
 .nav-list {
@@ -116,16 +148,13 @@
 .side-nav-item {
   justify-content: space-between;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
   cursor: pointer;
-  transition: background-color 0.2s;
   gap: 8px;
-   background-color: #FAFAFA;
+  background-color: #fafafa;
   border-radius: 12px;
   padding: 15px;
   display: flex;
   align-items: center;
-  text-decoration: none;
   color: #333;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
   transition: transform 0.2s ease-in-out;
@@ -164,34 +193,121 @@
   z-index: 2;
   color: white;
 }
+
 .nav-back-btn .icon-img-l {
   width: 28px;
   height: 28px;
-  filter: brightness(0) invert(1); /* Changes black SVG to white */
+  filter: brightness(0) invert(1);
 }
 
 .side-nav-item-content .icon-img-l,
 .widget-card .icon-img-l {
-  filter: invert(49%) sepia(21%) saturate(1054%) hue-rotate(43deg) brightness(91%) contrast(85%);
+  filter: invert(49%) sepia(21%) saturate(1054%) hue-rotate(43deg)
+    brightness(91%) contrast(85%);
 }
 
 .side-nav-item > .icon-img-l {
-   /* This filter converts black to #c0c0c0 */
-  filter: invert(85%) sepia(0%) saturate(231%) hue-rotate(188deg) brightness(88%) contrast(93%);
+  filter: invert(85%) sepia(0%) saturate(231%) hue-rotate(188deg)
+    brightness(88%) contrast(93%);
 }
 
+/* 360px - Samsung S23 */
+@media screen and (max-width: 360px) {
+  .profile-offcanvas {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
 
-/* for 360px samsumg s23  */
+  .side-nav-item {
+    padding: 12px 14px;
+    height: 52px;
+  }
 
+  .widget-card {
+    padding: 10px 12px;
+    height: 50px;
+    font-size: 13px;
+  }
 
-@media screen and  (max-width: 360px) {
-   .side-nav-item{
-  padding: 30px;
+  .user-details h4 {
+    font-size: 1.05rem;
+  }
+
+  .profile-body {
+    padding: 20px 12px;
+  }
 }
-.profile-header {
-  margin-left: 20px;
-}
-}
 
+/* 340px and below */
+@media screen and (max-width: 340px) {
+  .profile-offcanvas {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
 
- 
+  .profile-header {
+    padding: 0px 10px 14px 8px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+
+  .user-info-avatar {
+    width: 42px;
+    height: 42px;
+    padding-right: 8px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .user-details h4 {
+    font-size: 0.95rem;
+  }
+
+  .user-details p {
+    font-size: 0.72rem;
+  }
+
+  .profile-body {
+    padding: 16px 10px;
+  }
+
+  .top-widgets {
+    margin-bottom: 16px;
+  }
+
+  .widget-card {
+    padding: 8px 10px;
+    height: 46px;
+    font-size: 12px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+
+  .nav-list {
+    gap: 8px;
+  }
+
+  .side-nav-item {
+    padding: 10px 12px;
+    height: 48px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .side-nav-item-content {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .nav-back-btn {
+    padding: 0 8px;
+  }
+
+  .nav-back-btn .icon-img-l {
+    width: 24px;
+    height: 24px;
+  }
+}

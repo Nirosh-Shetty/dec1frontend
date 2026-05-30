@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { React, useEffect, useState, useRef, useCallback } from 'react';
 import { Clock } from 'lucide-react';
 import icon from "./../assets/Icon-1.png"
 

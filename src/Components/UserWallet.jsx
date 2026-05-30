@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { WalletContext } from "../WalletContext";
 import { Card, Button, Spinner } from "react-bootstrap";
 import moment from "moment";
@@ -17,9 +17,14 @@ import "../Styles/wallet.css";
 import Modal from "react-bootstrap/Modal";
 
 const UserWallet = () => {
-  const { wallet, transactions, loading, walletSeting } =
+  const { wallet, transactions, loading, walletSeting, fetchWalletData } =
     useContext(WalletContext);
   const [show, setShow] = useState(false);
+
+  // Refresh wallet data every time this page is opened
+  useEffect(() => {
+    fetchWalletData();
+  }, []);
 
   console.log(transactions, "transactions................");
 
