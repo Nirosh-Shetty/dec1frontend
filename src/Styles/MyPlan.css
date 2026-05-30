@@ -2823,6 +2823,19 @@ font-size: 0.8rem;
   border-left: 2px solid #e8e0d4;
   padding-left: 10px;
 }
+.myplan-savings-modal-dialog .modal-content {
+  max-height: 90vh;
+}
+
+.myplan-savings-modal-dialog .modal-body {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.myplan-savings-modal-dialog .modal-body::-webkit-scrollbar {
+  display: none;
+}
 /* Tablet styles for 820x1120 resolution */
 @media screen and (min-width: 800px) and (max-width: 900px) {
   .my-plan-container {
